@@ -1,0 +1,24 @@
+{
+  "common": {
+    "welcome": "خوش آمدید",
+    "loading": "در حال بارگذاری...",
+    "error": "خطا",
+    "success": "موفقیت",
+    "submit": "ارسال",
+    "cancel": "لغو",
+    "save": "ذخیره",
+    "delete": "حذف",
+    "edit": "ویرایش",
+    "search": "جستجو",
+    "filter": "فیلتر",
+    "close": "بستن"
+  },
+  "navigation": {
+    "home": "خانه",
+    "reports": "گزارش‌ها",
+    "graph": "گراف",
+    "submit": "ارسال گزارش",
+    "about": "درباره"
+  }
+}
+

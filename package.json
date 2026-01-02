@@ -1,0 +1,37 @@
+{
+  "name": "daadaar",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Decentralized, anonymous platform for exposing government injustices in Iran",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "bun scripts/dev.ts",
+    "dev:frontend": "bun --cwd frontend run dev",
+    "dev:backend": "bun --cwd backend run dev",
+    "build": "bun --cwd frontend run build && bun --cwd backend run build",
+    "build:frontend": "bun --cwd frontend run build",
+    "build:backend": "bun --cwd backend run build",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "type-check": "bun --cwd frontend run type-check && bun --cwd backend run type-check",
+    "test": "bun --cwd frontend run test && bun --cwd backend run test",
+    "test:frontend": "bun --cwd frontend run test",
+    "test:backend": "bun --cwd backend run test",
+    "clean": "rm -rf frontend/.next frontend/node_modules backend/dist backend/node_modules shared/node_modules node_modules",
+    "prepare": "echo 'Ready to develop!'"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.0",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}
+

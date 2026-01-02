@@ -1,0 +1,24 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "close": "Close"
+  },
+  "navigation": {
+    "home": "Home",
+    "reports": "Reports",
+    "graph": "Graph",
+    "submit": "Submit Report",
+    "about": "About"
+  }
+}
+

@@ -1,0 +1,16 @@
+# Bun configuration file
+# https://bun.sh/docs/cli/bunfig
+
+[install]
+# Use workspaces
+workspaces = true
+
+# Auto install peer dependencies
+peer = true
+
+# Production mode (don't install devDependencies)
+production = false
+
+# Optional: Set registry
+# registry = "https://registry.npmjs.org/"
+

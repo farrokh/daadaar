@@ -1,0 +1,30 @@
+# CODEOWNERS - Define who is responsible for code review
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+* @farrokh
+
+# Frontend code
+/frontend/ @farrokh
+
+# Backend code
+/backend/ @farrokh
+
+# Shared code (types, constants)
+/shared/ @farrokh
+
+# Database and migrations
+/database/ @farrokh
+
+# Infrastructure and CI/CD
+/.github/ @farrokh
+/infrastructure/ @farrokh
+
+# Documentation
+*.md @farrokh
+/docs/ @farrokh
+
+# Configuration files
+package.json @farrokh
+tsconfig.json @farrokh
+biome.json @farrokh
