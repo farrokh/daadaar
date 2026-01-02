@@ -22,7 +22,7 @@ Instead, please report security issues privately:
    - Fill out the form with details
 
 2. **Email**:
-   - Contact the maintainers directly (email TBD)
+   - Contact the maintainers directly (email saytec@gmail.com)
    - Use the subject line: `[SECURITY] Brief description`
 
 ### What to Include
