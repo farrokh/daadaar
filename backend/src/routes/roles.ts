@@ -2,8 +2,14 @@
 import type { RequestHandler } from 'express';
 import { Router } from 'express';
 import * as rolesController from '../controllers/roles';
+import { authMiddleware, requireAuth } from '../middleware/auth';
 
 const router: ReturnType<typeof Router> = Router();
+
+// Apply authentication middleware to all role routes
+// authMiddleware sets req.currentUser, requireAuth validates and maps to req.user
+router.use(authMiddleware);
+router.use(requireAuth);
 
 // GET /api/roles - List all roles (optionally filter by organizationId query param)
 router.get('/', rolesController.listRoles as RequestHandler);

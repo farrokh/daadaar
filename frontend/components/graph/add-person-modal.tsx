@@ -6,6 +6,7 @@ import { Modal } from '@/components/ui/modal';
 import { Select, type SelectOption } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 interface Role {
@@ -64,6 +65,10 @@ export function AddPersonModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const t = useTranslations('person');
+  const tRole = useTranslations('role');
+  const tCommon = useTranslations('common');
+
   // New role creation state
   const [isCreatingNewRole, setIsCreatingNewRole] = useState(false);
   const [newRoleTitle, setNewRoleTitle] = useState('');
@@ -114,29 +119,29 @@ export function AddPersonModal({
     const newErrors: Record<string, string> = {};
 
     if (!fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
+      newErrors.fullName = t('error_name_required');
     } else if (fullName.length < 2) {
-      newErrors.fullName = 'Name must be at least 2 characters';
+      newErrors.fullName = t('error_name_min');
     } else if (fullName.length > 255) {
-      newErrors.fullName = 'Name must not exceed 255 characters';
+      newErrors.fullName = t('error_name_max');
     }
 
     if (fullNameEn && fullNameEn.length > 255) {
-      newErrors.fullNameEn = 'English name must not exceed 255 characters';
+      newErrors.fullNameEn = t('error_name_en_max');
     }
 
     // Validate new role if creating one
     if (isCreatingNewRole) {
       if (!newRoleTitle.trim()) {
-        newErrors.newRoleTitle = 'Role title is required';
+        newErrors.newRoleTitle = tRole('error_title_required');
       } else if (newRoleTitle.length < 2) {
-        newErrors.newRoleTitle = 'Role title must be at least 2 characters';
+        newErrors.newRoleTitle = tRole('error_title_min');
       } else if (newRoleTitle.length > 255) {
-        newErrors.newRoleTitle = 'Role title must not exceed 255 characters';
+        newErrors.newRoleTitle = tRole('error_title_max');
       }
 
       if (newRoleTitleEn && newRoleTitleEn.length > 255) {
-        newErrors.newRoleTitleEn = 'English role title must not exceed 255 characters';
+        newErrors.newRoleTitleEn = tRole('error_title_en_max');
       }
     }
 
@@ -171,7 +176,7 @@ export function AddPersonModal({
 
       if (!roleResponse.success || !roleResponse.data) {
         setLoading(false);
-        setSubmitError(roleResponse.error?.message || 'Failed to create role');
+        setSubmitError(roleResponse.error?.message || tRole('error_create_failed'));
         return;
       }
 
@@ -200,7 +205,7 @@ export function AddPersonModal({
       onSuccess();
       onClose();
     } else {
-      setSubmitError(response.error?.message || 'Failed to create person');
+      setSubmitError(response.error?.message || t('error_create_failed'));
     }
   };
 
@@ -227,7 +232,11 @@ export function AddPersonModal({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={organizationName ? `Add Person to ${organizationName}` : 'Add New Person'}
+      title={
+        organizationName
+          ? t('add_to_org_title', { organization: organizationName })
+          : t('add_title')
+      }
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -239,8 +248,8 @@ export function AddPersonModal({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
-            label="Full Name *"
-            placeholder="نام کامل"
+            label={`${t('full_name')} *`}
+            placeholder={t('full_name_placeholder')}
             value={fullName}
             onChange={e => setFullName(e.target.value)}
             error={errors.fullName}
@@ -249,8 +258,8 @@ export function AddPersonModal({
           />
 
           <Input
-            label="Name (English)"
-            placeholder="Full name"
+            label={t('full_name_en')}
+            placeholder={t('full_name_en_placeholder')}
             value={fullNameEn}
             onChange={e => setFullNameEn(e.target.value)}
             error={errors.fullNameEn}
@@ -260,8 +269,8 @@ export function AddPersonModal({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Textarea
-            label="Biography"
-            placeholder="بیوگرافی..."
+            label={t('biography')}
+            placeholder={t('biography_placeholder')}
             value={biography}
             onChange={e => setBiography(e.target.value)}
             disabled={loading}
@@ -270,8 +279,8 @@ export function AddPersonModal({
           />
 
           <Textarea
-            label="Biography (English)"
-            placeholder="Biography..."
+            label={t('biography_en')}
+            placeholder={t('biography_en_placeholder')}
             value={biographyEn}
             onChange={e => setBiographyEn(e.target.value)}
             disabled={loading}
@@ -280,7 +289,7 @@ export function AddPersonModal({
         </div>
 
         <Input
-          label="Date of Birth"
+          label={t('date_of_birth')}
           type="date"
           value={dateOfBirth}
           onChange={e => setDateOfBirth(e.target.value)}
@@ -290,7 +299,7 @@ export function AddPersonModal({
         <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Role Assignment (Optional)
+              {t('role_assignment')}
             </h3>
             <button
               type="button"
@@ -298,7 +307,7 @@ export function AddPersonModal({
               disabled={loading}
               className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium disabled:opacity-50"
             >
-              {isCreatingNewRole ? '← Select existing role' : '+ Create new role'}
+              {isCreatingNewRole ? t('select_existing_role') : t('create_new_role')}
             </button>
           </div>
 
@@ -318,14 +327,14 @@ export function AddPersonModal({
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
                 <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                  Creating new role
+                  {t('creating_new_role')}
                 </span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Role Title *"
-                  placeholder="عنوان نقش"
+                  label={`${tRole('title')} *`}
+                  placeholder={tRole('title_placeholder')}
                   value={newRoleTitle}
                   onChange={e => setNewRoleTitle(e.target.value)}
                   error={errors.newRoleTitle}
@@ -334,8 +343,8 @@ export function AddPersonModal({
                 />
 
                 <Input
-                  label="Title (English)"
-                  placeholder="Role title"
+                  label={tRole('title_en')}
+                  placeholder={tRole('title_en_placeholder')}
                   value={newRoleTitleEn}
                   onChange={e => setNewRoleTitleEn(e.target.value)}
                   error={errors.newRoleTitleEn}
@@ -345,8 +354,8 @@ export function AddPersonModal({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Textarea
-                  label="Role Description"
-                  placeholder="توضیحات نقش..."
+                  label={tRole('description')}
+                  placeholder={tRole('description_placeholder')}
                   value={newRoleDescription}
                   onChange={e => setNewRoleDescription(e.target.value)}
                   disabled={loading}
@@ -355,8 +364,8 @@ export function AddPersonModal({
                 />
 
                 <Textarea
-                  label="Description (English)"
-                  placeholder="Role description..."
+                  label={tRole('description_en')}
+                  placeholder={tRole('description_en_placeholder')}
                   value={newRoleDescriptionEn}
                   onChange={e => setNewRoleDescriptionEn(e.target.value)}
                   disabled={loading}
@@ -365,38 +374,36 @@ export function AddPersonModal({
               </div>
 
               <Input
-                label="Start Date"
+                label={t('start_date')}
                 type="date"
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
                 disabled={loading}
-                helperText="When did they start this role?"
+                helperText={t('start_date_helper')}
               />
             </div>
           ) : (
             /* Existing Role Selection */
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Select
-                label="Role"
-                placeholder={fetchingRoles ? 'Loading roles...' : 'Select role (optional)'}
+                label={t('role')}
+                placeholder={fetchingRoles ? t('loading_roles') : t('role_placeholder')}
                 options={roleOptions}
                 value={roleId}
                 onChange={e => setRoleId(e.target.value)}
                 disabled={loading || fetchingRoles}
                 helperText={
-                  roles.length === 0 && !fetchingRoles
-                    ? 'No roles exist yet - create one above!'
-                    : 'Assign a role in this organization'
+                  roles.length === 0 && !fetchingRoles ? t('no_roles_helper') : t('role_helper')
                 }
               />
 
               <Input
-                label="Start Date"
+                label={t('start_date')}
                 type="date"
                 value={startDate}
                 onChange={e => setStartDate(e.target.value)}
                 disabled={loading || !roleId}
-                helperText="When did they start this role?"
+                helperText={t('start_date_helper')}
               />
             </div>
           )}
@@ -404,7 +411,7 @@ export function AddPersonModal({
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
           <Button type="button" variant="ghost" onClick={handleClose} disabled={loading}>
-            Cancel
+            {tCommon('cancel')}
           </Button>
           <Button type="submit" variant="primary" disabled={loading}>
             {loading ? (
@@ -412,7 +419,7 @@ export function AddPersonModal({
                 <svg
                   className="animate-spin h-4 w-4"
                   viewBox="0 0 24 24"
-                  aria-label="Loading"
+                  aria-label={tCommon('loading')}
                   role="img"
                 >
                   <circle
@@ -430,10 +437,10 @@ export function AddPersonModal({
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Creating...
+                {t('creating')}
               </span>
             ) : (
-              'Add Person'
+              t('create')
             )}
           </Button>
         </div>

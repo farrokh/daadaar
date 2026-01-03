@@ -53,7 +53,9 @@
     "click_to_drill_down": "برای جزئیات روی یک گره کلیک کنید",
     "scroll_to_zoom": "برای بزرگنمایی اسکرول کنید",
     "drag_to_pan": "برای جابجایی بکشید",
-    "coming_soon": "به زودی"
+    "coming_soon": "به زودی",
+    "loading": "در حال بارگذاری گراف...",
+    "try_again": "تلاش مجدد"
   },
   "organization": {
     "add_title": "افزودن سازمان جدید",

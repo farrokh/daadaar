@@ -6,6 +6,7 @@ import { Modal } from '@/components/ui/modal';
 import { Select, type SelectOption } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 interface Organization {
@@ -40,6 +41,9 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
   const [fetchingOrgs, setFetchingOrgs] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const t = useTranslations('organization');
+  const tCommon = useTranslations('common');
 
   // Fetch organizations for parent dropdown
   useEffect(() => {
@@ -79,15 +83,15 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
     const newErrors: Record<string, string> = {};
 
     if (!name.trim()) {
-      newErrors.name = 'Organization name is required';
+      newErrors.name = t('error_name_required');
     } else if (name.length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
+      newErrors.name = t('error_name_min');
     } else if (name.length > 255) {
-      newErrors.name = 'Name must not exceed 255 characters';
+      newErrors.name = t('error_name_max');
     }
 
     if (nameEn && nameEn.length > 255) {
-      newErrors.nameEn = 'English name must not exceed 255 characters';
+      newErrors.nameEn = t('error_name_en_max');
     }
 
     setErrors(newErrors);
@@ -122,7 +126,7 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
       onSuccess();
       onClose();
     } else {
-      setSubmitError(response.error?.message || 'Failed to create organization');
+      setSubmitError(response.error?.message || t('error_create_failed'));
     }
   };
 
@@ -132,7 +136,7 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
   }));
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Add New Organization" size="lg">
+    <Modal isOpen={isOpen} onClose={handleClose} title={t('add_title')} size="lg">
       <form onSubmit={handleSubmit} className="space-y-5">
         {submitError && (
           <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
@@ -142,8 +146,8 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
-            label="Organization Name *"
-            placeholder="نام سازمان"
+            label={`${t('name')} *`}
+            placeholder={t('name_placeholder')}
             value={name}
             onChange={e => setName(e.target.value)}
             error={errors.name}
@@ -152,8 +156,8 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
           />
 
           <Input
-            label="Name (English)"
-            placeholder="Organization name"
+            label={t('name_en')}
+            placeholder={t('name_en_placeholder')}
             value={nameEn}
             onChange={e => setNameEn(e.target.value)}
             error={errors.nameEn}
@@ -163,8 +167,8 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Textarea
-            label="Description"
-            placeholder="توضیحات سازمان..."
+            label={t('description')}
+            placeholder={t('description_placeholder')}
             value={description}
             onChange={e => setDescription(e.target.value)}
             disabled={loading}
@@ -173,8 +177,8 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
           />
 
           <Textarea
-            label="Description (English)"
-            placeholder="Organization description..."
+            label={t('description_en')}
+            placeholder={t('description_en_placeholder')}
             value={descriptionEn}
             onChange={e => setDescriptionEn(e.target.value)}
             disabled={loading}
@@ -183,20 +187,18 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
         </div>
 
         <Select
-          label="Parent Organization"
-          placeholder={
-            fetchingOrgs ? 'Loading organizations...' : 'Select parent organization (optional)'
-          }
+          label={t('parent')}
+          placeholder={fetchingOrgs ? t('loading_organizations') : t('parent_placeholder')}
           options={parentOptions}
           value={parentId}
           onChange={e => setParentId(e.target.value)}
           disabled={loading || fetchingOrgs}
-          helperText="Leave empty for a top-level organization"
+          helperText={t('parent_helper')}
         />
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
           <Button type="button" variant="ghost" onClick={handleClose} disabled={loading}>
-            Cancel
+            {tCommon('cancel')}
           </Button>
           <Button type="submit" variant="primary" disabled={loading}>
             {loading ? (
@@ -204,7 +206,7 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
                 <svg
                   className="animate-spin h-4 w-4"
                   viewBox="0 0 24 24"
-                  aria-label="Loading"
+                  aria-label={tCommon('loading')}
                   role="img"
                 >
                   <circle
@@ -222,10 +224,10 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                Creating...
+                {t('creating')}
               </span>
             ) : (
-              'Create Organization'
+              t('create')
             )}
           </Button>
         </div>

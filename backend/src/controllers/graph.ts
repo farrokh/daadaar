@@ -33,7 +33,8 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
     // Build nodes and edges
     const nodes = organizations.map(org => ({
       id: `org-${org.id}`,
-      type: 'organization',
+      type: 'organization' as const,
+      label: org.name,
       data: {
         id: org.id,
         name: org.name,
@@ -47,7 +48,7 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
       id: `edge-${hierarchy.parentId}-${hierarchy.childId}`,
       source: `org-${hierarchy.parentId}`,
       target: `org-${hierarchy.childId}`,
-      type: 'smoothstep',
+      type: 'hierarchy' as const,
     }));
 
     res.json({
@@ -168,8 +169,9 @@ export async function getOrganizationPeople(req: Request, res: Response) {
 
     // Build nodes and edges
     const nodes = individuals.map(individual => ({
-      id: `person-${individual.id}`,
-      type: 'person',
+      id: `individual-${individual.id}`,
+      type: 'individual' as const,
+      label: individual.fullName,
       data: {
         id: individual.id,
         name: individual.fullName,
@@ -181,10 +183,10 @@ export async function getOrganizationPeople(req: Request, res: Response) {
 
     // Create edges from organization to people (via roles)
     const edges = roleOccupancies.map(occupancy => ({
-      id: `edge-org-${organizationId}-person-${occupancy.individualId}`,
+      id: `edge-org-${organizationId}-individual-${occupancy.individualId}`,
       source: `org-${organizationId}`,
-      target: `person-${occupancy.individualId}`,
-      type: 'smoothstep',
+      target: `individual-${occupancy.individualId}`,
+      type: 'occupies' as const,
       data: {
         roleId: occupancy.roleId,
         startDate: occupancy.startDate,
@@ -299,7 +301,8 @@ export async function getIndividualReports(req: Request, res: Response) {
     // Build nodes and edges
     const nodes = reports.map(report => ({
       id: `report-${report.id}`,
-      type: 'report',
+      type: 'report' as const,
+      label: report.title,
       data: {
         id: report.id,
         title: report.title,
@@ -308,7 +311,7 @@ export async function getIndividualReports(req: Request, res: Response) {
         incidentDate: report.incidentDate,
         upvoteCount: report.upvoteCount,
         downvoteCount: report.downvoteCount,
-        createdAt: report.createdAt,
+        createdAt: report.createdAt.toISOString(), // Ensure date is string for shared type
       },
       position: { x: 0, y: 0 }, // Will be calculated on frontend
     }));
@@ -317,10 +320,10 @@ export async function getIndividualReports(req: Request, res: Response) {
     const edges = reportLinks
       .filter(rl => reports.some(r => r.id === rl.reportId))
       .map(link => ({
-        id: `edge-person-${individualId}-report-${link.reportId}`,
-        source: `person-${individualId}`,
+        id: `edge-individual-${individualId}-report-${link.reportId}`,
+        source: `individual-${individualId}`,
         target: `report-${link.reportId}`,
-        type: 'smoothstep',
+        type: 'linked_to' as const,
         data: {
           roleId: link.roleId,
           startDate: link.startDate,

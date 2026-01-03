@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
   Background,
@@ -28,7 +29,7 @@ import type { OrganizationNodeData, PersonNodeData } from './types';
 // Define node types
 const nodeTypes: NodeTypes = {
   organization: OrganizationNode,
-  person: PersonNode,
+  individual: PersonNode,
   report: ReportNode,
 };
 
@@ -95,6 +96,10 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   );
   const [isAddOrgModalOpen, setIsAddOrgModalOpen] = useState(false);
   const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState(false);
+
+  const t = useTranslations('graph');
+  const tOrg = useTranslations('organization');
+  const tPerson = useTranslations('person');
 
   // Layout algorithm: simple grid layout
   const layoutNodes = useCallback((nodes: Node[], edges: Edge[]) => {
@@ -172,11 +177,11 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       setEdges(response.data.edges);
       setViewContext({ mode: 'organizations' });
     } else {
-      setError(response.error?.message || 'Failed to load organizations');
+      setError(response.error?.message || tOrg('error_create_failed')); // Using error message from API if available
     }
 
     setLoading(false);
-  }, [layoutNodes]);
+  }, [layoutNodes, tOrg]);
 
   // Fetch people in organization
   const fetchOrganizationPeople = useCallback(
@@ -214,12 +219,12 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           organizationName: organization.name,
         });
       } else {
-        setError(response.error?.message || 'Failed to load people');
+        setError(response.error?.message || tPerson('error_create_failed'));
       }
 
       setLoading(false);
     },
-    [layoutNodes]
+    [layoutNodes, tPerson]
   );
 
   // Fetch reports for individual
@@ -235,10 +240,10 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       if (response.success && response.data) {
         const { individual, nodes: reportNodes, edges: reportEdges } = response.data;
 
-        // Create person node as root with actual data
-        const personNode: Node = {
-          id: `person-${individual.id}`,
-          type: 'person',
+        // Create individual node as root with actual data
+        const individualNode: Node = {
+          id: `individual-${individual.id}`,
+          type: 'individual',
           data: {
             id: individual.id,
             name: individual.fullName,
@@ -248,7 +253,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           position: { x: 0, y: 0 },
         };
 
-        const allNodes = [personNode, ...reportNodes];
+        const allNodes = [individualNode, ...reportNodes];
         const positionedNodes = layoutNodes(allNodes, reportEdges);
         setNodes(positionedNodes);
         setEdges(reportEdges);
@@ -258,12 +263,12 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           individualName: individual.fullName,
         });
       } else {
-        setError(response.error?.message || 'Failed to load reports');
+        setError(response.error?.message || tPerson('error_create_failed'));
       }
 
       setLoading(false);
     },
-    [layoutNodes]
+    [layoutNodes, tPerson]
   );
 
   // Handle node click
@@ -272,7 +277,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       if (node.type === 'organization') {
         const data = node.data as OrganizationNodeData;
         fetchOrganizationPeople(data.id, data.name);
-      } else if (node.type === 'person') {
+      } else if (node.type === 'individual') {
         const data = node.data as PersonNodeData;
         fetchIndividualReports(data.id, data.name);
       }
@@ -339,7 +344,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="flex flex-col items-center gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <div className="text-gray-500 dark:text-gray-400">Loading graph...</div>
+          <div className="text-gray-500 dark:text-gray-400">{t('loading')}</div>
         </div>
       </div>
     );
@@ -355,7 +360,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
             onClick={fetchOrganizations}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Try Again
+            {t('try_again')}
           </button>
         </div>
       </div>
@@ -380,7 +385,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         <MiniMap
           nodeColor={node => {
             if (node.type === 'organization') return '#3b82f6';
-            if (node.type === 'person') return '#a855f7';
+            if (node.type === 'individual') return '#a855f7';
             if (node.type === 'report') return '#22c55e';
             return '#6b7280';
           }}
@@ -426,7 +431,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
                 : 'text-blue-600 dark:text-blue-400'
             }`}
           >
-            Organizations
+            {t('organizations')}
           </button>
           {viewContext.mode === 'people' && viewContext.organizationName && (
             <>
@@ -449,8 +454,10 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
       {/* Help tooltip */}
       <div className="absolute bottom-4 right-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-10 text-xs text-gray-500 dark:text-gray-400">
-        <p>Click on a node to drill down</p>
-        <p>Scroll to zoom • Drag to pan</p>
+        <p>{t('click_to_drill_down')}</p>
+        <p>
+          {t('scroll_to_zoom')} • {t('drag_to_pan')}
+        </p>
       </div>
     </div>
   );

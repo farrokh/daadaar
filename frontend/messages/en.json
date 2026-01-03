@@ -53,7 +53,9 @@
     "click_to_drill_down": "Click on a node to drill down",
     "scroll_to_zoom": "Scroll to zoom",
     "drag_to_pan": "Drag to pan",
-    "coming_soon": "Coming soon"
+    "coming_soon": "Coming soon",
+    "loading": "Loading graph...",
+    "try_again": "Try Again"
   },
   "organization": {
     "add_title": "Add New Organization",
