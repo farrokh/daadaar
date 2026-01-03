@@ -31,16 +31,6 @@ router.get(
   authController.oauthCallback
 );
 
-// GitHub OAuth
-router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
-router.get(
-  '/github/callback',
-  passport.authenticate('github', {
-    session: false,
-    failureRedirect: '/login?error=github_failed',
-  }),
-  authController.oauthCallback
-);
 
 // ============================================================================
 // Anonymous Session Routes
