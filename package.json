@@ -3,11 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Decentralized, anonymous platform for exposing government injustices in Iran",
-  "workspaces": [
-    "frontend",
-    "backend",
-    "shared"
-  ],
+  "workspaces": ["frontend", "backend", "shared"],
   "scripts": {
     "dev": "bun scripts/dev.ts",
     "dev:frontend": "bun --cwd frontend run dev",
@@ -34,4 +30,3 @@
     "bun": ">=1.0.0"
   }
 }
-
