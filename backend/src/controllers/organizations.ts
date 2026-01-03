@@ -15,8 +15,12 @@ interface CreateOrganizationBody {
 }
 
 /**
- * POST /api/organizations
- * Create a new organization
+ * Create a new organization from the HTTP request body.
+ *
+ * Validates required `name` (trimmed, 2–255 characters) and optional `parentId`, associates the creating user when authenticated, inserts the organization (and a parent–child hierarchy record if `parentId` is provided), and sends the created organization in the response.
+ *
+ * @param req - Express request whose body contains the organization fields: `name` (required), `nameEn`, `description`, `descriptionEn`, and optional `parentId`
+ * @param res - Express response used to send success (201) or error (400/500) responses
  */
 export async function createOrganization(req: AuthenticatedRequest, res: Response) {
   try {
@@ -150,8 +154,11 @@ export async function listOrganizations(_req: AuthenticatedRequest, res: Respons
 }
 
 /**
- * GET /api/organizations/:id
- * Get a single organization by ID
+ * Fetches an organization by ID and returns it in the response.
+ *
+ * Validates req.params.id as an integer; responds with 400 (`INVALID_ID`) if invalid,
+ * 404 (`NOT_FOUND`) if no organization exists with that ID, or 200 with the organization
+ * object in `data`. On unexpected errors responds with 500 (`INTERNAL_ERROR`).
  */
 export async function getOrganization(req: AuthenticatedRequest, res: Response) {
   try {
@@ -199,8 +206,9 @@ export async function getOrganization(req: AuthenticatedRequest, res: Response) 
 }
 
 /**
- * PUT /api/organizations/:id
- * Update an organization
+ * Update an existing organization by ID.
+ *
+ * Validates the numeric ID and returns 400 with code `INVALID_ID` if invalid. If the organization does not exist, responds 404 with code `NOT_FOUND`. Accepts partial fields from the request body and applies updates: trims `name`, `nameEn`, `description`, and `descriptionEn`; sets empty or missing optional strings to `null`; enforces `name` length of at least 2 characters (returns 400 with code `VALIDATION_ERROR` if violated). Sets `updatedAt` to the current time and returns the updated organization in the response body on success.
  */
 export async function updateOrganization(req: AuthenticatedRequest, res: Response) {
   try {
@@ -289,8 +297,11 @@ export async function updateOrganization(req: AuthenticatedRequest, res: Respons
 }
 
 /**
- * GET /api/organizations/:id/roles
- * Get all roles for an organization
+ * Return the list of roles associated with a specific organization.
+ *
+ * Validates the organization ID from route parameters; responds with a 400 error for an invalid ID,
+ * a 404 error if the organization does not exist, a 200 response containing the organization's roles on success,
+ * and a 500 error for unexpected server failures.
  */
 export async function getOrganizationRoles(req: AuthenticatedRequest, res: Response) {
   try {

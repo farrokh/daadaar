@@ -7,8 +7,16 @@ export type { ApiResponse, CurrentUser, AuthUser, AnonymousUser, UserRole };
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 /**
- * Fetch API helper with cookie support
- * Ensures credentials (cookies) are sent with every request
+ * Performs a typed HTTP request against the configured API and returns a normalized ApiResponse.
+ *
+ * Ensures cookies are included by default and sets `Content-Type: application/json` when the request
+ * body is not a FormData instance and no Content-Type header is provided. On HTTP errors the
+ * response's error payload is returned when present; otherwise an error with code `FETCH_ERROR` is
+ * returned. Network-level failures produce an error with code `NETWORK_ERROR`.
+ *
+ * @param endpoint - Path appended to the configured API_URL (e.g., `/users`).
+ * @param options - Fetch options; `credentials` defaults to `'include'` and headers are merged with defaults.
+ * @returns An ApiResponse containing the parsed response body on success, or an error object (`code` and `message`) on failure.
  */
 export async function fetchApi<T>(
   endpoint: string,

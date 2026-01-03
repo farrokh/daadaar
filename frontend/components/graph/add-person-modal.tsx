@@ -44,6 +44,18 @@ interface RolesResponse {
   titleEn: string | null;
 }
 
+/**
+ * Render a modal form for adding a person to an organization, supporting optional assignment to an existing role or creation of a new role.
+ *
+ * The form manages local and English names, biographies, date of birth, role selection or new-role creation (with title/description and start date), client-side validation, and API interactions to create roles and individuals. On successful creation the form resets, calls `onSuccess`, and closes the modal.
+ *
+ * @param isOpen - Whether the modal is visible
+ * @param onClose - Callback invoked when the modal is closed
+ * @param onSuccess - Callback invoked after a person (and any new role) is created successfully
+ * @param organizationId - The numeric ID of the organization to which the person will be added
+ * @param organizationName - Optional organization name used in the modal title
+ * @returns The AddPersonModal React element
+ */
 export function AddPersonModal({
   isOpen,
   onClose,

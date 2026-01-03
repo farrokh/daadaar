@@ -14,6 +14,15 @@ export const metadata = {
   description: 'Decentralized, anonymous platform for exposing government injustices',
 };
 
+/**
+ * Root layout that sets the document language and direction, provides localization messages, and mounts session management for the specified locale.
+ *
+ * Awaits the route `locale` from `params`, triggers a 404 if the locale is not supported, loads translation messages, and returns an HTML structure with the locale applied (`dir` is set to `rtl` only for `fa`). The body suppresses hydration warnings and wraps `children` with the internationalization provider and a SessionManager.
+ *
+ * @param children - The React node(s) to render inside the layout
+ * @param params - A promise resolving to an object with the route `locale` (e.g., `{ locale: 'en' }`)
+ * @returns The root HTML layout element for the resolved locale
+ */
 export default async function LocaleLayout({
   children,
   params,

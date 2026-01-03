@@ -15,8 +15,12 @@ interface CreateRoleBody {
 }
 
 /**
- * POST /api/roles
- * Create a new role for an organization
+ * Create a new role for an organization and respond with the created role.
+ *
+ * Validates required input (organizationId and title), ensures the organization exists,
+ * and associates the creator when authenticated. Responds with 201 and the new role on success,
+ * 400 for validation errors (error codes like `VALIDATION_ERROR`, `INVALID_ID`, `NOT_FOUND`), and
+ * 500 for internal failures (`INTERNAL_ERROR`).
  */
 export async function createRole(req: AuthenticatedRequest, res: Response) {
   try {
@@ -114,8 +118,11 @@ export async function createRole(req: AuthenticatedRequest, res: Response) {
 }
 
 /**
- * GET /api/roles
- * List all roles (optionally filtered by organization)
+ * List roles, optionally filtered by organization.
+ *
+ * Responds with a JSON payload containing an array of roles. If the query
+ * parameter `organizationId` is provided and is a valid number, results are
+ * filtered to that organization. Results are ordered by role title.
  */
 export async function listRoles(req: AuthenticatedRequest, res: Response) {
   try {
@@ -158,8 +165,9 @@ export async function listRoles(req: AuthenticatedRequest, res: Response) {
 }
 
 /**
- * GET /api/roles/:id
- * Get a single role by ID
+ * Retrieve a role by its numeric ID and send it in the HTTP response.
+ *
+ * Responds with 400 (code `INVALID_ID`) when the ID is not a valid number, 404 (code `NOT_FOUND`) when no role exists for the given ID, 200 with the role data on success, and 500 (code `INTERNAL_ERROR`) on unexpected failures.
  */
 export async function getRole(req: AuthenticatedRequest, res: Response) {
   try {
@@ -204,8 +212,20 @@ export async function getRole(req: AuthenticatedRequest, res: Response) {
 }
 
 /**
- * PUT /api/roles/:id
- * Update a role
+ * Handle updating an existing role identified by the route `:id`.
+ *
+ * Validates the numeric role ID, accepts partial updates for `title`, `titleEn`,
+ * `description`, and `descriptionEn`, and returns the updated role on success.
+ *
+ * Behavior:
+ * - If the `id` route parameter is not a valid number, responds with 400 and error code `INVALID_ID`.
+ * - If no role exists with the given ID, responds with 404 and error code `NOT_FOUND`.
+ * - If `title` is provided and shorter than 2 characters, responds with 400 and error code `VALIDATION_ERROR`.
+ * - On success, responds with `{ success: true, data: updatedRole }`.
+ * - On unexpected failures, responds with 500 and error code `INTERNAL_ERROR`.
+ *
+ * @param req - AuthenticatedRequest with `params.id` (role ID) and a partial `CreateRoleBody` in `body`
+ * @param res - Express response used to send JSON results
  */
 export async function updateRole(req: AuthenticatedRequest, res: Response) {
   try {
@@ -294,8 +314,12 @@ export async function updateRole(req: AuthenticatedRequest, res: Response) {
 }
 
 /**
- * DELETE /api/roles/:id
- * Delete a role
+ * Delete a role by its ID.
+ *
+ * Validates the route parameter `id` as a numeric role ID, returns a 400 response with error code `INVALID_ID` if invalid, a 404 response with error code `NOT_FOUND` if no role exists with that ID, deletes the role (cascade handles related records), and returns a success message; on unexpected failures responds with error code `INTERNAL_ERROR`.
+ *
+ * @param req - Request containing route parameter `id` (the role ID)
+ * @param res - Express response used to send JSON results
  */
 export async function deleteRole(req: AuthenticatedRequest, res: Response) {
   try {

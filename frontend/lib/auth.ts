@@ -2,8 +2,9 @@ import type { CurrentUser } from '@/shared/types';
 import { fetchApi } from './api';
 
 /**
- * Get current authenticated user
- * Works for both registered users and anonymous sessions
+ * Retrieves the currently authenticated user, including anonymous sessions.
+ *
+ * @returns The authenticated CurrentUser if present, otherwise `null`.
  */
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const response = await fetchApi<CurrentUser>('/auth/me');
@@ -14,8 +15,9 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 }
 
 /**
- * Logout the current user
- * Clears the auth cookie on the backend
+ * Log out the current user and navigate to the site root if successful.
+ *
+ * @returns `true` if the logout request succeeded, `false` otherwise.
  */
 export async function logout(): Promise<boolean> {
   const response = await fetchApi<void>('/auth/logout', { method: 'POST' });
@@ -26,9 +28,9 @@ export async function logout(): Promise<boolean> {
 }
 
 /**
- * Create or validate anonymous session
- * The backend middleware handles session creation automatically,
- * this just ensures a session exists and returns its ID
+ * Ensure an anonymous session exists and return its session identifier.
+ *
+ * @returns `{ sessionId: string }` containing the session ID if available, `null` if the session could not be created or validated
  */
 export async function createAnonymousSession(): Promise<{ sessionId: string } | null> {
   const response = await fetchApi<{ sessionId: string }>('/auth/session', { method: 'POST' });
@@ -36,7 +38,9 @@ export async function createAnonymousSession(): Promise<{ sessionId: string } | 
 }
 
 /**
- * Validate current session
+ * Check whether the current authentication session is still valid.
+ *
+ * @returns `true` if the current session is valid, `false` otherwise.
  */
 export async function validateSession(): Promise<boolean> {
   const response = await fetchApi<unknown>('/auth/session', { method: 'GET' });
@@ -44,7 +48,9 @@ export async function validateSession(): Promise<boolean> {
 }
 
 /**
- * Invalidate current session (logout for anonymous users)
+ * Invalidate the current authentication session.
+ *
+ * @returns `true` if the session was invalidated, `false` otherwise.
  */
 export async function invalidateSession(): Promise<boolean> {
   const response = await fetchApi<void>('/auth/session', { method: 'DELETE' });
@@ -52,7 +58,9 @@ export async function invalidateSession(): Promise<boolean> {
 }
 
 /**
- * Check if current user/session is banned
+ * Determine whether the current user or session is banned.
+ *
+ * @returns The ban status object `{ isBanned: boolean; bannedAt?: string; bannedUntil?: string; banReason?: string }` when available, or `null` if the status could not be retrieved.
  */
 export async function getBanStatus(): Promise<{
   isBanned: boolean;
@@ -70,7 +78,11 @@ export async function getBanStatus(): Promise<{
 }
 
 /**
- * Login with email/username and password
+ * Authenticate a user using an email address or username and a password.
+ *
+ * @param identifier - The user's email address or username
+ * @param password - The user's password
+ * @returns `success` is `true` when authentication succeeds, `false` otherwise. When `success` is `false`, `error` contains a human-readable failure message.
  */
 export async function login(
   identifier: string,
@@ -92,7 +104,14 @@ export async function login(
 }
 
 /**
- * Register a new user
+ * Create a new user account with the provided credentials and optional display name.
+ *
+ * @param data - Registration information.
+ * @param data.email - User's email address.
+ * @param data.username - Chosen username.
+ * @param data.password - Account password.
+ * @param data.displayName - Optional display name to show in the UI.
+ * @returns `{ success: true }` on success, or `{ success: false, error: string }` with an error message on failure.
  */
 export async function register(data: {
   email: string;
@@ -116,7 +135,10 @@ export async function register(data: {
 }
 
 /**
- * Get OAuth login URL
+ * Builds the OAuth login URL for the specified provider.
+ *
+ * @param provider - OAuth provider, either `'google'` or `'github'`
+ * @returns The full OAuth endpoint URL for the given provider
  */
 export function getOAuthUrl(provider: 'google' | 'github'): string {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';

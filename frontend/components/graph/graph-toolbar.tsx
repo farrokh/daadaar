@@ -10,6 +10,16 @@ interface GraphToolbarProps {
   isLoading?: boolean;
 }
 
+/**
+ * Render a top-right graph action toolbar with a refresh control and view-specific add buttons.
+ *
+ * @param onAddOrganization - Callback invoked when the "Add Organization" button is clicked.
+ * @param onAddPerson - Optional callback invoked when the "Add Person" button is clicked.
+ * @param onRefresh - Callback invoked when the refresh button is clicked.
+ * @param viewMode - Current view mode; controls which add button is shown: 'organizations', 'people', or 'reports'.
+ * @param isLoading - When true, disables interactive controls and shows a loading state for the refresh icon.
+ * @returns A JSX.Element representing the toolbar.
+ */
 export function GraphToolbar({
   onAddOrganization,
   onAddPerson,

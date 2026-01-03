@@ -4,6 +4,12 @@ import { memo } from 'react';
 import { Handle, type NodeProps, Position } from 'reactflow';
 import type { PersonNodeData } from './types';
 
+/**
+ * Render a React Flow node for a person that includes connection handles, the person's name, and an optional short biography.
+ *
+ * @param data - Node data containing the person's `name` and optional `biography`
+ * @returns A React element representing the person node with left (target) and right (source) connection handles
+ */
 function PersonNode({ data }: NodeProps<PersonNodeData>) {
   return (
     <div className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-purple-500 rounded-lg shadow-lg min-w-[200px] max-w-[300px] relative">

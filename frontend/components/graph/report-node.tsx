@@ -4,6 +4,13 @@ import { memo } from 'react';
 import { Handle, type NodeProps, Position } from 'reactflow';
 import type { ReportNodeData } from './types';
 
+/**
+ * Renders a React Flow node representing a report with title, optional content, and vote counts.
+ *
+ * @param data - Node data containing the report fields used to populate the node:
+ *               `title` (string), optional `content` (string), `upvoteCount` (number), and `downvoteCount` (number).
+ * @returns A JSX element styled as a Report node including a left-side target handle, title, optional content, and upvote/downvote counts.
+ */
 function ReportNode({ data }: NodeProps<ReportNodeData>) {
   return (
     <div className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-green-500 rounded-lg shadow-lg min-w-[250px] max-w-[350px] relative">

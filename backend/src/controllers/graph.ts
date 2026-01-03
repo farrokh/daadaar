@@ -6,8 +6,9 @@ import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 
 /**
- * GET /api/graph/organizations
- * Get all organizations with their hierarchy relationships
+ * Return graph nodes and edges representing organizations and their parent–child hierarchies.
+ *
+ * @returns An object with `success: true` and `data` containing `nodes` (organization nodes) and `edges` (hierarchy edges). On failure responds with `success: false` and an `error` object (e.g., `code: 'INTERNAL_ERROR'`, `message: 'Failed to fetch organizations graph'`).
  */
 export async function getOrganizationsGraph(_req: Request, res: Response) {
   try {
@@ -70,8 +71,19 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
 }
 
 /**
- * GET /api/graph/organization/:id/people
- * Get all people (individuals) associated with an organization through their roles
+ * Retrieve people associated with an organization and return graph nodes and edges representing organization-to-person relationships.
+ *
+ * On success, responds with an object where `data` contains:
+ * - `organization`: the organization record (id, name, nameEn, description)
+ * - `nodes`: an array of person nodes with `id`, `type: "person"`, `data` (id, name, nameEn, biography), and `position`
+ * - `edges`: an array of edges from the organization to people with `id`, `source`, `target`, `type`, and `data` (roleId, startDate, endDate)
+ *
+ * Error responses:
+ * - 400 with code `INVALID_ID` when the provided organization ID is not a valid integer
+ * - 404 with code `NOT_FOUND` when the organization does not exist
+ * - 500 with code `INTERNAL_ERROR` on server-side failures
+ *
+ * @returns A JSON response containing either the graph data on success or an error object with `code` and `message`
  */
 export async function getOrganizationPeople(req: Request, res: Response) {
   try {
@@ -213,8 +225,16 @@ export async function getOrganizationPeople(req: Request, res: Response) {
 }
 
 /**
- * GET /api/graph/individual/:id/reports
- * Get all reports associated with an individual
+ * Return graph data for reports linked to a specific individual.
+ *
+ * Validates the `id` route parameter as an integer and:
+ * - Responds 400 with error code `INVALID_ID` when the id is not a valid integer.
+ * - Responds 404 with error code `NOT_FOUND` when the individual does not exist.
+ * - On success, responds with `{ success: true, data: { individual, nodes, edges } }`, where:
+ *   - `individual` contains the individual's id, fullName, fullNameEn, and biography.
+ *   - `nodes` is an array of report nodes with fields `id`, `type: "report"`, `data` (report fields), and `position`.
+ *   - `edges` is an array of edges from the person to each report with `id`, `source`, `target`, `type`, and `data` (`roleId`, `startDate`, `endDate`).
+ * - Responds 500 with error code `INTERNAL_ERROR` on unexpected server errors.
  */
 export async function getIndividualReports(req: Request, res: Response) {
   try {

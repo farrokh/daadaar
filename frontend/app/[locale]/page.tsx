@@ -3,6 +3,15 @@ import { Button } from '@/components/ui/button';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
+/**
+ * Render the application's home page with a top navigation and full-screen graph canvas.
+ *
+ * Fetches navigation translations and returns the server-rendered React element that includes
+ * the site branding, navigation links (reports, graph, about), login/signup actions, and the main
+ * GraphCanvas content area.
+ *
+ * @returns The homepage React element containing the header navigation and a full-screen graph canvas.
+ */
 export default async function HomePage() {
   const nav = await getTranslations('navigation');
 

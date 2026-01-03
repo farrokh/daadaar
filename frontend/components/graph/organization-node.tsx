@@ -4,6 +4,12 @@ import { memo } from 'react';
 import { Handle, type NodeProps, Position } from 'reactflow';
 import type { OrganizationNodeData } from './types';
 
+/**
+ * Render a styled organization node for React Flow that shows a name and an optional description.
+ *
+ * @param data - Node data containing `name` and optional `description`. `name` is rendered prominently; `description`, if present, is displayed below and clamped to two lines.
+ * @returns The JSX element for an organization node including left (target) and right (source) handles.
+ */
 function OrganizationNode({ data }: NodeProps<OrganizationNodeData>) {
   return (
     <div className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-blue-500 rounded-lg shadow-lg min-w-[200px] max-w-[300px] relative">

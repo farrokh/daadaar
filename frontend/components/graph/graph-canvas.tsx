@@ -85,6 +85,17 @@ interface IndividualReportsResponse {
   edges: Edge[];
 }
 
+/**
+ * Render an interactive graph canvas with drill-down views for organizations, people, and reports.
+ *
+ * Renders a React Flow-based graph with custom node types, a toolbar, modals for creating organizations
+ * and people, breadcrumb navigation, and a minimap. The component loads data on mount according to
+ * the optional initial view and supports drilling down by clicking nodes, refreshing the current view,
+ * and creating new entities which refresh the relevant view.
+ *
+ * @param initialView - Optional view context to load on mount; when omitted the organizations view is loaded.
+ * @returns The React element that displays the interactive graph UI with controls, modals, and navigation.
+ */
 export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);

@@ -19,8 +19,12 @@ interface CreateIndividualBody {
 }
 
 /**
- * POST /api/individuals
- * Create a new individual (person)
+ * Create a new individual (person).
+ *
+ * Validates required `fullName` (2–255 characters). If `roleId` is provided, verifies the role exists and, when `organizationId` is supplied, that the role belongs to that organization. Uses the authenticated user's id as `createdByUserId` when available. Inserts the individual and, if `roleId` was provided, creates a role occupancy record with `startDate` from the request or the current date.
+ *
+ * @param req - Request containing the create body and authenticated user (if any)
+ * @param res - Response object used to send HTTP status and JSON payload
  */
 export async function createIndividual(req: AuthenticatedRequest, res: Response) {
   try {
@@ -131,8 +135,11 @@ export async function createIndividual(req: AuthenticatedRequest, res: Response)
 }
 
 /**
- * GET /api/individuals
- * List all individuals
+ * List all individuals.
+ *
+ * Responds with JSON { success: true, data } where `data` is an array of individuals containing
+ * id, fullName, fullNameEn, biography, biographyEn, dateOfBirth, and createdAt. On failure responds
+ * with a 500 status and an `INTERNAL_ERROR` payload.
  */
 export async function listIndividuals(_req: AuthenticatedRequest, res: Response) {
   try {
@@ -166,8 +173,13 @@ export async function listIndividuals(_req: AuthenticatedRequest, res: Response)
 }
 
 /**
- * GET /api/individuals/:id
- * Get a single individual by ID
+ * Retrieve and return the individual identified by the ID in the request path.
+ *
+ * The handler reads the numeric individual ID from `req.params.id`, responds with
+ * 400 if the ID is invalid, 404 if no individual is found, and 500 on internal errors.
+ *
+ * @param req - The authenticated request; expects `req.params.id` to contain the numeric individual ID
+ * @param res - Express response used to send the JSON result or error response
  */
 export async function getIndividual(req: AuthenticatedRequest, res: Response) {
   try {
@@ -215,8 +227,16 @@ export async function getIndividual(req: AuthenticatedRequest, res: Response) {
 }
 
 /**
- * PUT /api/individuals/:id
- * Update an individual
+ * Update an existing individual identified by the URL `:id` with the provided fields.
+ *
+ * Validates the ID and required field constraints (fullName at least 2 characters), trims string fields,
+ * converts `dateOfBirth` to a Date or `null`, sets `updatedAt`, and persists the changes.
+ *
+ * Responds with JSON error shapes for:
+ * - `INVALID_ID` (400) when the `id` path parameter is not a valid integer.
+ * - `NOT_FOUND` (404) when no individual exists with the given ID.
+ * - `VALIDATION_ERROR` (400) when provided `fullName` is shorter than 2 characters.
+ * - `INTERNAL_ERROR` (500) on unexpected failures.
  */
 export async function updateIndividual(req: AuthenticatedRequest, res: Response) {
   try {

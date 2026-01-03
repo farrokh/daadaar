@@ -29,6 +29,15 @@ interface CreateOrganizationResponse {
   parentId: number | null;
 }
 
+/**
+ * Modal form for creating a new organization.
+ *
+ * Presents fields for organization name, English name, descriptions, and an optional parent; validates input, submits the creation request, and manages loading/error states.
+ *
+ * @param isOpen - Whether the modal is visible
+ * @param onClose - Called when the modal is closed or canceled
+ * @param onSuccess - Called after an organization is successfully created
+ */
 export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganizationModalProps) {
   const [name, setName] = useState('');
   const [nameEn, setNameEn] = useState('');
