@@ -1,7 +1,15 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { type Express } from 'express';
+import passport from 'passport';
 import { checkDatabaseConnection, closeDatabaseConnection } from './db';
+import { checkRedisConnection } from './lib/redis';
+import authRoutes from './routes/auth';
+import graphRoutes from './routes/graph';
+import individualsRoutes from './routes/individuals';
+import organizationsRoutes from './routes/organizations';
+import rolesRoutes from './routes/roles';
 
 dotenv.config();
 
@@ -17,22 +25,38 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(passport.initialize());
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/graph', graphRoutes);
+app.use('/api/organizations', organizationsRoutes);
+app.use('/api/individuals', individualsRoutes);
+app.use('/api/roles', rolesRoutes);
 
 // Health check endpoint
 app.get('/api/health', async (_req, res) => {
   const dbStatus = await checkDatabaseConnection();
+  const redisStatus = await checkRedisConnection();
 
   res.json({
-    status: dbStatus.connected ? 'ok' : 'degraded',
+    status: dbStatus.connected && redisStatus.connected ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
     services: {
       api: 'ok',
       database: dbStatus.connected ? 'ok' : 'error',
+      redis: redisStatus.connected ? 'ok' : 'error',
     },
     database: {
       connected: dbStatus.connected,
       latencyMs: dbStatus.latencyMs,
       error: dbStatus.error,
+    },
+    redis: {
+      connected: redisStatus.connected,
+      latencyMs: redisStatus.latencyMs,
+      error: redisStatus.error,
     },
   });
 });
