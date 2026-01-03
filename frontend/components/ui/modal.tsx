@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import type * as React from 'react';
 import { useEffect } from 'react';
 
 export interface ModalProps {
@@ -54,6 +54,8 @@ const Modal = ({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={onClose}
+      onKeyDown={e => e.key === 'Enter' && onClose()}
+      // biome-ignore lint/a11y/useSemanticElements: <dialog> element has limited browser support, using div with role="dialog" for better compatibility
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
@@ -66,21 +68,20 @@ const Modal = ({
           max-h-[90vh] overflow-y-auto
           transform transition-all
         `}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
       >
         {/* Header */}
         {(title || showCloseButton) && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             {title && (
-              <h2
-                id="modal-title"
-                className="text-xl font-semibold text-gray-900 dark:text-white"
-              >
+              <h2 id="modal-title" className="text-xl font-semibold text-gray-900 dark:text-white">
                 {title}
               </h2>
             )}
             {showCloseButton && (
               <button
+                type="button"
                 onClick={onClose}
                 className="
                   ml-auto p-2 rounded-lg 
@@ -99,6 +100,8 @@ const Modal = ({
                   strokeWidth="2"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  aria-label="Close icon"
+                  role="img"
                 >
                   <path d="M6 18L18 6M6 6l12 12" />
                 </svg>

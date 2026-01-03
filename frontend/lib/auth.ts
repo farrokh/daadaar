@@ -1,5 +1,5 @@
-import { fetchApi } from './api';
 import type { CurrentUser } from '@/shared/types';
+import { fetchApi } from './api';
 
 /**
  * Get current authenticated user
@@ -32,7 +32,7 @@ export async function logout(): Promise<boolean> {
  */
 export async function createAnonymousSession(): Promise<{ sessionId: string } | null> {
   const response = await fetchApi<{ sessionId: string }>('/auth/session', { method: 'POST' });
-  return response.success ? response.data ?? null : null;
+  return response.success ? (response.data ?? null) : null;
 }
 
 /**
@@ -66,7 +66,7 @@ export async function getBanStatus(): Promise<{
     bannedUntil?: string;
     banReason?: string;
   }>('/auth/ban-status');
-  return response.success ? response.data ?? null : null;
+  return response.success ? (response.data ?? null) : null;
 }
 
 /**

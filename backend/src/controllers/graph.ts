@@ -1,15 +1,15 @@
 // Graph visualization controller
 // Handles fetching graph data for organizations, people, and reports
 
+import { and, eq, inArray } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
-import { eq, and, inArray } from 'drizzle-orm';
 
 /**
  * GET /api/graph/organizations
  * Get all organizations with their hierarchy relationships
  */
-export async function getOrganizationsGraph(req: Request, res: Response) {
+export async function getOrganizationsGraph(_req: Request, res: Response) {
   try {
     // Fetch all organizations
     const organizations = await db
@@ -31,7 +31,7 @@ export async function getOrganizationsGraph(req: Request, res: Response) {
       .from(schema.organizationHierarchy);
 
     // Build nodes and edges
-    const nodes = organizations.map((org) => ({
+    const nodes = organizations.map(org => ({
       id: `org-${org.id}`,
       type: 'organization',
       data: {
@@ -43,7 +43,7 @@ export async function getOrganizationsGraph(req: Request, res: Response) {
       position: { x: 0, y: 0 }, // Will be calculated on frontend
     }));
 
-    const edges = hierarchies.map((hierarchy) => ({
+    const edges = hierarchies.map(hierarchy => ({
       id: `edge-${hierarchy.parentId}-${hierarchy.childId}`,
       source: `org-${hierarchy.parentId}`,
       target: `org-${hierarchy.childId}`,
@@ -75,9 +75,9 @@ export async function getOrganizationsGraph(req: Request, res: Response) {
  */
 export async function getOrganizationPeople(req: Request, res: Response) {
   try {
-    const organizationId = parseInt(req.params.id, 10);
+    const organizationId = Number.parseInt(req.params.id, 10);
 
-    if (isNaN(organizationId)) {
+    if (Number.isNaN(organizationId)) {
       return res.status(400).json({
         success: false,
         error: {
@@ -118,7 +118,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
       .from(schema.roles)
       .where(eq(schema.roles.organizationId, organizationId));
 
-    const roleIds = roles.map((r) => r.id);
+    const roleIds = roles.map(r => r.id);
 
     if (roleIds.length === 0) {
       return res.json({
@@ -142,9 +142,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
       .from(schema.roleOccupancy)
       .where(inArray(schema.roleOccupancy.roleId, roleIds));
 
-    const individualIds = [
-      ...new Set(roleOccupancies.map((ro) => ro.individualId)),
-    ];
+    const individualIds = [...new Set(roleOccupancies.map(ro => ro.individualId))];
 
     if (individualIds.length === 0) {
       return res.json({
@@ -169,7 +167,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
       .where(inArray(schema.individuals.id, individualIds));
 
     // Build nodes and edges
-    const nodes = individuals.map((individual) => ({
+    const nodes = individuals.map(individual => ({
       id: `person-${individual.id}`,
       type: 'person',
       data: {
@@ -182,7 +180,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
     }));
 
     // Create edges from organization to people (via roles)
-    const edges = roleOccupancies.map((occupancy) => ({
+    const edges = roleOccupancies.map(occupancy => ({
       id: `edge-org-${organizationId}-person-${occupancy.individualId}`,
       source: `org-${organizationId}`,
       target: `person-${occupancy.individualId}`,
@@ -220,9 +218,9 @@ export async function getOrganizationPeople(req: Request, res: Response) {
  */
 export async function getIndividualReports(req: Request, res: Response) {
   try {
-    const individualId = parseInt(req.params.id, 10);
+    const individualId = Number.parseInt(req.params.id, 10);
 
-    if (isNaN(individualId)) {
+    if (Number.isNaN(individualId)) {
       return res.status(400).json({
         success: false,
         error: {
@@ -264,7 +262,7 @@ export async function getIndividualReports(req: Request, res: Response) {
       .from(schema.reportLinks)
       .where(eq(schema.reportLinks.individualId, individualId));
 
-    const reportIds = reportLinks.map((rl) => rl.reportId);
+    const reportIds = reportLinks.map(rl => rl.reportId);
 
     if (reportIds.length === 0) {
       return res.json({
@@ -299,7 +297,7 @@ export async function getIndividualReports(req: Request, res: Response) {
       );
 
     // Build nodes and edges
-    const nodes = reports.map((report) => ({
+    const nodes = reports.map(report => ({
       id: `report-${report.id}`,
       type: 'report',
       data: {
@@ -317,8 +315,8 @@ export async function getIndividualReports(req: Request, res: Response) {
 
     // Create edges from person to reports
     const edges = reportLinks
-      .filter((rl) => reports.some((r) => r.id === rl.reportId))
-      .map((link) => ({
+      .filter(rl => reports.some(r => r.id === rl.reportId))
+      .map(link => ({
         id: `edge-person-${individualId}-report-${link.reportId}`,
         source: `person-${individualId}`,
         target: `report-${link.reportId}`,
@@ -349,4 +347,3 @@ export async function getIndividualReports(req: Request, res: Response) {
     });
   }
 }
-

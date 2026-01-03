@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import { createAnonymousSession } from '@/lib/auth';
+import { useEffect } from 'react';
 
 export function SessionManager() {
   useEffect(() => {
@@ -20,4 +20,3 @@ export function SessionManager() {
 
   return null;
 }
-

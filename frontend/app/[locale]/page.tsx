@@ -1,10 +1,9 @@
-import { getTranslations } from 'next-intl/server';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import GraphCanvas from '@/components/graph/graph-canvas';
+import { Button } from '@/components/ui/button';
+import { getTranslations } from 'next-intl/server';
+import Link from 'next/link';
 
 export default async function HomePage() {
-  const t = await getTranslations('landing');
   const nav = await getTranslations('navigation');
 
   return (

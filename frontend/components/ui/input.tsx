@@ -28,15 +28,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
             disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500
             dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500
-            ${error
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-gray-300 dark:border-gray-600'
-            }
+            ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600'}
             ${className}
           `}
           ref={ref}
           aria-invalid={error ? 'true' : 'false'}
-          aria-describedby={error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined}
+          aria-describedby={
+            error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
+          }
           {...props}
         />
         {error && (
@@ -58,4 +57,3 @@ Input.displayName = 'Input';
 
 export { Input };
 export default Input;
-

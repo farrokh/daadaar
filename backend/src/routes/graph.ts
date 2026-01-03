@@ -14,4 +14,3 @@ router.get('/organization/:id/people', graphController.getOrganizationPeople);
 router.get('/individual/:id/reports', graphController.getIndividualReports);
 
 export default router;
-

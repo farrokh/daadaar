@@ -1,5 +1,5 @@
 // Import shared types from the shared package
-import type { ApiResponse, CurrentUser, AuthUser, AnonymousUser, UserRole } from '@/shared/types';
+import type { AnonymousUser, ApiResponse, AuthUser, CurrentUser, UserRole } from '@/shared/types';
 
 // Re-export types for convenience
 export type { ApiResponse, CurrentUser, AuthUser, AnonymousUser, UserRole };

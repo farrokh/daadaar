@@ -20,4 +20,3 @@ router.put('/:id', organizationsController.updateOrganization);
 router.get('/:id/roles', organizationsController.getOrganizationRoles);
 
 export default router;
-

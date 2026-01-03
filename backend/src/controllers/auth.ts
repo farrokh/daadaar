@@ -1,9 +1,9 @@
-import type { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { db, schema } from '../db';
 import { eq, or } from 'drizzle-orm';
+import type { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
+import { db, schema } from '../db';
 import { redis } from '../lib/redis';
 import type { SessionData } from '../middleware/auth';
 
@@ -65,7 +65,10 @@ export const register = async (req: Request, res: Response) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        error: { code: 'ALREADY_EXISTS', message: 'User with this email or username already exists' },
+        error: {
+          code: 'ALREADY_EXISTS',
+          message: 'User with this email or username already exists',
+        },
       });
     }
 
@@ -360,7 +363,9 @@ export const oauthCallback = async (req: Request, res: Response) => {
   const dbUser = req.user as { id?: number; isBanned?: boolean } | undefined;
 
   if (!dbUser || !dbUser.id) {
-    return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=auth_failed`);
+    return res.redirect(
+      `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=auth_failed`
+    );
   }
 
   // Check if user is banned

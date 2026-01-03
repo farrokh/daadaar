@@ -16,17 +16,14 @@ import ReactFlow, {
   MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
+import { fetchApi } from '@/lib/api';
+import { AddOrganizationModal } from './add-organization-modal';
+import { AddPersonModal } from './add-person-modal';
+import { GraphToolbar } from './graph-toolbar';
 import OrganizationNode from './organization-node';
 import PersonNode from './person-node';
 import ReportNode from './report-node';
-import { GraphToolbar } from './graph-toolbar';
-import { AddOrganizationModal } from './add-organization-modal';
-import { AddPersonModal } from './add-person-modal';
-import { fetchApi } from '@/lib/api';
-import type {
-  OrganizationNodeData,
-  PersonNodeData,
-} from './types';
+import type { OrganizationNodeData, PersonNodeData } from './types';
 
 // Define node types
 const nodeTypes: NodeTypes = {
@@ -107,21 +104,21 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     const levels: string[][] = [];
 
     // Find root nodes (nodes with no incoming edges)
-    const rootNodes = nodes.filter(
-      (node) => !edges.some((edge) => edge.target === node.id)
-    );
+    const rootNodes = nodes.filter(node => !edges.some(edge => edge.target === node.id));
 
     // If no root nodes found, use all nodes as roots (handles disconnected graphs)
     const startNodes = rootNodes.length > 0 ? rootNodes : nodes;
 
     // BFS to assign levels
-    const queue: { id: string; level: number }[] = startNodes.map((n) => ({
+    const queue: { id: string; level: number }[] = startNodes.map(n => ({
       id: n.id,
       level: 0,
     }));
 
     while (queue.length > 0) {
-      const { id, level } = queue.shift()!;
+      const item = queue.shift();
+      if (!item) continue;
+      const { id, level } = item;
       if (visited.has(id)) continue;
       visited.add(id);
 
@@ -129,26 +126,24 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       levels[level].push(id);
 
       // Add children
-      edges
-        .filter((e) => e.source === id)
-        .forEach((e) => {
-          if (!visited.has(e.target)) {
-            queue.push({ id: e.target, level: level + 1 });
-          }
-        });
+      for (const e of edges.filter(e => e.source === id)) {
+        if (!visited.has(e.target)) {
+          queue.push({ id: e.target, level: level + 1 });
+        }
+      }
     }
 
     // Add any unvisited nodes to level 0
-    nodes.forEach((node) => {
+    for (const node of nodes) {
       if (!visited.has(node.id)) {
         if (!levels[0]) levels[0] = [];
         levels[0].push(node.id);
       }
-    });
+    }
 
     // Position nodes in grid
-    const positionedNodes = nodes.map((node) => {
-      const level = levels.findIndex((l) => l?.includes(node.id));
+    const positionedNodes = nodes.map(node => {
+      const level = levels.findIndex(l => l?.includes(node.id));
       const indexInLevel = levels[level]?.indexOf(node.id) || 0;
       const nodesInLevel = levels[level]?.length || 1;
 
@@ -185,7 +180,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   // Fetch people in organization
   const fetchOrganizationPeople = useCallback(
-    async (organizationId: number, organizationName?: string) => {
+    async (organizationId: number, _organizationName?: string) => {
       setLoading(true);
       setError(null);
 
@@ -229,7 +224,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   // Fetch reports for individual
   const fetchIndividualReports = useCallback(
-    async (individualId: number, individualName?: string) => {
+    async (individualId: number, _individualName?: string) => {
       setLoading(true);
       setError(null);
 
@@ -288,12 +283,12 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   // Handle node changes
   const onNodesChange: OnNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    changes => setNodes(nds => applyNodeChanges(changes, nds)),
     []
   );
 
   const onEdgesChange: OnEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    changes => setEdges(eds => applyEdgeChanges(changes, eds)),
     []
   );
 
@@ -323,6 +318,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   }, [viewContext.organizationId, viewContext.organizationName, fetchOrganizationPeople]);
 
   // Load initial data
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect should only run once on mount, adding dependencies would cause infinite loops
   useEffect(() => {
     if (initialView) {
       if (initialView.mode === 'organizations') {
@@ -355,6 +351,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         <div className="flex flex-col items-center gap-3">
           <div className="text-red-500 text-lg">{error}</div>
           <button
+            type="button"
             onClick={fetchOrganizations}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -381,7 +378,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         <Background />
         <Controls />
         <MiniMap
-          nodeColor={(node) => {
+          nodeColor={node => {
             if (node.type === 'organization') return '#3b82f6';
             if (node.type === 'person') return '#a855f7';
             if (node.type === 'report') return '#22c55e';
@@ -421,6 +418,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       <div className="absolute top-4 left-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-10">
         <div className="flex items-center gap-2 text-sm">
           <button
+            type="button"
             onClick={fetchOrganizations}
             className={`hover:underline ${
               viewContext.mode === 'organizations'

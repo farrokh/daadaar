@@ -20,4 +20,3 @@ router.put('/:id', rolesController.updateRole);
 router.delete('/:id', rolesController.deleteRole);
 
 export default router;
-
