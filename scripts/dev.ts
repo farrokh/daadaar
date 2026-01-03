@@ -47,4 +47,3 @@ try {
 } catch {
   // Processes will run indefinitely, so this is expected
 }
-
