@@ -1,8 +1,8 @@
+import { SessionManager } from '@/components/auth/session-manager';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
-import { SessionManager } from '@/components/auth/session-manager';
 import '../globals.css';
 
 export function generateStaticParams() {

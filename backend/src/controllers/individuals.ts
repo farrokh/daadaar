@@ -1,9 +1,10 @@
 // Individuals controller
 // Handles CRUD operations for individuals (people)
 
-import type { Request, Response } from 'express';
-import { db, schema } from '../db';
 import { eq } from 'drizzle-orm';
+import type { Response } from 'express';
+import { db, schema } from '../db';
+import type { AuthenticatedRequest } from '../types/auth';
 
 interface CreateIndividualBody {
   fullName: string;
@@ -21,7 +22,7 @@ interface CreateIndividualBody {
  * POST /api/individuals
  * Create a new individual (person)
  */
-export async function createIndividual(req: Request, res: Response) {
+export async function createIndividual(req: AuthenticatedRequest, res: Response) {
   try {
     const body = req.body as CreateIndividualBody;
 
@@ -88,9 +89,7 @@ export async function createIndividual(req: Request, res: Response) {
     }
 
     // Get user ID from session if authenticated
-    const userId = (req as any).user?.type === 'registered' 
-      ? (req as any).user.id 
-      : null;
+    const userId = req.user?.type === 'registered' ? req.user.id : null;
 
     // Create the individual
     const [newIndividual] = await db
@@ -135,7 +134,7 @@ export async function createIndividual(req: Request, res: Response) {
  * GET /api/individuals
  * List all individuals
  */
-export async function listIndividuals(req: Request, res: Response) {
+export async function listIndividuals(_req: AuthenticatedRequest, res: Response) {
   try {
     const individuals = await db
       .select({
@@ -170,11 +169,11 @@ export async function listIndividuals(req: Request, res: Response) {
  * GET /api/individuals/:id
  * Get a single individual by ID
  */
-export async function getIndividual(req: Request, res: Response) {
+export async function getIndividual(req: AuthenticatedRequest, res: Response) {
   try {
-    const individualId = parseInt(req.params.id, 10);
+    const individualId = Number.parseInt(req.params.id, 10);
 
-    if (isNaN(individualId)) {
+    if (Number.isNaN(individualId)) {
       return res.status(400).json({
         success: false,
         error: {
@@ -219,11 +218,11 @@ export async function getIndividual(req: Request, res: Response) {
  * PUT /api/individuals/:id
  * Update an individual
  */
-export async function updateIndividual(req: Request, res: Response) {
+export async function updateIndividual(req: AuthenticatedRequest, res: Response) {
   try {
-    const individualId = parseInt(req.params.id, 10);
+    const individualId = Number.parseInt(req.params.id, 10);
 
-    if (isNaN(individualId)) {
+    if (Number.isNaN(individualId)) {
       return res.status(400).json({
         success: false,
         error: {
@@ -252,7 +251,7 @@ export async function updateIndividual(req: Request, res: Response) {
     }
 
     // Prepare update data
-    const updateData: Record<string, any> = {
+    const updateData: Partial<typeof schema.individuals.$inferInsert> & { updatedAt: Date } = {
       updatedAt: new Date(),
     };
 
@@ -308,4 +307,3 @@ export async function updateIndividual(req: Request, res: Response) {
     });
   }
 }
-

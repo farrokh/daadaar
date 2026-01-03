@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Modal } from '@/components/ui/modal';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, type SelectOption } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
+import { Select, type SelectOption } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
+import { useEffect, useState } from 'react';
 
 interface Role {
   id: number;
@@ -81,7 +81,7 @@ export function AddPersonModal({
   const fetchRoles = async () => {
     setFetchingRoles(true);
     const response = await fetchApi<RolesResponse[]>(`/organizations/${organizationId}/roles`);
-    
+
     if (response.success && response.data) {
       setRoles(response.data);
     }
@@ -154,7 +154,7 @@ export function AddPersonModal({
 
     setLoading(true);
 
-    let finalRoleId: number | null = roleId ? parseInt(roleId, 10) : null;
+    let finalRoleId: number | null = roleId ? Number.parseInt(roleId, 10) : null;
 
     // If creating a new role, create it first
     if (isCreatingNewRole && newRoleTitle.trim()) {
@@ -204,7 +204,7 @@ export function AddPersonModal({
     }
   };
 
-  const roleOptions: SelectOption[] = roles.map((role) => ({
+  const roleOptions: SelectOption[] = roles.map(role => ({
     value: role.id,
     label: role.titleEn ? `${role.title} (${role.titleEn})` : role.title,
   }));
@@ -224,10 +224,10 @@ export function AddPersonModal({
   };
 
   return (
-    <Modal 
-      isOpen={isOpen} 
-      onClose={handleClose} 
-      title={organizationName ? `Add Person to ${organizationName}` : 'Add New Person'} 
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={organizationName ? `Add Person to ${organizationName}` : 'Add New Person'}
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -242,7 +242,7 @@ export function AddPersonModal({
             label="Full Name *"
             placeholder="نام کامل"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={e => setFullName(e.target.value)}
             error={errors.fullName}
             disabled={loading}
             dir="rtl"
@@ -252,7 +252,7 @@ export function AddPersonModal({
             label="Name (English)"
             placeholder="Full name"
             value={fullNameEn}
-            onChange={(e) => setFullNameEn(e.target.value)}
+            onChange={e => setFullNameEn(e.target.value)}
             error={errors.fullNameEn}
             disabled={loading}
           />
@@ -263,7 +263,7 @@ export function AddPersonModal({
             label="Biography"
             placeholder="بیوگرافی..."
             value={biography}
-            onChange={(e) => setBiography(e.target.value)}
+            onChange={e => setBiography(e.target.value)}
             disabled={loading}
             dir="rtl"
             rows={3}
@@ -273,7 +273,7 @@ export function AddPersonModal({
             label="Biography (English)"
             placeholder="Biography..."
             value={biographyEn}
-            onChange={(e) => setBiographyEn(e.target.value)}
+            onChange={e => setBiographyEn(e.target.value)}
             disabled={loading}
             rows={3}
           />
@@ -283,7 +283,7 @@ export function AddPersonModal({
           label="Date of Birth"
           type="date"
           value={dateOfBirth}
-          onChange={(e) => setDateOfBirth(e.target.value)}
+          onChange={e => setDateOfBirth(e.target.value)}
           disabled={loading}
         />
 
@@ -306,7 +306,15 @@ export function AddPersonModal({
             /* New Role Creation Form */
             <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 mb-2">
-                <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                <svg
+                  className="w-4 h-4 text-blue-600 dark:text-blue-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  aria-label="Plus icon"
+                  role="img"
+                >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
                 <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
@@ -319,7 +327,7 @@ export function AddPersonModal({
                   label="Role Title *"
                   placeholder="عنوان نقش"
                   value={newRoleTitle}
-                  onChange={(e) => setNewRoleTitle(e.target.value)}
+                  onChange={e => setNewRoleTitle(e.target.value)}
                   error={errors.newRoleTitle}
                   disabled={loading}
                   dir="rtl"
@@ -329,7 +337,7 @@ export function AddPersonModal({
                   label="Title (English)"
                   placeholder="Role title"
                   value={newRoleTitleEn}
-                  onChange={(e) => setNewRoleTitleEn(e.target.value)}
+                  onChange={e => setNewRoleTitleEn(e.target.value)}
                   error={errors.newRoleTitleEn}
                   disabled={loading}
                 />
@@ -340,7 +348,7 @@ export function AddPersonModal({
                   label="Role Description"
                   placeholder="توضیحات نقش..."
                   value={newRoleDescription}
-                  onChange={(e) => setNewRoleDescription(e.target.value)}
+                  onChange={e => setNewRoleDescription(e.target.value)}
                   disabled={loading}
                   dir="rtl"
                   rows={2}
@@ -350,7 +358,7 @@ export function AddPersonModal({
                   label="Description (English)"
                   placeholder="Role description..."
                   value={newRoleDescriptionEn}
-                  onChange={(e) => setNewRoleDescriptionEn(e.target.value)}
+                  onChange={e => setNewRoleDescriptionEn(e.target.value)}
                   disabled={loading}
                   rows={2}
                 />
@@ -360,7 +368,7 @@ export function AddPersonModal({
                 label="Start Date"
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={e => setStartDate(e.target.value)}
                 disabled={loading}
                 helperText="When did they start this role?"
               />
@@ -373,16 +381,20 @@ export function AddPersonModal({
                 placeholder={fetchingRoles ? 'Loading roles...' : 'Select role (optional)'}
                 options={roleOptions}
                 value={roleId}
-                onChange={(e) => setRoleId(e.target.value)}
+                onChange={e => setRoleId(e.target.value)}
                 disabled={loading || fetchingRoles}
-                helperText={roles.length === 0 && !fetchingRoles ? 'No roles exist yet - create one above!' : 'Assign a role in this organization'}
+                helperText={
+                  roles.length === 0 && !fetchingRoles
+                    ? 'No roles exist yet - create one above!'
+                    : 'Assign a role in this organization'
+                }
               />
 
               <Input
                 label="Start Date"
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={e => setStartDate(e.target.value)}
                 disabled={loading || !roleId}
                 helperText="When did they start this role?"
               />
@@ -391,22 +403,18 @@ export function AddPersonModal({
         </div>
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleClose}
-            disabled={loading}
-          >
+          <Button type="button" variant="ghost" onClick={handleClose} disabled={loading}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={loading}
-          >
+          <Button type="submit" variant="primary" disabled={loading}>
             {loading ? (
               <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <svg
+                  className="animate-spin h-4 w-4"
+                  viewBox="0 0 24 24"
+                  aria-label="Loading"
+                  role="img"
+                >
                   <circle
                     className="opacity-25"
                     cx="12"

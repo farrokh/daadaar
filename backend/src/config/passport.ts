@@ -1,9 +1,13 @@
-import passport from 'passport';
-import { Strategy as GoogleStrategy, type Profile as GoogleProfile, type VerifyCallback } from 'passport-google-oauth20';
-import { Strategy as GitHubStrategy } from 'passport-github2';
-import { db, schema } from '../db';
-import { eq, and } from 'drizzle-orm';
 import dotenv from 'dotenv';
+import { and, eq } from 'drizzle-orm';
+import passport from 'passport';
+import { Strategy as GitHubStrategy } from 'passport-github2';
+import {
+  type Profile as GoogleProfile,
+  Strategy as GoogleStrategy,
+  type VerifyCallback,
+} from 'passport-google-oauth20';
+import { db, schema } from '../db';
 
 dotenv.config();
 

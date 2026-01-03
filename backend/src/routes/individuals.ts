@@ -17,4 +17,3 @@ router.get('/:id', individualsController.getIndividual);
 router.put('/:id', individualsController.updateIndividual);
 
 export default router;
-

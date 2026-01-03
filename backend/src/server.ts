@@ -1,15 +1,15 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { type Express } from 'express';
-import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import { checkDatabaseConnection, closeDatabaseConnection } from './db';
+import { checkRedisConnection } from './lib/redis';
 import authRoutes from './routes/auth';
 import graphRoutes from './routes/graph';
-import organizationsRoutes from './routes/organizations';
 import individualsRoutes from './routes/individuals';
+import organizationsRoutes from './routes/organizations';
 import rolesRoutes from './routes/roles';
-import { checkRedisConnection } from './lib/redis';
 
 dotenv.config();
 

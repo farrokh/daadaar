@@ -34,6 +34,8 @@ export function GraphToolbar({
           viewBox="0 0 24 24"
           strokeWidth="2"
           stroke="currentColor"
+          aria-label="Refresh icon"
+          role="img"
         >
           <path
             strokeLinecap="round"
@@ -58,12 +60,10 @@ export function GraphToolbar({
             viewBox="0 0 24 24"
             strokeWidth="2"
             stroke="currentColor"
+            aria-label="Plus icon"
+            role="img"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
           Add Organization
         </Button>
@@ -84,12 +84,10 @@ export function GraphToolbar({
             viewBox="0 0 24 24"
             strokeWidth="2"
             stroke="currentColor"
+            aria-label="Plus icon"
+            role="img"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
           Add Person
         </Button>
@@ -113,12 +111,10 @@ export function GraphToolbar({
             viewBox="0 0 24 24"
             strokeWidth="2"
             stroke="currentColor"
+            aria-label="Plus icon"
+            role="img"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
           Add Report
         </Button>
@@ -128,4 +124,3 @@ export function GraphToolbar({
 }
 
 export default GraphToolbar;
-

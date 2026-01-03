@@ -1,9 +1,10 @@
 // Roles controller
 // Handles CRUD operations for roles within organizations
 
-import type { Request, Response } from 'express';
-import { db, schema } from '../db';
 import { eq } from 'drizzle-orm';
+import type { Response } from 'express';
+import { db, schema } from '../db';
+import type { AuthenticatedRequest } from '../types/auth';
 
 interface CreateRoleBody {
   organizationId: number;
@@ -17,7 +18,7 @@ interface CreateRoleBody {
  * POST /api/roles
  * Create a new role for an organization
  */
-export async function createRole(req: Request, res: Response) {
+export async function createRole(req: AuthenticatedRequest, res: Response) {
   try {
     const body = req.body as CreateRoleBody;
 
@@ -81,9 +82,7 @@ export async function createRole(req: Request, res: Response) {
     }
 
     // Get user ID from session if authenticated
-    const userId = (req as any).user?.type === 'registered' 
-      ? (req as any).user.id 
-      : null;
+    const userId = req.user?.type === 'registered' ? req.user.id : null;
 
     // Create the role
     const [newRole] = await db
@@ -118,10 +117,10 @@ export async function createRole(req: Request, res: Response) {
  * GET /api/roles
  * List all roles (optionally filtered by organization)
  */
-export async function listRoles(req: Request, res: Response) {
+export async function listRoles(req: AuthenticatedRequest, res: Response) {
   try {
-    const organizationId = req.query.organizationId 
-      ? parseInt(req.query.organizationId as string, 10) 
+    const organizationId = req.query.organizationId
+      ? Number.parseInt(req.query.organizationId as string, 10)
       : undefined;
 
     let query = db
@@ -136,7 +135,7 @@ export async function listRoles(req: Request, res: Response) {
       })
       .from(schema.roles);
 
-    if (organizationId && !isNaN(organizationId)) {
+    if (organizationId && !Number.isNaN(organizationId)) {
       query = query.where(eq(schema.roles.organizationId, organizationId)) as typeof query;
     }
 
@@ -162,11 +161,11 @@ export async function listRoles(req: Request, res: Response) {
  * GET /api/roles/:id
  * Get a single role by ID
  */
-export async function getRole(req: Request, res: Response) {
+export async function getRole(req: AuthenticatedRequest, res: Response) {
   try {
-    const roleId = parseInt(req.params.id, 10);
+    const roleId = Number.parseInt(req.params.id, 10);
 
-    if (isNaN(roleId)) {
+    if (Number.isNaN(roleId)) {
       return res.status(400).json({
         success: false,
         error: {
@@ -176,10 +175,7 @@ export async function getRole(req: Request, res: Response) {
       });
     }
 
-    const [role] = await db
-      .select()
-      .from(schema.roles)
-      .where(eq(schema.roles.id, roleId));
+    const [role] = await db.select().from(schema.roles).where(eq(schema.roles.id, roleId));
 
     if (!role) {
       return res.status(404).json({
@@ -211,11 +207,11 @@ export async function getRole(req: Request, res: Response) {
  * PUT /api/roles/:id
  * Update a role
  */
-export async function updateRole(req: Request, res: Response) {
+export async function updateRole(req: AuthenticatedRequest, res: Response) {
   try {
-    const roleId = parseInt(req.params.id, 10);
+    const roleId = Number.parseInt(req.params.id, 10);
 
-    if (isNaN(roleId)) {
+    if (Number.isNaN(roleId)) {
       return res.status(400).json({
         success: false,
         error: {
@@ -244,7 +240,7 @@ export async function updateRole(req: Request, res: Response) {
     }
 
     // Prepare update data
-    const updateData: Record<string, any> = {
+    const updateData: Partial<typeof schema.roles.$inferInsert> & { updatedAt: Date } = {
       updatedAt: new Date(),
     };
 
@@ -301,11 +297,11 @@ export async function updateRole(req: Request, res: Response) {
  * DELETE /api/roles/:id
  * Delete a role
  */
-export async function deleteRole(req: Request, res: Response) {
+export async function deleteRole(req: AuthenticatedRequest, res: Response) {
   try {
-    const roleId = parseInt(req.params.id, 10);
+    const roleId = Number.parseInt(req.params.id, 10);
 
-    if (isNaN(roleId)) {
+    if (Number.isNaN(roleId)) {
       return res.status(400).json({
         success: false,
         error: {
@@ -349,4 +345,3 @@ export async function deleteRole(req: Request, res: Response) {
     });
   }
 }
-

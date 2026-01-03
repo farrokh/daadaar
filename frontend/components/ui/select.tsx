@@ -5,7 +5,8 @@ export interface SelectOption {
   label: string;
 }
 
-export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'children'> {
+export interface SelectProps
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'children'> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -35,15 +36,14 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500
             dark:bg-gray-800 dark:text-white
             appearance-none cursor-pointer
-            ${error
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-gray-300 dark:border-gray-600'
-            }
+            ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600'}
             ${className}
           `}
           ref={ref}
           aria-invalid={error ? 'true' : 'false'}
-          aria-describedby={error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined}
+          aria-describedby={
+            error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined
+          }
           {...props}
         >
           {placeholder && (
@@ -51,7 +51,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               {placeholder}
             </option>
           )}
-          {options.map((option) => (
+          {options.map(option => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
@@ -76,4 +76,3 @@ Select.displayName = 'Select';
 
 export { Select };
 export default Select;
-

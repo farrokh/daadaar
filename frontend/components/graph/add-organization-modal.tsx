@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Modal } from '@/components/ui/modal';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, type SelectOption } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
+import { Select, type SelectOption } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
+import { useEffect, useState } from 'react';
 
 interface Organization {
   id: number;
@@ -29,11 +29,7 @@ interface CreateOrganizationResponse {
   parentId: number | null;
 }
 
-export function AddOrganizationModal({
-  isOpen,
-  onClose,
-  onSuccess,
-}: AddOrganizationModalProps) {
+export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganizationModalProps) {
   const [name, setName] = useState('');
   const [nameEn, setNameEn] = useState('');
   const [description, setDescription] = useState('');
@@ -54,8 +50,10 @@ export function AddOrganizationModal({
 
   const fetchOrganizations = async () => {
     setFetchingOrgs(true);
-    const response = await fetchApi<{ nodes: Array<{ data: Organization }> }>('/graph/organizations');
-    
+    const response = await fetchApi<{ nodes: Array<{ data: Organization }> }>(
+      '/graph/organizations'
+    );
+
     if (response.success && response.data) {
       setOrganizations(response.data.nodes.map(node => node.data));
     }
@@ -113,7 +111,7 @@ export function AddOrganizationModal({
         nameEn: nameEn.trim() || null,
         description: description.trim() || null,
         descriptionEn: descriptionEn.trim() || null,
-        parentId: parentId ? parseInt(parentId, 10) : null,
+        parentId: parentId ? Number.parseInt(parentId, 10) : null,
       }),
     });
 
@@ -128,7 +126,7 @@ export function AddOrganizationModal({
     }
   };
 
-  const parentOptions: SelectOption[] = organizations.map((org) => ({
+  const parentOptions: SelectOption[] = organizations.map(org => ({
     value: org.id,
     label: org.nameEn ? `${org.name} (${org.nameEn})` : org.name,
   }));
@@ -147,7 +145,7 @@ export function AddOrganizationModal({
             label="Organization Name *"
             placeholder="نام سازمان"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={e => setName(e.target.value)}
             error={errors.name}
             disabled={loading}
             dir="rtl"
@@ -157,7 +155,7 @@ export function AddOrganizationModal({
             label="Name (English)"
             placeholder="Organization name"
             value={nameEn}
-            onChange={(e) => setNameEn(e.target.value)}
+            onChange={e => setNameEn(e.target.value)}
             error={errors.nameEn}
             disabled={loading}
           />
@@ -168,7 +166,7 @@ export function AddOrganizationModal({
             label="Description"
             placeholder="توضیحات سازمان..."
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={e => setDescription(e.target.value)}
             disabled={loading}
             dir="rtl"
             rows={3}
@@ -178,7 +176,7 @@ export function AddOrganizationModal({
             label="Description (English)"
             placeholder="Organization description..."
             value={descriptionEn}
-            onChange={(e) => setDescriptionEn(e.target.value)}
+            onChange={e => setDescriptionEn(e.target.value)}
             disabled={loading}
             rows={3}
           />
@@ -186,31 +184,29 @@ export function AddOrganizationModal({
 
         <Select
           label="Parent Organization"
-          placeholder={fetchingOrgs ? 'Loading organizations...' : 'Select parent organization (optional)'}
+          placeholder={
+            fetchingOrgs ? 'Loading organizations...' : 'Select parent organization (optional)'
+          }
           options={parentOptions}
           value={parentId}
-          onChange={(e) => setParentId(e.target.value)}
+          onChange={e => setParentId(e.target.value)}
           disabled={loading || fetchingOrgs}
           helperText="Leave empty for a top-level organization"
         />
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleClose}
-            disabled={loading}
-          >
+          <Button type="button" variant="ghost" onClick={handleClose} disabled={loading}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={loading}
-          >
+          <Button type="submit" variant="primary" disabled={loading}>
             {loading ? (
               <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <svg
+                  className="animate-spin h-4 w-4"
+                  viewBox="0 0 24 24"
+                  aria-label="Loading"
+                  role="img"
+                >
                   <circle
                     className="opacity-25"
                     cx="12"
@@ -239,4 +235,3 @@ export function AddOrganizationModal({
 }
 
 export default AddOrganizationModal;
-

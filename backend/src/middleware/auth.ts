@@ -1,10 +1,10 @@
+import { eq } from 'drizzle-orm';
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
-import { redis } from '../lib/redis';
-import { db, schema } from '../db';
-import { eq } from 'drizzle-orm';
 import type { UserRole } from '../../../shared/types';
+import { db, schema } from '../db';
+import { redis } from '../lib/redis';
 
 // Define CurrentUser types locally to avoid import conflicts
 interface RegisteredUser {
@@ -58,7 +58,8 @@ const isTemporaryBanExpired = (bannedUntil: string | null | undefined): boolean 
  * Auto-unban user if temporary ban has expired
  */
 const autoUnbanUser = async (userId: number): Promise<void> => {
-  await db.update(schema.users)
+  await db
+    .update(schema.users)
     .set({
       isBanned: false,
       bannedAt: null,
@@ -78,16 +79,11 @@ const autoUnbanSession = async (sessionId: string, session: SessionData): Promis
     bannedAt: null,
     bannedUntil: null,
   };
-  
+
   if (redis) {
-    await redis.set(
-      `session:${sessionId}`,
-      JSON.stringify(updatedSession),
-      'EX',
-      SESSION_EXPIRY
-    );
+    await redis.set(`session:${sessionId}`, JSON.stringify(updatedSession), 'EX', SESSION_EXPIRY);
   }
-  
+
   return updatedSession;
 };
 
@@ -100,7 +96,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
   try {
     // 1. Try JWT token (registered user - email/password or OAuth)
     const token = req.cookies.authToken || req.headers.authorization?.split(' ')[1];
-    
+
     if (token) {
       try {
         const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
@@ -142,19 +138,19 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
           };
           return next();
         }
-      } catch (e) {
+      } catch (_e) {
         // Invalid token, continue to anonymous check
       }
     }
 
     // 2. Fall back to anonymous session
     const sessionId = req.cookies.sessionId;
-    
+
     if (sessionId && redis) {
       const sessionData = await redis.get(`session:${sessionId}`);
       if (sessionData) {
         let session: SessionData = JSON.parse(sessionData);
-        
+
         // Check if session is banned (per ARCHITECTURE_SUMMARY.md lines 687-707)
         if (session.isBanned) {
           // Check if temporary ban has expired
@@ -175,7 +171,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             });
           }
         }
-        
+
         // Update last activity
         await redis.set(
           `session:${sessionId}`,
@@ -220,12 +216,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     };
 
     if (redis) {
-      await redis.set(
-        `session:${newSessionId}`,
-        JSON.stringify(newSession),
-        'EX',
-        SESSION_EXPIRY
-      );
+      await redis.set(`session:${newSessionId}`, JSON.stringify(newSession), 'EX', SESSION_EXPIRY);
     }
 
     req.currentUser = {
@@ -253,7 +244,11 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
  * Per ARCHITECTURE_SUMMARY.md lines 722-728
  */
 export const adminMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.currentUser || req.currentUser.type !== 'registered' || req.currentUser.role !== 'admin') {
+  if (
+    !req.currentUser ||
+    req.currentUser.type !== 'registered' ||
+    req.currentUser.role !== 'admin'
+  ) {
     return res.status(403).json({
       success: false,
       error: { code: 'FORBIDDEN', message: 'Admin access required' },
@@ -289,7 +284,7 @@ export const optionalAuthMiddleware = async (req: Request, res: Response, next: 
     // Try to authenticate but don't fail if not possible
     await authMiddleware(req, res, () => {});
     next();
-  } catch (error) {
+  } catch (_error) {
     // Continue without user
     next();
   }

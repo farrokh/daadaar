@@ -29,15 +29,14 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500
             dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500
             resize-y min-h-[100px]
-            ${error
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-gray-300 dark:border-gray-600'
-            }
+            ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600'}
             ${className}
           `}
           ref={ref}
           aria-invalid={error ? 'true' : 'false'}
-          aria-describedby={error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined}
+          aria-describedby={
+            error ? `${textareaId}-error` : helperText ? `${textareaId}-helper` : undefined
+          }
           {...props}
         />
         {error && (
@@ -46,7 +45,10 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           </p>
         )}
         {helperText && !error && (
-          <p id={`${textareaId}-helper`} className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+          <p
+            id={`${textareaId}-helper`}
+            className="mt-1.5 text-sm text-gray-500 dark:text-gray-400"
+          >
             {helperText}
           </p>
         )}
@@ -59,4 +61,3 @@ Textarea.displayName = 'Textarea';
 
 export { Textarea };
 export default Textarea;
-

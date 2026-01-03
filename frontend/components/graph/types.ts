@@ -24,4 +24,3 @@ export interface ReportNodeData {
   downvoteCount: number;
   createdAt: string;
 }
-
