@@ -32,8 +32,8 @@ For detailed architecture, see [ARCHITECTURE_SUMMARY.md](ARCHITECTURE_SUMMARY.md
 ### Prerequisites
 
 - **Bun 1.0+** - [Install Bun](https://bun.sh)
-- **PostgreSQL 15+** - For database
-- **Redis** - For session management
+- **Docker** - For local PostgreSQL database
+- **Redis** - For session management (optional for local dev)
 
 ### Installation
 
@@ -46,8 +46,13 @@ cd daadaar
 bun install
 
 # Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
+bun run setup
+
+# Start PostgreSQL (via Docker)
+bun run docker:up
+
+# Push database schema
+bun run db:push
 
 # Run development servers
 bun run dev
@@ -65,6 +70,14 @@ bun run dev
 bun run dev              # Run both frontend and backend
 bun run dev:frontend     # Frontend only
 bun run dev:backend      # Backend only
+
+# Database
+bun run docker:up        # Start PostgreSQL container
+bun run docker:down      # Stop PostgreSQL container
+bun run docker:reset     # Reset database (deletes all data)
+bun run db:push          # Push schema to database
+bun run db:generate      # Generate migrations
+bun run db:studio        # Open Drizzle Studio (DB browser)
 
 # Code Quality
 bun run lint             # Check linting
@@ -86,11 +99,16 @@ daadaar/
 │   ├── i18n/          # Internationalization config
 │   └── messages/      # Translation files
 ├── backend/           # Express.js API server
-│   └── src/
-│       ├── routes/    # API endpoints
-│       ├── services/  # Business logic
-│       └── middleware/# Express middleware
+│   ├── src/
+│   │   ├── db/        # Database connection & utilities
+│   │   ├── routes/    # API endpoints
+│   │   ├── services/  # Business logic
+│   │   └── middleware/# Express middleware
+│   └── drizzle/       # Database migrations
+├── database/          # Drizzle ORM schema & config
+│   └── schema.ts      # Type-safe database schema
 ├── shared/            # Shared TypeScript types
+├── infrastructure/    # Docker & cloud configs
 ├── scripts/           # Development scripts
 └── .github/           # GitHub workflows & templates
 ```
