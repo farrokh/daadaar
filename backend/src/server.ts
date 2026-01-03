@@ -8,6 +8,7 @@ import authRoutes from './routes/auth';
 import graphRoutes from './routes/graph';
 import organizationsRoutes from './routes/organizations';
 import individualsRoutes from './routes/individuals';
+import rolesRoutes from './routes/roles';
 import { checkRedisConnection } from './lib/redis';
 
 dotenv.config();
@@ -32,6 +33,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/graph', graphRoutes);
 app.use('/api/organizations', organizationsRoutes);
 app.use('/api/individuals', individualsRoutes);
+app.use('/api/roles', rolesRoutes);
 
 // Health check endpoint
 app.get('/api/health', async (_req, res) => {

@@ -93,6 +93,7 @@
     "role": "Role",
     "role_placeholder": "Select role (optional)",
     "role_helper": "Assign a role in this organization",
+    "no_roles_helper": "No roles exist yet - create one above!",
     "start_date": "Start Date",
     "start_date_helper": "When did they start this role?",
     "creating": "Creating...",
@@ -102,6 +103,24 @@
     "error_name_min": "Name must be at least 2 characters",
     "error_name_max": "Name must not exceed 255 characters",
     "error_name_en_max": "English name must not exceed 255 characters",
-    "error_create_failed": "Failed to create person"
+    "error_create_failed": "Failed to create person",
+    "select_existing_role": "← Select existing role",
+    "create_new_role": "+ Create new role",
+    "creating_new_role": "Creating new role"
+  },
+  "role": {
+    "title": "Role Title",
+    "title_placeholder": "Enter role title",
+    "title_en": "Title (English)",
+    "title_en_placeholder": "Role title in English",
+    "description": "Role Description",
+    "description_placeholder": "Role description...",
+    "description_en": "Description (English)",
+    "description_en_placeholder": "Description in English...",
+    "error_title_required": "Role title is required",
+    "error_title_min": "Role title must be at least 2 characters",
+    "error_title_max": "Role title must not exceed 255 characters",
+    "error_title_en_max": "English role title must not exceed 255 characters",
+    "error_create_failed": "Failed to create role"
   }
 }
