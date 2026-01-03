@@ -47,7 +47,7 @@ export async function getOrganizationsGraph(req: Request, res: Response) {
       id: `edge-${hierarchy.parentId}-${hierarchy.childId}`,
       source: `org-${hierarchy.parentId}`,
       target: `org-${hierarchy.childId}`,
-      type: 'hierarchy',
+      type: 'smoothstep',
     }));
 
     res.json({
@@ -186,7 +186,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
       id: `edge-org-${organizationId}-person-${occupancy.individualId}`,
       source: `org-${organizationId}`,
       target: `person-${occupancy.individualId}`,
-      type: 'role',
+      type: 'smoothstep',
       data: {
         roleId: occupancy.roleId,
         startDate: occupancy.startDate,
@@ -322,7 +322,7 @@ export async function getIndividualReports(req: Request, res: Response) {
         id: `edge-person-${individualId}-report-${link.reportId}`,
         source: `person-${individualId}`,
         target: `report-${link.reportId}`,
-        type: 'report',
+        type: 'smoothstep',
         data: {
           roleId: link.roleId,
           startDate: link.startDate,

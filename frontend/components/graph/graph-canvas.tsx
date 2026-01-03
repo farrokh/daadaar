@@ -12,6 +12,8 @@ import ReactFlow, {
   applyNodeChanges,
   applyEdgeChanges,
   type NodeTypes,
+  type DefaultEdgeOptions,
+  MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import OrganizationNode from './organization-node';
@@ -30,6 +32,18 @@ const nodeTypes: NodeTypes = {
   organization: OrganizationNode,
   person: PersonNode,
   report: ReportNode,
+};
+
+// Default edge options with arrow markers
+const defaultEdgeOptions: DefaultEdgeOptions = {
+  animated: false,
+  style: { strokeWidth: 2, stroke: '#94a3b8' },
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+    width: 20,
+    height: 20,
+    color: '#94a3b8',
+  },
 };
 
 export type ViewMode = 'organizations' | 'people' | 'reports';
@@ -350,6 +364,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
+        defaultEdgeOptions={defaultEdgeOptions}
         fitView
         attributionPosition="bottom-left"
       >
