@@ -337,9 +337,9 @@ export interface PowSolution {
 
 export interface GraphNode {
   id: string;
-  type: 'organization' | 'role' | 'individual';
+  type: 'organization' | 'role' | 'individual' | 'report';
   label: string;
-  data: Organization | Role | Individual;
+  data: Organization | Role | Individual | Report;
 }
 
 export interface GraphEdge {

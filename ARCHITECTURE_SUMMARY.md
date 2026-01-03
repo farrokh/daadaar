@@ -70,6 +70,9 @@ The platform follows a **separated frontend-backend architecture** for optimal s
 - **Runtime**: Node.js 24+ LTS with TypeScript
 - **Framework**: Express.js
 - **Authentication**: Passport.js (OAuth) + Custom JWT (email/password)
+- **Route Protection**: `authMiddleware` + `requireAuth` for protected endpoints
+  - Roles, Organizations, Individuals routes require registered user authentication
+  - Admin/Moderator routes require role-based authorization
 - **Deployment**: AWS ECS (Fargate) with Application Load Balancer
 - **Auto-scaling**: Based on CPU/memory metrics
 
@@ -104,9 +107,83 @@ The platform supports **three authentication methods** through a unified middlew
    - Optional email verification (future)
 
 3. **OAuth Authentication** (Passport.js)
-   - Google, GitHub, Twitter/X support
+   - Google OAuth support only
    - Same JWT format as email/password
-   - Automatic user creation/update on first login
+   - User creation on first login (only if email doesn't exist)
+   - **Security**: Does NOT automatically link OAuth to existing accounts (prevents account takeover)
+   - **Type Safety**: Passport serialization/deserialization uses strongly-typed `Express.User` interface
+
+### Type Safety & Express Integration
+
+**Express.User Type Extension**:
+The platform extends Express's global `User` type to ensure type safety across Passport.js and custom authentication:
+
+```typescript
+// Global type extension in middleware/auth.ts
+declare global {
+  namespace Express {
+    interface User {
+      type: 'registered';
+      id: number;
+      email: string;
+      username: string;
+      displayName: string | null;
+      profileImageUrl?: string | null;
+      role: UserRole;
+      oauthProvider?: string | null;
+      oauthId?: string | null;
+    }
+  }
+}
+```
+
+**Passport.js Serialization** (with type safety):
+```typescript
+// Serialize user with explicit type checking
+passport.serializeUser((user: Express.User, done) => {
+  if (!user || user.id === undefined) {
+    return done(new Error('User or user ID is undefined during serialization'));
+  }
+  done(null, user.id);
+});
+
+// Deserialize user with type: 'registered' property
+passport.deserializeUser(async (id: number, done) => {
+  try {
+    const user = await db.query.users.findFirst({
+      where: eq(schema.users.id, id),
+    });
+    done(null, user ? ({ ...user, type: 'registered' } as Express.User) : undefined);
+  } catch (error) {
+    done(error);
+  }
+});
+```
+
+**OAuth Verify Callback**:
+```typescript
+// Google OAuth strategy with type-safe user creation
+new GoogleStrategy({...}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const email = profile.emails?.[0]?.value;
+    if (!email) {
+      return done(new Error('No email found from Google profile'));
+    }
+    
+    // Find or create user, then return with type property
+    const user = await findOrCreateUser(profile);
+    return done(null, { ...user, type: 'registered' } as Express.User);
+  } catch (error) {
+    return done(error as Error);
+  }
+});
+```
+
+**Benefits**:
+- Prevents `undefined` user ID errors in Passport serialization
+- Ensures consistent type structure between OAuth and email/password authentication
+- Provides compile-time type checking for `req.user` in controllers
+- Aligns with `AuthenticatedRequest` interface used throughout the application
 
 ### Authentication Flow
 
@@ -118,7 +195,7 @@ const authMiddleware = async (req, res, next) => {
   if (token) {
     const user = await validateJWT(token);
     if (user) {
-      req.user = { type: 'registered', id: user.id, ...user };
+      req.currentUser = { type: 'registered', id: user.id, ...user };
       return next();
     }
   }
@@ -128,7 +205,7 @@ const authMiddleware = async (req, res, next) => {
   if (sessionId) {
     const session = await redis.get(`session:${sessionId}`);
     if (session) {
-      req.user = { type: 'anonymous', sessionId };
+      req.currentUser = { type: 'anonymous', sessionId };
       return next();
     }
   }
@@ -136,10 +213,35 @@ const authMiddleware = async (req, res, next) => {
   // 3. Create new anonymous session if none exists
   const newSessionId = generateUUID();
   await redis.set(`session:${newSessionId}`, {...});
-  req.user = { type: 'anonymous', sessionId: newSessionId };
+  req.currentUser = { type: 'anonymous', sessionId: newSessionId };
+  next();
+};
+
+// Require authentication middleware (for protected routes)
+const requireAuth = async (req, res, next) => {
+  if (!req.currentUser || req.currentUser.type !== 'registered') {
+    return res.status(401).json({
+      success: false,
+      error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+    });
+  }
+  
+  // Map currentUser to user for controller compatibility
+  req.user = req.currentUser;
   next();
 };
 ```
+
+**Middleware Chain for Protected Routes**:
+- `authMiddleware` → Sets `req.currentUser` (can be registered or anonymous)
+- `requireAuth` → Validates registered user and maps to `req.user`
+- Controllers can safely access `req.user` as `RegisteredUser`
+
+**Protected Routes** (require authentication):
+- `/api/roles/*` - All role management endpoints
+- `/api/organizations/*` - All organization management endpoints
+- `/api/individuals/*` - All individual management endpoints
+
 
 ### User Data Model
 
@@ -264,22 +366,61 @@ const authMiddleware = async (req, res, next) => {
 **Purpose**: Visualize relationships between organizations, roles, and individuals over time
 
 **Frontend**:
-- React Flow or Cytoscape.js for interactive rendering
-- Timeline slider for date range filtering
-- Node click handlers to show details and reports
-- Client-side state management (Zustand)
+- React Flow for interactive rendering with directional edges
+- Graph toolbar with refresh and add buttons (context-aware)
+- Add Organization modal for creating new organizations with parent/child relationships
+- Add Person modal with inline role creation capability
+- Directional edges with arrow markers connecting parent/child organizations
+- Node click handlers to show details and drill down (organizations → people → reports)
+- Handle components on custom nodes for proper edge connections
+- Client-side state management (React hooks)
 
 **Backend**:
-- Graph data endpoint with date range filtering
+- Graph data endpoint with date range filtering (`GET /api/graph`)
+- Organization CRUD endpoints (`POST /api/organizations`, `GET /api/organizations/:id/roles`)
+- Individual CRUD endpoints (`POST /api/individuals`, `GET /api/individuals`)
+- Role CRUD endpoints (`POST /api/roles`, `GET /api/roles`)
 - PostgreSQL recursive CTEs for efficient graph queries
-- Redis caching for frequently accessed data
-- Returns optimized JSON structure (nodes + edges)
+- Returns optimized JSON structure (nodes + edges) with smoothstep edge types
+- Automatic edge creation when parent organizations are specified
+
+**Graph Management Features** (✅ Implemented):
+
+**Add Organization**:
+- Modal form with fields: name (Persian), name (English), description (both languages), parent organization dropdown
+- Creates organization and automatically creates hierarchy edge if parent is selected
+- Refreshes graph view after creation
+- Supports top-level organizations (no parent) and hierarchical structures
+
+**Add Person**:
+- Modal form with fields: full name (Persian), name (English), biography (both languages), date of birth
+- Inline role creation: toggle between selecting existing role or creating new role
+- When creating new role: role title, title (English), description (both languages)
+- Automatically creates role first, then creates person with role assignment
+- Refreshes people view after creation
+- Person appears on graph connected to organization via role edge
+
+**Graph Toolbar**:
+- Context-aware buttons based on current view mode (organizations/people/reports)
+- Refresh button: reloads current graph view
+- Add Organization button: visible in organizations view
+- Add Person button: visible in people view (when viewing organization's people)
+- Loading states during data fetching
+
+**Directional Edges**:
+- Arrow markers on edges showing direction (parent → child)
+- Smoothstep edge type for curved connections
+- Source handles on right side of nodes, target handles on left side
+- Styled handles matching node colors (blue for organizations, purple for people, green for reports)
 
 **Data Flow**:
 1. Frontend requests graph data with date range
 2. Backend queries PostgreSQL using Drizzle ORM
-3. Backend transforms relational data to graph format
-4. Frontend renders interactive visualization
+3. Backend transforms relational data to graph format (nodes + edges)
+4. Frontend renders interactive visualization with React Flow
+5. User interactions (add organization/person) trigger API calls
+6. Backend creates entities and returns updated graph data
+7. Frontend refreshes graph view to show new nodes and edges
 
 ### 2. Report Submission
 
@@ -680,7 +821,7 @@ const authMiddleware = async (req, res, next) => {
         // Temporary ban expired, auto-unban
         await unbanUser(user.id);
       }
-      req.user = { type: 'registered', id: user.id, role: user.role, ...user };
+      req.currentUser = { type: 'registered', id: user.id, role: user.role, ...user };
       return next();
     }
   }
@@ -702,7 +843,7 @@ const authMiddleware = async (req, res, next) => {
         // Temporary ban expired, auto-unban
         await unbanSession(sessionId);
       }
-      req.user = { type: 'anonymous', sessionId };
+      req.currentUser = { type: 'anonymous', sessionId };
       return next();
     }
   }
@@ -715,13 +856,13 @@ const authMiddleware = async (req, res, next) => {
     expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
     is_banned: false
   });
-  req.user = { type: 'anonymous', sessionId: newSessionId };
+  req.currentUser = { type: 'anonymous', sessionId: newSessionId };
   next();
 };
 
 // Admin middleware (requires admin role)
 const adminMiddleware = async (req, res, next) => {
-  if (!req.user || req.user.type !== 'registered' || req.user.role !== 'admin') {
+  if (!req.currentUser || req.currentUser.type !== 'registered' || req.currentUser.role !== 'admin') {
     return res.status(403).json({ error: 'Admin access required' });
   }
   next();
@@ -729,8 +870,8 @@ const adminMiddleware = async (req, res, next) => {
 
 // Moderator middleware (requires moderator or admin role)
 const moderatorMiddleware = async (req, res, next) => {
-  if (!req.user || req.user.type !== 'registered' || 
-      (req.user.role !== 'admin' && req.user.role !== 'moderator')) {
+  if (!req.currentUser || req.currentUser.type !== 'registered' || 
+      (req.currentUser.role !== 'admin' && req.currentUser.role !== 'moderator')) {
     return res.status(403).json({ error: 'Moderator access required' });
   }
   next();
@@ -888,10 +1029,10 @@ const authMiddleware = async (req, res, next) => {
       // Session invalid or migrated, create new one
       const newSessionId = generateUUID();
       await redis.set(`session:${newSessionId}`, {...});
-      req.user = { type: 'anonymous', sessionId: newSessionId };
+      req.currentUser = { type: 'anonymous', sessionId: newSessionId };
       return next();
     }
-    req.user = { type: 'anonymous', sessionId };
+    req.currentUser = { type: 'anonymous', sessionId };
     return next();
   }
   // ... rest of auth logic
@@ -1030,6 +1171,13 @@ POST /api/auth/claim-session
 - Timeout configurations
 - API key authentication for internal services (if needed)
 
+**9. OAuth Security**
+- Google OAuth only (GitHub removed for simplicity)
+- **Account Takeover Prevention**: OAuth accounts are NOT automatically linked to existing email addresses
+- If a user tries to sign in with Google OAuth using an email that already exists in the system, they receive an error
+- This prevents attackers from taking over accounts by registering the same email on OAuth providers
+- Future account linking must be implemented as an authenticated flow where users explicitly link providers from account settings
+
 ## Infrastructure & Deployment
 
 ### AWS Infrastructure
@@ -1098,11 +1246,13 @@ All endpoints follow consistent patterns:
 **Authentication**: Session management, registration, login, OAuth
 **Reports**: CRUD operations, search, filtering
 **Votes**: Create/update votes, get vote counts
-**Graph**: Graph data retrieval with date filtering
+**Graph**: Graph data retrieval with date filtering (✅ Implemented)
+**Organizations**: CRUD operations, hierarchy management, creation permissions (✅ Implemented)
+**Individuals**: CRUD operations for people/individuals (✅ Implemented)
+**Roles**: CRUD operations for roles within organizations (✅ Implemented)
 **Media**: Presigned URL generation, metadata retrieval
 **AI Verification**: Get verification results, trigger manual verification
 **Users**: Profile management, public profiles
-**Organizations**: CRUD operations, hierarchy management, creation permissions
 **Content Reports**: Report incorrect/inappropriate content for moderation
 **Moderation**: Admin tools for reviewing and handling content reports
 
@@ -1121,8 +1271,19 @@ Backend → Validate PoW → Check Rate Limit → Store Report → Queue AI Job 
 
 ```
 User → Frontend Graph Page → Request Graph Data (with date range) → Backend
-Backend → Query PostgreSQL (recursive CTEs) → Transform to Graph Format → Cache in Redis → Return JSON
-Frontend → Render Graph (React Flow/Cytoscape) → User Interaction → Fetch Details → Backend
+Backend → Query PostgreSQL (recursive CTEs) → Transform to Graph Format → Return JSON
+Frontend → Render Graph (React Flow) → User Interaction → Fetch Details → Backend
+
+Add Organization Flow:
+User → Click "Add Organization" → Modal Opens → Fill Form → Submit → POST /api/organizations
+Backend → Create Organization → Create Hierarchy Edge (if parent) → Return Success
+Frontend → Refresh Graph → Display New Node with Edge
+
+Add Person Flow:
+User → Click "Add Person" → Modal Opens → Fill Form → Create Role (if new) → Submit
+Frontend → POST /api/roles (if creating new role) → POST /api/individuals → Backend
+Backend → Create Role (if needed) → Create Individual → Create Role Occupancy → Return Success
+Frontend → Refresh People View → Display New Person Node with Edge to Organization
 ```
 
 ### Voting Flow
@@ -1158,13 +1319,13 @@ Frontend → Update UI Optimistically → Display Updated Counts
 **Core Authentication**:
 - [ ] Implement anonymous session system (Redis-based)
 - [ ] Implement user registration/login (JWT, bcrypt)
-- [ ] Implement OAuth providers (Passport.js: Google, GitHub)
+- [x] Implement OAuth provider (Passport.js: Google only, with security fix)
 - [ ] Unified authentication middleware
 
 **Core Features**:
-- [ ] Basic database schema (organizations, roles, individuals, reports, votes, media, sessions)
+- [x] Basic database schema (organizations, roles, individuals, reports, votes, media, sessions)
+- [x] Basic graph visualization with React Flow (✅ Implemented: graph rendering, add organization modal, add person modal with inline role creation, graph toolbar, directional edges)
 - [ ] Report submission form with PoW challenge
-- [ ] Basic graph visualization (static, no timeline filtering)
 - [ ] Simple voting system (with PoW for anonymous users)
 - [ ] Report listing page
 - [ ] Basic AI verification (simple prompt, background job)
@@ -1409,7 +1570,7 @@ t('title'); // "گزارش‌ها"
 - Redis connection (Upstash)
 - Cloudflare tokens
 - JWT secrets
-- OAuth provider credentials (Google, GitHub, etc.)
+- OAuth provider credentials (Google only)
 - Session secrets, encryption keys
 
 ### Production Security
