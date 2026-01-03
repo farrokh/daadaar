@@ -1,0 +1,1 @@
+ALTER TABLE "ban_history" ALTER COLUMN "banned_by_user_id" DROP NOT NULL;

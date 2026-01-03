@@ -1,9 +1,10 @@
 // Drizzle ORM Schema for Daadaar Platform
 // PostgreSQL database schema with type-safe table definitions
 
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import {
   boolean,
+  check,
   index,
   integer,
   pgEnum,
@@ -322,6 +323,9 @@ export const votes = pgTable(
     // Unique constraints to prevent duplicate votes
     uniqueIndex('votes_user_report_unique').on(table.userId, table.reportId),
     uniqueIndex('votes_session_report_unique').on(table.sessionId, table.reportId),
+    // Ensure at least one of userId or sessionId is provided to prevent orphan votes
+    // that bypass deduplication (NULL values are distinct in unique indexes)
+    check('votes_user_or_session_required', sql`user_id IS NOT NULL OR session_id IS NOT NULL`),
   ]
 );
 
@@ -408,9 +412,9 @@ export const banHistory = pgTable(
     action: banActionEnum('action').notNull(),
     reason: text('reason'),
     bannedUntil: timestamp('banned_until', { withTimezone: true }), // null = permanent
-    bannedByUserId: integer('banned_by_user_id')
-      .references(() => users.id, { onDelete: 'set null' })
-      .notNull(),
+    bannedByUserId: integer('banned_by_user_id').references(() => users.id, {
+      onDelete: 'set null',
+    }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   table => [
