@@ -104,9 +104,10 @@ The platform supports **three authentication methods** through a unified middlew
    - Optional email verification (future)
 
 3. **OAuth Authentication** (Passport.js)
-   - Google, GitHub, Twitter/X support
+   - Google OAuth support only
    - Same JWT format as email/password
-   - Automatic user creation/update on first login
+   - User creation on first login (only if email doesn't exist)
+   - **Security**: Does NOT automatically link OAuth to existing accounts (prevents account takeover)
 
 ### Authentication Flow
 
@@ -1069,6 +1070,13 @@ POST /api/auth/claim-session
 - Timeout configurations
 - API key authentication for internal services (if needed)
 
+**9. OAuth Security**
+- Google OAuth only (GitHub removed for simplicity)
+- **Account Takeover Prevention**: OAuth accounts are NOT automatically linked to existing email addresses
+- If a user tries to sign in with Google OAuth using an email that already exists in the system, they receive an error
+- This prevents attackers from taking over accounts by registering the same email on OAuth providers
+- Future account linking must be implemented as an authenticated flow where users explicitly link providers from account settings
+
 ## Infrastructure & Deployment
 
 ### AWS Infrastructure
@@ -1210,7 +1218,7 @@ Frontend → Update UI Optimistically → Display Updated Counts
 **Core Authentication**:
 - [ ] Implement anonymous session system (Redis-based)
 - [ ] Implement user registration/login (JWT, bcrypt)
-- [ ] Implement OAuth providers (Passport.js: Google, GitHub)
+- [x] Implement OAuth provider (Passport.js: Google only, with security fix)
 - [ ] Unified authentication middleware
 
 **Core Features**:
@@ -1461,7 +1469,7 @@ t('title'); // "گزارش‌ها"
 - Redis connection (Upstash)
 - Cloudflare tokens
 - JWT secrets
-- OAuth provider credentials (Google, GitHub, etc.)
+- OAuth provider credentials (Google only)
 - Session secrets, encryption keys
 
 ### Production Security

@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import { and, eq } from 'drizzle-orm';
 import passport from 'passport';
-import { Strategy as GitHubStrategy } from 'passport-github2';
 import {
   type Profile as GoogleProfile,
   Strategy as GoogleStrategy,
@@ -13,18 +12,7 @@ dotenv.config();
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
-const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:4000';
-
-// GitHub profile type
-interface GitHubProfile {
-  id: string;
-  username?: string;
-  displayName?: string;
-  emails?: Array<{ value: string }>;
-  photos?: Array<{ value: string }>;
-}
 
 // Configure Google OAuth Strategy
 if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
@@ -47,6 +35,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
             return done(new Error('No email found from Google profile'));
           }
 
+          // Check if user with this OAuth provider and ID exists
           let user = await db.query.users.findFirst({
             where: and(
               eq(schema.users.oauthProvider, 'google'),
@@ -61,94 +50,28 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
             });
 
             if (existingUser) {
-              // Link OAuth to existing user
-              [user] = await db
-                .update(schema.users)
-                .set({
-                  oauthProvider: 'google',
-                  oauthId: profile.id,
-                })
-                .where(eq(schema.users.id, existingUser.id))
-                .returning();
-            } else {
-              // Create new user
-              [user] = await db
-                .insert(schema.users)
-                .values({
-                  email,
-                  username: `google_${profile.id}`,
-                  displayName: profile.displayName || null,
-                  profileImageUrl: profile.photos?.[0]?.value || null,
-                  oauthProvider: 'google',
-                  oauthId: profile.id,
-                  role: 'user',
-                })
-                .returning();
+              // Security: Do not automatically link OAuth to existing accounts
+              // This prevents account takeover attacks
+              return done(
+                new Error(
+                  'An account with this email already exists. Please log in with your existing credentials.'
+                )
+              );
             }
-          }
 
-          return done(null, user);
-        } catch (error) {
-          return done(error as Error);
-        }
-      }
-    )
-  );
-}
-
-// Configure GitHub OAuth Strategy
-if (GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET) {
-  passport.use(
-    new GitHubStrategy(
-      {
-        clientID: GITHUB_CLIENT_ID,
-        clientSecret: GITHUB_CLIENT_SECRET,
-        callbackURL: `${BACKEND_URL}/api/auth/github/callback`,
-      },
-      async (
-        _accessToken: string,
-        _refreshToken: string,
-        profile: GitHubProfile,
-        done: (error: Error | null, user?: unknown) => void
-      ) => {
-        try {
-          const email = profile.emails?.[0]?.value || `${profile.username}@github.com`;
-
-          let user = await db.query.users.findFirst({
-            where: and(
-              eq(schema.users.oauthProvider, 'github'),
-              eq(schema.users.oauthId, profile.id)
-            ),
-          });
-
-          if (!user) {
-            const existingUser = await db.query.users.findFirst({
-              where: eq(schema.users.email, email),
-            });
-
-            if (existingUser) {
-              [user] = await db
-                .update(schema.users)
-                .set({
-                  oauthProvider: 'github',
-                  oauthId: profile.id,
-                })
-                .where(eq(schema.users.id, existingUser.id))
-                .returning();
-            } else {
-              [user] = await db
-                .insert(schema.users)
-                .values({
-                  email,
-                  username: profile.username || `github_${profile.id}`,
-                  displayName: profile.displayName || profile.username || null,
-                  profileImageUrl: profile.photos?.[0]?.value || null,
-                  oauthProvider: 'github',
-                  oauthId: profile.id,
-                  role: 'user',
-                })
-                .returning();
-            }
+            // Create new user
+            [user] = await db
+              .insert(schema.users)
+              .values({
+                email,
+                username: `google_${profile.id}`,
+                displayName: profile.displayName || null,
+                profileImageUrl: profile.photos?.[0]?.value || null,
+                oauthProvider: 'google',
+                oauthId: profile.id,
+                role: 'user',
+              })
+              .returning();
           }
 
           return done(null, user);
