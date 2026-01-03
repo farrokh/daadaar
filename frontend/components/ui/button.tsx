@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'primary' | 'secondary';
+  variant?: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'link';
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -9,11 +9,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = '', variant = 'default', size = 'md', ...props }, ref) => {
     const baseClasses =
       'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
+    
     const variantClasses = {
-      default: 'bg-gray-100 text-gray-900 hover:bg-gray-200',
+      default: 'bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-200',
       primary: 'bg-blue-600 text-white hover:bg-blue-700',
-      secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300',
+      secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-50 dark:hover:bg-gray-700',
+      outline: 'border border-gray-200 bg-white hover:bg-gray-100 dark:border-gray-800 dark:bg-transparent dark:hover:bg-gray-800',
+      ghost: 'hover:bg-gray-100 dark:hover:bg-gray-800',
+      link: 'text-blue-600 underline-offset-4 hover:underline dark:text-blue-400',
     };
+    
     const sizeClasses = {
       sm: 'h-8 px-3 text-sm',
       md: 'h-10 px-4 py-2',
@@ -32,4 +37,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button';
 
+// Export both named and default for flexibility
+export { Button };
 export default Button;
