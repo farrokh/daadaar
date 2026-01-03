@@ -1,17 +1,48 @@
 import { getTranslations } from 'next-intl/server';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import GraphCanvas from '@/components/graph/graph-canvas';
 
 export default async function HomePage() {
-  const t = await getTranslations('common');
+  const t = await getTranslations('landing');
+  const nav = await getTranslations('navigation');
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
-        <h1 className="text-4xl font-bold mb-4">{t('welcome')}</h1>
-        <p className="text-lg">Daadaar Platform</p>
-        <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-          Built with Next.js 16, React 19, Tailwind CSS v4, Biome, and Bun
-        </p>
-      </div>
-    </main>
+    <div className="flex flex-col h-screen">
+      {/* Header/Nav */}
+      <header className="px-4 lg:px-6 h-16 flex items-center border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 z-20">
+        <Link className="flex items-center justify-center" href="/">
+          <span className="text-2xl font-bold tracking-tighter sm:text-3xl bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
+            Daadaar
+          </span>
+        </Link>
+        <nav className="mx-auto flex gap-4 sm:gap-6">
+          <Link className="text-sm font-medium hover:underline underline-offset-4" href="/reports">
+            {nav('reports')}
+          </Link>
+          <Link className="text-sm font-medium hover:underline underline-offset-4" href="/graph">
+            {nav('graph')}
+          </Link>
+          <Link className="text-sm font-medium hover:underline underline-offset-4" href="/about">
+            {nav('about')}
+          </Link>
+        </nav>
+        <div className="flex items-center gap-4">
+          <Link href="/login">
+            <Button variant="ghost" size="sm">
+              {nav('login')}
+            </Button>
+          </Link>
+          <Link href="/signup">
+            <Button size="sm">{nav('signup')}</Button>
+          </Link>
+        </div>
+      </header>
+
+      {/* Main Graph Canvas - Full Screen */}
+      <main className="flex-1 relative overflow-hidden">
+        <GraphCanvas />
+      </main>
+    </div>
   );
 }

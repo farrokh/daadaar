@@ -11,13 +11,70 @@
     "edit": "Edit",
     "search": "Search",
     "filter": "Filter",
-    "close": "Close"
+    "close": "Close",
+    "refresh": "Refresh",
+    "create": "Create",
+    "add": "Add",
+    "optional": "Optional",
+    "required": "Required"
   },
   "navigation": {
     "home": "Home",
     "reports": "Reports",
     "graph": "Graph",
     "submit": "Submit Report",
-    "about": "About"
+    "about": "About",
+    "login": "Login",
+    "signup": "Sign Up"
+  },
+  "landing": {
+    "hero_title": "Exposing Injustice, Anonymously",
+    "hero_description": "Daadaar is a decentralized platform for mapping relationships between organizations and individuals in Iran, and reporting government injustices with AI-powered verification.",
+    "cta_anonymous": "Enter Anonymously",
+    "cta_login": "Login / Sign Up",
+    "feature_graph_title": "Interactive Graph",
+    "feature_graph_desc": "Visualize complex relationships between government bodies and officials over time.",
+    "feature_reports_title": "Verified Reports",
+    "feature_reports_desc": "Community-driven reporting with AI-powered confidence scores and verification.",
+    "feature_privacy_title": "Privacy First",
+    "feature_privacy_desc": "Participate completely anonymously. We don't log your IP or personal data.",
+    "footer_tagline": "Truth is the first step towards justice.",
+    "footer_terms": "Terms",
+    "footer_privacy": "Privacy"
+  },
+  "graph": {
+    "organizations": "Organizations",
+    "people": "People",
+    "reports": "Reports",
+    "add_organization": "Add Organization",
+    "add_person": "Add Person",
+    "add_report": "Add Report",
+    "refresh": "Refresh graph",
+    "click_to_drill_down": "Click on a node to drill down",
+    "scroll_to_zoom": "Scroll to zoom",
+    "drag_to_pan": "Drag to pan",
+    "coming_soon": "Coming soon"
+  },
+  "organization": {
+    "add_title": "Add New Organization",
+    "name": "Organization Name",
+    "name_placeholder": "Enter organization name",
+    "name_en": "Name (English)",
+    "name_en_placeholder": "Organization name in English",
+    "description": "Description",
+    "description_placeholder": "Organization description...",
+    "description_en": "Description (English)",
+    "description_en_placeholder": "Description in English...",
+    "parent": "Parent Organization",
+    "parent_placeholder": "Select parent organization (optional)",
+    "parent_helper": "Leave empty for a top-level organization",
+    "creating": "Creating...",
+    "create": "Create Organization",
+    "loading_organizations": "Loading organizations...",
+    "error_name_required": "Organization name is required",
+    "error_name_min": "Name must be at least 2 characters",
+    "error_name_max": "Name must not exceed 255 characters",
+    "error_name_en_max": "English name must not exceed 255 characters",
+    "error_create_failed": "Failed to create organization"
   }
 }

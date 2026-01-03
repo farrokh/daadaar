@@ -11,13 +11,70 @@
     "edit": "ویرایش",
     "search": "جستجو",
     "filter": "فیلتر",
-    "close": "بستن"
+    "close": "بستن",
+    "refresh": "بازنشانی",
+    "create": "ایجاد",
+    "add": "افزودن",
+    "optional": "اختیاری",
+    "required": "الزامی"
   },
   "navigation": {
     "home": "خانه",
     "reports": "گزارش‌ها",
     "graph": "گراف",
     "submit": "ارسال گزارش",
-    "about": "درباره"
+    "about": "درباره",
+    "login": "ورود",
+    "signup": "ثبت‌نام"
+  },
+  "landing": {
+    "hero_title": "افشای بی‌عدالتی، به صورت ناشناس",
+    "hero_description": "دادار یک پلتفرم غیرمتمرکز برای ترسیم روابط بین سازمان‌ها و افراد در ایران، و گزارش بی‌عدالتی‌های دولتی با تایید هوشمند (AI) است.",
+    "cta_anonymous": "ورود ناشناس",
+    "cta_login": "ورود / ثبت‌نام",
+    "feature_graph_title": "گراف تعاملی",
+    "feature_graph_desc": "روابط پیچیده بین نهادهای دولتی و مقامات را در طول زمان مشاهده کنید.",
+    "feature_reports_title": "گزارش‌های تایید شده",
+    "feature_reports_desc": "گزارش‌دهی جامعه‌محور با امتیازهای اطمینان و تایید مبتنی بر هوش مصنوعی.",
+    "feature_privacy_title": "اولویت با حریم خصوصی",
+    "feature_privacy_desc": "به صورت کاملاً ناشناس مشارکت کنید. ما آدرس IP یا اطلاعات شخصی شما را ثبت نمی‌کنیم.",
+    "footer_tagline": "حقیقت اولین قدم به سوی عدالت است.",
+    "footer_terms": "قوانین",
+    "footer_privacy": "حریم خصوصی"
+  },
+  "graph": {
+    "organizations": "سازمان‌ها",
+    "people": "افراد",
+    "reports": "گزارش‌ها",
+    "add_organization": "افزودن سازمان",
+    "add_person": "افزودن فرد",
+    "add_report": "افزودن گزارش",
+    "refresh": "بازنشانی گراف",
+    "click_to_drill_down": "برای جزئیات روی یک گره کلیک کنید",
+    "scroll_to_zoom": "برای بزرگنمایی اسکرول کنید",
+    "drag_to_pan": "برای جابجایی بکشید",
+    "coming_soon": "به زودی"
+  },
+  "organization": {
+    "add_title": "افزودن سازمان جدید",
+    "name": "نام سازمان",
+    "name_placeholder": "نام سازمان را وارد کنید",
+    "name_en": "نام (انگلیسی)",
+    "name_en_placeholder": "نام سازمان به انگلیسی",
+    "description": "توضیحات",
+    "description_placeholder": "توضیحات سازمان...",
+    "description_en": "توضیحات (انگلیسی)",
+    "description_en_placeholder": "توضیحات به انگلیسی...",
+    "parent": "سازمان مادر",
+    "parent_placeholder": "انتخاب سازمان مادر (اختیاری)",
+    "parent_helper": "برای سازمان سطح اول خالی بگذارید",
+    "creating": "در حال ایجاد...",
+    "create": "ایجاد سازمان",
+    "loading_organizations": "در حال بارگذاری سازمان‌ها...",
+    "error_name_required": "نام سازمان الزامی است",
+    "error_name_min": "نام باید حداقل ۲ کاراکتر باشد",
+    "error_name_max": "نام نباید بیش از ۲۵۵ کاراکتر باشد",
+    "error_name_en_max": "نام انگلیسی نباید بیش از ۲۵۵ کاراکتر باشد",
+    "error_create_failed": "ایجاد سازمان ناموفق بود"
   }
 }

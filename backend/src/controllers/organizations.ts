@@ -1,0 +1,291 @@
+// Organizations controller
+// Handles CRUD operations for organizations
+
+import type { Request, Response } from 'express';
+import { db, schema } from '../db';
+import { eq } from 'drizzle-orm';
+
+interface CreateOrganizationBody {
+  name: string;
+  nameEn?: string | null;
+  description?: string | null;
+  descriptionEn?: string | null;
+  parentId?: number | null;
+}
+
+/**
+ * POST /api/organizations
+ * Create a new organization
+ */
+export async function createOrganization(req: Request, res: Response) {
+  try {
+    const body = req.body as CreateOrganizationBody;
+
+    // Validate required fields
+    if (!body.name || typeof body.name !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Organization name is required',
+        },
+      });
+    }
+
+    const name = body.name.trim();
+
+    if (name.length < 2) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Organization name must be at least 2 characters',
+        },
+      });
+    }
+
+    if (name.length > 255) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Organization name must not exceed 255 characters',
+        },
+      });
+    }
+
+    // Validate parent organization if provided
+    if (body.parentId) {
+      const [parentOrg] = await db
+        .select({ id: schema.organizations.id })
+        .from(schema.organizations)
+        .where(eq(schema.organizations.id, body.parentId));
+
+      if (!parentOrg) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Parent organization not found',
+          },
+        });
+      }
+    }
+
+    // Get user ID from session if authenticated
+    const userId = (req as any).user?.type === 'registered' 
+      ? (req as any).user.id 
+      : null;
+
+    // Create the organization
+    const [newOrg] = await db
+      .insert(schema.organizations)
+      .values({
+        name,
+        nameEn: body.nameEn?.trim() || null,
+        description: body.description?.trim() || null,
+        descriptionEn: body.descriptionEn?.trim() || null,
+        parentId: body.parentId || null,
+        createdByUserId: userId,
+      })
+      .returning();
+
+    // If parent is specified, also create the hierarchy relationship
+    if (body.parentId && newOrg) {
+      await db.insert(schema.organizationHierarchy).values({
+        parentId: body.parentId,
+        childId: newOrg.id,
+        createdByUserId: userId,
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      data: newOrg,
+    });
+  } catch (error) {
+    console.error('Error creating organization:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to create organization',
+      },
+    });
+  }
+}
+
+/**
+ * GET /api/organizations
+ * List all organizations
+ */
+export async function listOrganizations(req: Request, res: Response) {
+  try {
+    const organizations = await db
+      .select({
+        id: schema.organizations.id,
+        name: schema.organizations.name,
+        nameEn: schema.organizations.nameEn,
+        description: schema.organizations.description,
+        descriptionEn: schema.organizations.descriptionEn,
+        parentId: schema.organizations.parentId,
+        createdAt: schema.organizations.createdAt,
+      })
+      .from(schema.organizations)
+      .orderBy(schema.organizations.name);
+
+    res.json({
+      success: true,
+      data: organizations,
+    });
+  } catch (error) {
+    console.error('Error listing organizations:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to list organizations',
+      },
+    });
+  }
+}
+
+/**
+ * GET /api/organizations/:id
+ * Get a single organization by ID
+ */
+export async function getOrganization(req: Request, res: Response) {
+  try {
+    const organizationId = parseInt(req.params.id, 10);
+
+    if (isNaN(organizationId)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_ID',
+          message: 'Invalid organization ID',
+        },
+      });
+    }
+
+    const [organization] = await db
+      .select()
+      .from(schema.organizations)
+      .where(eq(schema.organizations.id, organizationId));
+
+    if (!organization) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Organization not found',
+        },
+      });
+    }
+
+    res.json({
+      success: true,
+      data: organization,
+    });
+  } catch (error) {
+    console.error('Error getting organization:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to get organization',
+      },
+    });
+  }
+}
+
+/**
+ * PUT /api/organizations/:id
+ * Update an organization
+ */
+export async function updateOrganization(req: Request, res: Response) {
+  try {
+    const organizationId = parseInt(req.params.id, 10);
+
+    if (isNaN(organizationId)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_ID',
+          message: 'Invalid organization ID',
+        },
+      });
+    }
+
+    const body = req.body as Partial<CreateOrganizationBody>;
+
+    // Check if organization exists
+    const [existingOrg] = await db
+      .select({ id: schema.organizations.id })
+      .from(schema.organizations)
+      .where(eq(schema.organizations.id, organizationId));
+
+    if (!existingOrg) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Organization not found',
+        },
+      });
+    }
+
+    // Prepare update data
+    const updateData: Record<string, any> = {
+      updatedAt: new Date(),
+    };
+
+    if (body.name !== undefined) {
+      const name = body.name.trim();
+      if (name.length < 2) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Organization name must be at least 2 characters',
+          },
+        });
+      }
+      updateData.name = name;
+    }
+
+    if (body.nameEn !== undefined) {
+      updateData.nameEn = body.nameEn?.trim() || null;
+    }
+
+    if (body.description !== undefined) {
+      updateData.description = body.description?.trim() || null;
+    }
+
+    if (body.descriptionEn !== undefined) {
+      updateData.descriptionEn = body.descriptionEn?.trim() || null;
+    }
+
+    // Update the organization
+    const [updatedOrg] = await db
+      .update(schema.organizations)
+      .set(updateData)
+      .where(eq(schema.organizations.id, organizationId))
+      .returning();
+
+    res.json({
+      success: true,
+      data: updatedOrg,
+    });
+  } catch (error) {
+    console.error('Error updating organization:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to update organization',
+      },
+    });
+  }
+}
+

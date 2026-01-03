@@ -28,9 +28,9 @@ FRONTEND_URL=http://localhost:3000
 APP_URL=http://localhost:3000
 
 # =============================================================================
-# REDIS (Uncomment when Redis is enabled in docker-compose)
+# REDIS (Sessions and Rate Limiting)
 # =============================================================================
-# REDIS_URL=redis://localhost:6379
+REDIS_URL=redis://localhost:6379
 
 # =============================================================================
 # AUTHENTICATION (Development values - change in production!)
