@@ -1,0 +1,47 @@
+# Docker Compose for Daadaar Local Development
+# Usage:
+#   Start:    docker compose up -d
+#   Stop:     docker compose down
+#   Reset DB: docker compose down -v && docker compose up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: daadaar-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: daadaar
+      POSTGRES_PASSWORD: daadaar_dev_password
+      POSTGRES_DB: daadaar
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U daadaar -d daadaar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for sessions and rate limiting (optional, uncomment when needed)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: daadaar-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+  # redis_data:
+  #   driver: local
+

@@ -1,0 +1,1 @@
+ALTER TABLE "votes" ADD CONSTRAINT "votes_user_or_session_required" CHECK (user_id IS NOT NULL OR session_id IS NOT NULL);
