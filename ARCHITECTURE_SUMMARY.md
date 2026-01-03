@@ -203,23 +203,33 @@ const authMiddleware = async (req, res, next) => {
 
 ## Database Schema
 
+> **✅ Implementation Status**: Complete - All 15 tables implemented with Drizzle ORM
+> 
+> **Schema Location**: `database/schema.ts`
+> 
+> **Migrations**: `backend/drizzle/`
+
 ### Core Entities
 
-**Organizations**: Government bodies/institutions (nodes in graph)
-**Roles**: Positions within organizations (director, manager, etc.)
-**Individuals**: People who hold roles (nodes in graph)
-**Role Occupancy**: Timeline of individuals in roles (start_date, end_date)
-**Reports**: User-submitted reports/claims
-**Report Links**: Many-to-many relationship linking reports to individuals + roles + time periods
-**Votes**: Community votes on reports (upvote/downvote)
-**Users**: Registered users (optional - supports anonymous)
-**Sessions**: Anonymous session management
-**Media**: Attached media files for reports
-**AI Verification**: AI confidence scores and analysis
-**User Trust Scores**: Reputation tracking for organization creation permissions
-**Organization Hierarchy**: Parent-child relationships between organizations
-**Content Reports**: User-submitted reports about incorrect/inappropriate content (moderation)
-**Ban History**: Audit log of all ban/unban actions for accountability
+| Entity | Status | Description |
+|--------|--------|-------------|
+| **Organizations** | ✅ | Government bodies/institutions (nodes in graph) |
+| **Organization Hierarchy** | ✅ | Parent-child relationships between organizations |
+| **Roles** | ✅ | Positions within organizations (director, manager, etc.) |
+| **Individuals** | ✅ | People who hold roles (nodes in graph) |
+| **Role Occupancy** | ✅ | Timeline of individuals in roles (start_date, end_date) |
+| **Users** | ✅ | Registered users (optional - supports anonymous) |
+| **User Trust Scores** | ✅ | Reputation tracking for organization creation permissions |
+| **Reports** | ✅ | User-submitted reports/claims |
+| **Report Links** | ✅ | Many-to-many linking reports to individuals + roles + time periods |
+| **Votes** | ✅ | Community votes on reports (upvote/downvote) |
+| **Media** | ✅ | Attached media files for reports |
+| **AI Verification** | ✅ | AI confidence scores and analysis |
+| **Content Reports** | ✅ | User-submitted moderation reports |
+| **Ban History** | ✅ | Audit log of all ban/unban actions |
+| **PoW Challenges** | ✅ | Proof-of-work challenges for abuse prevention |
+
+**Sessions**: Stored in Redis (not PostgreSQL) for performance
 
 ### Key Relationships
 
