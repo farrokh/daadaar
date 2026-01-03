@@ -1,12 +1,18 @@
 'use client';
 
 import { memo } from 'react';
-import type { NodeProps } from 'reactflow';
+import { Handle, Position, type NodeProps } from 'reactflow';
 import type { ReportNodeData } from './types';
 
 function ReportNode({ data }: NodeProps<ReportNodeData>) {
   return (
-    <div className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-green-500 rounded-lg shadow-lg min-w-[250px] max-w-[350px]">
+    <div className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-green-500 rounded-lg shadow-lg min-w-[250px] max-w-[350px] relative">
+      {/* Target handle (left side - for incoming edges from person) */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="!bg-green-500 !w-3 !h-3"
+      />
       <div className="font-semibold text-base text-gray-900 dark:text-white line-clamp-2">
         {data.title}
       </div>
