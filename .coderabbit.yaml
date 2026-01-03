@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: en-US
+
+reviews:
+  # Enable auto reviews on all branches, not just default
+  auto_review:
+    enabled: true
+    # Review all PR types
+    drafts: false
+    # Base branches to review PRs against (empty = all branches)
+    base_branches: []
+
+  # Enable review status comments
+  review_status: true
+
+  # Request changes workflow
+  request_changes_workflow: false
+
+  # High-level summary in PR description
+  high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
+
+  # Enable poem in review (fun touch)
+  poem: false
+
+  # Collapse walkthrough for cleaner PR comments
+  collapse_walkthrough: true
+
+  # Path-based instructions for reviewers
+  path_instructions:
+    - path: "frontend/**"
+      instructions: |
+        Review React/Next.js code for:
+        - Proper use of React hooks and component patterns
+        - Accessibility (a11y) best practices
+        - Performance optimizations (memo, useMemo, useCallback where appropriate)
+        - Type safety with TypeScript
+        - Internationalization (i18n) patterns using next-intl
+
+    - path: "backend/**"
+      instructions: |
+        Review backend code for:
+        - Security vulnerabilities (SQL injection, XSS, etc.)
+        - Proper error handling and validation
+        - API design best practices
+        - Database query efficiency
+        - Type safety with TypeScript
+
+    - path: "database/**"
+      instructions: |
+        Review database schema changes for:
+        - Data integrity constraints
+        - Proper indexing strategies
+        - Migration safety (backwards compatibility)
+        - Naming conventions consistency
+
+    - path: "shared/**"
+      instructions: |
+        Review shared code for:
+        - Cross-package compatibility
+        - Type definitions accuracy
+        - Avoiding package-specific dependencies
+
+  # Tools configuration
+  tools:
+    # Enable AST-based analysis
+    ast_grep:
+      enabled: true
+
+chat:
+  # Enable chat functionality
+  auto_reply: true
+
+# Early access features
+early_access: false
+
+# Knowledge base
+knowledge_base:
+  opt_out: false
+  learnings:
+    scope: auto
+  issues:
+    scope: auto
+  pull_requests:
+    scope: auto
+
