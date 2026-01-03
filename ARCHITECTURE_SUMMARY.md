@@ -264,22 +264,61 @@ const authMiddleware = async (req, res, next) => {
 **Purpose**: Visualize relationships between organizations, roles, and individuals over time
 
 **Frontend**:
-- React Flow or Cytoscape.js for interactive rendering
-- Timeline slider for date range filtering
-- Node click handlers to show details and reports
-- Client-side state management (Zustand)
+- React Flow for interactive rendering with directional edges
+- Graph toolbar with refresh and add buttons (context-aware)
+- Add Organization modal for creating new organizations with parent/child relationships
+- Add Person modal with inline role creation capability
+- Directional edges with arrow markers connecting parent/child organizations
+- Node click handlers to show details and drill down (organizations → people → reports)
+- Handle components on custom nodes for proper edge connections
+- Client-side state management (React hooks)
 
 **Backend**:
-- Graph data endpoint with date range filtering
+- Graph data endpoint with date range filtering (`GET /api/graph`)
+- Organization CRUD endpoints (`POST /api/organizations`, `GET /api/organizations/:id/roles`)
+- Individual CRUD endpoints (`POST /api/individuals`, `GET /api/individuals`)
+- Role CRUD endpoints (`POST /api/roles`, `GET /api/roles`)
 - PostgreSQL recursive CTEs for efficient graph queries
-- Redis caching for frequently accessed data
-- Returns optimized JSON structure (nodes + edges)
+- Returns optimized JSON structure (nodes + edges) with smoothstep edge types
+- Automatic edge creation when parent organizations are specified
+
+**Graph Management Features** (✅ Implemented):
+
+**Add Organization**:
+- Modal form with fields: name (Persian), name (English), description (both languages), parent organization dropdown
+- Creates organization and automatically creates hierarchy edge if parent is selected
+- Refreshes graph view after creation
+- Supports top-level organizations (no parent) and hierarchical structures
+
+**Add Person**:
+- Modal form with fields: full name (Persian), name (English), biography (both languages), date of birth
+- Inline role creation: toggle between selecting existing role or creating new role
+- When creating new role: role title, title (English), description (both languages)
+- Automatically creates role first, then creates person with role assignment
+- Refreshes people view after creation
+- Person appears on graph connected to organization via role edge
+
+**Graph Toolbar**:
+- Context-aware buttons based on current view mode (organizations/people/reports)
+- Refresh button: reloads current graph view
+- Add Organization button: visible in organizations view
+- Add Person button: visible in people view (when viewing organization's people)
+- Loading states during data fetching
+
+**Directional Edges**:
+- Arrow markers on edges showing direction (parent → child)
+- Smoothstep edge type for curved connections
+- Source handles on right side of nodes, target handles on left side
+- Styled handles matching node colors (blue for organizations, purple for people, green for reports)
 
 **Data Flow**:
 1. Frontend requests graph data with date range
 2. Backend queries PostgreSQL using Drizzle ORM
-3. Backend transforms relational data to graph format
-4. Frontend renders interactive visualization
+3. Backend transforms relational data to graph format (nodes + edges)
+4. Frontend renders interactive visualization with React Flow
+5. User interactions (add organization/person) trigger API calls
+6. Backend creates entities and returns updated graph data
+7. Frontend refreshes graph view to show new nodes and edges
 
 ### 2. Report Submission
 
@@ -1098,11 +1137,13 @@ All endpoints follow consistent patterns:
 **Authentication**: Session management, registration, login, OAuth
 **Reports**: CRUD operations, search, filtering
 **Votes**: Create/update votes, get vote counts
-**Graph**: Graph data retrieval with date filtering
+**Graph**: Graph data retrieval with date filtering (✅ Implemented)
+**Organizations**: CRUD operations, hierarchy management, creation permissions (✅ Implemented)
+**Individuals**: CRUD operations for people/individuals (✅ Implemented)
+**Roles**: CRUD operations for roles within organizations (✅ Implemented)
 **Media**: Presigned URL generation, metadata retrieval
 **AI Verification**: Get verification results, trigger manual verification
 **Users**: Profile management, public profiles
-**Organizations**: CRUD operations, hierarchy management, creation permissions
 **Content Reports**: Report incorrect/inappropriate content for moderation
 **Moderation**: Admin tools for reviewing and handling content reports
 
@@ -1121,8 +1162,19 @@ Backend → Validate PoW → Check Rate Limit → Store Report → Queue AI Job 
 
 ```
 User → Frontend Graph Page → Request Graph Data (with date range) → Backend
-Backend → Query PostgreSQL (recursive CTEs) → Transform to Graph Format → Cache in Redis → Return JSON
-Frontend → Render Graph (React Flow/Cytoscape) → User Interaction → Fetch Details → Backend
+Backend → Query PostgreSQL (recursive CTEs) → Transform to Graph Format → Return JSON
+Frontend → Render Graph (React Flow) → User Interaction → Fetch Details → Backend
+
+Add Organization Flow:
+User → Click "Add Organization" → Modal Opens → Fill Form → Submit → POST /api/organizations
+Backend → Create Organization → Create Hierarchy Edge (if parent) → Return Success
+Frontend → Refresh Graph → Display New Node with Edge
+
+Add Person Flow:
+User → Click "Add Person" → Modal Opens → Fill Form → Create Role (if new) → Submit
+Frontend → POST /api/roles (if creating new role) → POST /api/individuals → Backend
+Backend → Create Role (if needed) → Create Individual → Create Role Occupancy → Return Success
+Frontend → Refresh People View → Display New Person Node with Edge to Organization
 ```
 
 ### Voting Flow
@@ -1162,9 +1214,9 @@ Frontend → Update UI Optimistically → Display Updated Counts
 - [ ] Unified authentication middleware
 
 **Core Features**:
-- [ ] Basic database schema (organizations, roles, individuals, reports, votes, media, sessions)
+- [x] Basic database schema (organizations, roles, individuals, reports, votes, media, sessions)
+- [x] Basic graph visualization with React Flow (✅ Implemented: graph rendering, add organization modal, add person modal with inline role creation, graph toolbar, directional edges)
 - [ ] Report submission form with PoW challenge
-- [ ] Basic graph visualization (static, no timeline filtering)
 - [ ] Simple voting system (with PoW for anonymous users)
 - [ ] Report listing page
 - [ ] Basic AI verification (simple prompt, background job)

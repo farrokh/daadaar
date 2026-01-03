@@ -34,7 +34,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={locale === 'fa' ? 'rtl' : 'ltr'}>
-      <body>
+      <body suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <SessionManager />
           {children}
