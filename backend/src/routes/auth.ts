@@ -31,7 +31,6 @@ router.get(
   authController.oauthCallback
 );
 
-
 // ============================================================================
 // Anonymous Session Routes
 // Per ARCHITECTURE_SUMMARY.md lines 1217-1220
