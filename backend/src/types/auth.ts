@@ -19,8 +19,9 @@ export interface AnonymousUser {
 
 export type AuthUser = RegisteredUser | AnonymousUser;
 
-// Extend Express Request with user property
-// This interface includes all Express Request properties (params, query, body, etc.)
+// Express user is already defined in middleware/auth.ts
+// after requireAuth, req.user is guaranteed to be a RegisteredUser
+
 export interface AuthenticatedRequest extends Request {
-  user?: AuthUser;
+  user: Express.User;
 }

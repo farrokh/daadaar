@@ -13,6 +13,7 @@ interface RegisteredUser {
   email: string;
   username: string;
   displayName: string | null;
+  profileImageUrl?: string | null;
   role: UserRole;
 }
 
@@ -23,16 +24,33 @@ interface AnonymousUser {
 
 type CurrentUser = RegisteredUser | AnonymousUser;
 
-// Extend Express Request type to include user
+// Extend Express Request type to include currentUser
+// Note: Express.User is already defined by @types/passport for req.user
 declare global {
   namespace Express {
     interface Request {
       currentUser?: CurrentUser;
     }
+    // Extend Passport's User type to match our RegisteredUser
+    // This allows req.user to work with Passport OAuth flow
+    interface User {
+      type: 'registered';
+      id: number;
+      email: string;
+      username: string;
+      displayName: string | null;
+      profileImageUrl?: string | null;
+      role: UserRole;
+      oauthProvider?: string | null;
+      oauthId?: string | null;
+    }
   }
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
 const SESSION_EXPIRY = 30 * 24 * 60 * 60; // 30 days in seconds
 
 // Interface for session data stored in Redis
@@ -288,6 +306,31 @@ export const optionalAuthMiddleware = async (req: Request, res: Response, next: 
     // Continue without user
     next();
   }
+};
+
+/**
+ * Require Authentication Middleware
+ * Ensures user is authenticated (registered, not anonymous)
+ * Maps req.currentUser to req.user for controller compatibility
+ * Should be used after authMiddleware in the middleware chain
+ */
+export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.currentUser || req.currentUser.type !== 'registered') {
+    return res.status(401).json({
+      success: false,
+      error: {
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      },
+    });
+  }
+
+  // Map currentUser to user for controller compatibility
+  // This bridges the gap between authMiddleware (sets currentUser) and
+  // controllers that expect AuthenticatedRequest (with user property)
+  // Cast to Express.User to work with Passport's type system
+  req.user = req.currentUser as Express.User;
+  next();
 };
 
 // Export types for use in controllers

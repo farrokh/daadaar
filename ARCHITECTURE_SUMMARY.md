@@ -70,6 +70,9 @@ The platform follows a **separated frontend-backend architecture** for optimal s
 - **Runtime**: Node.js 24+ LTS with TypeScript
 - **Framework**: Express.js
 - **Authentication**: Passport.js (OAuth) + Custom JWT (email/password)
+- **Route Protection**: `authMiddleware` + `requireAuth` for protected endpoints
+  - Roles, Organizations, Individuals routes require registered user authentication
+  - Admin/Moderator routes require role-based authorization
 - **Deployment**: AWS ECS (Fargate) with Application Load Balancer
 - **Auto-scaling**: Based on CPU/memory metrics
 
@@ -108,6 +111,79 @@ The platform supports **three authentication methods** through a unified middlew
    - Same JWT format as email/password
    - User creation on first login (only if email doesn't exist)
    - **Security**: Does NOT automatically link OAuth to existing accounts (prevents account takeover)
+   - **Type Safety**: Passport serialization/deserialization uses strongly-typed `Express.User` interface
+
+### Type Safety & Express Integration
+
+**Express.User Type Extension**:
+The platform extends Express's global `User` type to ensure type safety across Passport.js and custom authentication:
+
+```typescript
+// Global type extension in middleware/auth.ts
+declare global {
+  namespace Express {
+    interface User {
+      type: 'registered';
+      id: number;
+      email: string;
+      username: string;
+      displayName: string | null;
+      profileImageUrl?: string | null;
+      role: UserRole;
+      oauthProvider?: string | null;
+      oauthId?: string | null;
+    }
+  }
+}
+```
+
+**Passport.js Serialization** (with type safety):
+```typescript
+// Serialize user with explicit type checking
+passport.serializeUser((user: Express.User, done) => {
+  if (!user || user.id === undefined) {
+    return done(new Error('User or user ID is undefined during serialization'));
+  }
+  done(null, user.id);
+});
+
+// Deserialize user with type: 'registered' property
+passport.deserializeUser(async (id: number, done) => {
+  try {
+    const user = await db.query.users.findFirst({
+      where: eq(schema.users.id, id),
+    });
+    done(null, user ? ({ ...user, type: 'registered' } as Express.User) : undefined);
+  } catch (error) {
+    done(error);
+  }
+});
+```
+
+**OAuth Verify Callback**:
+```typescript
+// Google OAuth strategy with type-safe user creation
+new GoogleStrategy({...}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const email = profile.emails?.[0]?.value;
+    if (!email) {
+      return done(new Error('No email found from Google profile'));
+    }
+    
+    // Find or create user, then return with type property
+    const user = await findOrCreateUser(profile);
+    return done(null, { ...user, type: 'registered' } as Express.User);
+  } catch (error) {
+    return done(error as Error);
+  }
+});
+```
+
+**Benefits**:
+- Prevents `undefined` user ID errors in Passport serialization
+- Ensures consistent type structure between OAuth and email/password authentication
+- Provides compile-time type checking for `req.user` in controllers
+- Aligns with `AuthenticatedRequest` interface used throughout the application
 
 ### Authentication Flow
 
@@ -119,7 +195,7 @@ const authMiddleware = async (req, res, next) => {
   if (token) {
     const user = await validateJWT(token);
     if (user) {
-      req.user = { type: 'registered', id: user.id, ...user };
+      req.currentUser = { type: 'registered', id: user.id, ...user };
       return next();
     }
   }
@@ -129,7 +205,7 @@ const authMiddleware = async (req, res, next) => {
   if (sessionId) {
     const session = await redis.get(`session:${sessionId}`);
     if (session) {
-      req.user = { type: 'anonymous', sessionId };
+      req.currentUser = { type: 'anonymous', sessionId };
       return next();
     }
   }
@@ -137,10 +213,35 @@ const authMiddleware = async (req, res, next) => {
   // 3. Create new anonymous session if none exists
   const newSessionId = generateUUID();
   await redis.set(`session:${newSessionId}`, {...});
-  req.user = { type: 'anonymous', sessionId: newSessionId };
+  req.currentUser = { type: 'anonymous', sessionId: newSessionId };
+  next();
+};
+
+// Require authentication middleware (for protected routes)
+const requireAuth = async (req, res, next) => {
+  if (!req.currentUser || req.currentUser.type !== 'registered') {
+    return res.status(401).json({
+      success: false,
+      error: { code: 'UNAUTHORIZED', message: 'Authentication required' }
+    });
+  }
+  
+  // Map currentUser to user for controller compatibility
+  req.user = req.currentUser;
   next();
 };
 ```
+
+**Middleware Chain for Protected Routes**:
+- `authMiddleware` → Sets `req.currentUser` (can be registered or anonymous)
+- `requireAuth` → Validates registered user and maps to `req.user`
+- Controllers can safely access `req.user` as `RegisteredUser`
+
+**Protected Routes** (require authentication):
+- `/api/roles/*` - All role management endpoints
+- `/api/organizations/*` - All organization management endpoints
+- `/api/individuals/*` - All individual management endpoints
+
 
 ### User Data Model
 
@@ -720,7 +821,7 @@ const authMiddleware = async (req, res, next) => {
         // Temporary ban expired, auto-unban
         await unbanUser(user.id);
       }
-      req.user = { type: 'registered', id: user.id, role: user.role, ...user };
+      req.currentUser = { type: 'registered', id: user.id, role: user.role, ...user };
       return next();
     }
   }
@@ -742,7 +843,7 @@ const authMiddleware = async (req, res, next) => {
         // Temporary ban expired, auto-unban
         await unbanSession(sessionId);
       }
-      req.user = { type: 'anonymous', sessionId };
+      req.currentUser = { type: 'anonymous', sessionId };
       return next();
     }
   }
@@ -755,13 +856,13 @@ const authMiddleware = async (req, res, next) => {
     expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
     is_banned: false
   });
-  req.user = { type: 'anonymous', sessionId: newSessionId };
+  req.currentUser = { type: 'anonymous', sessionId: newSessionId };
   next();
 };
 
 // Admin middleware (requires admin role)
 const adminMiddleware = async (req, res, next) => {
-  if (!req.user || req.user.type !== 'registered' || req.user.role !== 'admin') {
+  if (!req.currentUser || req.currentUser.type !== 'registered' || req.currentUser.role !== 'admin') {
     return res.status(403).json({ error: 'Admin access required' });
   }
   next();
@@ -769,8 +870,8 @@ const adminMiddleware = async (req, res, next) => {
 
 // Moderator middleware (requires moderator or admin role)
 const moderatorMiddleware = async (req, res, next) => {
-  if (!req.user || req.user.type !== 'registered' || 
-      (req.user.role !== 'admin' && req.user.role !== 'moderator')) {
+  if (!req.currentUser || req.currentUser.type !== 'registered' || 
+      (req.currentUser.role !== 'admin' && req.currentUser.role !== 'moderator')) {
     return res.status(403).json({ error: 'Moderator access required' });
   }
   next();
@@ -928,10 +1029,10 @@ const authMiddleware = async (req, res, next) => {
       // Session invalid or migrated, create new one
       const newSessionId = generateUUID();
       await redis.set(`session:${newSessionId}`, {...});
-      req.user = { type: 'anonymous', sessionId: newSessionId };
+      req.currentUser = { type: 'anonymous', sessionId: newSessionId };
       return next();
     }
-    req.user = { type: 'anonymous', sessionId };
+    req.currentUser = { type: 'anonymous', sessionId };
     return next();
   }
   // ... rest of auth logic

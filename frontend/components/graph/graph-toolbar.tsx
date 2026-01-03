@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
 
 interface GraphToolbarProps {
   onAddOrganization: () => void;
@@ -17,6 +18,8 @@ export function GraphToolbar({
   viewMode,
   isLoading = false,
 }: GraphToolbarProps) {
+  const t = useTranslations('graph');
+
   return (
     <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
       {/* Refresh Button */}
@@ -26,7 +29,7 @@ export function GraphToolbar({
         onClick={onRefresh}
         disabled={isLoading}
         className="shadow-lg"
-        title="Refresh graph"
+        title={t('refresh')}
       >
         <svg
           className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
@@ -65,7 +68,7 @@ export function GraphToolbar({
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Add Organization
+          {t('add_organization')}
         </Button>
       )}
 
@@ -89,7 +92,7 @@ export function GraphToolbar({
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Add Person
+          {t('add_person')}
         </Button>
       )}
 
@@ -103,7 +106,7 @@ export function GraphToolbar({
           }}
           disabled={isLoading}
           className="shadow-lg opacity-50 cursor-not-allowed"
-          title="Coming soon"
+          title={t('coming_soon')}
         >
           <svg
             className="h-4 w-4 mr-1.5"
@@ -116,7 +119,7 @@ export function GraphToolbar({
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
-          Add Report
+          {t('add_report')}
         </Button>
       )}
     </div>

@@ -1,4 +1,3 @@
-import dotenv from 'dotenv';
 import { and, eq } from 'drizzle-orm';
 import passport from 'passport';
 import {
@@ -7,8 +6,6 @@ import {
   type VerifyCallback,
 } from 'passport-google-oauth20';
 import { db, schema } from '../db';
-
-dotenv.config();
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -74,7 +71,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
               .returning();
           }
 
-          return done(null, user);
+          return done(null, { ...user, type: 'registered' } as Express.User);
         } catch (error) {
           return done(error as Error);
         }
@@ -87,6 +84,9 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
 // but it's good practice for Passport's internal flow during the callback phase.
 passport.serializeUser((user: Express.User, done) => {
   const dbUser = user as { id?: number };
+  if (!dbUser.id) {
+    return done(new Error('User ID is required for serialization'));
+  }
   done(null, dbUser.id);
 });
 
@@ -95,7 +95,7 @@ passport.deserializeUser(async (id: number, done) => {
     const user = await db.query.users.findFirst({
       where: eq(schema.users.id, id),
     });
-    done(null, user || undefined);
+    done(null, user ? ({ ...user, type: 'registered' } as Express.User) : undefined);
   } catch (error) {
     done(error);
   }
