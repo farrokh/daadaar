@@ -65,8 +65,7 @@ reviews:
   # Tools configuration
   tools:
     # Enable AST-based analysis
-    ast_grep:
-      enabled: true
+    ast-grep: {}
 
 chat:
   # Enable chat functionality
