@@ -76,5 +76,32 @@
     "error_name_max": "Name must not exceed 255 characters",
     "error_name_en_max": "English name must not exceed 255 characters",
     "error_create_failed": "Failed to create organization"
+  },
+  "person": {
+    "add_title": "Add New Person",
+    "add_to_org_title": "Add Person to {organization}",
+    "full_name": "Full Name",
+    "full_name_placeholder": "Enter full name",
+    "full_name_en": "Name (English)",
+    "full_name_en_placeholder": "Full name in English",
+    "biography": "Biography",
+    "biography_placeholder": "Biography...",
+    "biography_en": "Biography (English)",
+    "biography_en_placeholder": "Biography in English...",
+    "date_of_birth": "Date of Birth",
+    "role_assignment": "Role Assignment (Optional)",
+    "role": "Role",
+    "role_placeholder": "Select role (optional)",
+    "role_helper": "Assign a role in this organization",
+    "start_date": "Start Date",
+    "start_date_helper": "When did they start this role?",
+    "creating": "Creating...",
+    "create": "Add Person",
+    "loading_roles": "Loading roles...",
+    "error_name_required": "Full name is required",
+    "error_name_min": "Name must be at least 2 characters",
+    "error_name_max": "Name must not exceed 255 characters",
+    "error_name_en_max": "English name must not exceed 255 characters",
+    "error_create_failed": "Failed to create person"
   }
 }
