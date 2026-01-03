@@ -76,5 +76,32 @@
     "error_name_max": "نام نباید بیش از ۲۵۵ کاراکتر باشد",
     "error_name_en_max": "نام انگلیسی نباید بیش از ۲۵۵ کاراکتر باشد",
     "error_create_failed": "ایجاد سازمان ناموفق بود"
+  },
+  "person": {
+    "add_title": "افزودن فرد جدید",
+    "add_to_org_title": "افزودن فرد به {organization}",
+    "full_name": "نام کامل",
+    "full_name_placeholder": "نام کامل را وارد کنید",
+    "full_name_en": "نام (انگلیسی)",
+    "full_name_en_placeholder": "نام کامل به انگلیسی",
+    "biography": "بیوگرافی",
+    "biography_placeholder": "بیوگرافی...",
+    "biography_en": "بیوگرافی (انگلیسی)",
+    "biography_en_placeholder": "بیوگرافی به انگلیسی...",
+    "date_of_birth": "تاریخ تولد",
+    "role_assignment": "انتساب نقش (اختیاری)",
+    "role": "نقش",
+    "role_placeholder": "انتخاب نقش (اختیاری)",
+    "role_helper": "یک نقش در این سازمان اختصاص دهید",
+    "start_date": "تاریخ شروع",
+    "start_date_helper": "این نقش از چه زمانی شروع شده؟",
+    "creating": "در حال ایجاد...",
+    "create": "افزودن فرد",
+    "loading_roles": "در حال بارگذاری نقش‌ها...",
+    "error_name_required": "نام کامل الزامی است",
+    "error_name_min": "نام باید حداقل ۲ کاراکتر باشد",
+    "error_name_max": "نام نباید بیش از ۲۵۵ کاراکتر باشد",
+    "error_name_en_max": "نام انگلیسی نباید بیش از ۲۵۵ کاراکتر باشد",
+    "error_create_failed": "ایجاد فرد ناموفق بود"
   }
 }

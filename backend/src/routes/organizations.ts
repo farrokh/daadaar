@@ -16,5 +16,8 @@ router.get('/:id', organizationsController.getOrganization);
 // PUT /api/organizations/:id - Update organization
 router.put('/:id', organizationsController.updateOrganization);
 
+// GET /api/organizations/:id/roles - Get roles for an organization
+router.get('/:id/roles', organizationsController.getOrganizationRoles);
+
 export default router;
 

@@ -21,6 +21,7 @@ import PersonNode from './person-node';
 import ReportNode from './report-node';
 import { GraphToolbar } from './graph-toolbar';
 import { AddOrganizationModal } from './add-organization-modal';
+import { AddPersonModal } from './add-person-modal';
 import { fetchApi } from '@/lib/api';
 import type {
   OrganizationNodeData,
@@ -96,6 +97,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     initialView || { mode: 'organizations' }
   );
   const [isAddOrgModalOpen, setIsAddOrgModalOpen] = useState(false);
+  const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState(false);
 
   // Layout algorithm: simple grid layout
   const layoutNodes = useCallback((nodes: Node[], edges: Edge[]) => {
@@ -312,6 +314,14 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     fetchOrganizations();
   }, [fetchOrganizations]);
 
+  // Handle successful person creation
+  const handlePersonCreated = useCallback(() => {
+    // Refresh the people view
+    if (viewContext.organizationId) {
+      fetchOrganizationPeople(viewContext.organizationId, viewContext.organizationName);
+    }
+  }, [viewContext.organizationId, viewContext.organizationName, fetchOrganizationPeople]);
+
   // Load initial data
   useEffect(() => {
     if (initialView) {
@@ -383,6 +393,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       {/* Toolbar */}
       <GraphToolbar
         onAddOrganization={() => setIsAddOrgModalOpen(true)}
+        onAddPerson={() => setIsAddPersonModalOpen(true)}
         onRefresh={handleRefresh}
         viewMode={viewContext.mode}
         isLoading={loading}
@@ -394,6 +405,17 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         onClose={() => setIsAddOrgModalOpen(false)}
         onSuccess={handleOrganizationCreated}
       />
+
+      {/* Add Person Modal */}
+      {viewContext.organizationId && (
+        <AddPersonModal
+          isOpen={isAddPersonModalOpen}
+          onClose={() => setIsAddPersonModalOpen(false)}
+          onSuccess={handlePersonCreated}
+          organizationId={viewContext.organizationId}
+          organizationName={viewContext.organizationName}
+        />
+      )}
 
       {/* Navigation breadcrumb */}
       <div className="absolute top-4 left-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-10">

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 
 interface GraphToolbarProps {
   onAddOrganization: () => void;
+  onAddPerson?: () => void;
   onRefresh: () => void;
   viewMode: 'organizations' | 'people' | 'reports';
   isLoading?: boolean;
@@ -11,6 +12,7 @@ interface GraphToolbarProps {
 
 export function GraphToolbar({
   onAddOrganization,
+  onAddPerson,
   onRefresh,
   viewMode,
   isLoading = false,
@@ -68,16 +70,13 @@ export function GraphToolbar({
       )}
 
       {/* Add Person Button - Only show in people view */}
-      {viewMode === 'people' && (
+      {viewMode === 'people' && onAddPerson && (
         <Button
           variant="primary"
           size="sm"
-          onClick={() => {
-            // TODO: Implement add person modal
-          }}
+          onClick={onAddPerson}
           disabled={isLoading}
-          className="shadow-lg opacity-50 cursor-not-allowed"
-          title="Coming soon"
+          className="shadow-lg"
         >
           <svg
             className="h-4 w-4 mr-1.5"

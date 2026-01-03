@@ -289,3 +289,66 @@ export async function updateOrganization(req: Request, res: Response) {
   }
 }
 
+/**
+ * GET /api/organizations/:id/roles
+ * Get all roles for an organization
+ */
+export async function getOrganizationRoles(req: Request, res: Response) {
+  try {
+    const organizationId = parseInt(req.params.id, 10);
+
+    if (isNaN(organizationId)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_ID',
+          message: 'Invalid organization ID',
+        },
+      });
+    }
+
+    // Check if organization exists
+    const [organization] = await db
+      .select({ id: schema.organizations.id })
+      .from(schema.organizations)
+      .where(eq(schema.organizations.id, organizationId));
+
+    if (!organization) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Organization not found',
+        },
+      });
+    }
+
+    // Get roles for this organization
+    const roles = await db
+      .select({
+        id: schema.roles.id,
+        title: schema.roles.title,
+        titleEn: schema.roles.titleEn,
+        description: schema.roles.description,
+        descriptionEn: schema.roles.descriptionEn,
+      })
+      .from(schema.roles)
+      .where(eq(schema.roles.organizationId, organizationId))
+      .orderBy(schema.roles.title);
+
+    res.json({
+      success: true,
+      data: roles,
+    });
+  } catch (error) {
+    console.error('Error getting organization roles:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to get organization roles',
+      },
+    });
+  }
+}
+
