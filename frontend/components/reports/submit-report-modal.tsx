@@ -74,11 +74,32 @@ export function SubmitReportModal({
         }
       );
 
-      // 3. Submit report
+      // 3. Fetch CSRF token
+      const csrfResponse = await fetch(`${apiUrl}/api/csrf/csrf-token`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!csrfResponse.ok) {
+        const csrfErrorData = await csrfResponse.json().catch(() => ({}));
+        throw new Error(
+          csrfErrorData.error?.message || 'Failed to fetch CSRF token. Please try again.'
+        );
+      }
+
+      const csrfData = await csrfResponse.json();
+      const csrfToken = csrfData.data?.csrfToken;
+
+      if (!csrfToken) {
+        throw new Error('CSRF token not found in response. Please try again.');
+      }
+
+      // 4. Submit report
       const response = await fetch(`${apiUrl}/api/reports`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-csrf-token': csrfToken,
         },
         credentials: 'include',
         body: JSON.stringify({
