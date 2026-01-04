@@ -4,7 +4,7 @@
 export function getS3PublicUrl(key: string, bucket?: string): string {
   const bucketName = bucket || process.env.NEXT_PUBLIC_AWS_S3_BUCKET || 'daadaar-media-frkia';
   const region = process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
-  
+
   // Only use mock URL if explicitly in mock mode or bucket is 'mock'
   if (bucketName === 'mock' || process.env.NEXT_PUBLIC_MOCK_MEDIA_SERVER === 'true') {
     return `http://localhost:4000/api/media/mock/${key}`;
@@ -26,6 +26,6 @@ export function formatDate(dateString: string, locale: string): string {
   return new Date(dateString).toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   });
 }

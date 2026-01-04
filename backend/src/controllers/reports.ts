@@ -1,5 +1,5 @@
-import type { Request, Response } from 'express';
 import { and, desc, eq, gte, ilike, inArray, lte, or, sql } from 'drizzle-orm';
+import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { validatePowSolution } from '../lib/pow-validator';
 import { checkReportSubmissionLimit } from '../lib/rate-limiter';
@@ -30,12 +30,20 @@ export async function createReport(req: Request, res: Response) {
     const body = req.body as CreateReportBody;
 
     // Validate required fields
-    if (!body.title || !body.content || !body.individualId || !body.powChallengeId || !body.powSolution || body.powSolutionNonce === undefined) {
+    if (
+      !body.title ||
+      !body.content ||
+      !body.individualId ||
+      !body.powChallengeId ||
+      !body.powSolution ||
+      body.powSolutionNonce === undefined
+    ) {
       return res.status(400).json({
         success: false,
         error: {
           code: 'MISSING_FIELDS',
-          message: 'Missing required fields: title, content, individualId, powChallengeId, powSolution, powSolutionNonce',
+          message:
+            'Missing required fields: title, content, individualId, powChallengeId, powSolution, powSolutionNonce',
         },
       });
     }
@@ -106,7 +114,7 @@ export async function createReport(req: Request, res: Response) {
     }
 
     // Create report in a transaction
-    const result = await db.transaction(async (tx) => {
+    const result = await db.transaction(async tx => {
       // 1. Create report
       const [report] = await tx
         .insert(schema.reports)
@@ -244,12 +252,13 @@ export async function getReports(req: Request, res: Response) {
     }
 
     if (search) {
-      conditions.push(
-        or(
-          ilike(schema.reports.title, `%${search}%`),
-          ilike(schema.reports.content, `%${search}%`)
-        )!
+      const searchCondition = or(
+        ilike(schema.reports.title, `%${search}%`),
+        ilike(schema.reports.content, `%${search}%`)
       );
+      if (searchCondition) {
+        conditions.push(searchCondition);
+      }
     }
 
     if (startDate) {
@@ -293,10 +302,10 @@ export async function getReports(req: Request, res: Response) {
 
     // Generate presigned URLs for media
     const reportsWithUrls = await Promise.all(
-      reports.map(async (report) => ({
+      reports.map(async report => ({
         ...report,
         media: await Promise.all(
-          report.media.map(async (item) => ({
+          report.media.map(async item => ({
             ...item,
             url: await generatePresignedGetUrl(item.s3Key, item.s3Bucket),
           }))
@@ -393,16 +402,16 @@ export async function getReportById(req: Request, res: Response) {
         },
       },
     });
-    
+
     if (report) {
       // Generate presigned URLs for media
       const mediaWithUrls = await Promise.all(
-        report.media.map(async (item) => ({
+        report.media.map(async item => ({
           ...item,
           url: await generatePresignedGetUrl(item.s3Key, item.s3Bucket),
         }))
       );
-      (report as any).media = mediaWithUrls;
+      Object.assign(report, { media: mediaWithUrls });
     }
 
     if (!report) {

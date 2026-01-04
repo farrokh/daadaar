@@ -1,13 +1,13 @@
-import type { Request, Response } from 'express';
 import { eq } from 'drizzle-orm';
+import type { Request, Response } from 'express';
 import sharp from 'sharp';
 import { db, schema } from '../db';
 import {
+  deleteS3Object,
   generatePresignedUploadUrl,
   generateS3Key,
-  validateMediaFile,
-  deleteS3Object,
   uploadS3Object,
+  validateMediaFile,
 } from '../lib/s3-client';
 
 /**
@@ -60,7 +60,7 @@ export async function generatePresignedUrl(req: Request, res: Response) {
     const [media] = await db
       .insert(schema.media)
       .values({
-        reportId: null as any,
+        reportId: null as number | null,
         s3Key,
         s3Bucket: process.env.AWS_S3_BUCKET || 'daadaar-media-frkia',
         originalFilename: filename,
@@ -143,7 +143,7 @@ export async function uploadImage(req: Request, res: Response) {
     const [media] = await db
       .insert(schema.media)
       .values({
-        reportId: null as any,
+        reportId: null as number | null,
         s3Key,
         s3Bucket: process.env.AWS_S3_BUCKET || 'daadaar-media-frkia',
         originalFilename: avifFilename,

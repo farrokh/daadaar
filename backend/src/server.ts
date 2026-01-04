@@ -8,11 +8,11 @@ import { checkRedisConnection } from './lib/redis';
 import authRoutes from './routes/auth';
 import graphRoutes from './routes/graph';
 import individualsRoutes from './routes/individuals';
-import organizationsRoutes from './routes/organizations';
-import rolesRoutes from './routes/roles';
-import powRoutes from './routes/pow';
 import mediaRoutes from './routes/media';
+import organizationsRoutes from './routes/organizations';
+import powRoutes from './routes/pow';
 import reportsRoutes from './routes/reports';
+import rolesRoutes from './routes/roles';
 
 dotenv.config();
 

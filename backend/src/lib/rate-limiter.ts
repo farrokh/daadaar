@@ -31,7 +31,7 @@ export async function checkRateLimit(
 
   try {
     const rateLimitKey = `ratelimit:${key}`;
-    
+
     // Get current count
     const currentCount = await redis.get(rateLimitKey);
     const count = currentCount ? Number.parseInt(currentCount, 10) : 0;

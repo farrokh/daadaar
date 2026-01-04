@@ -1,5 +1,5 @@
-import type { Request, Response } from 'express';
 import { randomBytes } from 'node:crypto';
+import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 
 /**

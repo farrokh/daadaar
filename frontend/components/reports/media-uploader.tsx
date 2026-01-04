@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { validateMediaFile } from '../../lib/validation/report-form-schema';
 import { useTranslations } from 'next-intl';
+import { useCallback, useState } from 'react';
+import { validateMediaFile } from '../../lib/validation/report-form-schema';
 
 export interface UploadedMedia {
   id: number;
@@ -24,7 +24,7 @@ interface MediaUploaderProps {
 export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: MediaUploaderProps) {
   const [mediaFiles, setMediaFiles] = useState<UploadedMedia[]>([]);
   const [dragActive, setDragActive] = useState(false);
-  const t = useTranslations('common');
+  const _t = useTranslations('common');
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -36,128 +36,135 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
     }
   }, []);
 
-  const uploadFile = async (file: File) => {
-    // Validate file
-    const validation = validateMediaFile(file);
-    if (!validation.valid) {
-      alert(validation.error);
-      return;
-    }
-
-    // Create preview for images
-    let preview: string | undefined;
-    if (file.type.startsWith('image/')) {
-      preview = URL.createObjectURL(file);
-    }
-
-    // Add to media files list with temporary ID
-    const tempId = Date.now();
-    const newMedia: UploadedMedia = {
-      id: tempId,
-      file,
-      uploadUrl: '',
-      s3Key: '',
-      preview,
-      uploading: true,
-      progress: 0,
-    };
-
-    setMediaFiles((prev) => [...prev, newMedia]);
-
-    try {
-      let mediaId: number;
-      let s3Key: string;
-      let uploadUrl: string = '';
-
-      if (file.type.startsWith('image/')) {
-        // 1. Upload directly to backend for AVIF conversion
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const uploadResponse = await fetch(`${apiUrl}/api/media/upload`, {
-          method: 'POST',
-          credentials: 'include',
-          body: formData,
-        });
-
-        if (!uploadResponse.ok) {
-          const error = await uploadResponse.json();
-          throw new Error(error.error?.message || 'Failed to upload image');
-        }
-
-        const { data } = await uploadResponse.json();
-        mediaId = data.mediaId;
-        s3Key = data.s3Key;
-      } else {
-        // 1. Request presigned URL from backend for non-images
-        const presignedResponse = await fetch(`${apiUrl}/api/media/presigned-url`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
-            filename: file.name,
-            contentType: file.type,
-            fileSize: file.size,
-          }),
-        });
-
-        if (!presignedResponse.ok) {
-          const error = await presignedResponse.json();
-          throw new Error(error.error?.message || 'Failed to get upload URL');
-        }
-
-        const { data } = await presignedResponse.json();
-        mediaId = data.mediaId;
-        uploadUrl = data.uploadUrl;
-        s3Key = data.s3Key;
-
-        // 2. Upload file to S3 using presigned URL
-        const s3Response = await fetch(uploadUrl, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': file.type,
-          },
-          body: file,
-        });
-
-        if (!s3Response.ok) {
-          // S3 upload failed - cleanup the database record
-          try {
-            await fetch(`${apiUrl}/api/media/${mediaId}`, {
-              method: 'DELETE',
-              credentials: 'include',
-            });
-          } catch (cleanupError) {
-            console.error('Failed to cleanup media record:', cleanupError);
-          }
-          throw new Error('Failed to upload file to S3');
-        }
+  const uploadFile = useCallback(
+    async (file: File) => {
+      // Validate file
+      const validation = validateMediaFile(file);
+      if (!validation.valid) {
+        alert(validation.error);
+        return;
       }
 
-      // 3. Update media file with real ID
-      setMediaFiles((prev) =>
-        prev.map((m) =>
-          m.id === tempId
-            ? { ...m, id: mediaId, uploadUrl, s3Key, uploading: false, progress: 100 }
-            : m
-        )
-      );
+      // Create preview for images
+      let preview: string | undefined;
+      if (file.type.startsWith('image/')) {
+        preview = URL.createObjectURL(file);
+      }
 
-      // Notify parent component
-      onMediaUploaded(mediaId);
-    } catch (error) {
-      console.error('Upload error:', error);
-      setMediaFiles((prev) =>
-        prev.map((m) =>
-          m.id === tempId
-            ? { ...m, uploading: false, error: error instanceof Error ? error.message : 'Upload failed' }
-            : m
-        )
-      );
-    }
-  };
+      // Add to media files list with temporary ID
+      const tempId = Date.now();
+      const newMedia: UploadedMedia = {
+        id: tempId,
+        file,
+        uploadUrl: '',
+        s3Key: '',
+        preview,
+        uploading: true,
+        progress: 0,
+      };
+
+      setMediaFiles(prev => [...prev, newMedia]);
+
+      try {
+        let mediaId: number;
+        let s3Key: string;
+        let uploadUrl = '';
+
+        if (file.type.startsWith('image/')) {
+          // 1. Upload directly to backend for AVIF conversion
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const uploadResponse = await fetch(`${apiUrl}/api/media/upload`, {
+            method: 'POST',
+            credentials: 'include',
+            body: formData,
+          });
+
+          if (!uploadResponse.ok) {
+            const error = await uploadResponse.json();
+            throw new Error(error.error?.message || 'Failed to upload image');
+          }
+
+          const { data } = await uploadResponse.json();
+          mediaId = data.mediaId;
+          s3Key = data.s3Key;
+        } else {
+          // 1. Request presigned URL from backend for non-images
+          const presignedResponse = await fetch(`${apiUrl}/api/media/presigned-url`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              filename: file.name,
+              contentType: file.type,
+              fileSize: file.size,
+            }),
+          });
+
+          if (!presignedResponse.ok) {
+            const error = await presignedResponse.json();
+            throw new Error(error.error?.message || 'Failed to get upload URL');
+          }
+
+          const { data } = await presignedResponse.json();
+          mediaId = data.mediaId;
+          uploadUrl = data.uploadUrl;
+          s3Key = data.s3Key;
+
+          // 2. Upload file to S3 using presigned URL
+          const s3Response = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': file.type,
+            },
+            body: file,
+          });
+
+          if (!s3Response.ok) {
+            // S3 upload failed - cleanup the database record
+            try {
+              await fetch(`${apiUrl}/api/media/${mediaId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+              });
+            } catch (cleanupError) {
+              console.error('Failed to cleanup media record:', cleanupError);
+            }
+            throw new Error('Failed to upload file to S3');
+          }
+        }
+
+        // 3. Update media file with real ID
+        setMediaFiles(prev =>
+          prev.map(m =>
+            m.id === tempId
+              ? { ...m, id: mediaId, uploadUrl, s3Key, uploading: false, progress: 100 }
+              : m
+          )
+        );
+
+        // Notify parent component
+        onMediaUploaded(mediaId);
+      } catch (error) {
+        console.error('Upload error:', error);
+        setMediaFiles(prev =>
+          prev.map(m =>
+            m.id === tempId
+              ? {
+                  ...m,
+                  uploading: false,
+                  error: error instanceof Error ? error.message : 'Upload failed',
+                }
+              : m
+          )
+        );
+      }
+    },
+    [apiUrl, onMediaUploaded]
+  );
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -169,7 +176,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
         Array.from(e.dataTransfer.files).forEach(uploadFile);
       }
     },
-    [apiUrl]
+    [uploadFile]
   );
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,7 +194,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
       });
 
       // Remove from local state
-      setMediaFiles((prev) => prev.filter((m) => m.id !== mediaId));
+      setMediaFiles(prev => prev.filter(m => m.id !== mediaId));
       onMediaRemoved(mediaId);
     } catch (error) {
       console.error('Remove media error:', error);
@@ -200,8 +207,8 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
       {/* Drop zone */}
       <div
         className={`relative border-2 border-dashed rounded-3xl p-10 text-center transition-all duration-300 ${
-          dragActive 
-            ? 'border-accent-primary bg-accent-primary/10 scale-[1.02]' 
+          dragActive
+            ? 'border-accent-primary bg-accent-primary/10 scale-[1.02]'
             : 'border-foreground/10 hover:border-foreground/20 bg-foreground/5'
         }`}
         onDragEnter={handleDrag}
@@ -219,15 +226,24 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
         />
         <label htmlFor="media-upload" className="cursor-pointer group flex flex-col items-center">
           <div className="w-16 h-16 rounded-2xl bg-foreground/5 flex items-center justify-center mb-4 group-hover:bg-accent-primary/20 transition-colors">
-             <svg className="w-8 h-8 text-foreground/40 group-hover:text-accent-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-             </svg>
+            <svg
+              className="w-8 h-8 text-foreground/40 group-hover:text-accent-primary"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <title>Upload</title>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
           </div>
           <div className="text-foreground">
             <p className="text-xl font-bold mb-1">Drop files here or click to upload</p>
-            <p className="text-sm text-foreground/40">
-              Supported: Images, Videos, PDFs, Audio
-            </p>
+            <p className="text-sm text-foreground/40">Supported: Images, Videos, PDFs, Audio</p>
           </div>
         </label>
       </div>
@@ -235,19 +251,22 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
       {/* Uploaded files list */}
       {mediaFiles.length > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-          {mediaFiles.map((media) => (
-            <div key={media.id} className="relative bg-foreground/5 border border-foreground/10 rounded-3xl p-3 group overflow-hidden">
+          {mediaFiles.map(media => (
+            <div
+              key={media.id}
+              className="relative bg-foreground/5 border border-foreground/10 rounded-3xl p-3 group overflow-hidden"
+            >
               {/* Preview */}
               {media.preview && (
                 <div className="relative h-32 w-full mb-3 rounded-2xl overflow-hidden">
-                   <img
+                  <img
                     src={media.preview}
                     alt={media.file.name}
                     className="w-full h-full object-cover transition-transform group-hover:scale-110"
                   />
                   {media.uploading && (
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                       <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+                      <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                   )}
                 </div>
@@ -281,7 +300,9 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
               )}
 
               {/* Error */}
-              {media.error && <p className="text-[10px] text-red-500 mt-2 px-1 font-medium">{media.error}</p>}
+              {media.error && (
+                <p className="text-[10px] text-red-500 mt-2 px-1 font-medium">{media.error}</p>
+              )}
 
               {/* Remove button */}
               {!media.uploading && (
@@ -291,7 +312,13 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
                   className="absolute top-4 right-4 bg-foreground/10 hover:bg-red-500/80 text-foreground hover:text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md transition-all border border-foreground/10 opacity-0 group-hover:opacity-100"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <title>Remove</title>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               )}

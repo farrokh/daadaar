@@ -95,7 +95,11 @@ export function handleApiResponse<T>(response: ApiResponse<T>): T {
 }
 
 // Helper function to create API error
-export function createApiError(code: string, message: string, details?: Record<string, unknown>): ApiResponse {
+export function createApiError(
+  code: string,
+  message: string,
+  details?: Record<string, unknown>
+): ApiResponse {
   return {
     success: false,
     error: {

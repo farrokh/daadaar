@@ -195,8 +195,11 @@ export interface ReportLink {
 export interface ReportWithDetails extends Report {
   user?: PublicUser | null;
   anonymous?: boolean;
-  reportLinks?: ReportLink[];
-  media?: Media[];
+  reportLinks?: (ReportLink & {
+    individual?: Individual;
+    role?: Role & { organization?: Organization };
+  })[];
+  media?: (Media & { url?: string })[];
   aiVerification?: AiVerification | null;
 }
 

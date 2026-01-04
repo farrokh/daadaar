@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { generatePresignedUrl, deleteMedia, uploadImage } from '../controllers/media';
+import { deleteMedia, generatePresignedUrl, uploadImage } from '../controllers/media';
 import { authMiddleware } from '../middleware/auth';
 
 const router: Router = Router();

@@ -1,18 +1,21 @@
 import { randomBytes } from 'node:crypto';
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
 // Store CSRF tokens in memory (use Redis in production for distributed systems)
 const csrfTokens = new Map<string, { token: string; expiresAt: number }>();
 
 // Cleanup expired tokens every hour
-setInterval(() => {
-  const now = Date.now();
-  for (const [sessionId, data] of csrfTokens.entries()) {
-    if (data.expiresAt < now) {
-      csrfTokens.delete(sessionId);
+setInterval(
+  () => {
+    const now = Date.now();
+    for (const [sessionId, data] of csrfTokens.entries()) {
+      if (data.expiresAt < now) {
+        csrfTokens.delete(sessionId);
+      }
     }
-  }
-}, 60 * 60 * 1000);
+  },
+  60 * 60 * 1000
+);
 
 /**
  * Generate a CSRF token for the current session
@@ -30,7 +33,7 @@ export function generateCsrfToken(sessionId: string): string {
  */
 export function validateCsrfToken(sessionId: string, token: string): boolean {
   const stored = csrfTokens.get(sessionId);
-  
+
   if (!stored) {
     return false;
   }
@@ -53,11 +56,12 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
   }
 
   // Get session ID from current user
-  const sessionId = req.currentUser?.type === 'anonymous' 
-    ? req.currentUser.sessionId 
-    : req.currentUser?.type === 'registered' 
-    ? `user-${req.currentUser.id}` 
-    : null;
+  const sessionId =
+    req.currentUser?.type === 'anonymous'
+      ? req.currentUser.sessionId
+      : req.currentUser?.type === 'registered'
+        ? `user-${req.currentUser.id}`
+        : null;
 
   if (!sessionId) {
     return res.status(401).json({
@@ -70,7 +74,7 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
   }
 
   // Get CSRF token from header or body
-  const csrfToken = req.headers['x-csrf-token'] as string || req.body?.csrfToken;
+  const csrfToken = (req.headers['x-csrf-token'] as string) || req.body?.csrfToken;
 
   if (!csrfToken) {
     return res.status(403).json({
@@ -101,11 +105,12 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
  * GET /api/csrf-token
  */
 export function getCsrfToken(req: Request, res: Response) {
-  const sessionId = req.currentUser?.type === 'anonymous' 
-    ? req.currentUser.sessionId 
-    : req.currentUser?.type === 'registered' 
-    ? `user-${req.currentUser.id}` 
-    : null;
+  const sessionId =
+    req.currentUser?.type === 'anonymous'
+      ? req.currentUser.sessionId
+      : req.currentUser?.type === 'registered'
+        ? `user-${req.currentUser.id}`
+        : null;
 
   if (!sessionId) {
     return res.status(401).json({
