@@ -1,4 +1,4 @@
-import { db, schema } from './backend/src/db';
+import { db, closeDatabaseConnection } from './backend/src/db';
 
 async function main() {
   const mediaItems = await db.query.media.findMany();
@@ -8,10 +8,12 @@ async function main() {
       `ID: ${item.id}, ReportID: ${item.reportId}, Bucket: ${item.s3Bucket}, Key: ${item.s3Key}, Type: ${item.mediaType}`
     );
   }
+  await closeDatabaseConnection();
   process.exit(0);
 }
 
-main().catch(err => {
+main().catch(async err => {
   console.error(err);
+  await closeDatabaseConnection();
   process.exit(1);
 });
