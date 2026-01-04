@@ -4,7 +4,7 @@
  */
 
 export interface PowChallenge {
-  challengeId: string;
+  id: string;
   nonce: string;
   difficulty: number;
   expiresAt: string;
@@ -97,5 +97,11 @@ export async function requestPowChallenge(resource: string, apiUrl: string): Pro
   }
 
   const data = await response.json();
-  return data.data;
+  // Map API response (challengeId) to PowChallenge type (id)
+  return {
+    id: data.data.challengeId,
+    nonce: data.data.nonce,
+    difficulty: data.data.difficulty,
+    expiresAt: data.data.expiresAt,
+  };
 }

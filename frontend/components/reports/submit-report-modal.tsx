@@ -86,7 +86,7 @@ export function SubmitReportModal({
           individualId,
           roleId,
           mediaIds,
-          powChallengeId: challenge.challengeId,
+          powChallengeId: challenge.id,
           powSolution,
           powSolutionNonce,
         }),
