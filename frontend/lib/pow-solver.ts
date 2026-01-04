@@ -4,6 +4,7 @@
  */
 
 import type { PowChallengeResponse } from '@/shared/api-types';
+import { fetchApi } from './api';
 
 // Use the shared API type for consistency
 type PowChallenge = PowChallengeResponse;
@@ -76,30 +77,22 @@ export async function solvePowChallenge(
 /**
  * Request a PoW challenge from the server
  * @param resource - The resource type (e.g., 'report-submission')
- * @param apiUrl - The API base URL
  * @returns The challenge
  */
-export async function requestPowChallenge(resource: string, apiUrl: string): Promise<PowChallenge> {
-  const response = await fetch(`${apiUrl}/api/pow/challenge`, {
+export async function requestPowChallenge(resource: string): Promise<PowChallenge> {
+  const response = await fetchApi<{
+    challengeId: string;
+    nonce: string;
+    difficulty: number;
+    expiresAt: string;
+  }>('/pow/challenge', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
     body: JSON.stringify({ resource }),
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || 'Failed to request PoW challenge');
+  if (!response.success || !response.data) {
+    throw new Error(response.error?.message || 'Failed to request PoW challenge');
   }
 
-  const data = await response.json();
-  // API response already uses challengeId, so we can return it directly
-  return {
-    challengeId: data.data.challengeId,
-    nonce: data.data.nonce,
-    difficulty: data.data.difficulty,
-    expiresAt: data.data.expiresAt,
-  };
+  return response.data;
 }

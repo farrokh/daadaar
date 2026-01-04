@@ -255,21 +255,7 @@ export default function ReportDetailPage() {
           )}
         </div>
 
-        {/* Voting Placeholder */}
-        <div className="mt-16 bg-linear-to-r from-primary/10 to-secondary/10 p-8 rounded-3xl border border-foreground/10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">{t('votes')}</h2>
-            <p className="text-foreground/60 text-sm">Community verification in progress</p>
-          </div>
-          <div className="flex gap-4">
-            <Button className="bg-primary text-white font-bold px-8">
-              👍 {t('upvote')} ({report.upvoteCount})
-            </Button>
-            <Button variant="outline" className="text-foreground border-foreground/20 px-8">
-              👎 {t('downvote')} ({report.downvoteCount})
-            </Button>
-          </div>
-        </div>
+
 
         {/* Lightbox Modal */}
         {selectedMedia && (
