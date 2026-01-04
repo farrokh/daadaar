@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { validateMediaFile } from '../../lib/validation/report-form-schema';
 
 export interface UploadedMedia {
@@ -25,6 +25,24 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
   const [mediaFiles, setMediaFiles] = useState<UploadedMedia[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const _t = useTranslations('common');
+  const mediaFilesRef = useRef(mediaFiles);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    mediaFilesRef.current = mediaFiles;
+  }, [mediaFiles]);
+
+  // Cleanup: revoke all blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      // Revoke all preview URLs when component unmounts
+      mediaFilesRef.current.forEach(media => {
+        if (media.preview && media.preview.startsWith('blob:')) {
+          URL.revokeObjectURL(media.preview);
+        }
+      });
+    };
+  }, []); // Empty deps - only run on unmount
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -139,11 +157,16 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
 
         // 3. Update media file with real ID
         setMediaFiles(prev =>
-          prev.map(m =>
-            m.id === tempId
-              ? { ...m, id: mediaId, uploadUrl, s3Key, uploading: false, progress: 100 }
-              : m
-          )
+          prev.map(m => {
+            if (m.id === tempId) {
+              // Revoke old preview URL if it exists (shouldn't happen, but safe)
+              if (m.preview && m.preview.startsWith('blob:')) {
+                URL.revokeObjectURL(m.preview);
+              }
+              return { ...m, id: mediaId, uploadUrl, s3Key, uploading: false, progress: 100 };
+            }
+            return m;
+          })
         );
 
         // Notify parent component
@@ -151,15 +174,17 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
       } catch (error) {
         console.error('Upload error:', error);
         setMediaFiles(prev =>
-          prev.map(m =>
-            m.id === tempId
-              ? {
-                  ...m,
-                  uploading: false,
-                  error: error instanceof Error ? error.message : 'Upload failed',
-                }
-              : m
-          )
+          prev.map(m => {
+            if (m.id === tempId) {
+              // Keep preview URL on error so user can see what failed
+              return {
+                ...m,
+                uploading: false,
+                error: error instanceof Error ? error.message : 'Upload failed',
+              };
+            }
+            return m;
+          })
         );
       }
     },
@@ -193,8 +218,14 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
         credentials: 'include',
       });
 
-      // Remove from local state
-      setMediaFiles(prev => prev.filter(m => m.id !== mediaId));
+      // Remove from local state and revoke preview URL
+      setMediaFiles(prev => {
+        const mediaToRemove = prev.find(m => m.id === mediaId);
+        if (mediaToRemove?.preview && mediaToRemove.preview.startsWith('blob:')) {
+          URL.revokeObjectURL(mediaToRemove.preview);
+        }
+        return prev.filter(m => m.id !== mediaId);
+      });
       onMediaRemoved(mediaId);
     } catch (error) {
       console.error('Remove media error:', error);
