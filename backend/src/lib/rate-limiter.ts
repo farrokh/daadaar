@@ -32,16 +32,29 @@ export async function checkRateLimit(
   try {
     const rateLimitKey = `ratelimit:${key}`;
 
-    // Get current count
-    const currentCount = await redis.get(rateLimitKey);
-    const count = currentCount ? Number.parseInt(currentCount, 10) : 0;
+    // Atomic Lua script: increment, set TTL if new key, return count and TTL
+    // This eliminates TOCTOU race conditions by doing everything atomically
+    const luaScript = `
+      local count = redis.call('INCR', KEYS[1])
+      if count == 1 then
+        redis.call('EXPIRE', KEYS[1], ARGV[1])
+      end
+      local ttl = redis.call('TTL', KEYS[1])
+      return {count, ttl}
+    `;
 
-    // Get TTL to calculate reset time
-    const ttl = await redis.ttl(rateLimitKey);
+    const result = await redis.eval(
+      luaScript,
+      1,
+      rateLimitKey,
+      windowSeconds.toString()
+    ) as [number, number];
+
+    const [newCount, ttl] = result;
     const resetAt = new Date(Date.now() + (ttl > 0 ? ttl * 1000 : windowSeconds * 1000));
 
-    // Check if limit exceeded
-    if (count >= limit) {
+    // Check if limit exceeded based on the atomically incremented count
+    if (newCount > limit) {
       return {
         allowed: false,
         remaining: 0,
@@ -50,18 +63,9 @@ export async function checkRateLimit(
       };
     }
 
-    // Increment counter
-    if (count === 0) {
-      // First request in window, set with expiration
-      await redis.set(rateLimitKey, '1', 'EX', windowSeconds);
-    } else {
-      // Increment existing counter
-      await redis.incr(rateLimitKey);
-    }
-
     return {
       allowed: true,
-      remaining: limit - count - 1,
+      remaining: Math.max(0, limit - newCount),
       resetAt,
     };
   } catch (error) {
