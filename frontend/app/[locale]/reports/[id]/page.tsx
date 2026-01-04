@@ -314,7 +314,6 @@ export default function ReportDetailPage() {
                       getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
                     }
                     controls
-                    autoPlay
                     className="max-w-full max-h-[80vh] rounded-2xl shadow-2xl border border-foreground/10"
                   >
                     <track kind="captions" />
