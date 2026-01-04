@@ -37,15 +37,19 @@ export async function validatePowSolution(
     // 4. Recompute the hash to verify it was computed correctly
     const expectedHash = createHash('sha256')
       .update(`${challenge.nonce}${solutionNonce}`)
-      .digest('hex');
+      .digest('hex')
+      .toLowerCase();
 
-    if (expectedHash !== solution) {
+    // Normalize solution to lowercase for case-insensitive comparison
+    const normalizedSolution = solution.toLowerCase();
+
+    if (expectedHash !== normalizedSolution) {
       return { valid: false, error: 'Invalid solution: hash mismatch' };
     }
 
     // 6. Verify the hash meets difficulty requirement
     const expectedPrefix = '0'.repeat(challenge.difficulty);
-    if (!solution.startsWith(expectedPrefix)) {
+    if (!normalizedSolution.startsWith(expectedPrefix)) {
       return { valid: false, error: 'Invalid solution: insufficient leading zeros' };
     }
 

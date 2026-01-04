@@ -1,4 +1,4 @@
-import { promises as fs } from 'node:fs';
+import fs from 'node:fs/promises';
 import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import sharp from 'sharp';
