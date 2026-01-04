@@ -6,7 +6,7 @@ import { formatDate, getS3PublicUrl } from '@/lib/utils';
 import type { Media, ReportWithDetails } from '@/shared/types';
 import { useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export default function ReportDetailPage() {
   const params = useParams();
@@ -17,6 +17,8 @@ export default function ReportDetailPage() {
   const [selectedMedia, setSelectedMedia] = useState<(Media & { url?: string }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -39,6 +41,31 @@ export default function ReportDetailPage() {
       fetchReport();
     }
   }, [params.id, t]);
+
+  // Focus management and Escape key handling for lightbox
+  useEffect(() => {
+    if (!selectedMedia) return;
+
+    // Focus the close button when dialog opens
+    closeButtonRef.current?.focus();
+
+    // Handle Escape key at document level
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedMedia(null);
+      }
+    };
+
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = '';
+    };
+  }, [selectedMedia]);
 
   if (loading) {
     return (
@@ -224,20 +251,24 @@ export default function ReportDetailPage() {
 
         {/* Lightbox Modal */}
         {selectedMedia && (
-          <button
-            type="button"
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="lightbox-title"
+            tabIndex={-1}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 sm:p-10"
             onClick={() => setSelectedMedia(null)}
-            onKeyDown={e => e.key === 'Escape' && setSelectedMedia(null)}
           >
             <button
+              ref={closeButtonRef}
               type="button"
-              className="absolute top-6 right-6 text-white/60 hover:text-white z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              className="absolute top-6 right-6 text-white/60 hover:text-white z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
               onClick={() => setSelectedMedia(null)}
-              aria-label="Close"
+              aria-label={commonT('close')}
             >
               <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <title>Close</title>
+                <title>{commonT('close')}</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -250,8 +281,6 @@ export default function ReportDetailPage() {
             <div
               className="max-w-7xl w-full max-h-full flex flex-col items-center"
               onClick={e => e.stopPropagation()}
-              onKeyDown={e => e.stopPropagation()}
-              aria-modal="true"
             >
               <div className="w-full flex justify-center mb-6">
                 {selectedMedia.mediaType === 'image' && (
@@ -279,7 +308,7 @@ export default function ReportDetailPage() {
                 )}
               </div>
               <div className="text-center">
-                <h4 className="text-white font-bold text-xl mb-2">
+                <h4 id="lightbox-title" className="text-white font-bold text-xl mb-2">
                   {selectedMedia.originalFilename}
                 </h4>
                 <p className="text-white/40 text-sm">
@@ -290,7 +319,7 @@ export default function ReportDetailPage() {
                 </p>
               </div>
             </div>
-          </button>
+          </div>
         )}
       </div>
     </div>
