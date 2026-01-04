@@ -3,15 +3,9 @@
  * These types ensure type safety across frontend and backend
  */
 
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: {
-    code: string;
-    message: string;
-    details?: Record<string, unknown>;
-  };
-}
+// Import and re-export ApiResponse from the canonical definition
+import type { ApiResponse } from './types';
+export type { ApiResponse } from './types';
 
 export interface PaginatedResponse<T> {
   items: T[];
@@ -100,7 +94,7 @@ export function createApiError(
   code: string,
   message: string,
   details?: Record<string, unknown>
-): ApiResponse {
+): ApiResponse<never> {
   return {
     success: false,
     error: {
