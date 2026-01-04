@@ -6,6 +6,7 @@ import passport from 'passport';
 import { checkDatabaseConnection, closeDatabaseConnection } from './db';
 import { checkRedisConnection } from './lib/redis';
 import authRoutes from './routes/auth';
+import csrfRoutes from './routes/csrf';
 import graphRoutes from './routes/graph';
 import individualsRoutes from './routes/individuals';
 import mediaRoutes from './routes/media';
@@ -33,6 +34,7 @@ app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/csrf', csrfRoutes);
 app.use('/api/graph', graphRoutes);
 app.use('/api/organizations', organizationsRoutes);
 app.use('/api/individuals', individualsRoutes);
