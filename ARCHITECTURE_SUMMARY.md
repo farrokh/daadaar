@@ -59,10 +59,12 @@ The platform follows a **separated frontend-backend architecture** for optimal s
 
 ### Frontend Layer
 - **Framework**: Next.js 16+ (App Router) with React 19+
+- **Styling**: Tailwind CSS 4 (Beta/Stable) for high-performance visual styling
+- **Theme Support**: Native System Theme support using CSS variables and `@media (prefers-color-scheme)`
+- **Design System**: Custom design system focused on **Glassmorphism**, smooth transitions, and accessibility
 - **Internationalization**: next-intl (App Router optimized, RTL support)
-- **Graph Visualization**: React Flow or Cytoscape.js
-- **UI Components**: Tailwind CSS + shadcn/ui
-- **State Management**: Zustand
+- **Graph Visualization**: React Flow (Interactive directional graphs)
+- **State Management**: Zustand (Global) + React Hooks (Contextual)
 - **Form Handling**: React Hook Form + Zod
 - **Deployment**: AWS Amplify/EC2 with Cloudflare CDN
 
@@ -367,13 +369,13 @@ const requireAuth = async (req, res, next) => {
 
 **Frontend**:
 - React Flow for interactive rendering with directional edges
-- Graph toolbar with refresh and add buttons (context-aware)
-- Add Organization modal for creating new organizations with parent/child relationships
-- Add Person modal with inline role creation capability
+- **System-Preference Theming**: Dynamic adaptation to Light/Dark modes
+- **Shared Navbar**: Persistent localized navigation available across all views
+- **Graph Toolbar**: Context-aware management tools for organizations, people, and reports
+- **Breadcrumb Navigation**: Floating dynamic breadcrumbs for drill-down context Tracking
 - Directional edges with arrow markers connecting parent/child organizations
-- Node click handlers to show details and drill down (organizations → people → reports)
-- Handle components on custom nodes for proper edge connections
-- Client-side state management (React hooks)
+- Node click handlers for deep exploration (organizations → people → reports)
+- Handles on custom nodes for optimized edge routing
 
 **Backend**:
 - Graph data endpoint with date range filtering (`GET /api/graph`)
@@ -427,20 +429,34 @@ const requireAuth = async (req, res, next) => {
 **Purpose**: Filter graph data (reports and role occupancies) based on a selected time range to visualize historical changes and incident clusters
 
 **Frontend**:
-- `TimelineFilter` component: A custom dual-handle range slider for year selection.
-  - **Glassmorphism Design**: High-end visual aesthetic with backdrop-blur and responsive handle alignment.
-  - **Dynamic Range**: Automatically scales its min/max boundaries based on the data present in the current view.
-  - **Handle-Center Alignment**: Custom CSS/JS math ensures the highlight bar perfectly aligns with the center of the slider handles.
-- **Global Visibility**: Integrated into `GraphCanvas` to be always visible on the home page and drill-down views.
-- **Internationalization**: Fully localized support for English and Persian.
+- `TimelineFilter`: A custom dual-handle range slider with glassmorphism styling.
+- **Dynamic Limits**: Min/Max range scales automatically based on the years found in currently loaded reports.
+- **Node Filtering**: Reports are filtered by `incidentDate`.
+- **Edge Filtering**: Role occupancy edges are filtered by their `startDate` and `endDate`.
+- **Overlap Logic**: Relationships are shown if their active duration intersects with the selected timeline window.
+- **Persistent Visibility**: The filter remains active across all view modes (Organizations, People, Reports).
 
-**Implementation Details**:
-- **Node Filtering**: Reports are filtered by their `incidentDate`.
-- **Edge Filtering**: Relationships (edges) are filtered based on their temporal metadata (e.g., `startDate` and `endDate` in role occupancy).
-- **Overlap Logic**: Edges are shown if their active duration [start, end] has any overlap with the selected timeline window.
-- **Fallback Range**: Defaults to a 2000-Present range if no specific dates are found in the current dataset.
+### 3. Media Gallery & Secure Delivery
 
-### 3. Report Submission
+**Purpose**: Provide a premium, secure way to view evidentiary media (images/videos)
+
+**Features**:
+- **Secure S3 Delivery**: Uses AWS S3 Presigned GET URLs to serve media from private buckets.
+- **AVIF Optimization**: Built-in support for next-gen image formats.
+- **Lightbox Viewer**: Glassmorphism-styled modal for full-screen media inspection with backdrop blur.
+- **Thumbnail Grid**: Optimized responsive grid for multi-media reports below the description.
+
+### 4. System Theme Support
+
+**Purpose**: Seamlessly adapt to user system preferences for optimal readability and accessibility
+
+**Technical Implementation**:
+- **CSS Variables**: Defined in `globals.css` with adaptive values for `--background`, `--foreground`, and `--card-bg`.
+- **Tailwind Integration**: Custom classes like `bg-background` and `text-foreground` used throughout the app.
+- **Dark Mode Overrides**: Uses `@media (prefers-color-scheme: dark)` to update variables without manual toggles.
+- **Theme-Aware Components**: All core UI elements (Buttons, Inputs, Modals) use opacity-based variants (e.g., `bg-foreground/5`) to maintain contrast in both themes.
+
+### 5. Report Submission
 
 **Purpose**: Allow users to submit detailed reports linking individuals to incidents
 
@@ -468,7 +484,7 @@ const requireAuth = async (req, res, next) => {
 6. Backend queues AI verification job
 7. Returns created report with ID
 
-### 3. Voting System
+### 6. Voting System
 
 **Purpose**: Community-driven credibility assessment
 
@@ -496,7 +512,7 @@ const requireAuth = async (req, res, next) => {
 5. Backend updates vote counts atomically
 6. Returns updated totals
 
-### 4. AI Verification
+### 7. AI Verification
 
 **Purpose**: Provide confidence scores for reports using AI analysis
 
@@ -514,7 +530,7 @@ const requireAuth = async (req, res, next) => {
 - Filter by confidence threshold
 - Show AI analysis summary (if available)
 
-### 5. Search & Filtering
+### 8. Search & Filtering
 
 **Purpose**: Enable users to find relevant reports
 
@@ -530,7 +546,7 @@ const requireAuth = async (req, res, next) => {
 - Pagination support
 - Returns filtered and sorted results
 
-### 6. Organization Management & Trust System
+### 9. Organization Management & Trust System
 
 **Purpose**: Allow users to create and manage organizations with a trust-based permission system
 
@@ -643,7 +659,7 @@ const canCreateOrganization = async (userId: number) => {
 - Existing organizations remain accessible
 - Users who created organizations before switch retain creation rights (grandfathered)
 
-### 7. Content Reporting & Moderation System
+### 10. Content Reporting & Moderation System
 
 **Purpose**: Allow users to report incorrect, inappropriate, or problematic content throughout the application for administrative review
 
@@ -754,7 +770,7 @@ report_reasons {
 - Report option in media viewer
 - Context menu option throughout UI
 
-### 8. Admin Roles & Banned User System
+### 11. Admin Roles & Banned User System
 
 **Purpose**: Enable administrative control over the platform with user banning capabilities for both registered users and anonymous sessions
 
@@ -968,7 +984,7 @@ const moderatorMiddleware = async (req, res, next) => {
 - Optionally transfer ban to new account
 - Or allow account creation but warn about previous ban
 
-### 9. Session Transfer & Migration (Secure)
+### 12. Session Transfer & Migration (Secure)
 
 **Purpose**: Allow anonymous users to transfer their sessions (including trust scores) between devices/browsers securely
 
