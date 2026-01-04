@@ -36,11 +36,11 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
   useEffect(() => {
     return () => {
       // Revoke all preview URLs when component unmounts
-      mediaFilesRef.current.forEach(media => {
-        if (media.preview && media.preview.startsWith('blob:')) {
+      for (const media of mediaFilesRef.current) {
+        if (media.preview?.startsWith('blob:')) {
           URL.revokeObjectURL(media.preview);
         }
-      });
+      }
     };
   }, []); // Empty deps - only run on unmount
 
@@ -160,7 +160,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
           prev.map(m => {
             if (m.id === tempId) {
               // Revoke old preview URL if it exists (shouldn't happen, but safe)
-              if (m.preview && m.preview.startsWith('blob:')) {
+              if (m.preview?.startsWith('blob:')) {
                 URL.revokeObjectURL(m.preview);
               }
               return { ...m, id: mediaId, uploadUrl, s3Key, uploading: false, progress: 100 };
@@ -221,7 +221,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
       // Remove from local state and revoke preview URL
       setMediaFiles(prev => {
         const mediaToRemove = prev.find(m => m.id === mediaId);
-        if (mediaToRemove?.preview && mediaToRemove.preview.startsWith('blob:')) {
+        if (mediaToRemove?.preview?.startsWith('blob:')) {
           URL.revokeObjectURL(mediaToRemove.preview);
         }
         return prev.filter(m => m.id !== mediaId);

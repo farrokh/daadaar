@@ -53,12 +53,7 @@ export async function validatePowSolution(
     const updateResult = await db
       .update(schema.powChallenges)
       .set({ isUsed: true })
-      .where(
-        and(
-          eq(schema.powChallenges.id, challengeId),
-          eq(schema.powChallenges.isUsed, false)
-        )
-      )
+      .where(and(eq(schema.powChallenges.id, challengeId), eq(schema.powChallenges.isUsed, false)))
       .returning();
 
     // If no rows were updated, the challenge was already used

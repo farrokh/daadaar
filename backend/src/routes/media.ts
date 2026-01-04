@@ -1,6 +1,6 @@
+import { tmpdir } from 'node:os';
 import { Router } from 'express';
 import multer from 'multer';
-import { tmpdir } from 'os';
 import { deleteMedia, generatePresignedUrl, uploadImage } from '../controllers/media';
 import { csrfProtection } from '../lib/csrf-protection';
 import { authMiddleware } from '../middleware/auth';
@@ -8,12 +8,12 @@ import { authMiddleware } from '../middleware/auth';
 const router: Router = Router();
 const upload = multer({
   storage: multer.diskStorage({
-    destination: (req, file, cb) => {
+    destination: (_req, _file, cb) => {
       cb(null, tmpdir());
     },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, file.fieldname + '-' + uniqueSuffix);
+    filename: (_req, file, cb) => {
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      cb(null, `${file.fieldname}-${uniqueSuffix}`);
     },
   }),
   limits: {
