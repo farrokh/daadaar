@@ -33,6 +33,9 @@ Redis is a **required runtime dependency** for production deployments, used for 
 - `REDIS_PASSWORD` - Separate password (if not in URL)
 - `REDIS_TLS` - Enable TLS (`true`/`false`, defaults based on URL scheme)
 - `REDIS_DB` - Database number (0-15, defaults to 0)
+- `RATE_LIMITER_FAIL_CLOSED` - Fail-closed mode for rate limiting (`true`/`false`, default: `false`)
+  - When `true`: Denies all requests when Redis is unavailable
+  - When `false`: Uses in-memory fallback rate limiter (default)
 
 ### Configuration Parameters
 
@@ -61,9 +64,14 @@ Redis is a **required runtime dependency** for production deployments, used for 
 ### Health Checks & Monitoring
 
 **Health Check Endpoint**:
+- Endpoint: `GET /api/health`
+- Returns comprehensive health status including:
+  - `redis.connected` - Redis connection status
+  - `redis.latencyMs` - Redis ping latency
+  - `rateLimiter.redisUnavailableCount` - Counter of Redis unavailability events
+  - `rateLimiter.usingInMemoryFallback` - Boolean indicating fallback mode
 - Function: `checkRedisConnection()` in `backend/src/lib/redis.ts`
-- Returns: `{ connected: boolean, latencyMs?: number, error?: string }`
-- Usage: Expose via `/api/health/redis` endpoint for monitoring
+- Function: `getRedisUnavailableCount()` in `backend/src/lib/rate-limiter.ts`
 
 **Monitoring Metrics**:
 - Connection status (connected/disconnected)
@@ -73,9 +81,11 @@ Redis is a **required runtime dependency** for production deployments, used for 
 - Memory usage (if monitoring Redis directly)
 
 **Alerting**:
-- **Critical**: Redis connection failures (fail-open behavior means service continues)
+- **Critical**: Redis connection failures (in-memory fallback enables service to continue)
 - **Warning**: High latency (>100ms ping response)
+- **Warning**: `rateLimiter.redisUnavailableCount` increasing (indicates Redis issues)
 - **Info**: Connection recovery after failure
+- **Info**: In-memory fallback activation (check `rateLimiter.usingInMemoryFallback`)
 
 **Recommended Monitoring**:
 - CloudWatch alarms for Redis connection failures
@@ -96,9 +106,11 @@ Redis is a **required runtime dependency** for production deployments, used for 
 - **Note**: Rate limit state loss is acceptable; no backup required for this use case
 
 **Disaster Recovery**:
-- Redis failure triggers fail-open behavior (rate limiting disabled)
+- Redis failure triggers in-memory fallback (rate limiting continues per-instance)
+- Report submission endpoint uses fail-closed mode (denies requests if Redis unavailable)
 - No data recovery needed (rate limits reset automatically)
-- Restore Redis connectivity to resume rate limiting
+- Restore Redis connectivity to resume distributed rate limiting
+- In-memory fallback provides per-instance protection during outages
 
 ### High Availability Options
 

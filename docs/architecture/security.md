@@ -27,32 +27,51 @@ Limits are tied to session IDs (anonymous) or User IDs (registered), not IP addr
   - Example: `redis://localhost:6379` or `rediss://user:pass@redis.example.com:6380/0`
 - **Connection**: Uses `ioredis` client with automatic reconnection enabled
 - **Health Check**: Available via `checkRedisConnection()` function (returns connection status and latency)
+- **Fail-Closed Mode**: `RATE_LIMITER_FAIL_CLOSED` (optional, default: `false`)
+  - When `true`, denies requests when Redis is unavailable (fail-closed)
+  - When `false`, uses in-memory fallback rate limiter (fail-open with fallback)
 
 **Fallback Behavior** (Redis Unavailable):
-When Redis is unavailable or not configured, the system implements a **fail-open policy** with reduced guarantees:
+When Redis is unavailable or not configured, the system implements a **multi-tier fallback strategy**:
 
 1. **Development Mode** (`REDIS_URL` not set):
-   - Rate limiting is **disabled** (all requests allowed)
-   - Warning logged: `"Redis not available, skipping rate limit check"`
+   - Uses **in-memory rate limiter** (same algorithm as Redis, per-instance)
+   - Rate limiting continues to function locally
+   - Warning logged: `"Redis not available, using in-memory fallback"`
    - Intended for local development only
 
-2. **Production Mode** (Redis connection failure):
-   - Rate limiting **temporarily disabled** (fail-open)
-   - **Loud alert** logged: `"Rate limit check error: [error details]"`
-   - Requests are allowed to prevent service disruption
-   - **Critical**: Operators must monitor Redis health and restore connectivity immediately
+2. **Production Mode - Fail-Open (Default)**:
+   - Uses **in-memory rate limiter** as fallback (same fixed-window algorithm)
+   - Rate limiting continues to function across all endpoints except critical ones
+   - **Prominent alert** logged every minute: `"[RATE_LIMITER_ALERT] Redis unavailable - Using in-memory fallback"`
+   - Metrics tracked: `redisUnavailableCount` exposed in `/api/health` endpoint
+   - Automatic cleanup of expired entries every 5 minutes
+   - **Note**: In-memory limits are per-instance (not shared across multiple backend instances)
 
-**Why Fail-Open?**
-- Prevents cascading failures if Redis is temporarily unavailable
-- Ensures platform remains accessible during infrastructure issues
-- Rate limiting is a protective layer, not a hard requirement for core functionality
-- PoW protection still provides abuse prevention even without rate limiting
+3. **Production Mode - Fail-Closed (Critical Endpoints)**:
+   - **Report submission** (`checkReportSubmissionLimit`) uses **fail-closed by default**
+   - When Redis is unavailable, report submissions are **denied** with error: `"Rate limiting service unavailable. Please try again later."`
+   - This ensures critical abuse prevention even during Redis outages
+   - Other endpoints (voting, challenge generation) use fail-open with in-memory fallback
+
+4. **Global Fail-Closed Mode** (`RATE_LIMITER_FAIL_CLOSED=true`):
+   - All rate-limited endpoints deny requests when Redis is unavailable
+   - Use only if rate limiting is absolutely critical for your deployment
+   - **Warning**: This can cause service disruption during Redis outages
+
+**Why In-Memory Fallback?**
+- Continues rate limiting protection even when Redis is down
+- Uses the same fixed-window algorithm for consistency
+- Prevents service disruption while maintaining abuse protection
+- Per-instance limits are acceptable for most use cases (PoW provides additional protection)
 
 **Operational Notes**:
-- Monitor Redis connection health via application logs and health check endpoints
+- Monitor Redis connection health via `/api/health` endpoint (includes `rateLimiter.redisUnavailableCount`)
 - Set up alerts for Redis connection failures (CloudWatch, Sentry, etc.)
+- Monitor `rateLimiter.usingInMemoryFallback` flag in health checks
 - In high-availability deployments, use Redis Sentinel or Cluster mode (see Infrastructure docs)
 - Rate limit state is ephemeral; Redis restarts clear all rate limit counters (acceptable trade-off)
+- In-memory fallback limits are per-instance (not shared in multi-instance deployments)
 
 ### 3. CSRF Protection
 Custom implementation (`lib/csrf-protection.ts`) using 32-byte tokens with 24-hour expiration.
