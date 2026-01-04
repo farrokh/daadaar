@@ -7,8 +7,8 @@ import { authMiddleware, requireAuth } from '../middleware/auth';
 const router: ReturnType<typeof Router> = Router();
 
 // Apply authentication middleware to all organization routes
+// authMiddleware ensures req.currentUser is set (either 'registered' or 'anonymous')
 router.use(authMiddleware);
-router.use(requireAuth);
 
 // GET /api/organizations - List all organizations
 router.get('/', organizationsController.listOrganizations as RequestHandler);

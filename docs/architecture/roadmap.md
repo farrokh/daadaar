@@ -6,6 +6,8 @@ The development of Daadaar is organized into three strategic phases, moving from
 
 ## 📊 Implementation Status Overview
 
+> **Note**: This roadmap reflects the current state as of January 2026. Features marked as "In Progress" may have database schemas and type definitions complete, but are missing actual implementation (routes, controllers, business logic).
+
 ### ✅ Completed Features
 
 #### Core Infrastructure
@@ -47,13 +49,45 @@ The development of Daadaar is organized into three strategic phases, moving from
 
 ### High Priority
 - [ ] **Voting Mechanism**: Upvote/downvote with PoW for anonymous users, session-based duplicate prevention, and atomic vote count updates
+  - ✅ Database schema complete (`votes` table with unique constraints)
+  - ✅ Rate limiting function exists (`checkVotingLimit`)
+  - ✅ PoW resource type configured for voting
+  - ❌ **Missing**: Voting routes (`POST /api/votes`) and controller implementation
+  - ❌ **Missing**: Atomic vote count updates on reports table
+  - ❌ **Missing**: Frontend voting functionality (currently placeholder UI)
 - [ ] **AI Verification (Basic)**: OpenAI GPT-4 API integration for report analysis and confidence scoring with background job queue (BullMQ)
+  - ✅ Database schema complete (`ai_verification` table with all fields)
+  - ❌ **Missing**: OpenAI SDK dependency (`openai` package)
+  - ❌ **Missing**: BullMQ dependency and job queue setup
+  - ❌ **Missing**: AI verification controller and background job processor
+  - ❌ **Missing**: Integration with report creation workflow
 - [ ] **Full-Text Search**: PostgreSQL tsvector/tsquery implementation for searching reports by organization, role, individual, date range, and AI confidence
+  - ✅ `pg_trgm` extension available in database init script
+  - ❌ **Missing**: tsvector columns and indexes on reports table
+  - ❌ **Missing**: Search query implementation in `getReports` controller
+  - ❌ **Missing**: Search parameters in API types
 
 ### Medium Priority
 - [ ] **User Trust Score System**: Calculation and tracking system for organization creation permissions
+  - ✅ Database schema complete (`user_trust_scores` table)
+  - ✅ Type definitions exist (`UserTrustScore` interface)
+  - ❌ **Missing**: Trust score calculation logic
+  - ❌ **Missing**: Trust score update triggers/hooks
+  - ❌ **Missing**: Organization creation permission checks based on trust score
 - [ ] **Content Reporting System**: Universal reporting for incorrect/inappropriate content across all entities (reports, organizations, individuals, users, media)
+  - ✅ Database schema complete (`content_reports` table with all status/reason enums)
+  - ✅ Type definitions exist (`ContentReport` interface)
+  - ❌ **Missing**: Content reporting routes (`POST /api/content-reports`)
+  - ❌ **Missing**: Content reporting controller
+  - ❌ **Missing**: Frontend reporting UI
 - [ ] **Admin Roles & Banning**: User/moderator/admin roles with banning system for registered users and anonymous sessions, plus ban history tracking
+  - ✅ Database schema complete (`users.role`, `users.isBanned`, `ban_history` table)
+  - ✅ Ban checking in auth middleware (auto-unban on expiry)
+  - ✅ Ban status endpoint (`GET /api/auth/ban-status`)
+  - ❌ **Missing**: Admin ban management routes (`POST /api/admin/bans`)
+  - ❌ **Missing**: Ban management controller (ban/unban operations)
+  - ❌ **Missing**: Admin middleware for role-based access control
+  - ❌ **Missing**: Ban history tracking on ban/unban actions
 
 ---
 

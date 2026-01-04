@@ -2,9 +2,8 @@
 // Handles CRUD operations for organizations
 
 import { eq } from 'drizzle-orm';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { db, schema } from '../db';
-import type { AuthenticatedRequest } from '../types/auth';
 
 interface CreateOrganizationBody {
   name: string;
@@ -18,7 +17,7 @@ interface CreateOrganizationBody {
  * POST /api/organizations
  * Create a new organization
  */
-export async function createOrganization(req: AuthenticatedRequest, res: Response) {
+export async function createOrganization(req: Request, res: Response) {
   try {
     const body = req.body as CreateOrganizationBody;
 
@@ -73,8 +72,9 @@ export async function createOrganization(req: AuthenticatedRequest, res: Respons
       }
     }
 
-    // Get user ID from session if authenticated
-    const userId = req.user?.type === 'registered' ? req.user.id : null;
+    // Get user/session info
+    const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
+    const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
     // Create the organization
     const [newOrg] = await db
@@ -86,6 +86,7 @@ export async function createOrganization(req: AuthenticatedRequest, res: Respons
         descriptionEn: body.descriptionEn?.trim() || null,
         parentId: body.parentId || null,
         createdByUserId: userId,
+        sessionId,
       })
       .returning();
 
@@ -95,6 +96,7 @@ export async function createOrganization(req: AuthenticatedRequest, res: Respons
         parentId: body.parentId,
         childId: newOrg.id,
         createdByUserId: userId,
+        sessionId,
       });
     }
 
@@ -118,7 +120,7 @@ export async function createOrganization(req: AuthenticatedRequest, res: Respons
  * GET /api/organizations
  * List all organizations
  */
-export async function listOrganizations(_req: AuthenticatedRequest, res: Response) {
+export async function listOrganizations(_req: Request, res: Response) {
   try {
     const organizations = await db
       .select({
@@ -153,7 +155,7 @@ export async function listOrganizations(_req: AuthenticatedRequest, res: Respons
  * GET /api/organizations/:id
  * Get a single organization by ID
  */
-export async function getOrganization(req: AuthenticatedRequest, res: Response) {
+export async function getOrganization(req: Request, res: Response) {
   try {
     const organizationId = Number.parseInt(req.params.id, 10);
 
@@ -202,7 +204,7 @@ export async function getOrganization(req: AuthenticatedRequest, res: Response) 
  * PUT /api/organizations/:id
  * Update an organization
  */
-export async function updateOrganization(req: AuthenticatedRequest, res: Response) {
+export async function updateOrganization(req: Request, res: Response) {
   try {
     const organizationId = Number.parseInt(req.params.id, 10);
 
@@ -292,7 +294,7 @@ export async function updateOrganization(req: AuthenticatedRequest, res: Respons
  * GET /api/organizations/:id/roles
  * Get all roles for an organization
  */
-export async function getOrganizationRoles(req: AuthenticatedRequest, res: Response) {
+export async function getOrganizationRoles(req: Request, res: Response) {
   try {
     const organizationId = Number.parseInt(req.params.id, 10);
 

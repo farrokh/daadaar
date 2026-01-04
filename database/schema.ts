@@ -65,6 +65,7 @@ export const organizations = pgTable(
     descriptionEn: text('description_en'), // English translation
     parentId: integer('parent_id'),
     createdByUserId: integer('created_by_user_id'),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
@@ -91,6 +92,7 @@ export const organizationHierarchy = pgTable(
     createdByUserId: integer('created_by_user_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   table => [
@@ -118,6 +120,7 @@ export const roles = pgTable(
     createdByUserId: integer('created_by_user_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
@@ -144,6 +147,7 @@ export const individuals = pgTable(
     createdByUserId: integer('created_by_user_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
@@ -172,6 +176,7 @@ export const roleOccupancy = pgTable(
     createdByUserId: integer('created_by_user_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },

@@ -2,9 +2,8 @@
 // Handles CRUD operations for individuals (people)
 
 import { eq } from 'drizzle-orm';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { db, schema } from '../db';
-import type { AuthenticatedRequest } from '../types/auth';
 
 interface CreateIndividualBody {
   fullName: string;
@@ -22,7 +21,7 @@ interface CreateIndividualBody {
  * POST /api/individuals
  * Create a new individual (person)
  */
-export async function createIndividual(req: AuthenticatedRequest, res: Response) {
+export async function createIndividual(req: Request, res: Response) {
   try {
     const body = req.body as CreateIndividualBody;
 
@@ -88,8 +87,9 @@ export async function createIndividual(req: AuthenticatedRequest, res: Response)
       }
     }
 
-    // Get user ID from session if authenticated
-    const userId = req.user?.type === 'registered' ? req.user.id : null;
+    // Get user/session info
+    const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
+    const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
     // Create the individual
     const [newIndividual] = await db
@@ -101,6 +101,7 @@ export async function createIndividual(req: AuthenticatedRequest, res: Response)
         biographyEn: body.biographyEn?.trim() || null,
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
         createdByUserId: userId,
+        sessionId,
       })
       .returning();
 
@@ -111,6 +112,7 @@ export async function createIndividual(req: AuthenticatedRequest, res: Response)
         roleId: body.roleId,
         startDate: body.startDate ? new Date(body.startDate) : new Date(),
         createdByUserId: userId,
+        sessionId,
       });
     }
 
@@ -134,7 +136,7 @@ export async function createIndividual(req: AuthenticatedRequest, res: Response)
  * GET /api/individuals
  * List all individuals
  */
-export async function listIndividuals(_req: AuthenticatedRequest, res: Response) {
+export async function listIndividuals(_req: Request, res: Response) {
   try {
     const individuals = await db
       .select({
@@ -169,7 +171,7 @@ export async function listIndividuals(_req: AuthenticatedRequest, res: Response)
  * GET /api/individuals/:id
  * Get a single individual by ID
  */
-export async function getIndividual(req: AuthenticatedRequest, res: Response) {
+export async function getIndividual(req: Request, res: Response) {
   try {
     const individualId = Number.parseInt(req.params.id, 10);
 
@@ -218,7 +220,7 @@ export async function getIndividual(req: AuthenticatedRequest, res: Response) {
  * PUT /api/individuals/:id
  * Update an individual
  */
-export async function updateIndividual(req: AuthenticatedRequest, res: Response) {
+export async function updateIndividual(req: Request, res: Response) {
   try {
     const individualId = Number.parseInt(req.params.id, 10);
 
