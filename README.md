@@ -32,8 +32,8 @@ For detailed architecture, see [ARCHITECTURE_SUMMARY.md](ARCHITECTURE_SUMMARY.md
 ### Prerequisites
 
 - **Bun 1.0+** - [Install Bun](https://bun.sh)
-- **Docker** - For local PostgreSQL database
-- **Redis** - For session management (optional for local dev)
+- **Docker** - For local PostgreSQL and Redis databases
+- **Redis** - Required for production (rate limiting, sessions). Optional for local dev (system will operate without it but rate limiting will be disabled)
 
 ### Installation
 
@@ -75,8 +75,9 @@ bun run dev:backend      # Backend only
 bun run docker:up        # Start PostgreSQL container
 bun run docker:down      # Stop PostgreSQL container
 bun run docker:reset     # Reset database (deletes all data)
-bun run db:push          # Push schema to database
+bun run db:push          # Push schema to database (local dev only)
 bun run db:generate      # Generate migrations
+bun run db:migrate       # Run migrations (use in production, not db:push)
 bun run db:studio        # Open Drizzle Studio (DB browser)
 
 # Code Quality

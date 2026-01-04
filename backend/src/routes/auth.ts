@@ -1,6 +1,7 @@
 import { Router, type Router as RouterType } from 'express';
 import passport from 'passport';
 import * as authController from '../controllers/auth';
+import { csrfProtection } from '../lib/csrf-protection';
 import { authMiddleware } from '../middleware/auth';
 import '../config/passport'; // Initialize Passport strategies
 
@@ -37,13 +38,13 @@ router.get(
 // ============================================================================
 
 // POST /api/auth/session - Create anonymous session
-router.post('/session', authMiddleware, authController.createSession);
+router.post('/session', authMiddleware, csrfProtection, authController.createSession);
 
 // GET /api/auth/session - Validate session
 router.get('/session', authMiddleware, authController.validateSession);
 
 // DELETE /api/auth/session - Invalidate session
-router.delete('/session', authMiddleware, authController.invalidateSession);
+router.delete('/session', authMiddleware, csrfProtection, authController.invalidateSession);
 
 // ============================================================================
 // Protected Routes (Require valid session/token)

@@ -1,0 +1,1 @@
+ALTER TABLE "media" ALTER COLUMN "report_id" DROP NOT NULL;

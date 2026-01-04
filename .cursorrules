@@ -1,0 +1,61 @@
+# Daadaar Platform Agent Rules
+
+You are an expert AI developer working on the Daadaar Platform. You must follow these rules to maintain the integrity, privacy, and architecture of the project.
+
+## 1. Privacy & Anonymity First
+- **Always** support anonymous contributions via `sessionId`.
+- Every "contributable" entity (Reports, Organizations, People, Roles) must have both `createdByUserId` (registered) and `sessionId` (anonymous).
+- **Never** make `requireAuth` mandatory for creation endpoints unless specifically instructed. Use `authMiddleware` instead to capture the session/user.
+
+## 2. Database & Migrations
+- **Schema Location**: Always edit `database/schema.ts`.
+- **Migration Policy**: Following schema changes, follow the `database-migration` workflow.
+- **NEVER** use `push` in a production environment; only use `generate` followed by `migrate`.
+
+## 3. Backend Routes & Controllers
+- **Middleware Order**: Use `authMiddleware` first to populate `req.currentUser`, then `csrfProtection` for state-changing routes (POST, PUT, DELETE, PATCH).
+- **RequireAuth**: Use `requireAuth` only for sensitive actions (deleting, sensitive updates, admin/mod actions). Creation should ideally be anonymous-friendly.
+- **Controller Types**: Use generic `Request` and `Response` from `express` for handlers that support both anonymous and registered users. Access user info via `req.currentUser`.
+- **CSRF Integration**: Apply `csrfProtection` middleware to all routes that modify state. GET/HEAD/OPTIONS requests are automatically skipped by the middleware.
+
+## 4. Internationalization (i18n)
+- The platform supports Persian (fa) and English (en).
+- **Frontend**: Use `useTranslations` from `next-intl`.
+- **Backend/DB**: Most entities have dual fields (e.g., `name` for Persian, `nameEn` for English). Always ensure both are handled in controllers.
+
+## 5. Security & Rate Limiting
+- **PoW**: All high-stakes writes (Reports, Votes) MUST be protected by Proof-of-Work (PoW).
+- **VPN Support**: Avoid IP-based rate limiting where possible; favor session-based and PoW-based limits to support users behind VPNs.
+- **Redis Dependency**: Redis is a **required runtime dependency** for production. Rate limiting uses Redis with in-memory fallback when Redis is unavailable. See `backend/src/lib/rate-limiter.ts` for implementation.
+- **Fail-Open vs Fail-Closed**: 
+  - Default: In-memory fallback (fail-open) - continues rate limiting per-instance
+  - Report submission: Fail-closed by default (denies requests if Redis unavailable)
+  - Global fail-closed: Set `RATE_LIMITER_FAIL_CLOSED=true` environment variable
+- **Rate Limit Keys**: Use format `ratelimit:{type}:{identifier}:{action}` (e.g., `ratelimit:user:123:reports`, `ratelimit:session:abc123:votes`).
+- **Health Checks**: Rate limiter metrics exposed in `/api/health` endpoint (`rateLimiter.redisUnavailableCount`, `rateLimiter.usingInMemoryFallback`).
+
+## 7. Frontend Development
+- **Framework**: Use Next.js 16+ (App Router) with React 19+.
+- **Styling**: Use Tailwind CSS 4. Follow the premium "Glassmorphic" design system (blurs, gradients, micro-animations).
+- **Internationalization (i18n)**: Persian (fa) is primary. Support RTL for `fa` and LTR for `en`. Use `next-intl` for translations.
+- **Graph Visualization**: Use React Flow for the `GraphCanvas`. Follow existing layout logic in `graph-layout.ts`.
+
+## 8. Security Protocols
+- **Proof-of-Work (PoW)**: Mandatory for all high-stakes write operations (Reports, Votes). Verify on backend using `pow-validator.ts`. Frontend must solve challenges using `pow-solver.ts` and submit both `solution` and `solutionNonce`.
+- **CSRF Protection**: All state-changing endpoints (POST, PUT, DELETE, PATCH) must use the `csrfProtection` middleware from `backend/src/lib/csrf-protection.ts`. CSRF tokens are session-based with 24-hour expiration. Frontend must fetch tokens from `GET /api/csrf-token` and include in `X-CSRF-Token` header.
+- **XSS Prevention**: Always sanitize user-provided Markdown or rich text before rendering. Use the shared sanitization utility if available.
+- **Zero IP Policy**: Never log or store user IP addresses. Rely on `sessionId` or `userId`.
+
+## 9. Project Structure & Monorepo
+- **frontend/**: Next.js app. Keep components small and modular.
+- **backend/**: Express.js API. Use controller/route pattern.
+- **database/**: Drizzle schema and migrations (always edit `database/schema.ts`).
+- **shared/**: Types and logic shared between frontend/backend. Update `shared/types.ts` when changing database schemas.
+- **docs/**: Keep architecture documentation updated with any structural changes.
+
+## 10. Development Workflow
+- **Database**: Use the `/database-migration` workflow for any schema changes. Always use `drizzle-kit generate` followed by `drizzle-kit migrate` - never use `push` in production.
+- **Redis**: Required for production. Local development can run without Redis (rate limiting disabled). Configure via `REDIS_URL` environment variable.
+- **Health Checks**: Backend exposes `/api/health` endpoint that checks database and Redis connectivity. Use for monitoring and deployment health checks.
+- **Testing**: Run lint checks with `biome` before submitting code.
+- **Commits**: Use descriptive commit messages following the project's conventional style.

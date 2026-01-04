@@ -1,275 +1,74 @@
 'use client';
 
+import { useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
   Background,
-  Controls,
+  applyEdgeChanges,
+  applyNodeChanges,
   MiniMap,
   type Node,
-  type Edge,
-  type OnNodesChange,
   type OnEdgesChange,
-  applyNodeChanges,
-  applyEdgeChanges,
-  type NodeTypes,
-  type DefaultEdgeOptions,
-  MarkerType,
+  type OnNodesChange,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { fetchApi } from '@/lib/api';
+
+import { useGraphData } from '@/hooks/use-graph-data';
+import { type ViewContext, defaultEdgeOptions, nodeTypes } from './config';
+import { GraphControls } from './graph-controls';
+import { GraphMarkers } from './graph-markers';
+import { GraphToolbar } from './graph-toolbar';
+import TimelineFilter from './timeline-filter';
+
+import { SubmitReportModal } from '../reports/submit-report-modal';
 import { AddOrganizationModal } from './add-organization-modal';
 import { AddPersonModal } from './add-person-modal';
-import { GraphToolbar } from './graph-toolbar';
-import OrganizationNode from './organization-node';
-import PersonNode from './person-node';
-import ReportNode from './report-node';
-import type { OrganizationNodeData, PersonNodeData } from './types';
+import type { OrganizationNodeData, PersonNodeData, ReportNodeData } from './types';
 
-// Define node types
-const nodeTypes: NodeTypes = {
-  organization: OrganizationNode,
-  individual: PersonNode,
-  report: ReportNode,
-};
+import { Button } from '@/components/ui/button';
+import { Map as MapIcon } from 'lucide-react';
 
-// Default edge options with arrow markers
-const defaultEdgeOptions: DefaultEdgeOptions = {
-  animated: false,
-  style: { strokeWidth: 2, stroke: '#94a3b8' },
-  markerEnd: {
-    type: MarkerType.ArrowClosed,
-    width: 20,
-    height: 20,
-    color: '#94a3b8',
-  },
-};
-
-export type ViewMode = 'organizations' | 'people' | 'reports';
-export type ViewContext = {
-  mode: ViewMode;
-  organizationId?: number;
-  organizationName?: string;
-  individualId?: number;
-  individualName?: string;
+// Custom MiniMap Node (Dot)
+// biome-ignore lint/suspicious/noExplicitAny: ReactFlow types for MiniMapNodeProps are generic
+const MiniMapNode = ({ x, y, width, height, color }: any) => {
+  return <circle cx={x + width / 2} cy={y + height / 2} r={24} fill={color} />;
 };
 
 interface GraphCanvasProps {
   initialView?: ViewContext;
 }
 
-// API response types
-interface OrganizationsResponse {
-  nodes: Node[];
-  edges: Edge[];
-}
-
-interface OrganizationPeopleResponse {
-  organization: {
-    id: number;
-    name: string;
-    nameEn?: string | null;
-    description?: string | null;
-  };
-  nodes: Node[];
-  edges: Edge[];
-}
-
-interface IndividualReportsResponse {
-  individual: {
-    id: number;
-    fullName: string;
-    fullNameEn?: string | null;
-    biography?: string | null;
-  };
-  nodes: Node[];
-  edges: Edge[];
-}
-
 export default function GraphCanvas({ initialView }: GraphCanvasProps) {
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [viewContext, setViewContext] = useState<ViewContext>(
-    initialView || { mode: 'organizations' }
-  );
+  const router = useRouter();
   const [isAddOrgModalOpen, setIsAddOrgModalOpen] = useState(false);
   const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState(false);
+  const [isSubmitReportModalOpen, setIsSubmitReportModalOpen] = useState(false);
+  const [showMiniMap, setShowMiniMap] = useState(false);
 
   const t = useTranslations('graph');
   const tOrg = useTranslations('organization');
   const tPerson = useTranslations('person');
 
-  // Layout algorithm: simple grid layout
-  const layoutNodes = useCallback((nodes: Node[], edges: Edge[]) => {
-    if (nodes.length === 0) return nodes;
-
-    const visited = new Set<string>();
-    const levels: string[][] = [];
-
-    // Find root nodes (nodes with no incoming edges)
-    const rootNodes = nodes.filter(node => !edges.some(edge => edge.target === node.id));
-
-    // If no root nodes found, use all nodes as roots (handles disconnected graphs)
-    const startNodes = rootNodes.length > 0 ? rootNodes : nodes;
-
-    // BFS to assign levels
-    const queue: { id: string; level: number }[] = startNodes.map(n => ({
-      id: n.id,
-      level: 0,
-    }));
-
-    while (queue.length > 0) {
-      const item = queue.shift();
-      if (!item) continue;
-      const { id, level } = item;
-      if (visited.has(id)) continue;
-      visited.add(id);
-
-      if (!levels[level]) levels[level] = [];
-      levels[level].push(id);
-
-      // Add children
-      for (const e of edges.filter(e => e.source === id)) {
-        if (!visited.has(e.target)) {
-          queue.push({ id: e.target, level: level + 1 });
-        }
-      }
-    }
-
-    // Add any unvisited nodes to level 0
-    for (const node of nodes) {
-      if (!visited.has(node.id)) {
-        if (!levels[0]) levels[0] = [];
-        levels[0].push(node.id);
-      }
-    }
-
-    // Position nodes in grid
-    const positionedNodes = nodes.map(node => {
-      const level = levels.findIndex(l => l?.includes(node.id));
-      const indexInLevel = levels[level]?.indexOf(node.id) || 0;
-      const nodesInLevel = levels[level]?.length || 1;
-
-      const x = level * 400;
-      const y = (indexInLevel - nodesInLevel / 2) * 180;
-
-      return {
-        ...node,
-        position: { x, y },
-      };
-    });
-
-    return positionedNodes;
-  }, []);
-
-  // Fetch organizations graph
-  const fetchOrganizations = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    const response = await fetchApi<OrganizationsResponse>('/graph/organizations');
-
-    if (response.success && response.data) {
-      const positionedNodes = layoutNodes(response.data.nodes, response.data.edges);
-      setNodes(positionedNodes);
-      setEdges(response.data.edges);
-      setViewContext({ mode: 'organizations' });
-    } else {
-      setError(response.error?.message || tOrg('error_create_failed')); // Using error message from API if available
-    }
-
-    setLoading(false);
-  }, [layoutNodes, tOrg]);
-
-  // Fetch people in organization
-  const fetchOrganizationPeople = useCallback(
-    async (organizationId: number, _organizationName?: string) => {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetchApi<OrganizationPeopleResponse>(
-        `/graph/organization/${organizationId}/people`
-      );
-
-      if (response.success && response.data) {
-        const { organization, nodes: peopleNodes, edges: peopleEdges } = response.data;
-
-        // Create organization node as root with actual data
-        const orgNode: Node = {
-          id: `org-${organization.id}`,
-          type: 'organization',
-          data: {
-            id: organization.id,
-            name: organization.name,
-            nameEn: organization.nameEn,
-            description: organization.description,
-          },
-          position: { x: 0, y: 0 },
-        };
-
-        const allNodes = [orgNode, ...peopleNodes];
-        const positionedNodes = layoutNodes(allNodes, peopleEdges);
-        setNodes(positionedNodes);
-        setEdges(peopleEdges);
-        setViewContext({
-          mode: 'people',
-          organizationId: organization.id,
-          organizationName: organization.name,
-        });
-      } else {
-        setError(response.error?.message || tPerson('error_create_failed'));
-      }
-
-      setLoading(false);
-    },
-    [layoutNodes, tPerson]
-  );
-
-  // Fetch reports for individual
-  const fetchIndividualReports = useCallback(
-    async (individualId: number, _individualName?: string) => {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetchApi<IndividualReportsResponse>(
-        `/graph/individual/${individualId}/reports`
-      );
-
-      if (response.success && response.data) {
-        const { individual, nodes: reportNodes, edges: reportEdges } = response.data;
-
-        // Create individual node as root with actual data
-        const individualNode: Node = {
-          id: `individual-${individual.id}`,
-          type: 'individual',
-          data: {
-            id: individual.id,
-            name: individual.fullName,
-            nameEn: individual.fullNameEn,
-            biography: individual.biography,
-          },
-          position: { x: 0, y: 0 },
-        };
-
-        const allNodes = [individualNode, ...reportNodes];
-        const positionedNodes = layoutNodes(allNodes, reportEdges);
-        setNodes(positionedNodes);
-        setEdges(reportEdges);
-        setViewContext({
-          mode: 'reports',
-          individualId: individual.id,
-          individualName: individual.fullName,
-        });
-      } else {
-        setError(response.error?.message || tPerson('error_create_failed'));
-      }
-
-      setLoading(false);
-    },
-    [layoutNodes, tPerson]
-  );
+  const {
+    nodes,
+    edges,
+    loading,
+    error,
+    viewContext,
+    dateRange,
+    timeRangeLimit,
+    setNodes,
+    setEdges,
+    setDateRange,
+    fetchOrganizations,
+    fetchOrganizationPeople,
+    fetchIndividualReports,
+  } = useGraphData({
+    initialView,
+    tOrg,
+    tPerson,
+  });
 
   // Handle node click
   const onNodeClick = useCallback(
@@ -280,21 +79,23 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       } else if (node.type === 'individual') {
         const data = node.data as PersonNodeData;
         fetchIndividualReports(data.id, data.name);
+      } else if (node.type === 'report') {
+        const data = node.data as ReportNodeData;
+        router.push(`/reports/${data.id}`);
       }
-      // Report nodes don't navigate further
     },
-    [fetchOrganizationPeople, fetchIndividualReports]
+    [fetchOrganizationPeople, fetchIndividualReports, router]
   );
 
   // Handle node changes
   const onNodesChange: OnNodesChange = useCallback(
     changes => setNodes(nds => applyNodeChanges(changes, nds)),
-    []
+    [setNodes]
   );
 
   const onEdgesChange: OnEdgesChange = useCallback(
     changes => setEdges(eds => applyEdgeChanges(changes, eds)),
-    []
+    [setEdges]
   );
 
   // Handle refresh based on current view
@@ -308,22 +109,8 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     }
   }, [viewContext, fetchOrganizations, fetchOrganizationPeople, fetchIndividualReports]);
 
-  // Handle successful organization creation
-  const handleOrganizationCreated = useCallback(() => {
-    // Refresh the organizations view
-    fetchOrganizations();
-  }, [fetchOrganizations]);
-
-  // Handle successful person creation
-  const handlePersonCreated = useCallback(() => {
-    // Refresh the people view
-    if (viewContext.organizationId) {
-      fetchOrganizationPeople(viewContext.organizationId, viewContext.organizationName);
-    }
-  }, [viewContext.organizationId, viewContext.organizationName, fetchOrganizationPeople]);
-
   // Load initial data
-  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect should only run once on mount, adding dependencies would cause infinite loops
+  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect should only run once on mount
   useEffect(() => {
     if (initialView) {
       if (initialView.mode === 'organizations') {
@@ -341,10 +128,10 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="w-full h-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <div className="text-gray-500 dark:text-gray-400">{t('loading')}</div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-primary" />
+          <div className="text-foreground/40">{t('loading')}</div>
         </div>
       </div>
     );
@@ -352,13 +139,13 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   if (error) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="w-full h-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
           <div className="text-red-500 text-lg">{error}</div>
           <button
             type="button"
             onClick={fetchOrganizations}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-accent-primary text-white rounded-lg hover:opacity-90 transition-opacity"
           >
             {t('try_again')}
           </button>
@@ -367,11 +154,38 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     );
   }
 
+  // Filter nodes and edges based on date range
+  const visibleNodes = nodes.filter(node => {
+    if (node.type === 'report') {
+      const data = node.data as ReportNodeData;
+      if (!data.incidentDate) return true;
+      const year = new Date(data.incidentDate).getFullYear();
+      return year >= dateRange[0] && year <= dateRange[1];
+    }
+    return true;
+  });
+
+  const visibleEdges = edges.filter(edge => {
+    if (edge.data?.startDate) {
+      const startYear = new Date(edge.data.startDate).getFullYear();
+      const endYear = edge.data.endDate
+        ? new Date(edge.data.endDate).getFullYear()
+        : new Date().getFullYear();
+
+      const hasOverlap = Math.max(startYear, dateRange[0]) <= Math.min(endYear, dateRange[1]);
+      if (!hasOverlap) return false;
+    }
+
+    const sourceVisible = visibleNodes.some(n => n.id === edge.source);
+    const targetVisible = visibleNodes.some(n => n.id === edge.target);
+    return sourceVisible && targetVisible;
+  });
+
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full text-foreground bg-background">
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        nodes={visibleNodes}
+        edges={visibleEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
@@ -379,23 +193,55 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         defaultEdgeOptions={defaultEdgeOptions}
         fitView
         attributionPosition="bottom-left"
+        className="bg-background"
       >
-        <Background />
-        <Controls />
-        <MiniMap
-          nodeColor={node => {
-            if (node.type === 'organization') return '#3b82f6';
-            if (node.type === 'individual') return '#a855f7';
-            if (node.type === 'report') return '#22c55e';
-            return '#6b7280';
-          }}
+        <GraphMarkers />
+        <Background
+          color="currentColor"
+          gap={24}
+          size={1}
+          className="text-foreground/5 opacity-50"
         />
+        <GraphControls />
+
+        {/* Type casting MiniMapNode to any to avoid strict type issues with ReactFlow version mismatches or generic complexity */}
+        {showMiniMap && (
+          <MiniMap
+            nodeComponent={MiniMapNode}
+            nodeColor={node => {
+              if (node.type === 'organization') return '#3b82f6';
+              if (node.type === 'individual') return '#a855f7';
+              if (node.type === 'report') return '#22c55e';
+              return '#6b7280';
+            }}
+            className="!bg-background/60 !backdrop-blur-xl !border !border-white/10 !rounded-2xl !shadow-2xl !bottom-20 !right-6 !m-0 !w-[200px] !h-[150px]"
+            maskColor="rgba(0, 0, 0, 0.1)"
+          />
+        )}
       </ReactFlow>
+
+      {/* MiniMap Toggle Button */}
+      <div className="absolute bottom-6 right-6 z-10">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowMiniMap(!showMiniMap)}
+          className={`h-12 w-12 p-0 rounded-2xl shadow-xl border border-white/10 backdrop-blur-xl transition-all ${
+            showMiniMap
+              ? 'bg-accent-primary text-white hover:bg-accent-primary/90'
+              : 'bg-background/60 text-foreground/80 hover:bg-background/80 hover:text-foreground'
+          }`}
+          title={showMiniMap ? t('hide_minimap') : t('show_minimap')}
+        >
+          <MapIcon className="h-5 w-5" />
+        </Button>
+      </div>
 
       {/* Toolbar */}
       <GraphToolbar
         onAddOrganization={() => setIsAddOrgModalOpen(true)}
         onAddPerson={() => setIsAddPersonModalOpen(true)}
+        onAddReport={() => setIsSubmitReportModalOpen(true)}
         onRefresh={handleRefresh}
         viewMode={viewContext.mode}
         isLoading={loading}
@@ -405,7 +251,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       <AddOrganizationModal
         isOpen={isAddOrgModalOpen}
         onClose={() => setIsAddOrgModalOpen(false)}
-        onSuccess={handleOrganizationCreated}
+        onSuccess={() => fetchOrganizations()}
       />
 
       {/* Add Person Modal */}
@@ -413,52 +259,80 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         <AddPersonModal
           isOpen={isAddPersonModalOpen}
           onClose={() => setIsAddPersonModalOpen(false)}
-          onSuccess={handlePersonCreated}
+          onSuccess={() => {
+            if (viewContext.organizationId) {
+              fetchOrganizationPeople(viewContext.organizationId, viewContext.organizationName);
+            }
+          }}
           organizationId={viewContext.organizationId}
           organizationName={viewContext.organizationName}
         />
       )}
 
+      {/* Submit Report Modal */}
+      {viewContext.individualId && (
+        <SubmitReportModal
+          isOpen={isSubmitReportModalOpen}
+          onClose={() => setIsSubmitReportModalOpen(false)}
+          individualId={viewContext.individualId}
+          individualName={viewContext.individualName || ''}
+          apiUrl={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}
+          onSuccess={() => {
+            if (viewContext.individualId) {
+              fetchIndividualReports(viewContext.individualId, viewContext.individualName);
+            }
+          }}
+        />
+      )}
+
       {/* Navigation breadcrumb */}
-      <div className="absolute top-4 left-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-10">
+      <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg border border-foreground/10 z-10">
         <div className="flex items-center gap-2 text-sm">
           <button
             type="button"
             onClick={fetchOrganizations}
             className={`hover:underline ${
               viewContext.mode === 'organizations'
-                ? 'text-gray-900 dark:text-white font-medium'
-                : 'text-blue-600 dark:text-blue-400'
+                ? 'text-foreground font-medium'
+                : 'text-accent-primary'
             }`}
           >
             {t('organizations')}
           </button>
           {viewContext.mode === 'people' && viewContext.organizationName && (
             <>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-900 dark:text-white font-medium">
-                {viewContext.organizationName}
-              </span>
+              <span className="text-foreground/40">/</span>
+              <span className="text-foreground font-medium">{viewContext.organizationName}</span>
             </>
           )}
           {viewContext.mode === 'reports' && viewContext.individualName && (
             <>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-900 dark:text-white font-medium">
-                {viewContext.individualName}
-              </span>
+              <span className="text-foreground/40">/</span>
+              <span className="text-foreground font-medium">{viewContext.individualName}</span>
             </>
           )}
         </div>
       </div>
 
       {/* Help tooltip */}
-      <div className="absolute bottom-4 right-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-10 text-xs text-gray-500 dark:text-gray-400">
-        <p>{t('click_to_drill_down')}</p>
-        <p>
-          {t('scroll_to_zoom')} • {t('drag_to_pan')}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-background/60 backdrop-blur-xl px-4 py-2 rounded-full shadow-sm border border-white/10 z-10 text-xs font-medium text-foreground/60 pointer-events-none select-none">
+        <p className="flex items-center gap-2">
+          <span>{t('click_to_drill_down')}</span>
+          <span className="w-px h-3 bg-foreground/10" />
+          <span>
+            {t('scroll_to_zoom')} • {t('drag_to_pan')}
+          </span>
         </p>
       </div>
+
+      {/* Timeline Filter */}
+      <TimelineFilter
+        minYear={timeRangeLimit[0]}
+        maxYear={timeRangeLimit[1]}
+        selectedRange={dateRange}
+        onRangeChange={setDateRange}
+        isVisible={true}
+      />
     </div>
   );
 }
