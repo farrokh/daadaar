@@ -4,11 +4,16 @@ import dotenv from 'dotenv';
 import express, { type Express } from 'express';
 import passport from 'passport';
 import { checkDatabaseConnection, closeDatabaseConnection } from './db';
+import { getRedisUnavailableCount } from './lib/rate-limiter';
 import { checkRedisConnection } from './lib/redis';
 import authRoutes from './routes/auth';
+import csrfRoutes from './routes/csrf';
 import graphRoutes from './routes/graph';
 import individualsRoutes from './routes/individuals';
+import mediaRoutes from './routes/media';
 import organizationsRoutes from './routes/organizations';
+import powRoutes from './routes/pow';
+import reportsRoutes from './routes/reports';
 import rolesRoutes from './routes/roles';
 
 dotenv.config();
@@ -30,15 +35,20 @@ app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/csrf', csrfRoutes);
 app.use('/api/graph', graphRoutes);
 app.use('/api/organizations', organizationsRoutes);
 app.use('/api/individuals', individualsRoutes);
 app.use('/api/roles', rolesRoutes);
+app.use('/api/pow', powRoutes);
+app.use('/api/media', mediaRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // Health check endpoint
 app.get('/api/health', async (_req, res) => {
   const dbStatus = await checkDatabaseConnection();
   const redisStatus = await checkRedisConnection();
+  const rateLimiterRedisUnavailableCount = getRedisUnavailableCount();
 
   res.json({
     status: dbStatus.connected && redisStatus.connected ? 'ok' : 'degraded',
@@ -57,6 +67,10 @@ app.get('/api/health', async (_req, res) => {
       connected: redisStatus.connected,
       latencyMs: redisStatus.latencyMs,
       error: redisStatus.error,
+    },
+    rateLimiter: {
+      redisUnavailableCount: rateLimiterRedisUnavailableCount,
+      usingInMemoryFallback: !redisStatus.connected && rateLimiterRedisUnavailableCount > 0,
     },
   });
 });

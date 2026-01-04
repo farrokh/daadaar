@@ -1,22 +1,40 @@
 'use client';
 
+import { Building2 } from 'lucide-react';
 import { memo } from 'react';
 import { Handle, type NodeProps, Position } from 'reactflow';
 import type { OrganizationNodeData } from './types';
 
 function OrganizationNode({ data }: NodeProps<OrganizationNodeData>) {
   return (
-    <div className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-blue-500 rounded-lg shadow-lg min-w-[200px] max-w-[300px] relative">
-      {/* Source handle (right side - for outgoing edges to children) */}
-      <Handle type="source" position={Position.Right} className="!bg-blue-500 !w-3 !h-3" />
-      {/* Target handle (left side - for incoming edges from parent) */}
-      <Handle type="target" position={Position.Left} className="!bg-blue-500 !w-3 !h-3" />
-      <div className="font-semibold text-lg text-gray-900 dark:text-white">{data.name}</div>
-      {data.description && (
-        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-          {data.description}
+    <div className="group relative min-w-[240px] max-w-[320px]">
+      {/* Glow Effect */}
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl opacity-20 group-hover:opacity-60 blur transition duration-500" />
+
+      {/* Card Content */}
+      <div className="relative px-5 py-4 bg-background/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl transition-transform hover:-translate-y-1">
+        {/* Source handle (right side - for outgoing edges to children) */}
+        <Handle type="source" position={Position.Right} className="!w-3 !h-3 !opacity-0" />
+
+        {/* Target handle (left side - for incoming edges from parent) */}
+        <Handle type="target" position={Position.Left} className="!w-3 !h-3 !opacity-0" />
+
+        <div className="flex items-start gap-4">
+          <div className="p-2.5 bg-blue-500/10 rounded-lg shrink-0">
+            <Building2 className="w-5 h-5 text-blue-500" />
+          </div>
+          <div>
+            <div className="font-bold text-base text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80">
+              {data.name}
+            </div>
+            {data.description && (
+              <div className="text-xs text-foreground/50 mt-1.5 line-clamp-2 leading-relaxed">
+                {data.description}
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

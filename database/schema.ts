@@ -65,6 +65,7 @@ export const organizations = pgTable(
     descriptionEn: text('description_en'), // English translation
     parentId: integer('parent_id'),
     createdByUserId: integer('created_by_user_id'),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
@@ -91,6 +92,7 @@ export const organizationHierarchy = pgTable(
     createdByUserId: integer('created_by_user_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   table => [
@@ -118,6 +120,7 @@ export const roles = pgTable(
     createdByUserId: integer('created_by_user_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
@@ -144,6 +147,7 @@ export const individuals = pgTable(
     createdByUserId: integer('created_by_user_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
@@ -172,6 +176,7 @@ export const roleOccupancy = pgTable(
     createdByUserId: integer('created_by_user_id').references(() => users.id, {
       onDelete: 'set null',
     }),
+    sessionId: uuid('session_id'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },
@@ -270,6 +275,9 @@ export const reports = pgTable(
     index('reports_created_at_idx').on(table.createdAt),
     index('reports_votes_idx').on(table.upvoteCount, table.downvoteCount),
     index('reports_published_idx').on(table.isPublished),
+    index('reports_incident_date_idx').on(table.incidentDate),
+    index('reports_submitted_by_user_id_idx').on(table.userId),
+    index('reports_submitted_by_session_id_idx').on(table.sessionId),
   ]
 );
 
@@ -337,9 +345,7 @@ export const media = pgTable(
   'media',
   {
     id: serial('id').primaryKey(),
-    reportId: integer('report_id')
-      .references(() => reports.id, { onDelete: 'cascade' })
-      .notNull(),
+    reportId: integer('report_id').references(() => reports.id, { onDelete: 'cascade' }),
     s3Key: varchar('s3_key', { length: 500 }).notNull(),
     s3Bucket: varchar('s3_bucket', { length: 255 }).notNull(),
     originalFilename: varchar('original_filename', { length: 500 }),
@@ -360,6 +366,9 @@ export const media = pgTable(
     index('media_report_idx').on(table.reportId),
     index('media_s3_key_idx').on(table.s3Key),
     index('media_type_idx').on(table.mediaType),
+    index('media_uploaded_by_user_id_idx').on(table.uploadedByUserId),
+    index('media_uploaded_by_session_id_idx').on(table.uploadedBySessionId),
+    index('media_is_deleted_idx').on(table.isDeleted),
   ]
 );
 
@@ -480,6 +489,7 @@ export const powChallenges = pgTable(
     index('pow_challenges_session_idx').on(table.sessionId),
     index('pow_challenges_user_idx').on(table.userId),
     index('pow_challenges_expires_idx').on(table.expiresAt),
+    index('pow_challenges_is_used_idx').on(table.isUsed),
   ]
 );
 

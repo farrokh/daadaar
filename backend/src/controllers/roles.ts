@@ -2,9 +2,8 @@
 // Handles CRUD operations for roles within organizations
 
 import { eq } from 'drizzle-orm';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { db, schema } from '../db';
-import type { AuthenticatedRequest } from '../types/auth';
 
 interface CreateRoleBody {
   organizationId: number;
@@ -18,7 +17,7 @@ interface CreateRoleBody {
  * POST /api/roles
  * Create a new role for an organization
  */
-export async function createRole(req: AuthenticatedRequest, res: Response) {
+export async function createRole(req: Request, res: Response) {
   try {
     const body = req.body as CreateRoleBody;
 
@@ -81,8 +80,9 @@ export async function createRole(req: AuthenticatedRequest, res: Response) {
       });
     }
 
-    // Get user ID from session if authenticated
-    const userId = req.user?.type === 'registered' ? req.user.id : null;
+    // Get user/session info
+    const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
+    const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
     // Create the role
     const [newRole] = await db
@@ -94,6 +94,7 @@ export async function createRole(req: AuthenticatedRequest, res: Response) {
         description: body.description?.trim() || null,
         descriptionEn: body.descriptionEn?.trim() || null,
         createdByUserId: userId,
+        sessionId,
       })
       .returning();
 
@@ -117,7 +118,7 @@ export async function createRole(req: AuthenticatedRequest, res: Response) {
  * GET /api/roles
  * List all roles (optionally filtered by organization)
  */
-export async function listRoles(req: AuthenticatedRequest, res: Response) {
+export async function listRoles(req: Request, res: Response) {
   try {
     const organizationId = req.query.organizationId
       ? Number.parseInt(req.query.organizationId as string, 10)
@@ -161,7 +162,7 @@ export async function listRoles(req: AuthenticatedRequest, res: Response) {
  * GET /api/roles/:id
  * Get a single role by ID
  */
-export async function getRole(req: AuthenticatedRequest, res: Response) {
+export async function getRole(req: Request, res: Response) {
   try {
     const roleId = Number.parseInt(req.params.id, 10);
 
@@ -207,7 +208,7 @@ export async function getRole(req: AuthenticatedRequest, res: Response) {
  * PUT /api/roles/:id
  * Update a role
  */
-export async function updateRole(req: AuthenticatedRequest, res: Response) {
+export async function updateRole(req: Request, res: Response) {
   try {
     const roleId = Number.parseInt(req.params.id, 10);
 
@@ -297,7 +298,7 @@ export async function updateRole(req: AuthenticatedRequest, res: Response) {
  * DELETE /api/roles/:id
  * Delete a role
  */
-export async function deleteRole(req: AuthenticatedRequest, res: Response) {
+export async function deleteRole(req: Request, res: Response) {
   try {
     const roleId = Number.parseInt(req.params.id, 10);
 

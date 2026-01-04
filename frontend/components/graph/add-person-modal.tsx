@@ -241,7 +241,7 @@ export function AddPersonModal({
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         {submitError && (
-          <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+          <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
             <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>
           </div>
         )}
@@ -296,16 +296,14 @@ export function AddPersonModal({
           disabled={loading}
         />
 
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+        <div className="border-t border-foreground/10 pt-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('role_assignment')}
-            </h3>
+            <h3 className="text-sm font-medium text-foreground/60">{t('role_assignment')}</h3>
             <button
               type="button"
               onClick={handleToggleNewRole}
               disabled={loading}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium disabled:opacity-50"
+              className="text-sm text-accent-primary hover:opacity-80 font-medium disabled:opacity-50"
             >
               {isCreatingNewRole ? t('select_existing_role') : t('create_new_role')}
             </button>
@@ -313,10 +311,10 @@ export function AddPersonModal({
 
           {isCreatingNewRole ? (
             /* New Role Creation Form */
-            <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="space-y-4 p-4 bg-accent-primary/5 rounded-lg border border-accent-primary/20">
               <div className="flex items-center gap-2 mb-2">
                 <svg
-                  className="w-4 h-4 text-blue-600 dark:text-blue-400"
+                  className="w-4 h-4 text-accent-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth="2"
@@ -326,7 +324,7 @@ export function AddPersonModal({
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                <span className="text-sm font-medium text-accent-primary">
                   {t('creating_new_role')}
                 </span>
               </div>
@@ -409,7 +407,7 @@ export function AddPersonModal({
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-foreground/10">
           <Button type="button" variant="ghost" onClick={handleClose} disabled={loading}>
             {tCommon('cancel')}
           </Button>

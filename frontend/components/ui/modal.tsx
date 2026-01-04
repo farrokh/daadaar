@@ -63,19 +63,20 @@ const Modal = ({
       <div
         className={`
           relative w-full ${sizeClasses[size]} 
-          bg-white dark:bg-gray-900 
+          bg-background
           rounded-xl shadow-2xl 
           max-h-[90vh] overflow-y-auto
           transform transition-all
+          border border-foreground/10
         `}
         onClick={e => e.stopPropagation()}
         onKeyDown={e => e.stopPropagation()}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-foreground/5">
             {title && (
-              <h2 id="modal-title" className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2 id="modal-title" className="text-xl font-semibold text-foreground">
                 {title}
               </h2>
             )}
@@ -85,9 +86,8 @@ const Modal = ({
                 onClick={onClose}
                 className="
                   ml-auto p-2 rounded-lg 
-                  text-gray-400 hover:text-gray-600 
-                  dark:text-gray-500 dark:hover:text-gray-300
-                  hover:bg-gray-100 dark:hover:bg-gray-800
+                  text-foreground/40 hover:text-foreground 
+                  hover:bg-foreground/5
                   transition-colors
                 "
                 aria-label="Close modal"
