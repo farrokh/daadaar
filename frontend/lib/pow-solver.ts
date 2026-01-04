@@ -13,6 +13,7 @@ export interface PowChallenge {
 export interface PowSolution {
   challengeId: string;
   solution: string;
+  solutionNonce: number; // Added for backend verification
 }
 
 export interface PowProgress {
@@ -30,7 +31,7 @@ export interface PowProgress {
 export async function solvePowChallenge(
   challenge: PowChallenge,
   onProgress?: (progress: PowProgress) => void
-): Promise<string> {
+): Promise<{ solution: string; solutionNonce: number }> {
   const { nonce, difficulty } = challenge;
   const targetPrefix = '0'.repeat(difficulty);
   const startTime = Date.now();
@@ -52,7 +53,7 @@ export async function solvePowChallenge(
 
     // Check if hash meets difficulty requirement
     if (hashHex.startsWith(targetPrefix)) {
-      return hashHex;
+      return { solution: hashHex, solutionNonce };
     }
 
     // Report progress every 1000 attempts

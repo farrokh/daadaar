@@ -123,6 +123,15 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
         });
 
         if (!s3Response.ok) {
+          // S3 upload failed - cleanup the database record
+          try {
+            await fetch(`${apiUrl}/api/media/${mediaId}`, {
+              method: 'DELETE',
+              credentials: 'include',
+            });
+          } catch (cleanupError) {
+            console.error('Failed to cleanup media record:', cleanupError);
+          }
           throw new Error('Failed to upload file to S3');
         }
       }

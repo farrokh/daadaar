@@ -270,6 +270,9 @@ export const reports = pgTable(
     index('reports_created_at_idx').on(table.createdAt),
     index('reports_votes_idx').on(table.upvoteCount, table.downvoteCount),
     index('reports_published_idx').on(table.isPublished),
+    index('reports_incident_date_idx').on(table.incidentDate),
+    index('reports_submitted_by_user_id_idx').on(table.userId),
+    index('reports_submitted_by_session_id_idx').on(table.sessionId),
   ]
 );
 
@@ -359,6 +362,9 @@ export const media = pgTable(
     index('media_report_idx').on(table.reportId),
     index('media_s3_key_idx').on(table.s3Key),
     index('media_type_idx').on(table.mediaType),
+    index('media_uploaded_by_user_id_idx').on(table.uploadedByUserId),
+    index('media_uploaded_by_session_id_idx').on(table.uploadedBySessionId),
+    index('media_is_deleted_idx').on(table.isDeleted),
   ]
 );
 
@@ -479,6 +485,7 @@ export const powChallenges = pgTable(
     index('pow_challenges_session_idx').on(table.sessionId),
     index('pow_challenges_user_idx').on(table.userId),
     index('pow_challenges_expires_idx').on(table.expiresAt),
+    index('pow_challenges_is_used_idx').on(table.isUsed),
   ]
 );
 

@@ -161,6 +161,14 @@
     "draft": "Draft",
     "deleted": "Deleted",
     "error_fetching": "Failed to load reports",
-    "error_not_found": "Report not found"
+    "error_not_found": "Report not found",
+    "solving_pow": "Solving security challenge...",
+    "uploading_media": "Uploading media...",
+    "submit_success": "Report submitted successfully",
+    "submit_error": "Failed to submit report",
+    "title_required": "Title is required",
+    "content_required": "Content is required",
+    "media_upload_error": "Failed to upload media",
+    "media_delete_error": "Failed to delete media"
   }
 }

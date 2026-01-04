@@ -6,11 +6,13 @@ import { db, schema } from '../db';
  * Validate a proof-of-work solution
  * @param challengeId - The challenge ID
  * @param solution - The solution hash to validate
+ * @param solutionNonce - The nonce that was used to generate the solution
  * @returns true if valid, false otherwise
  */
 export async function validatePowSolution(
   challengeId: string,
-  solution: string
+  solution: string,
+  solutionNonce: number
 ): Promise<{ valid: boolean; error?: string }> {
   try {
     // 1. Fetch challenge from database
@@ -32,21 +34,27 @@ export async function validatePowSolution(
       return { valid: false, error: 'Challenge already used' };
     }
 
-    // 4. Validate the solution hash
+    // 4. Validate the solution hash format
+    if (!/^[0-9a-f]{64}$/i.test(solution)) {
+      return { valid: false, error: 'Invalid solution format' };
+    }
+
+    // 5. Recompute the hash to verify it was computed correctly
+    const expectedHash = createHash('sha256')
+      .update(`${challenge.nonce}${solutionNonce}`)
+      .digest('hex');
+
+    if (expectedHash !== solution) {
+      return { valid: false, error: 'Invalid solution: hash mismatch' };
+    }
+
+    // 6. Verify the hash meets difficulty requirement
     const expectedPrefix = '0'.repeat(challenge.difficulty);
     if (!solution.startsWith(expectedPrefix)) {
       return { valid: false, error: 'Invalid solution: insufficient leading zeros' };
     }
 
-    // 5. Verify the hash is correct by recomputing it
-    // The solution should be: hash(nonce + solution_nonce)
-    // We need to extract the solution_nonce from the client
-    // For now, we'll just verify the hash format
-    if (!/^[0-9a-f]{64}$/i.test(solution)) {
-      return { valid: false, error: 'Invalid solution format' };
-    }
-
-    // 6. Mark challenge as used
+    // 7. Mark challenge as used
     await db
       .update(schema.powChallenges)
       .set({ isUsed: true })

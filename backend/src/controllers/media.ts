@@ -62,7 +62,7 @@ export async function generatePresignedUrl(req: Request, res: Response) {
       .values({
         reportId: null as any,
         s3Key,
-        s3Bucket: process.env.AWS_S3_BUCKET || 'daadaar-media',
+        s3Bucket: process.env.AWS_S3_BUCKET || 'daadaar-media-frkia',
         originalFilename: filename,
         mimeType: contentType,
         mediaType: validation.mediaType as 'image' | 'video' | 'document' | 'audio',

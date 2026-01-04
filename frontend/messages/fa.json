@@ -161,6 +161,14 @@
     "draft": "پیش‌نویس",
     "deleted": "حذف شده",
     "error_fetching": "خطا در بارگذاری گزارش‌ها",
-    "error_not_found": "گزارش یافت نشد"
+    "error_not_found": "گزارش یافت نشد",
+    "solving_pow": "در حال حل چالش امنیتی...",
+    "uploading_media": "در حال بارگذاری رسانه...",
+    "submit_success": "گزارش با موفقیت ارسال شد",
+    "submit_error": "ارسال گزارش ناموفق بود",
+    "title_required": "عنوان الزامی است",
+    "content_required": "محتوا الزامی است",
+    "media_upload_error": "بارگذاری رسانه ناموفق بود",
+    "media_delete_error": "حذف رسانه ناموفق بود"
   }
 }

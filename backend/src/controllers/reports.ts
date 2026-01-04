@@ -18,6 +18,7 @@ interface CreateReportBody {
   mediaIds?: number[];
   powChallengeId: string;
   powSolution: string;
+  powSolutionNonce: number; // Added for hash verification
 }
 
 /**
@@ -29,12 +30,12 @@ export async function createReport(req: Request, res: Response) {
     const body = req.body as CreateReportBody;
 
     // Validate required fields
-    if (!body.title || !body.content || !body.individualId || !body.powChallengeId || !body.powSolution) {
+    if (!body.title || !body.content || !body.individualId || !body.powChallengeId || !body.powSolution || body.powSolutionNonce === undefined) {
       return res.status(400).json({
         success: false,
         error: {
           code: 'MISSING_FIELDS',
-          message: 'Missing required fields: title, content, individualId, powChallengeId, powSolution',
+          message: 'Missing required fields: title, content, individualId, powChallengeId, powSolution, powSolutionNonce',
         },
       });
     }
@@ -56,8 +57,12 @@ export async function createReport(req: Request, res: Response) {
       });
     }
 
-    // Validate PoW solution
-    const powValidation = await validatePowSolution(body.powChallengeId, body.powSolution);
+    // Validate PoW solution with hash verification
+    const powValidation = await validatePowSolution(
+      body.powChallengeId,
+      body.powSolution,
+      body.powSolutionNonce
+    );
     if (!powValidation.valid) {
       return res.status(400).json({
         success: false,
