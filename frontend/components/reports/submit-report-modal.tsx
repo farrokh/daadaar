@@ -160,7 +160,7 @@ export function SubmitReportModal({
         </div>
 
         {/* Scrollable Form Content */}
-        <div className="overflow-y-auto flex-grow">
+        <div className="overflow-y-auto grow">
           <form id="report-form" onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-8">
             {/* Title (Persian) */}
             <div>
@@ -257,7 +257,7 @@ export function SubmitReportModal({
                   {...register('incidentDate')}
                   id="incidentDate"
                   type="date"
-                  className="w-full px-5 py-3 bg-foreground/5 border border-foreground/10 rounded-2xl focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all outline-none text-foreground [color-scheme:dark] dark:[color-scheme:dark] light:[color-scheme:light]"
+                  className="w-full px-5 py-3 bg-foreground/5 border border-foreground/10 rounded-2xl focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all outline-none text-foreground scheme-dark dark:scheme-dark light:[color-scheme:light]"
                 />
                 {errors.incidentDate && (
                   <p className="text-red-500 text-xs mt-2 px-1">{errors.incidentDate.message}</p>
@@ -301,7 +301,7 @@ export function SubmitReportModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-8 border-t border-foreground/5 bg-foreground/[0.02]">
+        <div className="p-8 border-t border-foreground/5 bg-foreground/2">
           {/* PoW Progress */}
           {powProgress && (
             <div className="bg-accent-primary/10 border border-accent-primary/20 rounded-2xl p-5 mb-6">
