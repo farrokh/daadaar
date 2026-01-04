@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Clock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 
@@ -49,54 +50,43 @@ export function TimelineFilter({
   };
 
   return (
-    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl bg-background/80 backdrop-blur-md px-6 py-4 rounded-2xl shadow-2xl border border-foreground/10 z-10 transition-all hover:bg-background/90">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-accent-primary/10 rounded-lg">
-            <svg
-              className="w-4 h-4 text-accent-primary"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-label="Clock icon"
-              role="img"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl bg-background/60 backdrop-blur-xl px-6 py-5 rounded-3xl shadow-2xl border border-white/10 z-10 transition-all hover:bg-background/80 group">
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-accent-primary/10 rounded-xl text-accent-primary group-hover:scale-110 transition-transform">
+            <Clock className="w-4 h-4" />
           </div>
-          <h3 className="text-sm font-semibold tracking-tight">{t('timeline')}</h3>
+          <h3 className="text-sm font-semibold tracking-tight text-foreground/90">
+            {t('timeline')}
+          </h3>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs font-mono bg-accent-primary/10 text-accent-primary px-2.5 py-1 rounded-full border border-accent-primary/20">
+          <span className="text-xs font-mono bg-accent-primary/5 text-accent-primary border border-accent-primary/20 px-3 py-1 rounded-full font-medium shadow-sm">
             {localRange[0]} — {localRange[1]}
           </span>
-          <Button variant="secondary" size="sm" onClick={resetAllTime} className="h-7 text-xs px-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={resetAllTime}
+            className="h-7 text-xs px-3 hover:bg-accent-primary/10 hover:text-accent-primary rounded-full transition-colors"
+          >
             {t('all_time')}
           </Button>
         </div>
       </div>
 
-      <div className="relative h-6 flex items-center">
+      <div className="relative h-6 flex items-center mb-1">
         {/* Sliders Container with its own relative positioning for internal alignment */}
         <div className="relative w-full h-full flex items-center mx-2">
           {/* Track Background */}
-          <div className="absolute left-0 right-0 h-1.5 bg-foreground/10 rounded-full" />
+          <div className="absolute left-0 right-0 h-1.5 bg-foreground/5 rounded-full" />
 
           {/* Active range highlight */}
           <div
-            className="absolute h-1.5 bg-accent-primary rounded-full transition-all shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+            className="absolute h-1.5 bg-accent-primary rounded-full transition-all shadow-[0_0_15px_rgba(59,130,246,0.5)]"
             style={{
-              left: `calc(${((localRange[0] - minYear) / (maxYear - minYear)) * 100}% + ${
-                10 - ((localRange[0] - minYear) / (maxYear - minYear)) * 20
-              }px)`,
-              right: `calc(${
-                (1 - (localRange[1] - minYear) / (maxYear - minYear)) * 100
-              }% + ${10 - (1 - (localRange[1] - minYear) / (maxYear - minYear)) * 20}px)`,
+              left: `calc( ${((localRange[0] - minYear) / (maxYear - minYear)) * 100}% )`,
+              right: `calc( ${(1 - (localRange[1] - minYear) / (maxYear - minYear)) * 100}% )`,
             }}
           />
 
@@ -133,9 +123,9 @@ export function TimelineFilter({
         </div>
       </div>
 
-      <div className="flex justify-between mt-3 px-1 text-[10px] text-foreground/40 font-medium tracking-wider">
+      <div className="flex justify-between mt-3 px-1 text-[10px] text-foreground/40 font-medium tracking-wider uppercase">
         <span>{minYear}</span>
-        <div className="flex gap-4">
+        <div className="flex gap-8 opacity-50">
           {/* Add some intermediate markers if range is large */}
           {maxYear - minYear > 4 && (
             <>

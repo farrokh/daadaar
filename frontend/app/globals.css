@@ -19,18 +19,18 @@
   --foreground: #020617;
   --accent-primary: #3b82f6;
   --accent-secondary: #8b5cf6;
-  --card-bg: #ffffff;
-  --card-border: rgba(0, 0, 0, 0.05);
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --card-border: rgba(2, 6, 23, 0.08);
   --muted-text: rgba(2, 6, 23, 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #030712;
-    --foreground: #ffffff;
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --card-border: rgba(255, 255, 255, 0.1);
-    --muted-text: rgba(255, 255, 255, 0.4);
+    --background: #020617;
+    --foreground: #f8fafc;
+    --card-bg: rgba(2, 6, 23, 0.4);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --muted-text: rgba(248, 250, 252, 0.4);
   }
 }
 

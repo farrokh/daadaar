@@ -368,14 +368,19 @@ const requireAuth = async (req, res, next) => {
 **Purpose**: Visualize relationships between organizations, roles, and individuals over time
 
 **Frontend**:
-- React Flow for interactive rendering with directional edges
+- **Framework**: React Flow for interactive rendering
+- **Modular Architecture**: 
+  - `GraphCanvas`: Main container component
+  - `useGraphData`: Custom hook for data fetching and state management
+  - `graph-layout`: Extracted BFS grid layout algorithm
+  - `config`: Centralized node/edge types and constants
 - **System-Preference Theming**: Dynamic adaptation to Light/Dark modes
 - **Shared Navbar**: Persistent localized navigation available across all views
-- **Graph Toolbar**: Context-aware management tools for organizations, people, and reports
-- **Breadcrumb Navigation**: Floating dynamic breadcrumbs for drill-down context Tracking
-- Directional edges with arrow markers connecting parent/child organizations
-- Node click handlers for deep exploration (organizations → people → reports)
-- Handles on custom nodes for optimized edge routing
+- **Graph Toolbar**: Context-aware management tools (Floating Dock style)
+- **Breadcrumb Navigation**: Floating dynamic breadcrumbs
+- **Minimap**: Collapsible, dot-based minimap implementation
+- **Edge Styling**: Smoothstep edges with minimal circle markers for clean aesthetics
+- **Node Design**: Interactive glassmorphic cards with gradient glows
 
 **Backend**:
 - Graph data endpoint with date range filtering (`GET /api/graph`)
@@ -383,7 +388,7 @@ const requireAuth = async (req, res, next) => {
 - Individual CRUD endpoints (`POST /api/individuals`, `GET /api/individuals`)
 - Role CRUD endpoints (`POST /api/roles`, `GET /api/roles`)
 - PostgreSQL recursive CTEs for efficient graph queries
-- Returns optimized JSON structure (nodes + edges) with smoothstep edge types
+- Returns optimized JSON structure (nodes + edges)
 - Automatic edge creation when parent organizations are specified
 
 **Graph Management Features** (✅ Implemented):
@@ -410,10 +415,10 @@ const requireAuth = async (req, res, next) => {
 - Loading states during data fetching
 
 **Directional Edges**:
-- Arrow markers on edges showing direction (parent → child)
-- Smoothstep edge type for curved connections
-- Source handles on right side of nodes, target handles on left side
-- Styled handles matching node colors (blue for organizations, purple for people, green for reports)
+- **Markers**: Minimal small circular dots (SVG markers)
+- **Lines**: Smoothstep edge type for clearer path routing
+- **Handles**: Invisible connection points on nodes for cleaner UI
+- **Styling**: Thinner, slate-colored strokes matching the modern aesthetic
 
 **Data Flow**:
 1. Frontend requests graph data with date range

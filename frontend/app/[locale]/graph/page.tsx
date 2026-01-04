@@ -1,5 +1,10 @@
 import { redirect } from '@/i18n/routing';
 
-export default function GraphRedirect() {
-  redirect('/');
+export default async function GraphRedirect({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  redirect({ href: '/', locale });
 }

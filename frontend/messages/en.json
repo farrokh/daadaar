@@ -58,7 +58,12 @@
     "try_again": "Try Again",
     "timeline": "Timeline",
     "all_time": "All Time",
-    "filter_by_date": "Filter by Date"
+    "filter_by_date": "Filter by Date",
+    "show_minimap": "Show MiniMap",
+    "hide_minimap": "Hide MiniMap",
+    "zoom_in": "Zoom In",
+    "zoom_out": "Zoom Out",
+    "fit_view": "Fit View"
   },
   "organization": {
     "add_title": "Add New Organization",
