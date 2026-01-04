@@ -5,7 +5,7 @@ You are an expert AI developer working on the Daadaar Platform. You must follow 
 ## 1. Privacy & Anonymity First
 - **Always** support anonymous contributions via `sessionId`.
 - Every "contributable" entity (Reports, Organizations, People, Roles) must have both `createdByUserId` (registered) and `sessionId` (anonymous).
-- **Never** make `requireAuth` mandatory for creation endpoints unless specifically instructed. User `authMiddleware` instead to capture the session/user.
+- **Never** make `requireAuth` mandatory for creation endpoints unless specifically instructed. Use `authMiddleware` instead to capture the session/user.
 
 ## 2. Database & Migrations
 - **Schema Location**: Always edit `database/schema.ts`.
