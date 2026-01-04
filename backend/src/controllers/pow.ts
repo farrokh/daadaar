@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
+import { checkChallengeGenerationLimit } from '../lib/rate-limiter';
 
 /**
  * Generate a new proof-of-work challenge
@@ -37,6 +38,19 @@ export async function generateChallenge(req: Request, res: Response) {
     // Get user/session info from auth middleware
     const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
+
+    // Check rate limit
+    const rateLimit = await checkChallengeGenerationLimit(userId, sessionId);
+    if (!rateLimit.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: {
+          code: 'RATE_LIMIT_EXCEEDED',
+          message: rateLimit.error,
+          resetAt: rateLimit.resetAt.toISOString(),
+        },
+      });
+    }
 
     // Create challenge in database
     const [challenge] = await db
