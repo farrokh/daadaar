@@ -181,10 +181,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
         setMediaFiles(prev =>
           prev.map(m => {
             if (m.id === tempId) {
-              // Revoke old preview URL if it exists (shouldn't happen, but safe)
-              if (m.preview?.startsWith('blob:')) {
-                URL.revokeObjectURL(m.preview);
-              }
+              // Keep preview URL intact so it remains visible after upload
               return { ...m, id: mediaId, uploadUrl, s3Key, uploading: false, progress: 100 };
             }
             return m;
