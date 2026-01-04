@@ -104,3 +104,18 @@ export async function checkVotingLimit(
 
   return checkRateLimit(key, limit, windowSeconds);
 }
+
+/**
+ * Check challenge generation rate limit
+ * 30 challenges per hour per user/session
+ */
+export async function checkChallengeGenerationLimit(
+  userId: number | null,
+  sessionId: string | null
+): Promise<RateLimitResult> {
+  const key = userId ? `user:${userId}:challenges` : `session:${sessionId}:challenges`;
+  const limit = 30;
+  const windowSeconds = 60 * 60; // 1 hour
+
+  return checkRateLimit(key, limit, windowSeconds);
+}
