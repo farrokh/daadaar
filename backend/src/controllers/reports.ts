@@ -5,6 +5,14 @@ import { validatePowSolution } from '../lib/pow-validator';
 import { checkReportSubmissionLimit } from '../lib/rate-limiter';
 import { generatePresignedGetUrl } from '../lib/s3-client';
 
+/**
+ * Escape special characters in a string for use in SQL LIKE patterns.
+ * Escapes backslashes first, then % and _ to prevent them from being treated as wildcards.
+ */
+function escapeLikePattern(input: string): string {
+  return input.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+}
+
 interface CreateReportBody {
   title: string;
   titleEn?: string;
@@ -252,9 +260,11 @@ export async function getReports(req: Request, res: Response) {
     }
 
     if (search) {
+      const escapedSearch = escapeLikePattern(search);
+      const pattern = `%${escapedSearch}%`;
       const searchCondition = or(
-        ilike(schema.reports.title, `%${search}%`),
-        ilike(schema.reports.content, `%${search}%`)
+        ilike(schema.reports.title, pattern),
+        ilike(schema.reports.content, pattern)
       );
       if (searchCondition) {
         conditions.push(searchCondition);
