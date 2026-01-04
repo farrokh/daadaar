@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { tmpdir } from 'os';
 import { deleteMedia, generatePresignedUrl, uploadImage } from '../controllers/media';
+import { csrfProtection } from '../lib/csrf-protection';
 import { authMiddleware } from '../middleware/auth';
 
 const router: Router = Router();
@@ -22,6 +23,9 @@ const upload = multer({
 
 // Apply auth middleware to all routes
 router.use(authMiddleware);
+
+// Apply CSRF protection to state-changing operations (POST, PUT, DELETE)
+router.use(csrfProtection);
 
 /**
  * POST /api/media/presigned-url

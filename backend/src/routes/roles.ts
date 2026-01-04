@@ -2,6 +2,7 @@
 import type { RequestHandler } from 'express';
 import { Router } from 'express';
 import * as rolesController from '../controllers/roles';
+import { csrfProtection } from '../lib/csrf-protection';
 import { authMiddleware, requireAuth } from '../middleware/auth';
 
 const router: ReturnType<typeof Router> = Router();
@@ -9,6 +10,9 @@ const router: ReturnType<typeof Router> = Router();
 // Apply authentication middleware to all role routes
 // authMiddleware ensures req.currentUser is set (either 'registered' or 'anonymous')
 router.use(authMiddleware);
+
+// Apply CSRF protection to state-changing operations (POST, PUT, DELETE)
+router.use(csrfProtection);
 
 // GET /api/roles - List all roles (optionally filter by organizationId query param)
 router.get('/', rolesController.listRoles as RequestHandler);
