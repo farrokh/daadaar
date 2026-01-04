@@ -14,12 +14,16 @@
     "test:watch": "echo 'No tests configured yet' && exit 0"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "date-fns": "^4.1.0",
     "next": "^16.0.0",
     "next-intl": "^4.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.69.0",
     "reactflow": "^11.11.4",
-    "tailwindcss": "^4.1.0"
+    "tailwindcss": "^4.1.0",
+    "zod": "^4.3.4"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.0",

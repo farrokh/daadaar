@@ -10,6 +10,9 @@ import graphRoutes from './routes/graph';
 import individualsRoutes from './routes/individuals';
 import organizationsRoutes from './routes/organizations';
 import rolesRoutes from './routes/roles';
+import powRoutes from './routes/pow';
+import mediaRoutes from './routes/media';
+import reportsRoutes from './routes/reports';
 
 dotenv.config();
 
@@ -34,6 +37,9 @@ app.use('/api/graph', graphRoutes);
 app.use('/api/organizations', organizationsRoutes);
 app.use('/api/individuals', individualsRoutes);
 app.use('/api/roles', rolesRoutes);
+app.use('/api/pow', powRoutes);
+app.use('/api/media', mediaRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // Health check endpoint
 app.get('/api/health', async (_req, res) => {

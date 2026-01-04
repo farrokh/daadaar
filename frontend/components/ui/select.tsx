@@ -23,7 +23,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+            className="block text-sm font-medium text-foreground/60 mb-1.5"
           >
             {label}
           </label>
@@ -31,12 +31,11 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <select
           id={selectId}
           className={`
-            w-full rounded-lg border bg-white px-4 py-2.5 text-gray-900
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500
-            dark:bg-gray-800 dark:text-white
+            w-full rounded-lg border bg-foreground/[0.02] px-4 py-2.5 text-foreground
+            focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent
+            disabled:cursor-not-allowed disabled:opacity-50
             appearance-none cursor-pointer
-            ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600'}
+            ${error ? 'border-red-500 focus:ring-red-500' : 'border-foreground/10'}
             ${className}
           `}
           ref={ref}
