@@ -220,7 +220,7 @@ Cloudflare acts as the first line of defense and performance optimization.
 1. **Lint & Test**: GitHub Actions runs ESLint, Prettier, and Vitest/Jest suites on every PR.
 2. **Build**: Docker images are built and pushed to Amazon ECR.
 3. **Deploy**: Blue/Green deployment to ECS ensures zero-downtime updates.
-4. **Database Migrations**: `drizzle-kit push` or `migrations` run as part of the deployment sequence.
+4. **Database Migrations**: `drizzle-kit generate` followed by `drizzle-kit migrate` run as part of the deployment sequence. **Note**: Per `.cursorrules` section 2, `drizzle-kit push` is forbidden in production; always use the generate + migrate workflow to ensure proper versioning and rollback capabilities.
 
 ---
 *Back to [README](README.md)*
