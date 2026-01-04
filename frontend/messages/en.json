@@ -26,7 +26,10 @@
     "uploadImageFailed": "Failed to upload image",
     "getUploadUrlFailed": "Failed to get upload URL",
     "uploadS3Failed": "Failed to upload file to S3",
-    "removeMediaFailed": "Failed to remove media"
+    "removeMediaFailed": "Failed to remove media",
+    "validationError": "Validation error",
+    "fileTypeNotAllowed": "File type {type} is not allowed. Supported formats: Images, Videos, PDFs, Audio",
+    "fileSizeExceedsLimit": "File size {size}MB exceeds maximum {maxSize}MB for this file type"
   },
   "navigation": {
     "home": "Home",

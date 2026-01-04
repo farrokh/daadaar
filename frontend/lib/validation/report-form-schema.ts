@@ -31,8 +31,14 @@ export type ReportFormData = z.infer<typeof reportFormSchema>;
 
 /**
  * Validate a single media file
+ * Returns structured error information for i18n support
  */
-export function validateMediaFile(file: File): { valid: boolean; error?: string } {
+export function validateMediaFile(file: File): {
+  valid: boolean;
+  error?: string;
+  errorCode?: 'FILE_TYPE_NOT_ALLOWED' | 'FILE_SIZE_EXCEEDS_LIMIT';
+  errorData?: { type?: string; size?: number; maxSize?: number };
+} {
   const maxSizes: Record<string, number> = {
     image: 50 * 1024 * 1024, // 50MB
     video: 200 * 1024 * 1024, // 200MB
@@ -60,15 +66,23 @@ export function validateMediaFile(file: File): { valid: boolean; error?: string 
     return {
       valid: false,
       error: `File type ${file.type} is not allowed`,
+      errorCode: 'FILE_TYPE_NOT_ALLOWED',
+      errorData: { type: file.type },
     };
   }
 
   const maxSize = maxSizes[mediaType];
   if (file.size > maxSize) {
     const maxSizeMB = maxSize / (1024 * 1024);
+    const fileSizeMB = file.size / (1024 * 1024);
     return {
       valid: false,
-      error: `File size ${(file.size / (1024 * 1024)).toFixed(2)}MB exceeds maximum ${maxSizeMB}MB`,
+      error: `File size ${fileSizeMB.toFixed(2)}MB exceeds maximum ${maxSizeMB}MB`,
+      errorCode: 'FILE_SIZE_EXCEEDS_LIMIT',
+      errorData: {
+        size: Number(fileSizeMB.toFixed(2)),
+        maxSize: maxSizeMB,
+      },
     };
   }
 

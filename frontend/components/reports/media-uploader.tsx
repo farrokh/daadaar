@@ -24,6 +24,7 @@ interface MediaUploaderProps {
 export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: MediaUploaderProps) {
   const [mediaFiles, setMediaFiles] = useState<UploadedMedia[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [generalError, setGeneralError] = useState<string | null>(null);
   const _t = useTranslations('common');
   const mediaFilesRef = useRef(mediaFiles);
 
@@ -56,10 +57,31 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
 
   const uploadFile = useCallback(
     async (file: File) => {
+      // Clear any previous general errors
+      setGeneralError(null);
+
       // Validate file
       const validation = validateMediaFile(file);
       if (!validation.valid) {
-        alert(validation.error);
+        // Map validation error to translatable message
+        let errorMessage: string;
+        if (validation.errorCode === 'FILE_TYPE_NOT_ALLOWED') {
+          errorMessage = _t('fileTypeNotAllowed', {
+            type: validation.errorData?.type || 'unknown',
+          });
+        } else if (validation.errorCode === 'FILE_SIZE_EXCEEDS_LIMIT') {
+          const size = validation.errorData?.size ?? 0;
+          const maxSize = validation.errorData?.maxSize ?? 0;
+          errorMessage = _t('fileSizeExceedsLimit', {
+            size: size.toFixed(2),
+            maxSize: maxSize.toFixed(0),
+          });
+        } else {
+          errorMessage = validation.error || _t('validationError');
+        }
+        setGeneralError(errorMessage);
+        // Clear error after 5 seconds
+        setTimeout(() => setGeneralError(null), 5000);
         return;
       }
 
@@ -229,12 +251,25 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
       onMediaRemoved(mediaId);
     } catch (error) {
       console.error('Remove media error:', error);
-      alert(_t('removeMediaFailed'));
+      setGeneralError(_t('removeMediaFailed'));
+      // Clear error after 5 seconds
+      setTimeout(() => setGeneralError(null), 5000);
     }
   };
 
   return (
     <div className="space-y-6">
+      {/* General error message */}
+      {generalError && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-500 text-sm font-medium"
+        >
+          {generalError}
+        </div>
+      )}
+
       {/* Drop zone */}
       <div
         className={`relative border-2 border-dashed rounded-3xl p-10 text-center transition-all duration-300 ${
