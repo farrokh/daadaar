@@ -19,13 +19,14 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { fetchApi } from '@/lib/api';
+import { SubmitReportModal } from '../reports/submit-report-modal';
 import { AddOrganizationModal } from './add-organization-modal';
 import { AddPersonModal } from './add-person-modal';
-import { SubmitReportModal } from '../reports/submit-report-modal';
 import { GraphToolbar } from './graph-toolbar';
 import OrganizationNode from './organization-node';
 import PersonNode from './person-node';
 import ReportNode from './report-node';
+import TimelineFilter from './timeline-filter';
 import type { OrganizationNodeData, PersonNodeData, ReportNodeData } from './types';
 
 // Define node types
@@ -100,6 +101,11 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const [isAddOrgModalOpen, setIsAddOrgModalOpen] = useState(false);
   const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState(false);
   const [isSubmitReportModalOpen, setIsSubmitReportModalOpen] = useState(false);
+  const [dateRange, setDateRange] = useState<[number, number]>([2000, new Date().getFullYear()]);
+  const [timeRangeLimit, setTimeRangeLimit] = useState<[number, number]>([
+    2000,
+    new Date().getFullYear(),
+  ]);
 
   const t = useTranslations('graph');
   const tOrg = useTranslations('organization');
@@ -179,6 +185,21 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       const positionedNodes = layoutNodes(response.data.nodes, response.data.edges);
       setNodes(positionedNodes);
       setEdges(response.data.edges);
+
+      // Update time range limits based on reports if any
+      const reportYears = response.data.nodes
+        .filter(n => n.type === 'report')
+        .map(n => (n.data as ReportNodeData).incidentDate)
+        .filter((d): d is string => !!d)
+        .map(d => new Date(d).getFullYear());
+
+      if (reportYears.length > 0) {
+        const min = Math.min(...reportYears);
+        const max = Math.max(...reportYears);
+        setTimeRangeLimit([min, max]);
+        setDateRange([min, max]);
+      }
+
       setViewContext({ mode: 'organizations' });
     } else {
       setError(response.error?.message || tOrg('error_create_failed')); // Using error message from API if available
@@ -222,6 +243,9 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           organizationId: organization.id,
           organizationName: organization.name,
         });
+
+        // People view might also have reports or activities with dates in the future
+        // For now, let's reset or calculate based on occupancy if we had those dates
       } else {
         setError(response.error?.message || tPerson('error_create_failed'));
       }
@@ -266,6 +290,19 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           individualId: individual.id,
           individualName: individual.fullName,
         });
+
+        // Update time range limits based on reports
+        const reportYears = reportNodes
+          .map(n => (n.data as ReportNodeData).incidentDate)
+          .filter((d): d is string => !!d)
+          .map(d => new Date(d).getFullYear());
+
+        if (reportYears.length > 0) {
+          const min = Math.min(...reportYears);
+          const max = Math.max(...reportYears);
+          setTimeRangeLimit([min, max]);
+          setDateRange([min, max]);
+        }
       } else {
         setError(response.error?.message || tPerson('error_create_failed'));
       }
@@ -381,11 +418,42 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     );
   }
 
+  // Filter nodes and edges based on date range
+  const visibleNodes = nodes.filter((node) => {
+    if (node.type === 'report') {
+      const data = node.data as ReportNodeData;
+      if (!data.incidentDate) return true;
+      const year = new Date(data.incidentDate).getFullYear();
+      return year >= dateRange[0] && year <= dateRange[1];
+    }
+    // Individual and Organization nodes are always visible for now, 
+    // but they might be filtered by edges later.
+    return true;
+  });
+
+  const visibleEdges = edges.filter((edge) => {
+    // Check if the edge itself has temporal data (e.g., role occupancy)
+    if (edge.data?.startDate) {
+      const startYear = new Date(edge.data.startDate).getFullYear();
+      const endYear = edge.data.endDate 
+        ? new Date(edge.data.endDate).getFullYear() 
+        : new Date().getFullYear();
+      
+      // Keep edge if there is ANY overlap between [startYear, endYear] and [dateRange[0], dateRange[1]]
+      const hasOverlap = Math.max(startYear, dateRange[0]) <= Math.min(endYear, dateRange[1]);
+      if (!hasOverlap) return false;
+    }
+
+    const sourceVisible = visibleNodes.some((n) => n.id === edge.source);
+    const targetVisible = visibleNodes.some((n) => n.id === edge.target);
+    return sourceVisible && targetVisible;
+  });
+
   return (
     <div className="w-full h-full text-foreground bg-background">
       <ReactFlow
-        nodes={nodes}
-        edges={edges}
+        nodes={visibleNodes}
+        edges={visibleEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
@@ -464,17 +532,13 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           {viewContext.mode === 'people' && viewContext.organizationName && (
             <>
               <span className="text-foreground/40">/</span>
-              <span className="text-foreground font-medium">
-                {viewContext.organizationName}
-              </span>
+              <span className="text-foreground font-medium">{viewContext.organizationName}</span>
             </>
           )}
           {viewContext.mode === 'reports' && viewContext.individualName && (
             <>
               <span className="text-foreground/40">/</span>
-              <span className="text-foreground font-medium">
-                {viewContext.individualName}
-              </span>
+              <span className="text-foreground font-medium">{viewContext.individualName}</span>
             </>
           )}
         </div>
@@ -487,6 +551,15 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           {t('scroll_to_zoom')} • {t('drag_to_pan')}
         </p>
       </div>
+
+      {/* Timeline Filter */}
+      <TimelineFilter
+        minYear={timeRangeLimit[0]}
+        maxYear={timeRangeLimit[1]}
+        selectedRange={dateRange}
+        onRangeChange={setDateRange}
+        isVisible={true}
+      />
     </div>
   );
 }

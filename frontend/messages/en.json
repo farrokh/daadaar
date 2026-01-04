@@ -55,7 +55,10 @@
     "drag_to_pan": "Drag to pan",
     "coming_soon": "Coming soon",
     "loading": "Loading graph...",
-    "try_again": "Try Again"
+    "try_again": "Try Again",
+    "timeline": "Timeline",
+    "all_time": "All Time",
+    "filter_by_date": "Filter by Date"
   },
   "organization": {
     "add_title": "Add New Organization",
