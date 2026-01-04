@@ -7,8 +7,25 @@ export type { ApiResponse, CurrentUser, AuthUser, AnonymousUser, UserRole };
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 /**
- * Fetch API helper with cookie support
+ * Get a CSRF token from the backend
+ */
+export async function getCsrfToken(): Promise<string | null> {
+  try {
+    const response = await fetch(`${API_URL}/csrf/csrf-token`, {
+      credentials: 'include',
+    });
+    const data = await response.json();
+    return data.success ? data.data.csrfToken : null;
+  } catch (error) {
+    console.error('Failed to fetch CSRF token:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch API helper with cookie and CSRF support
  * Ensures credentials (cookies) are sent with every request
+ * Automatically fetches and adds CSRF token for state-changing methods
  */
 export async function fetchApi<T>(
   endpoint: string,
@@ -20,6 +37,17 @@ export async function fetchApi<T>(
   const headers = new Headers(options.headers);
   if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
+  }
+
+  // Automatically add CSRF token for state-changing methods
+  const method = options.method?.toUpperCase() || 'GET';
+  const stateChangingMethods = ['POST', 'PUT', 'DELETE', 'PATCH'];
+
+  if (stateChangingMethods.includes(method)) {
+    const csrfToken = await getCsrfToken();
+    if (csrfToken) {
+      headers.set('X-CSRF-Token', csrfToken);
+    }
   }
 
   // Ensure credentials (cookies) are sent

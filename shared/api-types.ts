@@ -81,6 +81,52 @@ export interface CsrfTokenResponse {
   csrfToken: string;
 }
 
+// Vote Types
+export interface CastVoteRequest {
+  reportId: number;
+  voteType: 'upvote' | 'downvote';
+  // PoW is required for anonymous users only
+  powChallengeId?: string;
+  powSolution?: string;
+  powSolutionNonce?: number;
+}
+
+export interface CastVoteResponse {
+  vote: {
+    id: number;
+    reportId: number;
+    userId: number | null;
+    sessionId: string | null;
+    voteType: 'upvote' | 'downvote';
+    createdAt: string;
+    updatedAt: string;
+  };
+  voteAction: 'created' | 'updated' | 'unchanged';
+  reportVoteCounts: {
+    upvoteCount: number;
+    downvoteCount: number;
+  };
+}
+
+export interface RemoveVoteResponse {
+  reportVoteCounts: {
+    upvoteCount: number;
+    downvoteCount: number;
+  };
+}
+
+export interface GetMyVoteResponse {
+  vote: {
+    id: number;
+    reportId: number;
+    userId: number | null;
+    sessionId: string | null;
+    voteType: 'upvote' | 'downvote';
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+}
+
 // Helper function to handle API responses
 export function handleApiResponse<T>(response: ApiResponse<T>): T {
   if (!response.success || !response.data) {

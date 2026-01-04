@@ -15,6 +15,7 @@ import organizationsRoutes from './routes/organizations';
 import powRoutes from './routes/pow';
 import reportsRoutes from './routes/reports';
 import rolesRoutes from './routes/roles';
+import votesRoutes from './routes/votes';
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use('/api/roles', rolesRoutes);
 app.use('/api/pow', powRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/votes', votesRoutes);
 
 // Health check endpoint
 app.get('/api/health', async (_req, res) => {

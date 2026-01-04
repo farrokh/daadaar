@@ -183,5 +183,18 @@
     "content_required": "محتوا الزامی است",
     "media_upload_error": "بارگذاری رسانه ناموفق بود",
     "media_delete_error": "حذف رسانه ناموفق بود"
+  },
+  "voting": {
+    "upvote": "رأی مثبت",
+    "downvote": "رأی منفی",
+    "removeVote": "حذف رأی",
+    "upvotes": "رأی‌های مثبت",
+    "downvotes": "رأی‌های منفی",
+    "voteCast": "رأی با موفقیت ثبت شد",
+    "voteRemoved": "رأی با موفقیت حذف شد",
+    "voteError": "خطا در ثبت رأی",
+    "removeVoteError": "خطا در حذف رأی",
+    "solvingPow": "در حال حل اثبات کار...",
+    "powRequired": "رأی‌دهی ناشناس نیازمند تأیید اثبات کار است"
   }
 }

@@ -1,6 +1,8 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { VotingButtons } from '@/components/reports/voting-buttons';
+import { useAuth } from '@/lib/auth';
 import { getS3PublicUrl } from '@/lib/utils';
 import type { ReportWithDetails } from '@/shared/types';
 import { useLocale, useTranslations } from 'next-intl';
@@ -15,6 +17,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
   const locale = useLocale();
   const t = useTranslations('report');
   const isRtl = locale === 'fa';
+  const { isAnonymous } = useAuth();
 
   const title = isRtl ? report.title : report.titleEn || report.title;
   const content = isRtl ? report.content : report.contentEn || report.content;
@@ -74,25 +77,37 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
           {truncatedContent}
         </p>
 
-        <div className="mt-auto pt-6 border-t border-foreground/5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-accent-secondary/50 flex items-center justify-center text-[10px] text-white">
-              {report.user?.displayName?.[0] || 'A'}
-            </div>
-            <span className="text-xs text-foreground/60">
-              {report.user?.displayName || t('anonymous_reporter')}
-            </span>
-          </div>
+        <div className="mt-auto pt-4 space-y-4">
+          {/* Voting Buttons */}
+          <VotingButtons
+            reportId={report.id}
+            initialUpvoteCount={report.upvoteCount}
+            initialDownvoteCount={report.downvoteCount}
+            isAnonymous={isAnonymous}
+            compact
+          />
 
-          <Link href={`/${locale}/reports/${report.id}`}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-accent-primary hover:text-accent-primary hover:bg-accent-primary/10"
-            >
-              {t('report_details')} →
-            </Button>
-          </Link>
+          {/* Footer */}
+          <div className="pt-4 border-t border-foreground/5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-accent-secondary/50 flex items-center justify-center text-[10px] text-white">
+                {report.user?.displayName?.[0] || 'A'}
+              </div>
+              <span className="text-xs text-foreground/60">
+                {report.user?.displayName || t('anonymous_reporter')}
+              </span>
+            </div>
+
+            <Link href={`/${locale}/reports/${report.id}`}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-accent-primary hover:text-accent-primary hover:bg-accent-primary/10"
+              >
+                {t('report_details')} →
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

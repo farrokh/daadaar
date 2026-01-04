@@ -42,11 +42,11 @@ export function GraphToolbar({
       {/* Add Organization Button - Only show in organizations view */}
       {viewMode === 'organizations' && (
         <Button
-          variant="default" // Assuming 'primary' was mapped to default or creating custom variant
+          variant="primary"
           size="sm"
           onClick={onAddOrganization}
           disabled={isLoading}
-          className="h-9 rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 transition-all font-medium px-4"
+          className="h-9 rounded-xl shadow-lg shadow-primary/20 transition-all font-medium px-4"
         >
           <Building2 className="h-4 w-4 mr-2" />
           {t('add_organization')}
@@ -56,11 +56,11 @@ export function GraphToolbar({
       {/* Add Person Button - Only show in people view */}
       {viewMode === 'people' && onAddPerson && (
         <Button
-          variant="default"
+          variant="secondary"
           size="sm"
           onClick={onAddPerson}
           disabled={isLoading}
-          className="h-9 rounded-xl bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-500/20 transition-all font-medium px-4"
+          className="h-9 rounded-xl shadow-lg shadow-secondary/20 transition-all font-medium px-4"
         >
           <User className="h-4 w-4 mr-2" />
           {t('add_person')}
@@ -74,7 +74,7 @@ export function GraphToolbar({
           size="sm"
           onClick={onAddReport}
           disabled={isLoading}
-          className="h-9 rounded-xl bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-500/20 transition-all font-medium px-4"
+          className="h-9 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-500/20 transition-all font-medium px-4"
         >
           <FileText className="h-4 w-4 mr-2" />
           {t('add_report')}

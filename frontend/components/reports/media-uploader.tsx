@@ -271,7 +271,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
       <div
         className={`relative border-2 border-dashed rounded-3xl p-10 text-center transition-all duration-300 ${
           dragActive
-            ? 'border-accent-primary bg-accent-primary/10 scale-[1.02]'
+            ? 'border-primary bg-primary/10 scale-[1.02]'
             : 'border-foreground/10 hover:border-foreground/20 bg-foreground/5'
         }`}
         onDragEnter={handleDrag}
@@ -288,9 +288,9 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
           onChange={handleFileInput}
         />
         <label htmlFor="media-upload" className="cursor-pointer group flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-foreground/5 flex items-center justify-center mb-4 group-hover:bg-accent-primary/20 transition-colors">
+          <div className="w-16 h-16 rounded-2xl bg-foreground/5 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
             <svg
-              className="w-8 h-8 text-foreground/40 group-hover:text-accent-primary"
+              className="w-8 h-8 text-foreground/40 group-hover:text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -329,7 +329,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
                   />
                   {media.uploading && (
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                      <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+                      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                   )}
                 </div>
@@ -355,7 +355,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
                 <div className="mt-3 px-1">
                   <div className="w-full bg-foreground/5 rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="bg-accent-primary h-full rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(var(--accent-primary-rgb),0.5)]"
+                      className="bg-primary h-full rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
                       style={{ width: `${media.progress}%` }}
                     />
                   </div>
@@ -372,7 +372,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
                 <button
                   type="button"
                   onClick={() => removeMedia(media.id)}
-                  className="absolute top-4 right-4 bg-foreground/10 hover:bg-red-500/80 text-foreground hover:text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md transition-all border border-foreground/10 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-primary focus:ring-offset-background"
+                  className="absolute top-4 right-4 bg-foreground/10 hover:bg-red-500/80 text-foreground hover:text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md transition-all border border-foreground/10 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <title>{_t('remove')}</title>
