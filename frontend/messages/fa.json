@@ -16,7 +16,17 @@
     "create": "ایجاد",
     "add": "افزودن",
     "optional": "اختیاری",
-    "required": "الزامی"
+    "required": "الزامی",
+    "dropFilesHere": "فایل‌ها را اینجا رها کنید یا برای بارگذاری کلیک کنید",
+    "supportedFormats": "پشتیبانی شده: تصاویر، ویدیوها، PDF، صدا",
+    "upload": "بارگذاری",
+    "remove": "حذف",
+    "file": "فایل",
+    "uploadFailed": "بارگذاری ناموفق بود",
+    "uploadImageFailed": "بارگذاری تصویر ناموفق بود",
+    "getUploadUrlFailed": "دریافت آدرس بارگذاری ناموفق بود",
+    "uploadS3Failed": "بارگذاری فایل در S3 ناموفق بود",
+    "removeMediaFailed": "حذف رسانه ناموفق بود"
   },
   "navigation": {
     "home": "خانه",

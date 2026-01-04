@@ -101,7 +101,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
 
           if (!uploadResponse.ok) {
             const error = await uploadResponse.json();
-            throw new Error(error.error?.message || 'Failed to upload image');
+            throw new Error(error.error?.message || _t('uploadImageFailed'));
           }
 
           const { data } = await uploadResponse.json();
@@ -124,7 +124,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
 
           if (!presignedResponse.ok) {
             const error = await presignedResponse.json();
-            throw new Error(error.error?.message || 'Failed to get upload URL');
+            throw new Error(error.error?.message || _t('getUploadUrlFailed'));
           }
 
           const { data } = await presignedResponse.json();
@@ -151,7 +151,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
             } catch (cleanupError) {
               console.error('Failed to cleanup media record:', cleanupError);
             }
-            throw new Error('Failed to upload file to S3');
+            throw new Error(_t('uploadS3Failed'));
           }
         }
 
@@ -180,7 +180,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
               return {
                 ...m,
                 uploading: false,
-                error: error instanceof Error ? error.message : 'Upload failed',
+                error: error instanceof Error ? error.message : _t('uploadFailed'),
               };
             }
             return m;
@@ -188,7 +188,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
         );
       }
     },
-    [apiUrl, onMediaUploaded]
+    [apiUrl, onMediaUploaded, _t]
   );
 
   const handleDrop = useCallback(
@@ -229,7 +229,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
       onMediaRemoved(mediaId);
     } catch (error) {
       console.error('Remove media error:', error);
-      alert('Failed to remove media');
+      alert(_t('removeMediaFailed'));
     }
   };
 
@@ -263,7 +263,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <title>Upload</title>
+              <title>{_t('upload')}</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -273,8 +273,8 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
             </svg>
           </div>
           <div className="text-foreground">
-            <p className="text-xl font-bold mb-1">Drop files here or click to upload</p>
-            <p className="text-sm text-foreground/40">Supported: Images, Videos, PDFs, Audio</p>
+            <p className="text-xl font-bold mb-1">{_t('dropFilesHere')}</p>
+            <p className="text-sm text-foreground/40">{_t('supportedFormats')}</p>
           </div>
         </label>
       </div>
@@ -305,7 +305,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
               {!media.preview && (
                 <div className="w-full h-32 bg-foreground/5 rounded-2xl flex items-center justify-center mb-3">
                   <span className="text-foreground/40 font-bold uppercase tracking-tight text-xs">
-                    {media.file.type.split('/')[1] || 'file'}
+                    {media.file.type.split('/')[1] || _t('file')}
                   </span>
                 </div>
               )}
@@ -343,7 +343,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
                   className="absolute top-4 right-4 bg-foreground/10 hover:bg-red-500/80 text-foreground hover:text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md transition-all border border-foreground/10 opacity-0 group-hover:opacity-100"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <title>Remove</title>
+                    <title>{_t('remove')}</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

@@ -16,7 +16,17 @@
     "create": "Create",
     "add": "Add",
     "optional": "Optional",
-    "required": "Required"
+    "required": "Required",
+    "dropFilesHere": "Drop files here or click to upload",
+    "supportedFormats": "Supported: Images, Videos, PDFs, Audio",
+    "upload": "Upload",
+    "remove": "Remove",
+    "file": "file",
+    "uploadFailed": "Upload failed",
+    "uploadImageFailed": "Failed to upload image",
+    "getUploadUrlFailed": "Failed to get upload URL",
+    "uploadS3Failed": "Failed to upload file to S3",
+    "removeMediaFailed": "Failed to remove media"
   },
   "navigation": {
     "home": "Home",
