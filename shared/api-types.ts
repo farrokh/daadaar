@@ -9,6 +9,7 @@ export interface ApiResponse<T = unknown> {
   error?: {
     code: string;
     message: string;
+    details?: Record<string, unknown>;
   };
 }
 
@@ -105,7 +106,7 @@ export function createApiError(
     error: {
       code,
       message,
-      ...details,
+      details: details,
     },
   };
 }
