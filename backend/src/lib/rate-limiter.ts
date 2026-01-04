@@ -43,12 +43,10 @@ export async function checkRateLimit(
       return {count, ttl}
     `;
 
-    const result = await redis.eval(
-      luaScript,
-      1,
-      rateLimitKey,
-      windowSeconds.toString()
-    ) as [number, number];
+    const result = (await redis.eval(luaScript, 1, rateLimitKey, windowSeconds.toString())) as [
+      number,
+      number,
+    ];
 
     const [newCount, ttl] = result;
     const resetAt = new Date(Date.now() + (ttl > 0 ? ttl * 1000 : windowSeconds * 1000));

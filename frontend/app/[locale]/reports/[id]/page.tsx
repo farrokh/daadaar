@@ -17,7 +17,7 @@ export default function ReportDetailPage() {
   const [selectedMedia, setSelectedMedia] = useState<(Media & { url?: string }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -44,7 +44,13 @@ export default function ReportDetailPage() {
 
   // Focus management and Escape key handling for lightbox
   useEffect(() => {
-    if (!selectedMedia) return;
+    if (!selectedMedia) {
+      dialogRef.current?.close();
+      return;
+    }
+
+    // Show the dialog
+    dialogRef.current?.showModal();
 
     // Focus the close button when dialog opens
     closeButtonRef.current?.focus();
@@ -251,14 +257,17 @@ export default function ReportDetailPage() {
 
         {/* Lightbox Modal */}
         {selectedMedia && (
-          <div
+          <dialog
             ref={dialogRef}
-            role="dialog"
-            aria-modal="true"
             aria-labelledby="lightbox-title"
-            tabIndex={-1}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 sm:p-10"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 sm:p-10 border-0"
             onClick={() => setSelectedMedia(null)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSelectedMedia(null);
+              }
+            }}
           >
             <button
               ref={closeButtonRef}
@@ -281,6 +290,11 @@ export default function ReportDetailPage() {
             <div
               className="max-w-7xl w-full max-h-full flex flex-col items-center"
               onClick={e => e.stopPropagation()}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.stopPropagation();
+                }
+              }}
             >
               <div className="w-full flex justify-center mb-6">
                 {selectedMedia.mediaType === 'image' && (
@@ -319,7 +333,7 @@ export default function ReportDetailPage() {
                 </p>
               </div>
             </div>
-          </div>
+          </dialog>
         )}
       </div>
     </div>

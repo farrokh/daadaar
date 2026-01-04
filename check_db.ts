@@ -1,4 +1,4 @@
-import { db, closeDatabaseConnection } from './backend/src/db';
+import { closeDatabaseConnection, db } from './backend/src/db';
 
 async function main() {
   const mediaItems = await db.query.media.findMany();

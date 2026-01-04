@@ -3,13 +3,14 @@
  */
 export function getS3PublicUrl(key: string, bucket?: string): string {
   const bucketName = bucket || process.env.NEXT_PUBLIC_AWS_S3_BUCKET;
-  
+
   if (!bucketName) {
-    const errorMessage = 'S3 bucket configuration is missing. Please provide a bucket argument or set NEXT_PUBLIC_AWS_S3_BUCKET environment variable.';
+    const errorMessage =
+      'S3 bucket configuration is missing. Please provide a bucket argument or set NEXT_PUBLIC_AWS_S3_BUCKET environment variable.';
     console.error(errorMessage);
     throw new Error(errorMessage);
   }
-  
+
   const region = process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
 
   // Only use mock URL if explicitly in mock mode or bucket is 'mock'
@@ -31,12 +32,12 @@ export function getS3PublicUrl(key: string, bucket?: string): string {
  */
 export function formatDate(dateString: string, locale: string): string {
   const d = new Date(dateString);
-  
-  if (isNaN(d.getTime())) {
+
+  if (Number.isNaN(d.getTime())) {
     // Return empty string for invalid dates
     return '';
   }
-  
+
   return d.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',
