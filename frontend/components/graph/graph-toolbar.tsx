@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 interface GraphToolbarProps {
   onAddOrganization: () => void;
   onAddPerson?: () => void;
+  onAddReport?: () => void;
   onRefresh: () => void;
   viewMode: 'organizations' | 'people' | 'reports';
   isLoading?: boolean;
@@ -14,6 +15,7 @@ interface GraphToolbarProps {
 export function GraphToolbar({
   onAddOrganization,
   onAddPerson,
+  onAddReport,
   onRefresh,
   viewMode,
   isLoading = false,
@@ -97,16 +99,13 @@ export function GraphToolbar({
       )}
 
       {/* Add Report Button - Only show in reports view */}
-      {viewMode === 'reports' && (
+      {viewMode === 'reports' && onAddReport && (
         <Button
           variant="primary"
           size="sm"
-          onClick={() => {
-            // TODO: Navigate to submit report page
-          }}
+          onClick={onAddReport}
           disabled={isLoading}
-          className="shadow-lg opacity-50 cursor-not-allowed"
-          title={t('coming_soon')}
+          className="shadow-lg"
         >
           <svg
             className="h-4 w-4 mr-1.5"

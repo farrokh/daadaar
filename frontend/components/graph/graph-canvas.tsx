@@ -1,5 +1,6 @@
 'use client';
 
+import { Link, useRouter } from '@/i18n/routing';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
@@ -20,11 +21,12 @@ import 'reactflow/dist/style.css';
 import { fetchApi } from '@/lib/api';
 import { AddOrganizationModal } from './add-organization-modal';
 import { AddPersonModal } from './add-person-modal';
+import { SubmitReportModal } from '../reports/submit-report-modal';
 import { GraphToolbar } from './graph-toolbar';
 import OrganizationNode from './organization-node';
 import PersonNode from './person-node';
 import ReportNode from './report-node';
-import type { OrganizationNodeData, PersonNodeData } from './types';
+import type { OrganizationNodeData, PersonNodeData, ReportNodeData } from './types';
 
 // Define node types
 const nodeTypes: NodeTypes = {
@@ -87,6 +89,7 @@ interface IndividualReportsResponse {
 }
 
 export default function GraphCanvas({ initialView }: GraphCanvasProps) {
+  const router = useRouter();
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,6 +99,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   );
   const [isAddOrgModalOpen, setIsAddOrgModalOpen] = useState(false);
   const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState(false);
+  const [isSubmitReportModalOpen, setIsSubmitReportModalOpen] = useState(false);
 
   const t = useTranslations('graph');
   const tOrg = useTranslations('organization');
@@ -280,10 +284,12 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       } else if (node.type === 'individual') {
         const data = node.data as PersonNodeData;
         fetchIndividualReports(data.id, data.name);
+      } else if (node.type === 'report') {
+        const data = node.data as ReportNodeData;
+        router.push(`/reports/${data.id}`);
       }
-      // Report nodes don't navigate further
     },
-    [fetchOrganizationPeople, fetchIndividualReports]
+    [fetchOrganizationPeople, fetchIndividualReports, router]
   );
 
   // Handle node changes
@@ -322,6 +328,14 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     }
   }, [viewContext.organizationId, viewContext.organizationName, fetchOrganizationPeople]);
 
+  // Handle successful report creation
+  const handleReportCreated = useCallback(() => {
+    // Refresh the reports view
+    if (viewContext.individualId) {
+      fetchIndividualReports(viewContext.individualId, viewContext.individualName);
+    }
+  }, [viewContext.individualId, viewContext.individualName, fetchIndividualReports]);
+
   // Load initial data
   // biome-ignore lint/correctness/useExhaustiveDependencies: This effect should only run once on mount, adding dependencies would cause infinite loops
   useEffect(() => {
@@ -341,10 +355,10 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="w-full h-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <div className="text-gray-500 dark:text-gray-400">{t('loading')}</div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-primary" />
+          <div className="text-foreground/40">{t('loading')}</div>
         </div>
       </div>
     );
@@ -352,13 +366,13 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   if (error) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="w-full h-full flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
           <div className="text-red-500 text-lg">{error}</div>
           <button
             type="button"
             onClick={fetchOrganizations}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-accent-primary text-white rounded-lg hover:opacity-90 transition-opacity"
           >
             {t('try_again')}
           </button>
@@ -368,7 +382,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full text-foreground bg-background">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -389,6 +403,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
             if (node.type === 'report') return '#22c55e';
             return '#6b7280';
           }}
+          className="!bg-background !border-foreground/10"
         />
       </ReactFlow>
 
@@ -396,6 +411,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       <GraphToolbar
         onAddOrganization={() => setIsAddOrgModalOpen(true)}
         onAddPerson={() => setIsAddPersonModalOpen(true)}
+        onAddReport={() => setIsSubmitReportModalOpen(true)}
         onRefresh={handleRefresh}
         viewMode={viewContext.mode}
         isLoading={loading}
@@ -419,32 +435,44 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         />
       )}
 
+      {/* Submit Report Modal */}
+      {viewContext.individualId && (
+        <SubmitReportModal
+          isOpen={isSubmitReportModalOpen}
+          onClose={() => setIsSubmitReportModalOpen(false)}
+          individualId={viewContext.individualId}
+          individualName={viewContext.individualName || ''}
+          apiUrl={process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}
+          onSuccess={handleReportCreated}
+        />
+      )}
+
       {/* Navigation breadcrumb */}
-      <div className="absolute top-4 left-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-10">
+      <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg border border-foreground/10 z-10">
         <div className="flex items-center gap-2 text-sm">
           <button
             type="button"
             onClick={fetchOrganizations}
             className={`hover:underline ${
               viewContext.mode === 'organizations'
-                ? 'text-gray-900 dark:text-white font-medium'
-                : 'text-blue-600 dark:text-blue-400'
+                ? 'text-foreground font-medium'
+                : 'text-accent-primary'
             }`}
           >
             {t('organizations')}
           </button>
           {viewContext.mode === 'people' && viewContext.organizationName && (
             <>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-900 dark:text-white font-medium">
+              <span className="text-foreground/40">/</span>
+              <span className="text-foreground font-medium">
                 {viewContext.organizationName}
               </span>
             </>
           )}
           {viewContext.mode === 'reports' && viewContext.individualName && (
             <>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-900 dark:text-white font-medium">
+              <span className="text-foreground/40">/</span>
+              <span className="text-foreground font-medium">
                 {viewContext.individualName}
               </span>
             </>
@@ -453,7 +481,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       </div>
 
       {/* Help tooltip */}
-      <div className="absolute bottom-4 right-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg z-10 text-xs text-gray-500 dark:text-gray-400">
+      <div className="absolute bottom-4 right-4 bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg border border-foreground/10 z-10 text-xs text-foreground/40">
         <p>{t('click_to_drill_down')}</p>
         <p>
           {t('scroll_to_zoom')} • {t('drag_to_pan')}

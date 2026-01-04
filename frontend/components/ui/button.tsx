@@ -12,14 +12,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantClasses = {
       default:
-        'bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-200',
-      primary: 'bg-blue-600 text-white hover:bg-blue-700',
+        'bg-foreground text-background hover:bg-foreground/90',
+      primary: 'bg-accent-primary text-white hover:bg-accent-primary/90',
       secondary:
-        'bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-50 dark:hover:bg-gray-700',
+        'bg-foreground/10 text-foreground hover:bg-foreground/20 backdrop-blur-sm',
       outline:
-        'border border-gray-200 bg-white hover:bg-gray-100 dark:border-gray-800 dark:bg-transparent dark:hover:bg-gray-800',
-      ghost: 'hover:bg-gray-100 dark:hover:bg-gray-800',
-      link: 'text-blue-600 underline-offset-4 hover:underline dark:text-blue-400',
+        'border border-foreground/10 bg-transparent hover:bg-foreground/5',
+      ghost: 'hover:bg-foreground/5',
+      link: 'text-accent-primary underline-offset-4 hover:underline',
     };
 
     const sizeClasses = {
