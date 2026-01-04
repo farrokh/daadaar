@@ -23,6 +23,8 @@ The platform manages complex relational data and high-volume media assets with a
 | **Media** | Attachments linked to reports. |
 | **Users** | Registered identities (Admin, Moderator, User). |
 
+*Note: All entities (Reports, Organizations, Individuals, Roles) support attribution to either a `userId` or a `sessionId`.*
+
 ---
 
 ## 🛠️ Performance & Scalability

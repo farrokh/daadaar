@@ -7,8 +7,8 @@ import { authMiddleware, requireAuth } from '../middleware/auth';
 const router: ReturnType<typeof Router> = Router();
 
 // Apply authentication middleware to all individual routes
+// authMiddleware ensures req.currentUser is set (either 'registered' or 'anonymous')
 router.use(authMiddleware);
-router.use(requireAuth);
 
 // GET /api/individuals - List all individuals
 router.get('/', individualsController.listIndividuals as RequestHandler);

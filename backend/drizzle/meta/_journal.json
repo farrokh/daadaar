@@ -29,6 +29,13 @@
       "when": 1767486933405,
       "tag": "0003_reports_media_nullable_and_votes_check",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1767560408431,
+      "tag": "0004_wise_toad_men",
+      "breakpoints": true
     }
   ]
 }

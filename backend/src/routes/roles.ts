@@ -7,9 +7,8 @@ import { authMiddleware, requireAuth } from '../middleware/auth';
 const router: ReturnType<typeof Router> = Router();
 
 // Apply authentication middleware to all role routes
-// authMiddleware sets req.currentUser, requireAuth validates and maps to req.user
+// authMiddleware ensures req.currentUser is set (either 'registered' or 'anonymous')
 router.use(authMiddleware);
-router.use(requireAuth);
 
 // GET /api/roles - List all roles (optionally filter by organizationId query param)
 router.get('/', rolesController.listRoles as RequestHandler);
