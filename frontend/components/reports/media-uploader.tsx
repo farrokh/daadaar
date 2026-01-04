@@ -2,7 +2,19 @@
 
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { fetchApi } from '../../lib/api';
 import { validateMediaFile } from '../../lib/validation/report-form-schema';
+
+interface MediaUploadResponse {
+  mediaId: number;
+  s3Key: string;
+}
+
+interface PresignedUrlResponse {
+  mediaId: number;
+  uploadUrl: string;
+  s3Key: string;
+}
 
 export interface UploadedMedia {
   id: number;
@@ -115,28 +127,21 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
           const formData = new FormData();
           formData.append('file', file);
 
-          const uploadResponse = await fetch(`${apiUrl}/api/media/upload`, {
+          const response = await fetchApi<MediaUploadResponse>('/media/upload', {
             method: 'POST',
-            credentials: 'include',
             body: formData,
           });
 
-          if (!uploadResponse.ok) {
-            const error = await uploadResponse.json();
-            throw new Error(error.error?.message || _t('uploadImageFailed'));
+          if (!response.success || !response.data) {
+            throw new Error(response.error?.message || _t('uploadImageFailed'));
           }
 
-          const { data } = await uploadResponse.json();
-          mediaId = data.mediaId;
-          s3Key = data.s3Key;
+          mediaId = response.data.mediaId;
+          s3Key = response.data.s3Key;
         } else {
           // 1. Request presigned URL from backend for non-images
-          const presignedResponse = await fetch(`${apiUrl}/api/media/presigned-url`, {
+          const presignedResponse = await fetchApi<PresignedUrlResponse>('/media/presigned-url', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
             body: JSON.stringify({
               filename: file.name,
               contentType: file.type,
@@ -144,15 +149,13 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
             }),
           });
 
-          if (!presignedResponse.ok) {
-            const error = await presignedResponse.json();
-            throw new Error(error.error?.message || _t('getUploadUrlFailed'));
+          if (!presignedResponse.success || !presignedResponse.data) {
+            throw new Error(presignedResponse.error?.message || _t('getUploadUrlFailed'));
           }
 
-          const { data } = await presignedResponse.json();
-          mediaId = data.mediaId;
-          uploadUrl = data.uploadUrl;
-          s3Key = data.s3Key;
+          mediaId = presignedResponse.data.mediaId;
+          uploadUrl = presignedResponse.data.uploadUrl;
+          s3Key = presignedResponse.data.s3Key;
 
           // 2. Upload file to S3 using presigned URL
           const s3Response = await fetch(uploadUrl, {
@@ -166,9 +169,8 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
           if (!s3Response.ok) {
             // S3 upload failed - cleanup the database record
             try {
-              await fetch(`${apiUrl}/api/media/${mediaId}`, {
+              await fetchApi(`/media/${mediaId}`, {
                 method: 'DELETE',
-                credentials: 'include',
               });
             } catch (cleanupError) {
               console.error('Failed to cleanup media record:', cleanupError);
@@ -207,7 +209,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
         );
       }
     },
-    [apiUrl, onMediaUploaded, _t]
+    [onMediaUploaded, _t]
   );
 
   const handleDrop = useCallback(
@@ -232,9 +234,8 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
   const removeMedia = async (mediaId: number) => {
     try {
       // Call backend to soft delete
-      await fetch(`${apiUrl}/api/media/${mediaId}`, {
+      await fetchApi(`/media/${mediaId}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
 
       // Remove from local state and revoke preview URL
