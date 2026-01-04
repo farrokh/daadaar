@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import express, { type Express } from 'express';
 import passport from 'passport';
 import { checkDatabaseConnection, closeDatabaseConnection } from './db';
+import { getRedisUnavailableCount } from './lib/rate-limiter';
 import { checkRedisConnection } from './lib/redis';
 import authRoutes from './routes/auth';
 import csrfRoutes from './routes/csrf';
@@ -47,6 +48,7 @@ app.use('/api/reports', reportsRoutes);
 app.get('/api/health', async (_req, res) => {
   const dbStatus = await checkDatabaseConnection();
   const redisStatus = await checkRedisConnection();
+  const rateLimiterRedisUnavailableCount = getRedisUnavailableCount();
 
   res.json({
     status: dbStatus.connected && redisStatus.connected ? 'ok' : 'degraded',
@@ -65,6 +67,10 @@ app.get('/api/health', async (_req, res) => {
       connected: redisStatus.connected,
       latencyMs: redisStatus.latencyMs,
       error: redisStatus.error,
+    },
+    rateLimiter: {
+      redisUnavailableCount: rateLimiterRedisUnavailableCount,
+      usingInMemoryFallback: !redisStatus.connected && rateLimiterRedisUnavailableCount > 0,
     },
   });
 });
