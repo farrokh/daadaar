@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db, schema } from '../db';
 
 /**
@@ -29,17 +29,12 @@ export async function validatePowSolution(
       return { valid: false, error: 'Challenge expired' };
     }
 
-    // 3. Check if challenge has already been used
-    if (challenge.isUsed) {
-      return { valid: false, error: 'Challenge already used' };
-    }
-
-    // 4. Validate the solution hash format
+    // 3. Validate the solution hash format
     if (!/^[0-9a-f]{64}$/i.test(solution)) {
       return { valid: false, error: 'Invalid solution format' };
     }
 
-    // 5. Recompute the hash to verify it was computed correctly
+    // 4. Recompute the hash to verify it was computed correctly
     const expectedHash = createHash('sha256')
       .update(`${challenge.nonce}${solutionNonce}`)
       .digest('hex');
@@ -54,11 +49,22 @@ export async function validatePowSolution(
       return { valid: false, error: 'Invalid solution: insufficient leading zeros' };
     }
 
-    // 7. Mark challenge as used
-    await db
+    // 7. Atomically mark challenge as used (only if not already used)
+    const updateResult = await db
       .update(schema.powChallenges)
       .set({ isUsed: true })
-      .where(eq(schema.powChallenges.id, challengeId));
+      .where(
+        and(
+          eq(schema.powChallenges.id, challengeId),
+          eq(schema.powChallenges.isUsed, false)
+        )
+      )
+      .returning();
+
+    // If no rows were updated, the challenge was already used
+    if (updateResult.length === 0) {
+      return { valid: false, error: 'Challenge already used' };
+    }
 
     return { valid: true };
   } catch (error) {
