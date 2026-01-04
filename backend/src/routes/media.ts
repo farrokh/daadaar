@@ -1,13 +1,22 @@
 import { Router } from 'express';
 import multer from 'multer';
+import { tmpdir } from 'os';
 import { deleteMedia, generatePresignedUrl, uploadImage } from '../controllers/media';
 import { authMiddleware } from '../middleware/auth';
 
 const router: Router = Router();
 const upload = multer({
-  storage: multer.memoryStorage(),
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, tmpdir());
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix);
+    },
+  }),
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB (buffer limit)
+    fileSize: 10 * 1024 * 1024, // 10MB for images
   },
 });
 

@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
+import { promises as fs } from 'fs';
 import sharp from 'sharp';
 import { db, schema } from '../db';
 import {
@@ -100,14 +101,26 @@ export async function generatePresignedUrl(req: Request, res: Response) {
  * POST /api/media/upload
  */
 export async function uploadImage(req: Request, res: Response) {
+  const file = req.file;
+  let tempFilePath: string | undefined;
+
   try {
-    const file = req.file;
     if (!file) {
       return res.status(400).json({
         success: false,
         error: { code: 'NO_FILE', message: 'No file uploaded' },
       });
     }
+
+    // Ensure file path exists (diskStorage provides path, not buffer)
+    if (!file.path) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_FILE', message: 'File path not available' },
+      });
+    }
+
+    tempFilePath = file.path;
 
     // Validate image type
     const validation = validateMediaFile(file.mimetype, file.size);
@@ -125,8 +138,8 @@ export async function uploadImage(req: Request, res: Response) {
     const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
-    // Process image with Sharp: convert to AVIF
-    const avifBuffer = await sharp(file.buffer)
+    // Process image with Sharp: convert to AVIF (Sharp can read from file path)
+    const avifBuffer = await sharp(file.path)
       .resize({ width: 2048, withoutEnlargement: true }) // Limit size for performance
       .avif({ quality: 60, effort: 4 }) // Good balance of size and quality
       .toBuffer();
@@ -171,6 +184,16 @@ export async function uploadImage(req: Request, res: Response) {
       success: false,
       error: { code: 'UPLOAD_FAILED', message: 'Failed to process and upload image' },
     });
+  } finally {
+    // Clean up temporary file in all cases (success or error)
+    if (tempFilePath) {
+      try {
+        await fs.unlink(tempFilePath);
+      } catch (cleanupError) {
+        console.error('Failed to clean up temporary file:', cleanupError);
+        // Don't fail the request if cleanup fails
+      }
+    }
   }
 }
 
