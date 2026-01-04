@@ -67,7 +67,7 @@ export function SubmitReportModal({
       const challenge = await requestPowChallenge('report-submission', apiUrl);
 
       // 2. Solve PoW challenge
-      const solution = await solvePowChallenge(challenge, (progress) => {
+      const { solution: powSolution, solutionNonce: powSolutionNonce } = await solvePowChallenge(challenge, (progress) => {
         setPowProgress(progress);
       });
 
@@ -84,7 +84,8 @@ export function SubmitReportModal({
           roleId,
           mediaIds,
           powChallengeId: challenge.challengeId,
-          powSolution: solution,
+          powSolution,
+          powSolutionNonce,
         }),
       });
 

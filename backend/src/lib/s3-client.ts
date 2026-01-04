@@ -13,7 +13,7 @@ const s3Client = new S3Client({
       : undefined,
 });
 
-const BUCKET_NAME = process.env.AWS_S3_BUCKET || 'daadaar-media';
+const BUCKET_NAME = process.env.AWS_S3_BUCKET || 'daadaar-media-frkia';
 const USE_S3 = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
 
 /**
