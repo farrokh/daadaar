@@ -3,12 +3,10 @@
  * Client-side SHA-256 hash computation for spam prevention
  */
 
-export interface PowChallenge {
-  id: string;
-  nonce: string;
-  difficulty: number;
-  expiresAt: string;
-}
+import type { PowChallengeResponse } from '@/shared/api-types';
+
+// Use the shared API type for consistency
+type PowChallenge = PowChallengeResponse;
 
 export interface PowSolution {
   challengeId: string;
@@ -97,9 +95,9 @@ export async function requestPowChallenge(resource: string, apiUrl: string): Pro
   }
 
   const data = await response.json();
-  // Map API response (challengeId) to PowChallenge type (id)
+  // API response already uses challengeId, so we can return it directly
   return {
-    id: data.data.challengeId,
+    challengeId: data.data.challengeId,
     nonce: data.data.nonce,
     difficulty: data.data.difficulty,
     expiresAt: data.data.expiresAt,

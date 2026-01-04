@@ -322,7 +322,7 @@ export interface ContentReport {
 // ============================================================================
 
 export interface PowChallenge {
-  id: string;
+  challengeId: string;
   resource: string;
   difficulty: number;
   nonce: string;
