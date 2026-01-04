@@ -13,9 +13,10 @@ You are an expert AI developer working on the Daadaar Platform. You must follow 
 - **NEVER** use `push` in a production environment; only use `generate` followed by `migrate`.
 
 ## 3. Backend Routes & Controllers
-- **Middleware Order**: Use `authMiddleware` first to populate `req.currentUser`.
+- **Middleware Order**: Use `authMiddleware` first to populate `req.currentUser`, then `csrfProtection` for state-changing routes (POST, PUT, DELETE, PATCH).
 - **RequireAuth**: Use `requireAuth` only for sensitive actions (deleting, sensitive updates, admin/mod actions). Creation should ideally be anonymous-friendly.
 - **Controller Types**: Use generic `Request` and `Response` from `express` for handlers that support both anonymous and registered users. Access user info via `req.currentUser`.
+- **CSRF Integration**: Apply `csrfProtection` middleware to all routes that modify state. GET/HEAD/OPTIONS requests are automatically skipped by the middleware.
 
 ## 4. Internationalization (i18n)
 - The platform supports Persian (fa) and English (en).
@@ -25,6 +26,8 @@ You are an expert AI developer working on the Daadaar Platform. You must follow 
 ## 5. Security & Rate Limiting
 - **PoW**: All high-stakes writes (Reports, Votes) MUST be protected by Proof-of-Work (PoW).
 - **VPN Support**: Avoid IP-based rate limiting where possible; favor session-based and PoW-based limits to support users behind VPNs.
+- **Redis Dependency**: Redis is a **required runtime dependency** for production. Rate limiting uses Redis with fail-open behavior (allows requests if Redis unavailable, but logs errors). See `backend/src/lib/rate-limiter.ts` for implementation.
+- **Rate Limit Keys**: Use format `ratelimit:{type}:{identifier}:{action}` (e.g., `ratelimit:user:123:reports`, `ratelimit:session:abc123:votes`).
 
 ## 7. Frontend Development
 - **Framework**: Use Next.js 16+ (App Router) with React 19+.
@@ -33,8 +36,8 @@ You are an expert AI developer working on the Daadaar Platform. You must follow 
 - **Graph Visualization**: Use React Flow for the `GraphCanvas`. Follow existing layout logic in `graph-layout.ts`.
 
 ## 8. Security Protocols
-- **Proof-of-Work (PoW)**: Mandatory for all high-stakes write operations (Reports, Votes). Verify on backend using `pow-validator.ts`.
-- **CSRF Protection**: All state-changing endpoints (POST, PUT, DELETE) must use the custom CSRF middleware.
+- **Proof-of-Work (PoW)**: Mandatory for all high-stakes write operations (Reports, Votes). Verify on backend using `pow-validator.ts`. Frontend must solve challenges using `pow-solver.ts` and submit both `solution` and `solutionNonce`.
+- **CSRF Protection**: All state-changing endpoints (POST, PUT, DELETE, PATCH) must use the `csrfProtection` middleware from `backend/src/lib/csrf-protection.ts`. CSRF tokens are session-based with 24-hour expiration. Frontend must fetch tokens from `GET /api/csrf-token` and include in `X-CSRF-Token` header.
 - **XSS Prevention**: Always sanitize user-provided Markdown or rich text before rendering. Use the shared sanitization utility if available.
 - **Zero IP Policy**: Never log or store user IP addresses. Rely on `sessionId` or `userId`.
 
@@ -46,6 +49,8 @@ You are an expert AI developer working on the Daadaar Platform. You must follow 
 - **docs/**: Keep architecture documentation updated with any structural changes.
 
 ## 10. Development Workflow
-- **Database**: Use the `/database-migration` workflow for any schema changes.
+- **Database**: Use the `/database-migration` workflow for any schema changes. Always use `drizzle-kit generate` followed by `drizzle-kit migrate` - never use `push` in production.
+- **Redis**: Required for production. Local development can run without Redis (rate limiting disabled). Configure via `REDIS_URL` environment variable.
+- **Health Checks**: Backend exposes `/api/health` endpoint that checks database and Redis connectivity. Use for monitoring and deployment health checks.
 - **Testing**: Run lint checks with `biome` before submitting code.
 - **Commits**: Use descriptive commit messages following the project's conventional style.

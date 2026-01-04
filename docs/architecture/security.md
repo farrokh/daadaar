@@ -56,8 +56,12 @@ When Redis is unavailable or not configured, the system implements a **fail-open
 
 ### 3. CSRF Protection
 Custom implementation (`lib/csrf-protection.ts`) using 32-byte tokens with 24-hour expiration.
-- **Middleware**: Validates state-changing operations (POST, PUT, DELETE).
-- **Automation**: Automatic cleanup of expired tokens via background process.
+- **Middleware**: Validates state-changing operations (POST, PUT, DELETE, PATCH). GET/HEAD/OPTIONS requests are automatically skipped.
+- **Token Endpoint**: `GET /api/csrf-token` - Requires authentication (anonymous or registered) to generate token for the session.
+- **Token Header**: Frontend must include CSRF token in `X-CSRF-Token` header for all state-changing requests.
+- **Session-Based**: Tokens are tied to session IDs (anonymous) or user IDs (registered).
+- **Automation**: Automatic cleanup of expired tokens via background process (every hour).
+- **Integration Status**: ✅ Fully integrated into all state-changing routes (reports, media, organizations, individuals, roles, auth, pow).
 
 ---
 
