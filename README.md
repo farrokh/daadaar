@@ -32,8 +32,8 @@ For detailed architecture, see [ARCHITECTURE_SUMMARY.md](ARCHITECTURE_SUMMARY.md
 ### Prerequisites
 
 - **Bun 1.0+** - [Install Bun](https://bun.sh)
-- **Docker** - For local PostgreSQL database
-- **Redis** - For session management (optional for local dev)
+- **Docker** - For local PostgreSQL and Redis databases
+- **Redis** - Required for production (rate limiting, sessions). Optional for local dev (system will operate without it but rate limiting will be disabled)
 
 ### Installation
 
