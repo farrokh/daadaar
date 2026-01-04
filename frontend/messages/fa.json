@@ -55,7 +55,10 @@
     "drag_to_pan": "برای جابجایی بکشید",
     "coming_soon": "به زودی",
     "loading": "در حال بارگذاری گراف...",
-    "try_again": "تلاش مجدد"
+    "try_again": "تلاش مجدد",
+    "timeline": "خط زمان",
+    "all_time": "همه زمان‌ها",
+    "filter_by_date": "فیلتر بر اساس تاریخ"
   },
   "organization": {
     "add_title": "افزودن سازمان جدید",

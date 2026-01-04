@@ -422,7 +422,25 @@ const requireAuth = async (req, res, next) => {
 6. Backend creates entities and returns updated graph data
 7. Frontend refreshes graph view to show new nodes and edges
 
-### 2. Report Submission
+### 2. Timeline Filtering
+
+**Purpose**: Filter graph data (reports and role occupancies) based on a selected time range to visualize historical changes and incident clusters
+
+**Frontend**:
+- `TimelineFilter` component: A custom dual-handle range slider for year selection.
+  - **Glassmorphism Design**: High-end visual aesthetic with backdrop-blur and responsive handle alignment.
+  - **Dynamic Range**: Automatically scales its min/max boundaries based on the data present in the current view.
+  - **Handle-Center Alignment**: Custom CSS/JS math ensures the highlight bar perfectly aligns with the center of the slider handles.
+- **Global Visibility**: Integrated into `GraphCanvas` to be always visible on the home page and drill-down views.
+- **Internationalization**: Fully localized support for English and Persian.
+
+**Implementation Details**:
+- **Node Filtering**: Reports are filtered by their `incidentDate`.
+- **Edge Filtering**: Relationships (edges) are filtered based on their temporal metadata (e.g., `startDate` and `endDate` in role occupancy).
+- **Overlap Logic**: Edges are shown if their active duration [start, end] has any overlap with the selected timeline window.
+- **Fallback Range**: Defaults to a 2000-Present range if no specific dates are found in the current dataset.
+
+### 3. Report Submission
 
 **Purpose**: Allow users to submit detailed reports linking individuals to incidents
 
