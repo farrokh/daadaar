@@ -1,8 +1,8 @@
 import { SessionManager } from '@/components/auth/session-manager';
+import { Navbar } from '@/components/layout/navbar';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { Navbar } from '@/components/layout/navbar';
 import { routing } from '../../i18n/routing';
 import '../globals.css';
 
@@ -14,6 +14,10 @@ export const metadata = {
   title: 'Daadaar Platform',
   description: 'Decentralized, anonymous platform for exposing government injustices',
 };
+
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export default async function LocaleLayout({
   children,
@@ -35,13 +39,14 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={locale === 'fa' ? 'rtl' : 'ltr'}>
-      <body suppressHydrationWarning className="bg-background text-foreground antialiased min-h-screen selection:bg-accent-primary/30">
+      <body
+        suppressHydrationWarning
+        className={`${inter.className} bg-background text-foreground antialiased min-h-screen selection:bg-accent-primary/30`}
+      >
         <NextIntlClientProvider messages={messages}>
           <Navbar />
           <SessionManager />
-          <main className="pt-16">
-            {children}
-          </main>
+          <main className="pt-16">{children}</main>
         </NextIntlClientProvider>
       </body>
     </html>

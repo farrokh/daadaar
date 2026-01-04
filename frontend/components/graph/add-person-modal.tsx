@@ -298,9 +298,7 @@ export function AddPersonModal({
 
         <div className="border-t border-foreground/10 pt-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-foreground/60">
-              {t('role_assignment')}
-            </h3>
+            <h3 className="text-sm font-medium text-foreground/60">{t('role_assignment')}</h3>
             <button
               type="button"
               onClick={handleToggleNewRole}

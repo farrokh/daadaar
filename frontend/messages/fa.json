@@ -58,7 +58,12 @@
     "try_again": "تلاش مجدد",
     "timeline": "خط زمان",
     "all_time": "همه زمان‌ها",
-    "filter_by_date": "فیلتر بر اساس تاریخ"
+    "filter_by_date": "فیلتر بر اساس تاریخ",
+    "show_minimap": "نمایش نقشه کوچک",
+    "hide_minimap": "پنهان کردن نقشه کوچک",
+    "zoom_in": "بزرگنمایی",
+    "zoom_out": "کوچک‌نمایی",
+    "fit_view": "تنظیم اندازه"
   },
   "organization": {
     "add_title": "افزودن سازمان جدید",
