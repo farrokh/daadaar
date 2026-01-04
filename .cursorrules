@@ -26,8 +26,13 @@ You are an expert AI developer working on the Daadaar Platform. You must follow 
 ## 5. Security & Rate Limiting
 - **PoW**: All high-stakes writes (Reports, Votes) MUST be protected by Proof-of-Work (PoW).
 - **VPN Support**: Avoid IP-based rate limiting where possible; favor session-based and PoW-based limits to support users behind VPNs.
-- **Redis Dependency**: Redis is a **required runtime dependency** for production. Rate limiting uses Redis with fail-open behavior (allows requests if Redis unavailable, but logs errors). See `backend/src/lib/rate-limiter.ts` for implementation.
+- **Redis Dependency**: Redis is a **required runtime dependency** for production. Rate limiting uses Redis with in-memory fallback when Redis is unavailable. See `backend/src/lib/rate-limiter.ts` for implementation.
+- **Fail-Open vs Fail-Closed**: 
+  - Default: In-memory fallback (fail-open) - continues rate limiting per-instance
+  - Report submission: Fail-closed by default (denies requests if Redis unavailable)
+  - Global fail-closed: Set `RATE_LIMITER_FAIL_CLOSED=true` environment variable
 - **Rate Limit Keys**: Use format `ratelimit:{type}:{identifier}:{action}` (e.g., `ratelimit:user:123:reports`, `ratelimit:session:abc123:votes`).
+- **Health Checks**: Rate limiter metrics exposed in `/api/health` endpoint (`rateLimiter.redisUnavailableCount`, `rateLimiter.usingInMemoryFallback`).
 
 ## 7. Frontend Development
 - **Framework**: Use Next.js 16+ (App Router) with React 19+.
