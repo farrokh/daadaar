@@ -105,7 +105,7 @@ if (!s3Response.ok) {
 
 ---
 
-### 4. CSRF Protection ✅
+### 4. CSRF Protection ✅ COMPLETE
 
 **Files Created**:
 - `backend/src/lib/csrf-protection.ts`
@@ -118,12 +118,22 @@ if (!s3Response.ok) {
 - ✅ Session-based token storage (memory-based, can be moved to Redis)
 - ✅ GET endpoint to retrieve CSRF token: `GET /api/csrf-token`
 
+**Integration Status**: ✅ **FULLY INTEGRATED**
+- ✅ `/api/reports` - All routes protected
+- ✅ `/api/media` - All routes protected
+- ✅ `/api/organizations` - All routes protected
+- ✅ `/api/individuals` - All routes protected
+- ✅ `/api/roles` - All routes protected
+- ✅ `/api/auth` - Session creation/deletion protected
+- ✅ `/api/pow` - Challenge generation protected
+- ✅ CSRF route registered in `server.ts` at `/api/csrf`
+
 **Usage**:
 ```typescript
 // Backend - Apply to protected routes
 import { csrfProtection } from '../lib/csrf-protection';
 
-router.post('/api/reports', authMiddleware, csrfProtection, createReport);
+router.use(csrfProtection); // Applied to all routes in the router
 ```
 
 ```typescript
@@ -138,8 +148,6 @@ fetch('/api/reports', {
   body: JSON.stringify(data),
 });
 ```
-
-**Note**: Needs to be integrated into existing routes (see TODO below).
 
 ---
 
@@ -208,22 +216,14 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
    - Apply all migrations before deployment:
      ```bash
      cd backend
-     bunx drizzle-kit push
+     bunx drizzle-kit migrate
      ```
-   - Or use migration runner if you have one configured
+   - **Important**: Never use `drizzle-kit push` in production. Always use `generate` + `migrate` workflow for proper versioning and rollback capabilities.
 
-2. **Integrate CSRF Protection**:
-   - Add `csrfProtection` middleware to state-changing routes:
-     - `/api/reports` (POST)
-     - `/api/media/*` (POST, DELETE)
-     - `/api/organizations/*` (POST, PUT, DELETE)
-     - `/api/individuals/*` (POST, PUT, DELETE)
-     - `/api/roles/*` (POST, PUT, DELETE)
-   - Add CSRF route to server.ts:
-     ```typescript
-     import csrfRoutes from './routes/csrf';
-     app.use('/api', csrfRoutes);
-     ```
+2. **Integrate CSRF Protection** ✅ **COMPLETE**:
+   - ✅ CSRF protection has been integrated into all state-changing routes
+   - ✅ CSRF route registered in `server.ts` at `/api/csrf`
+   - ✅ All routes protected: reports, media, organizations, individuals, roles, auth, pow
 
 3. **Update Frontend to Use Shared Types**:
    - Replace `any` types with `ApiResponse<T>` types
@@ -306,14 +306,15 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 - No breaking changes to existing API contracts
 - Database migration is additive (no data loss)
 - CDN is optional and can be enabled later
-- CSRF protection needs to be integrated into routes
+- ✅ CSRF protection fully integrated into all routes
+- Redis is required for production (rate limiting). System operates in fail-open mode if Redis unavailable.
 
 ---
 
 ## 🎯 Next Steps
 
-1. Run database migration
-2. Integrate CSRF protection into routes
+1. ✅ Run database migration (use `drizzle-kit migrate`, not `push`)
+2. ✅ Integrate CSRF protection into routes (COMPLETE)
 3. Update frontend to use shared types
 4. Add missing translations
 5. Test all changes thoroughly
