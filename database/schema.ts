@@ -340,8 +340,7 @@ export const media = pgTable(
   'media',
   {
     id: serial('id').primaryKey(),
-    reportId: integer('report_id')
-      .references(() => reports.id, { onDelete: 'cascade' }),
+    reportId: integer('report_id').references(() => reports.id, { onDelete: 'cascade' }),
     s3Key: varchar('s3_key', { length: 500 }).notNull(),
     s3Bucket: varchar('s3_bucket', { length: 255 }).notNull(),
     originalFilename: varchar('original_filename', { length: 500 }),

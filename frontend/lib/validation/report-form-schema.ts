@@ -14,7 +14,7 @@ export const reportFormSchema = z.object({
     .min(50, 'Content must be at least 50 characters')
     .max(10000, 'Content must not exceed 10,000 characters'),
   individualId: z.number().int().positive('Individual is required'),
-  
+
   // Optional fields
   titleEn: z.string().max(500).optional(),
   contentEn: z.string().max(10000).optional(),
@@ -22,7 +22,7 @@ export const reportFormSchema = z.object({
   incidentLocation: z.string().max(255).optional(),
   incidentLocationEn: z.string().max(255).optional(),
   roleId: z.number().int().positive().optional(),
-  
+
   // Media files (array of media IDs)
   mediaIds: z.array(z.number().int().positive()).optional(),
 });

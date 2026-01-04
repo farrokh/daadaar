@@ -49,7 +49,7 @@ export async function solvePowChallenge(
     const data = `${nonce}${solutionNonce}`;
     const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(data));
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     // Check if hash meets difficulty requirement
     if (hashHex.startsWith(targetPrefix)) {
@@ -60,7 +60,7 @@ export async function solvePowChallenge(
     if (onProgress && attempts % 1000 === 0) {
       const elapsedMs = Date.now() - startTime;
       const attemptsPerMs = attempts / elapsedMs;
-      const estimatedTotalAttempts = Math.pow(16, difficulty);
+      const estimatedTotalAttempts = 16 ** difficulty;
       const estimatedTimeMs = estimatedTotalAttempts / attemptsPerMs;
       const progress = Math.min((attempts / estimatedTotalAttempts) * 100, 99);
 
@@ -81,10 +81,7 @@ export async function solvePowChallenge(
  * @param apiUrl - The API base URL
  * @returns The challenge
  */
-export async function requestPowChallenge(
-  resource: string,
-  apiUrl: string
-): Promise<PowChallenge> {
+export async function requestPowChallenge(resource: string, apiUrl: string): Promise<PowChallenge> {
   const response = await fetch(`${apiUrl}/api/pow/challenge`, {
     method: 'POST',
     headers: {

@@ -1,10 +1,10 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { reportFormSchema, type ReportFormData } from '../../lib/validation/report-form-schema';
-import { requestPowChallenge, solvePowChallenge, type PowProgress } from '../../lib/pow-solver';
+import { type PowProgress, requestPowChallenge, solvePowChallenge } from '../../lib/pow-solver';
+import { type ReportFormData, reportFormSchema } from '../../lib/validation/report-form-schema';
 import { MediaUploader } from './media-uploader';
 
 interface SubmitReportModalProps {
@@ -50,11 +50,11 @@ export function SubmitReportModal({
   });
 
   const handleMediaUploaded = (mediaId: number) => {
-    setMediaIds((prev) => [...prev, mediaId]);
+    setMediaIds(prev => [...prev, mediaId]);
   };
 
   const handleMediaRemoved = (mediaId: number) => {
-    setMediaIds((prev) => prev.filter((id) => id !== mediaId));
+    setMediaIds(prev => prev.filter(id => id !== mediaId));
   };
 
   const onSubmit = async (data: ReportFormData) => {
@@ -67,9 +67,12 @@ export function SubmitReportModal({
       const challenge = await requestPowChallenge('report-submission', apiUrl);
 
       // 2. Solve PoW challenge
-      const { solution: powSolution, solutionNonce: powSolutionNonce } = await solvePowChallenge(challenge, (progress) => {
-        setPowProgress(progress);
-      });
+      const { solution: powSolution, solutionNonce: powSolutionNonce } = await solvePowChallenge(
+        challenge,
+        progress => {
+          setPowProgress(progress);
+        }
+      );
 
       // 3. Submit report
       const response = await fetch(`${apiUrl}/api/reports`, {
@@ -144,9 +147,15 @@ export function SubmitReportModal({
             disabled={isSubmitting}
             className="text-foreground/20 hover:text-foreground p-2 hover:bg-foreground/5 rounded-full transition-all disabled:opacity-50"
           >
-             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-             </svg>
+            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <title>Close</title>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
           </button>
         </div>
 
@@ -155,8 +164,11 @@ export function SubmitReportModal({
           <form id="report-form" onSubmit={handleSubmit(onSubmit)} className="p-8 space-y-8">
             {/* Title (Persian) */}
             <div>
-              <label htmlFor="title" className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider">
-                 {individualName} (Persian) <span className="text-red-500">*</span>
+              <label
+                htmlFor="title"
+                className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider"
+              >
+                {individualName} (Persian) <span className="text-red-500">*</span>
               </label>
               <input
                 {...register('title')}
@@ -166,12 +178,17 @@ export function SubmitReportModal({
                 placeholder="عنوان گزارش"
                 dir="rtl"
               />
-              {errors.title && <p className="text-red-500 text-xs mt-2 px-1">{errors.title.message}</p>}
+              {errors.title && (
+                <p className="text-red-500 text-xs mt-2 px-1">{errors.title.message}</p>
+              )}
             </div>
 
             {/* Title (English) */}
             <div>
-              <label htmlFor="titleEn" className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider">
+              <label
+                htmlFor="titleEn"
+                className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider"
+              >
                 Title (English)
               </label>
               <input
@@ -181,12 +198,17 @@ export function SubmitReportModal({
                 className="w-full px-5 py-3 bg-foreground/5 border border-foreground/10 rounded-2xl focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-all outline-none text-foreground placeholder:text-foreground/20"
                 placeholder="Report title"
               />
-              {errors.titleEn && <p className="text-red-500 text-xs mt-2 px-1">{errors.titleEn.message}</p>}
+              {errors.titleEn && (
+                <p className="text-red-500 text-xs mt-2 px-1">{errors.titleEn.message}</p>
+              )}
             </div>
 
             {/* Content (Persian) */}
             <div>
-              <label htmlFor="content" className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider">
+              <label
+                htmlFor="content"
+                className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider"
+              >
                 Content (Persian) <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -197,12 +219,17 @@ export function SubmitReportModal({
                 placeholder="محتوای گزارش..."
                 dir="rtl"
               />
-              {errors.content && <p className="text-red-500 text-xs mt-2 px-1">{errors.content.message}</p>}
+              {errors.content && (
+                <p className="text-red-500 text-xs mt-2 px-1">{errors.content.message}</p>
+              )}
             </div>
 
             {/* Content (English) */}
             <div>
-              <label htmlFor="contentEn" className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider">
+              <label
+                htmlFor="contentEn"
+                className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider"
+              >
                 Content (English)
               </label>
               <textarea
@@ -220,7 +247,10 @@ export function SubmitReportModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Incident Date */}
               <div>
-                <label htmlFor="incidentDate" className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider">
+                <label
+                  htmlFor="incidentDate"
+                  className="block text-sm font-bold text-foreground/60 mb-2 uppercase tracking-wider"
+                >
                   Incident Date
                 </label>
                 <input
@@ -255,7 +285,10 @@ export function SubmitReportModal({
 
             {/* Media Upload */}
             <div>
-              <label className="block text-sm font-bold text-foreground/60 mb-4 uppercase tracking-wider">
+              <label
+                htmlFor="media-upload"
+                className="block text-sm font-bold text-foreground/60 mb-4 uppercase tracking-wider"
+              >
                 Evidence & Media
               </label>
               <MediaUploader
@@ -269,15 +302,15 @@ export function SubmitReportModal({
 
         {/* Footer Actions */}
         <div className="p-8 border-t border-foreground/5 bg-foreground/[0.02]">
-           {/* PoW Progress */}
-           {powProgress && (
+          {/* PoW Progress */}
+          {powProgress && (
             <div className="bg-accent-primary/10 border border-accent-primary/20 rounded-2xl p-5 mb-6">
               <div className="flex justify-between items-center mb-3">
                 <span className="text-sm font-bold text-accent-primary">
                   Solving security challenge...
                 </span>
                 <span className="text-xs font-mono text-accent-primary/60">
-                   {powProgress.progress.toFixed(0)}%
+                  {powProgress.progress.toFixed(0)}%
                 </span>
               </div>
               <div className="w-full bg-accent-primary/10 rounded-full h-2 overflow-hidden">
@@ -315,11 +348,13 @@ export function SubmitReportModal({
               className="px-8 py-3 bg-accent-primary text-white font-bold rounded-2xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-accent-primary/20 transition-all flex items-center gap-2"
             >
               {isSubmitting ? (
-                 <>
+                <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   {powProgress ? 'Verifying...' : 'Submitting...'}
-                 </>
-              ) : 'Submit Report'}
+                </>
+              ) : (
+                'Submit Report'
+              )}
             </button>
           </div>
         </div>
