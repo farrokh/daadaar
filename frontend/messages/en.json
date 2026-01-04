@@ -183,5 +183,18 @@
     "content_required": "Content is required",
     "media_upload_error": "Failed to upload media",
     "media_delete_error": "Failed to delete media"
+  },
+  "voting": {
+    "upvote": "Upvote",
+    "downvote": "Downvote",
+    "removeVote": "Remove Vote",
+    "upvotes": "Upvotes",
+    "downvotes": "Downvotes",
+    "voteCast": "Vote cast successfully",
+    "voteRemoved": "Vote removed successfully",
+    "voteError": "Failed to cast vote",
+    "removeVoteError": "Failed to remove vote",
+    "solvingPow": "Solving proof-of-work...",
+    "powRequired": "Anonymous voting requires proof-of-work verification"
   }
 }

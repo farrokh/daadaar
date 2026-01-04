@@ -48,13 +48,16 @@ The development of Daadaar is organized into three strategic phases, moving from
 ## 🚧 In Progress (Phase 1 - MVP Completion)
 
 ### High Priority
-- [ ] **Voting Mechanism**: Upvote/downvote with PoW for anonymous users, session-based duplicate prevention, and atomic vote count updates
+- [x] **Voting Mechanism**: Upvote/downvote with PoW for anonymous users, session-based duplicate prevention, and atomic vote count updates
   - ✅ Database schema complete (`votes` table with unique constraints)
   - ✅ Rate limiting function exists (`checkVotingLimit`)
   - ✅ PoW resource type configured for voting
-  - ❌ **Missing**: Voting routes (`POST /api/votes`) and controller implementation
-  - ❌ **Missing**: Atomic vote count updates on reports table
-  - ❌ **Missing**: Frontend voting functionality (currently placeholder UI)
+  - ✅ Voting routes (`POST /api/votes`, `DELETE /api/votes/:reportId`, `GET /api/votes/:reportId/my-vote`)
+  - ✅ Controller implementation with PoW validation for anonymous users
+  - ✅ Atomic vote count updates on reports table using SQL expressions
+  - ✅ Frontend voting functionality with `useVoting` hook and `VotingButtons` component
+  - ✅ Vote change support (upvote ↔ downvote) with automatic count adjustments
+  - ✅ Optimistic UI updates with server reconciliation
 - [ ] **AI Verification (Basic)**: OpenAI GPT-4 API integration for report analysis and confidence scoring with background job queue (BullMQ)
   - ✅ Database schema complete (`ai_verification` table with all fields)
   - ❌ **Missing**: OpenAI SDK dependency (`openai` package)

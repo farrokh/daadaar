@@ -30,7 +30,11 @@ export function getS3PublicUrl(key: string, bucket?: string): string {
 /**
  * Format a date string to a localized date
  */
-export function formatDate(dateString: string, locale: string): string {
+export function formatDate(dateString: string | null | undefined, locale: string): string {
+  if (!dateString) {
+    return '';
+  }
+
   const d = new Date(dateString);
 
   if (Number.isNaN(d.getTime())) {

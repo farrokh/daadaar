@@ -1,3 +1,4 @@
+import { AuthProvider } from '@/components/auth/auth-provider';
 import { SessionManager } from '@/components/auth/session-manager';
 import { Navbar } from '@/components/layout/navbar';
 import { NextIntlClientProvider } from 'next-intl';
@@ -44,9 +45,11 @@ export default async function LocaleLayout({
         className={`${inter.className} bg-background text-foreground antialiased min-h-screen selection:bg-accent-primary/30`}
       >
         <NextIntlClientProvider messages={messages}>
-          <Navbar />
-          <SessionManager />
-          <main className="pt-16">{children}</main>
+          <AuthProvider>
+            <Navbar />
+            <SessionManager />
+            <main className="pt-16">{children}</main>
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>
