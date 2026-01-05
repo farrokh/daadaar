@@ -182,6 +182,35 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 
 ---
 
+### 7. Content Reporting System ✅
+
+**Files**:
+- `backend/src/controllers/content-reports.ts`
+- `frontend/components/ui/report-content-button.tsx`
+- `docs/CONTENT_REPORTING_PLAN.md`
+
+**Features**:
+- ✅ Universal reporting for reports, organizations, individuals, and users
+- ✅ Standardized "Report" button component
+- ✅ Backend storage with reason codes and descriptions
+- ✅ Admin dashboard readiness (schema supports review workflow)
+
+---
+
+### 8. Rich Media Support ✅
+
+**Files**:
+- `frontend/components/reports/media-uploader.tsx`
+- `backend/src/controllers/reports.ts` (media linking)
+
+**Features**:
+- ✅ Support for PDF documents and Audio files
+- ✅ File type specific icons (when preview is unavailable)
+- ✅ Presigned URL generation for secure access
+- ✅ Improved drag-and-drop interface with progress tracking
+
+---
+
 ### 6. CDN Configuration Documentation ✅
 
 **File**: `docs/CDN_CONFIGURATION.md`

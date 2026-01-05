@@ -2,10 +2,12 @@
 
 import { VotingButtons } from '@/components/reports/voting-buttons';
 import { Button } from '@/components/ui/button';
+import { ReportContentButton } from '@/components/ui/report-content-button';
 import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getS3PublicUrl } from '@/lib/utils';
 import type { Media, ReportWithDetails } from '@/shared/types';
+import { Download, ExternalLink, FileText, Music } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -112,13 +114,16 @@ export default function ReportDetailPage() {
     >
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
-        <button
-          type="button"
-          onClick={() => window.history.back()}
-          className="flex items-center gap-2 text-foreground/40 hover:text-foreground mb-8 transition-colors"
-        >
-          {isRtl ? '→' : '←'} {t('all_reports')}
-        </button>
+        <div className="flex items-center justify-between mb-8">
+          <button
+            type="button"
+            onClick={() => window.history.back()}
+            className="flex items-center gap-2 text-foreground/40 hover:text-foreground transition-colors"
+          >
+            {isRtl ? '→' : '←'} {t('all_reports')}
+          </button>
+          <ReportContentButton contentType="report" contentId={report.id} />
+        </div>
 
         {/* Hero Meta */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -191,6 +196,19 @@ export default function ReportDetailPage() {
                       </svg>
                     </div>
                   )}
+                  {item.mediaType === 'document' && (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-secondary/10 p-4 text-center">
+                      <FileText className="w-10 h-10 text-primary mb-2 opacity-60" />
+                      <span className="text-[10px] text-foreground/60 truncate w-full px-2" title={item.originalFilename || ''}>
+                        {item.originalFilename}
+                      </span>
+                    </div>
+                  )}
+                  {item.mediaType === 'audio' && (
+                    <div className="w-full h-full flex items-center justify-center bg-secondary/10 p-4">
+                      <Music className="w-10 h-10 text-primary opacity-60" />
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                 </button>
               );
@@ -206,8 +224,20 @@ export default function ReportDetailPage() {
               {t('reported_by')}
             </h3>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-secondary/50 flex items-center justify-center text-lg text-white font-bold">
-                {report.user?.displayName?.[0] || 'A'}
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-secondary/50 flex items-center justify-center text-lg text-white font-bold shrink-0">
+                {report.user?.profileImageUrl ? (
+                  <img
+                    src={
+                      report.user.profileImageUrl.startsWith('http')
+                        ? report.user.profileImageUrl
+                        : getS3PublicUrl(report.user.profileImageUrl)
+                    }
+                    alt={report.user.displayName || 'User'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  report.user?.displayName?.[0] || 'A'
+                )}
               </div>
               <div>
                 <div className="text-foreground font-bold">
@@ -229,8 +259,20 @@ export default function ReportDetailPage() {
               <div className="space-y-4">
                 {report.reportLinks.map(link => (
                   <div key={link.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/50 flex items-center justify-center text-xs text-white">
-                      {link.individual?.fullName?.[0] || 'P'}
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/50 flex items-center justify-center text-xs text-white shrink-0">
+                      {link.individual?.profileImageUrl ? (
+                        <img
+                          src={
+                            link.individual.profileImageUrl.startsWith('http')
+                              ? link.individual.profileImageUrl
+                              : getS3PublicUrl(link.individual.profileImageUrl)
+                          }
+                          alt={link.individual.fullName}
+                          className="w-full h-8 object-cover"
+                        />
+                      ) : (
+                        link.individual?.fullName?.[0] || 'P'
+                      )}
                     </div>
                     <div>
                       <div className="text-foreground font-medium text-sm">
@@ -315,11 +357,81 @@ export default function ReportDetailPage() {
                     <track kind="captions" />
                   </video>
                 )}
+                {selectedMedia.mediaType === 'audio' && (
+                  <div className="w-full max-w-2xl bg-white/5 backdrop-blur-md p-8 rounded-3xl border border-white/10 flex flex-col items-center gap-6">
+                    <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                      <Music className="w-10 h-10" />
+                    </div>
+                    <audio
+                      src={
+                        selectedMedia.url ||
+                        getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                      }
+                      controls
+                      className="w-full"
+                    >
+                      <track kind="captions" />
+                    </audio>
+                  </div>
+                )}
+                {selectedMedia.mediaType === 'document' && (
+                  <div className="w-full flex flex-col items-center gap-6">
+                    {selectedMedia.mimeType === 'application/pdf' || selectedMedia.originalFilename?.toLowerCase().endsWith('.pdf') ? (
+                      <div className="w-full max-w-4xl h-[70vh] rounded-2xl overflow-hidden border border-white/10 bg-white/5 shadow-2xl">
+                        <embed
+                          src={
+                            selectedMedia.url ||
+                            getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                          }
+                          type="application/pdf"
+                          width="100%"
+                          height="100%"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-64 h-64 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 flex flex-col items-center justify-center gap-4">
+                        <FileText className="w-20 h-20 text-primary opacity-40" />
+                      </div>
+                    )}
+                    <div className="flex gap-4">
+                      <a
+                        href={
+                          selectedMedia.url ||
+                          getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center rounded-full px-6 py-2 gap-2 text-sm font-medium transition-colors bg-secondary text-white hover:opacity-90 backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        {commonT('open')}
+                      </a>
+                      <a
+                        href={
+                          selectedMedia.url ||
+                          getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                        }
+                        download={selectedMedia.originalFilename || 'document'}
+                        className="inline-flex items-center justify-center rounded-full px-6 py-2 gap-2 text-sm font-medium transition-colors border border-white/10 bg-transparent hover:bg-white/10 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        {commonT('download')}
+                      </a>
+                    </div>
+                  </div>
+                )}
               </div>
-              <div className="text-center">
-                <h4 id="lightbox-title" className="text-white font-bold text-xl mb-2">
-                  {selectedMedia.originalFilename}
-                </h4>
+              <div className="text-center flex flex-col items-center gap-2">
+                <div className="flex items-center gap-3">
+                  <h4 id="lightbox-title" className="text-white font-bold text-xl">
+                    {selectedMedia.originalFilename}
+                  </h4>
+                  <ReportContentButton
+                    contentType="media"
+                    contentId={selectedMedia.id}
+                    className="scale-90"
+                  />
+                </div>
                 <p className="text-white/40 text-sm">
                   {selectedMedia.fileSizeBytes
                     ? (selectedMedia.fileSizeBytes / 1024 / 1024).toFixed(2)

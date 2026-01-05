@@ -29,7 +29,9 @@
     "removeMediaFailed": "حذف رسانه ناموفق بود",
     "validationError": "خطای اعتبارسنجی",
     "fileTypeNotAllowed": "نوع فایل {type} مجاز نیست. فرمت‌های پشتیبانی شده: تصاویر، ویدیوها، PDF، صدا",
-    "fileSizeExceedsLimit": "حجم فایل {size} مگابایت از حداکثر {maxSize} مگابایت برای این نوع فایل بیشتر است"
+    "fileSizeExceedsLimit": "حجم فایل {size} مگابایت از حداکثر {maxSize} مگابایت برای این نوع فایل بیشتر است",
+    "open": "باز کردن",
+    "download": "دانلود"
   },
   "navigation": {
     "home": "خانه",
@@ -38,7 +40,10 @@
     "submit": "ارسال گزارش",
     "about": "درباره",
     "login": "ورود",
-    "signup": "ثبت‌نام"
+    "signup": "ثبت‌نام",
+    "profile": "پروفایل",
+    "logout": "خروج",
+    "admin": "مدیریت"
   },
   "landing": {
     "hero_title": "افشای بی‌عدالتی، به صورت ناشناس",
@@ -91,6 +96,8 @@
     "description_placeholder": "توضیحات سازمان...",
     "description_en": "توضیحات (انگلیسی)",
     "description_en_placeholder": "توضیحات به انگلیسی...",
+    "logo": "لوگوی سازمان",
+    "logo_helper": "بارگذاری لوگو برای این سازمان (اختیاری، حداکثر ۵ مگابایت)",
     "parent": "سازمان مادر",
     "parent_placeholder": "انتخاب سازمان مادر (اختیاری)",
     "parent_helper": "برای سازمان سطح اول خالی بگذارید",
@@ -199,5 +206,56 @@
     "removeVoteError": "خطا در حذف رأی",
     "solvingPow": "در حال حل اثبات کار...",
     "powRequired": "رأی‌دهی ناشناس نیازمند تأیید اثبات کار است"
+  },
+  "contentReport": {
+    "reportButton": "گزارش",
+    "title": "گزارش محتوا",
+    "close": "بستن",
+    "reasonLabel": "دلیل گزارش",
+    "descriptionLabel": "جزئیات بیشتر",
+    "optional": "(اختیاری)",
+    "descriptionPlaceholder": "توضیحات بیشتری برای گزارش خود ارائه دهید...",
+    "reasons": {
+      "spam": "هرزنامه یا تبلیغات",
+      "misinformation": "اطلاعات نادرست یا گمراه‌کننده",
+      "harassment": "آزار یا سوء استفاده",
+      "inappropriate": "محتوای نامناسب",
+      "duplicate": "ورودی تکراری",
+      "other": "سایر"
+    },
+    "cancel": "لغو",
+    "submit": "ارسال گزارش",
+    "submitting": "در حال ارسال...",
+    "success": "گزارش با موفقیت ارسال شد",
+    "error": "ارسال گزارش ناموفق بود",
+    "error_unexpected": "یک خطای غیرمنتظره رخ داد. لطفاً دوباره تلاش کنید.",
+    "error_submit": "ارسال گزارش ناموفق بود. لطفاً اتصال خود را بررسی کنید."
+  },
+  "admin": {
+    "dashboard_title": "پنل مدیریت",
+    "dashboard_subtitle": "بررسی و مدیریت محتواهای گزارش شده در پلتفرم.",
+    "content_reports_title": "گزارش‌های محتوا",
+    "all": "همه",
+    "status_pending": "در انتظار",
+    "status_reviewing": "در حال بررسی",
+    "status_resolved": "حل شده",
+    "status_dismissed": "رد شده",
+    "col_content": "محتوا",
+    "col_reason": "دلیل",
+    "col_reporter": "گزارش‌دهنده",
+    "col_date": "تاریخ",
+    "col_status": "وضعیت",
+    "col_actions": "عملیات",
+    "reason_spam": "هرزنامه",
+    "reason_misinformation": "اطلاعات نادرست",
+    "reason_harassment": "اذیت و آزار",
+    "reason_inappropriate": "نامناسب",
+    "reason_duplicate": "تکراری",
+    "reason_other": "سایر",
+    "action_review": "تغییر به در حال بررسی",
+    "action_resolve": "حل کردن",
+    "action_dismiss": "رد کردن",
+    "no_reports_found": "گزارشی مطابق با معیارهای جستجو یافت نشد.",
+    "pagination_page": "صفحه {current} از {total}"
   }
 }

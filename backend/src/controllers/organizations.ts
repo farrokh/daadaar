@@ -4,12 +4,14 @@
 import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
+import { generatePresignedGetUrl } from '../lib/s3-client';
 
 interface CreateOrganizationBody {
   name: string;
   nameEn?: string | null;
   description?: string | null;
   descriptionEn?: string | null;
+  logoUrl?: string | null;
   parentId?: number | null;
 }
 
@@ -84,6 +86,7 @@ export async function createOrganization(req: Request, res: Response) {
         nameEn: body.nameEn?.trim() || null,
         description: body.description?.trim() || null,
         descriptionEn: body.descriptionEn?.trim() || null,
+        logoUrl: body.logoUrl || null,
         parentId: body.parentId || null,
         createdByUserId: userId,
         sessionId,
@@ -98,6 +101,11 @@ export async function createOrganization(req: Request, res: Response) {
         createdByUserId: userId,
         sessionId,
       });
+    }
+
+    // Generate presigned URL for logo
+    if (newOrg && newOrg.logoUrl && !newOrg.logoUrl.startsWith('http')) {
+      newOrg.logoUrl = await generatePresignedGetUrl(newOrg.logoUrl);
     }
 
     res.status(201).json({
@@ -129,15 +137,28 @@ export async function listOrganizations(_req: Request, res: Response) {
         nameEn: schema.organizations.nameEn,
         description: schema.organizations.description,
         descriptionEn: schema.organizations.descriptionEn,
+        logoUrl: schema.organizations.logoUrl,
         parentId: schema.organizations.parentId,
         createdAt: schema.organizations.createdAt,
       })
       .from(schema.organizations)
       .orderBy(schema.organizations.name);
 
+    // Generate presigned URLs for logos
+    const organizationsWithUrls = await Promise.all(
+      organizations.map(async org => ({
+        ...org,
+        logoUrl: org.logoUrl
+          ? org.logoUrl.startsWith('http')
+            ? org.logoUrl
+            : await generatePresignedGetUrl(org.logoUrl)
+          : null,
+      }))
+    );
+
     res.json({
       success: true,
-      data: organizations,
+      data: organizationsWithUrls,
     });
   } catch (error) {
     console.error('Error listing organizations:', error);
@@ -182,6 +203,11 @@ export async function getOrganization(req: Request, res: Response) {
           message: 'Organization not found',
         },
       });
+    }
+
+    // Generate presigned URL for logo
+    if (organization.logoUrl && !organization.logoUrl.startsWith('http')) {
+      organization.logoUrl = await generatePresignedGetUrl(organization.logoUrl);
     }
 
     res.json({
@@ -267,12 +293,21 @@ export async function updateOrganization(req: Request, res: Response) {
       updateData.descriptionEn = body.descriptionEn?.trim() || null;
     }
 
+    if (body.logoUrl !== undefined) {
+      updateData.logoUrl = body.logoUrl || null;
+    }
+
     // Update the organization
     const [updatedOrg] = await db
       .update(schema.organizations)
       .set(updateData)
       .where(eq(schema.organizations.id, organizationId))
       .returning();
+
+    // Generate presigned URL for logo
+    if (updatedOrg.logoUrl && !updatedOrg.logoUrl.startsWith('http')) {
+      updatedOrg.logoUrl = await generatePresignedGetUrl(updatedOrg.logoUrl);
+    }
 
     res.json({
       success: true,

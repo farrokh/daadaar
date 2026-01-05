@@ -422,6 +422,24 @@ export async function getReportById(req: Request, res: Response) {
         }))
       );
       Object.assign(report, { media: mediaWithUrls });
+
+      // Generate presigned URL for report author (user) profile image
+      if (report.user && report.user.profileImageUrl && !report.user.profileImageUrl.startsWith('http')) {
+        const presignedUrl = await generatePresignedGetUrl(report.user.profileImageUrl);
+        Object.assign(report.user, { profileImageUrl: presignedUrl });
+      }
+
+      // Generate presigned URLs for linked individuals
+      if (report.reportLinks && report.reportLinks.length > 0) {
+        await Promise.all(
+          report.reportLinks.map(async link => {
+            if (link.individual && link.individual.profileImageUrl && !link.individual.profileImageUrl.startsWith('http')) {
+              const presignedUrl = await generatePresignedGetUrl(link.individual.profileImageUrl);
+              Object.assign(link.individual, { profileImageUrl: presignedUrl });
+            }
+          })
+        );
+      }
     }
 
     if (!report) {

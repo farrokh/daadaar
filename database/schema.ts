@@ -63,6 +63,7 @@ export const organizations = pgTable(
     nameEn: varchar('name_en', { length: 255 }), // English translation
     description: text('description'),
     descriptionEn: text('description_en'), // English translation
+    logoUrl: text('logo_url'), // Organization logo URL
     parentId: integer('parent_id'),
     createdByUserId: integer('created_by_user_id'),
     sessionId: uuid('session_id'),
