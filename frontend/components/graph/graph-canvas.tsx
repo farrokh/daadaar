@@ -29,6 +29,7 @@ import type { OrganizationNodeData, PersonNodeData, ReportNodeData } from './typ
 
 import { useToolContext } from '@/components/providers/tool-provider';
 import { Button } from '@/components/ui/button';
+import { ReportContentButton } from '@/components/ui/report-content-button';
 import { Map as MapIcon } from 'lucide-react';
 
 // Custom MiniMap Node (Dot)
@@ -324,12 +325,26 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
             <>
               <span className="text-foreground/40">/</span>
               <span className="text-foreground font-medium">{viewContext.organizationName}</span>
+              {viewContext.organizationId && (
+                <ReportContentButton
+                  contentType="organization"
+                  contentId={viewContext.organizationId}
+                  className="ml-1"
+                />
+              )}
             </>
           )}
           {viewContext.mode === 'reports' && viewContext.individualName && (
             <>
               <span className="text-foreground/40">/</span>
               <span className="text-foreground font-medium">{viewContext.individualName}</span>
+              {viewContext.individualId && (
+                <ReportContentButton
+                  contentType="individual"
+                  contentId={viewContext.individualId}
+                  className="ml-1"
+                />
+              )}
             </>
           )}
         </div>

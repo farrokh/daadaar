@@ -16,6 +16,9 @@ interface OrganizationPeopleResponse {
     name: string;
     nameEn?: string | null;
     description?: string | null;
+    logoUrl?: string | null;
+    url?: string | null;
+    s3Key?: string | null;
   };
   nodes: Node[];
   edges: Edge[];
@@ -27,6 +30,9 @@ interface IndividualReportsResponse {
     fullName: string;
     fullNameEn?: string | null;
     biography?: string | null;
+    profileImageUrl?: string | null;
+    url?: string | null;
+    s3Key?: string | null;
   };
   nodes: Node[];
   edges: Edge[];
@@ -110,6 +116,9 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
             name: organization.name,
             nameEn: organization.nameEn,
             description: organization.description,
+            logoUrl: organization.logoUrl,
+            url: organization.url,
+            s3Key: organization.s3Key,
           },
           position: { x: 0, y: 0 },
         };
@@ -157,6 +166,9 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
             name: individual.fullName,
             nameEn: individual.fullNameEn,
             biography: individual.biography,
+            profileImageUrl: individual.profileImageUrl,
+            url: individual.url,
+            s3Key: individual.s3Key,
           },
           position: { x: 0, y: 0 },
         };

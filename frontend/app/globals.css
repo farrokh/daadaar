@@ -64,4 +64,18 @@ body {
       /* External Drop Shadow */
       0px 4px 20px -8px hsl(0 0% 0% / 0.15);
   }
+
+  /* Custom Scrollbar for Webkit/Blink */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-foreground/10 rounded-full transition-colors hover:bg-foreground/20;
+  }
 }

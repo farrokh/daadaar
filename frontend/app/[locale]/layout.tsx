@@ -12,9 +12,44 @@ export function generateStaticParams() {
   return routing.locales.map(locale => ({ locale }));
 }
 
-export const metadata = {
-  title: 'Daadaar Platform',
-  description: 'Decentralized, anonymous platform for exposing government injustices',
+import type { Metadata, Viewport } from 'next';
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://daadaar.org'),
+  title: {
+    template: '%s | Daadaar',
+    default: 'Daadaar Platform',
+  },
+  description: 'Decentralized, anonymous platform for exposing Iranian government injustices',
+  openGraph: {
+    title: 'Daadaar Platform',
+    description: 'Decentralized, anonymous platform for exposing Iranian government injustices',
+    url: '/',
+    siteName: 'Daadaar',
+    type: 'website',
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png' }],
+    other: [
+      {
+        rel: 'mask-icon',
+        url: '/safari-pinned-tab.svg',
+      },
+    ],
+  },
+  manifest: '/manifest.webmanifest',
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+    { media: '(prefers-color-scheme: dark)', color: '#020617' },
+  ],
 };
 
 import { Inter, Vazirmatn } from 'next/font/google';

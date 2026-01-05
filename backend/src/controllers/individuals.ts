@@ -4,17 +4,20 @@
 import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
+import { generatePresignedGetUrl } from '../lib/s3-client';
 
 interface CreateIndividualBody {
   fullName: string;
   fullNameEn?: string | null;
   biography?: string | null;
   biographyEn?: string | null;
+  profileImageUrl?: string | null;
   dateOfBirth?: string | null;
   // Role assignment (optional)
   roleId?: number | null;
   organizationId?: number | null;
   startDate?: string | null;
+  endDate?: string | null;
 }
 
 /**
@@ -99,6 +102,7 @@ export async function createIndividual(req: Request, res: Response) {
         fullNameEn: body.fullNameEn?.trim() || null,
         biography: body.biography?.trim() || null,
         biographyEn: body.biographyEn?.trim() || null,
+        profileImageUrl: body.profileImageUrl || null,
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
         createdByUserId: userId,
         sessionId,
@@ -111,9 +115,15 @@ export async function createIndividual(req: Request, res: Response) {
         individualId: newIndividual.id,
         roleId: body.roleId,
         startDate: body.startDate ? new Date(body.startDate) : new Date(),
+        endDate: body.endDate ? new Date(body.endDate) : null,
         createdByUserId: userId,
         sessionId,
       });
+    }
+
+    // Generate presigned URL for profile image
+    if (newIndividual?.profileImageUrl && !newIndividual.profileImageUrl.startsWith('http')) {
+      newIndividual.profileImageUrl = await generatePresignedGetUrl(newIndividual.profileImageUrl);
     }
 
     res.status(201).json({
@@ -145,15 +155,28 @@ export async function listIndividuals(_req: Request, res: Response) {
         fullNameEn: schema.individuals.fullNameEn,
         biography: schema.individuals.biography,
         biographyEn: schema.individuals.biographyEn,
+        profileImageUrl: schema.individuals.profileImageUrl,
         dateOfBirth: schema.individuals.dateOfBirth,
         createdAt: schema.individuals.createdAt,
       })
       .from(schema.individuals)
       .orderBy(schema.individuals.fullName);
 
+    // Generate presigned URLs for profile images
+    const individualsWithUrls = await Promise.all(
+      individuals.map(async ind => ({
+        ...ind,
+        profileImageUrl: ind.profileImageUrl
+          ? ind.profileImageUrl.startsWith('http')
+            ? ind.profileImageUrl
+            : await generatePresignedGetUrl(ind.profileImageUrl)
+          : null,
+      }))
+    );
+
     res.json({
       success: true,
-      data: individuals,
+      data: individualsWithUrls,
     });
   } catch (error) {
     console.error('Error listing individuals:', error);
@@ -198,6 +221,11 @@ export async function getIndividual(req: Request, res: Response) {
           message: 'Individual not found',
         },
       });
+    }
+
+    // Generate presigned URL for profile image
+    if (individual.profileImageUrl && !individual.profileImageUrl.startsWith('http')) {
+      individual.profileImageUrl = await generatePresignedGetUrl(individual.profileImageUrl);
     }
 
     res.json({
@@ -283,6 +311,10 @@ export async function updateIndividual(req: Request, res: Response) {
       updateData.biographyEn = body.biographyEn?.trim() || null;
     }
 
+    if (body.profileImageUrl !== undefined) {
+      updateData.profileImageUrl = body.profileImageUrl || null;
+    }
+
     if (body.dateOfBirth !== undefined) {
       updateData.dateOfBirth = body.dateOfBirth ? new Date(body.dateOfBirth) : null;
     }
@@ -293,6 +325,16 @@ export async function updateIndividual(req: Request, res: Response) {
       .set(updateData)
       .where(eq(schema.individuals.id, individualId))
       .returning();
+
+    // Generate presigned URL for profile image
+    if (
+      updatedIndividual.profileImageUrl &&
+      !updatedIndividual.profileImageUrl.startsWith('http')
+    ) {
+      updatedIndividual.profileImageUrl = await generatePresignedGetUrl(
+        updatedIndividual.profileImageUrl
+      );
+    }
 
     res.json({
       success: true,

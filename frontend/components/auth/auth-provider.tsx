@@ -25,9 +25,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUser = useCallback(async () => {
     try {
       const user = await getCurrentUser();
+      console.log('AuthProvider: Fetched user:', user);
       setCurrentUser(user);
       setError(null);
     } catch (err) {
+      console.error('AuthProvider: Error fetching user:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch user'));
     } finally {
       setLoading(false);
