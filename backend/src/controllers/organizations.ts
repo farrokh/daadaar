@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
+import { notifyNewOrganization } from '../lib/slack';
 
 interface CreateOrganizationBody {
   name: string;
@@ -101,6 +102,14 @@ export async function createOrganization(req: Request, res: Response) {
         createdByUserId: userId,
         sessionId,
       });
+    }
+
+    if (newOrg) {
+      // Notify Slack about new organization
+      notifyNewOrganization({
+        id: newOrg.id,
+        name: newOrg.name,
+      }).catch(err => console.error('Slack notification error:', err));
     }
 
     // Generate presigned URL for logo

@@ -1,0 +1,97 @@
+/**
+ * Slack Notification Utility
+ * Handles sending messages to Slack via Webhooks
+ */
+
+const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
+
+interface SlackMessageOptions {
+  text: string;
+  blocks?: any[];
+}
+
+/**
+ * Send a notification to Slack
+ */
+export async function sendSlackNotification(options: SlackMessageOptions): Promise<void> {
+  if (!SLACK_WEBHOOK_URL) {
+    console.warn('SLACK_WEBHOOK_URL is not defined. Skipping notification.');
+    return;
+  }
+
+  try {
+    const response = await fetch(SLACK_WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(options),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Failed to send Slack notification: ${response.status} ${errorText}`);
+    }
+  } catch (error) {
+    console.error('Error sending Slack notification:', error);
+  }
+}
+
+/**
+ * Format and send a notification for a new user
+ */
+export async function notifyNewUser(user: {
+  email: string;
+  username: string;
+  displayName: string;
+}) {
+  await sendSlackNotification({
+    text: `🆕 *New User Registered*\n*Username:* ${user.username}\n*Display Name:* ${user.displayName}\n*Email:* ${user.email}`,
+  });
+}
+
+/**
+ * Format and send a notification for a new report
+ */
+export async function notifyNewReport(report: { id: number; title: string; author: string }) {
+  const reportUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reports/${report.id}`;
+  await sendSlackNotification({
+    text: `📝 *New Report Created*\n*Title:* ${report.title}\n*Author:* ${report.author}\n*Link:* <${reportUrl}|View Report>`,
+  });
+}
+
+/**
+ * Format and send a notification for a new individual
+ */
+export async function notifyNewIndividual(individual: { id: number; fullName: string }) {
+  const individualUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/individuals/${individual.id}`;
+  await sendSlackNotification({
+    text: `👤 *New Individual Added*\n*Name:* ${individual.fullName}\n*Link:* <${individualUrl}|View Profile>`,
+  });
+}
+
+/**
+ * Format and send a notification for a new organization
+ */
+export async function notifyNewOrganization(org: { id: number; name: string }) {
+  const orgUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/organizations/${org.id}`;
+  await sendSlackNotification({
+    text: `🏢 *New Organization Added*\n*Name:* ${org.name}\n*Link:* <${orgUrl}|View Organization>`,
+  });
+}
+
+/**
+ * Format and send a notification for a new content report (abuse/moderation)
+ */
+export async function notifyNewContentReport(report: {
+  id: number;
+  contentType: string;
+  contentId: number;
+  reason: string;
+  description?: string | null;
+}) {
+  const adminUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/reports`; // Assuming there's an admin path
+  await sendSlackNotification({
+    text: `🚩 *New Content Report (Abuse)*\n*Type:* ${report.contentType}\n*Content ID:* ${report.contentId}\n*Reason:* ${report.reason}\n*Description:* ${report.description || 'N/A'}\n*Admin Link:* <${adminUrl}|View Reports>`,
+  });
+}

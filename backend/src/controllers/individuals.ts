@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
+import { notifyNewIndividual } from '../lib/slack';
 
 interface CreateIndividualBody {
   fullName: string;
@@ -119,6 +120,14 @@ export async function createIndividual(req: Request, res: Response) {
         createdByUserId: userId,
         sessionId,
       });
+    }
+
+    if (newIndividual) {
+      // Notify Slack about new individual
+      notifyNewIndividual({
+        id: newIndividual.id,
+        fullName: newIndividual.fullName,
+      }).catch(err => console.error('Slack notification error:', err));
     }
 
     // Generate presigned URL for profile image

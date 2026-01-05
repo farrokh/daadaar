@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { db, schema } from '../db';
 import { sendVerificationEmail } from '../lib/email';
 import { redis } from '../lib/redis';
+import { notifyNewUser } from '../lib/slack';
 import type { SessionData } from '../middleware/auth';
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -98,6 +99,13 @@ export const register = async (req: Request, res: Response) => {
 
     // Send verification email
     await sendVerificationEmail(newUser.email, verificationToken);
+
+    // Notify Slack about new user
+    notifyNewUser({
+      email: newUser.email,
+      username: newUser.username,
+      displayName: newUser.displayName || newUser.username,
+    }).catch(err => console.error('Slack notification error:', err));
 
     res.status(201).json({
       success: true,

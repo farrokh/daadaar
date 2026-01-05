@@ -7,6 +7,7 @@ import type {
 import type { ApiResponse } from '../../../shared/types';
 import { db } from '../db';
 import { notifyModeratorsOfReport } from '../lib/email';
+import { notifyNewContentReport } from '../lib/slack';
 
 /**
  * Create a new content report
@@ -63,8 +64,19 @@ export async function createContentReport(
       contentId,
       reason,
       description,
-    }).catch((err: any) => {
+    }).catch((err: unknown) => {
       console.error('Failed to notify moderators about new report:', err);
+    });
+
+    // Notify Slack (background task)
+    notifyNewContentReport({
+      id: contentReport.id,
+      contentType,
+      contentId,
+      reason,
+      description,
+    }).catch((err: unknown) => {
+      console.error('Failed to send Slack notification for new report:', err);
     });
   } catch (error) {
     console.error('Error creating content report:', error);
