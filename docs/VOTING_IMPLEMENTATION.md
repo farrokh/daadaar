@@ -25,6 +25,7 @@ The voting system allows users (both registered and anonymous) to upvote or down
 
 - **Remove Vote** (`DELETE /api/votes/:reportId`):
   - Delete existing vote
+  - **PoW validation for anonymous users** (same as casting votes)
   - Atomic decrement of vote counts
   - Returns updated vote counts
 
@@ -40,6 +41,7 @@ The voting system allows users (both registered and anonymous) to upvote or down
 #### 3. **API Types** (`shared/api-types.ts`)
 - `CastVoteRequest`: Request body for casting votes
 - `CastVoteResponse`: Response with vote and updated counts
+- `RemoveVoteRequest`: Request body for removing votes (includes PoW fields for anonymous users)
 - `RemoveVoteResponse`: Response with updated counts
 - `GetMyVoteResponse`: Response with user's current vote
 
@@ -47,7 +49,7 @@ The voting system allows users (both registered and anonymous) to upvote or down
 
 #### 1. **Voting API** (`frontend/lib/voting-api.ts`)
 - `castVote()`: Cast or change vote with automatic PoW solving for anonymous users
-- `removeVote()`: Remove vote with CSRF protection
+- `removeVote()`: Remove vote with **automatic PoW solving for anonymous users** and CSRF protection
 - `getMyVote()`: Fetch current user's vote
 - Automatic CSRF token fetching
 - Error handling and type safety
@@ -238,6 +240,16 @@ Cast or change a vote on a report.
 ### DELETE /api/votes/:reportId
 Remove a vote from a report.
 
+**Request Body** (for anonymous users):
+```typescript
+{
+  // Required for anonymous users:
+  powChallengeId?: string;
+  powSolution?: string;
+  powSolutionNonce?: number;
+}
+```
+
 **Response** (200 OK):
 ```typescript
 {
@@ -252,7 +264,7 @@ Remove a vote from a report.
 ```
 
 **Error Responses**:
-- `400`: Invalid report ID
+- `400`: Invalid report ID, missing PoW (anonymous users), invalid PoW
 - `404`: Vote not found
 
 ---
