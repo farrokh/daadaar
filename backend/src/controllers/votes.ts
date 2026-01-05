@@ -1,4 +1,4 @@
-import { and, eq, or, sql } from 'drizzle-orm';
+import { type SQL, and, eq, or, sql } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { validatePowSolution } from '../lib/pow-validator';
@@ -16,7 +16,7 @@ interface CastVoteBody {
 /**
  * Cast a vote on a report (upvote or downvote)
  * POST /api/votes
- * 
+ *
  * Supports:
  * - Voting (creates new vote)
  * - Vote changes (upvote -> downvote or vice versa)
@@ -61,7 +61,8 @@ export async function castVote(req: Request, res: Response) {
           success: false,
           error: {
             code: 'POW_REQUIRED',
-            message: 'Anonymous users must provide PoW: powChallengeId, powSolution, powSolutionNonce',
+            message:
+              'Anonymous users must provide PoW: powChallengeId, powSolution, powSolutionNonce',
           },
         });
       }
@@ -119,16 +120,32 @@ export async function castVote(req: Request, res: Response) {
     }
 
     // Check for existing vote
+    let whereClause: SQL | undefined;
+    if (userId) {
+      whereClause = and(eq(schema.votes.reportId, body.reportId), eq(schema.votes.userId, userId));
+    } else if (sessionId) {
+      whereClause = and(
+        eq(schema.votes.reportId, body.reportId),
+        eq(schema.votes.sessionId, sessionId)
+      );
+    } else {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required to vote',
+        },
+      });
+    }
+
     const existingVote = await db.query.votes.findFirst({
-      where: userId
-        ? and(eq(schema.votes.reportId, body.reportId), eq(schema.votes.userId, userId))
-        : and(eq(schema.votes.reportId, body.reportId), eq(schema.votes.sessionId, sessionId)),
+      where: whereClause,
     });
 
     // Execute vote in a transaction (for atomic count updates)
     const result = await db.transaction(async tx => {
       let voteAction: 'created' | 'updated' | 'unchanged' = 'created';
-      let vote;
+      let vote: typeof existingVote;
 
       if (existingVote) {
         // Vote exists - check if it's the same type
@@ -231,7 +248,7 @@ export async function castVote(req: Request, res: Response) {
     });
   } catch (error) {
     console.error('Cast vote error:', error);
-    
+
     // Handle unique constraint violation (should not happen due to checks, but defensive)
     if (error instanceof Error && 'code' in error && error.code === '23505') {
       return res.status(409).json({
@@ -276,10 +293,23 @@ export async function removeVote(req: Request, res: Response) {
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
     // Find existing vote
+    let whereClause: SQL | undefined;
+    if (userId) {
+      whereClause = and(eq(schema.votes.reportId, reportId), eq(schema.votes.userId, userId));
+    } else if (sessionId) {
+      whereClause = and(eq(schema.votes.reportId, reportId), eq(schema.votes.sessionId, sessionId));
+    } else {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required to remove vote',
+        },
+      });
+    }
+
     const existingVote = await db.query.votes.findFirst({
-      where: userId
-        ? and(eq(schema.votes.reportId, reportId), eq(schema.votes.userId, userId))
-        : and(eq(schema.votes.reportId, reportId), eq(schema.votes.sessionId, sessionId)),
+      where: whereClause,
     });
 
     if (!existingVote) {
@@ -370,11 +400,25 @@ export async function getMyVote(req: Request, res: Response) {
     const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
+    // Construct where clause based on user authentication
+    let whereClause: SQL | undefined;
+    if (userId) {
+      whereClause = and(eq(schema.votes.reportId, reportId), eq(schema.votes.userId, userId));
+    } else if (sessionId) {
+      whereClause = and(eq(schema.votes.reportId, reportId), eq(schema.votes.sessionId, sessionId));
+    } else {
+      // No user/session identified - guest cannot have a vote
+      return res.status(200).json({
+        success: true,
+        data: {
+          vote: null,
+        },
+      });
+    }
+
     // Find existing vote
     const vote = await db.query.votes.findFirst({
-      where: userId
-        ? and(eq(schema.votes.reportId, reportId), eq(schema.votes.userId, userId))
-        : and(eq(schema.votes.reportId, reportId), eq(schema.votes.sessionId, sessionId)),
+      where: whereClause,
     });
 
     return res.status(200).json({
@@ -394,4 +438,3 @@ export async function getMyVote(req: Request, res: Response) {
     });
   }
 }
-

@@ -30,10 +30,9 @@ export interface UploadedMedia {
 interface MediaUploaderProps {
   onMediaUploaded: (mediaId: number) => void;
   onMediaRemoved: (mediaId: number) => void;
-  apiUrl: string;
 }
 
-export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: MediaUploaderProps) {
+export function MediaUploader({ onMediaUploaded, onMediaRemoved }: MediaUploaderProps) {
   const [mediaFiles, setMediaFiles] = useState<UploadedMedia[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);

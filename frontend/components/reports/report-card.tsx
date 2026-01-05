@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { VotingButtons } from '@/components/reports/voting-buttons';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { getS3PublicUrl } from '@/lib/utils';
 import type { ReportWithDetails } from '@/shared/types';
