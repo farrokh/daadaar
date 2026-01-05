@@ -68,7 +68,23 @@ We use a shared library (`shared/api-types.ts`) to synchronize types between the
 
 ---
 
-## ⚙️ Background Processing
+---
+ 
+ ## 🔌 External Integrations
+ 
+ ### 1. Slack Notifications
+ We utilize Slack Webhooks for real-time monitoring of critical platform events. This allows our team to respond quickly to new content and potential abuse.
+ - **Utility**: `backend/src/lib/slack.ts`
+ - **Events Tracked**:
+   - New User Registrations
+   - New Incident Reports
+   - New Individuals/Organizations added to the graph
+   - Content Reports (Abuse/Moderation)
+ - **Implementation**: Fire-and-forget async calls to avoid blocking the main thread.
+ 
+ ---
+ 
+ ## ⚙️ Background Processing
 
 We use **BullMQ** (powered by Redis) for tasks that should not block the main request-response cycle:
 - **AI Verification**: Triggering GPT-4 analysis of new reports.
