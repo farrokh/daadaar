@@ -50,3 +50,9 @@ bun-debug.log*
 
 # Bun
 bun.lockb
+
+
+# AWS
+.prod_db_creds
+.prod_env_secrets
+apprunner-service.json

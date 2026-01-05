@@ -22,6 +22,7 @@
     "db:migrate": "bun run --filter backend db:migrate",
     "db:push": "bun run --filter database push",
     "db:studio": "bun run --filter database studio",
+    "db:seed:organizations": "bun scripts/seed-organizations.ts",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:reset": "docker compose down -v && docker compose up -d",

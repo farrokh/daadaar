@@ -79,6 +79,7 @@ bun run db:push          # Push schema to database (local dev only)
 bun run db:generate      # Generate migrations
 bun run db:migrate       # Run migrations (use in production, not db:push)
 bun run db:studio        # Open Drizzle Studio (DB browser)
+bun run db:seed:organizations # Seed Iranian government organization hierarchy
 
 # Code Quality
 bun run lint             # Check linting
