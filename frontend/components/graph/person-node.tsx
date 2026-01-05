@@ -8,8 +8,8 @@ import type { PersonNodeData } from './types';
 
 function PersonNode({ data }: NodeProps<PersonNodeData>) {
   const locale = useLocale();
-  const displayName = locale === 'en' ? (data.nameEn || data.name) : data.name;
-  const displayBiography = locale === 'en' ? (data.biographyEn || data.biography) : data.biography;
+  const displayName = locale === 'en' ? data.nameEn || data.name : data.name;
+  const displayBiography = locale === 'en' ? data.biographyEn || data.biography : data.biography;
 
   return (
     <div className="group relative min-w-[240px] max-w-[320px]">

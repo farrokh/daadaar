@@ -8,8 +8,8 @@ import type { ReportNodeData } from './types';
 
 function ReportNode({ data }: NodeProps<ReportNodeData>) {
   const locale = useLocale();
-  const displayTitle = locale === 'en' ? (data.titleEn || data.title) : data.title;
-  const displayContent = locale === 'en' ? (data.contentEn || data.content) : data.content;
+  const displayTitle = locale === 'en' ? data.titleEn || data.title : data.title;
+  const displayContent = locale === 'en' ? data.contentEn || data.content : data.content;
 
   return (
     <div className="group relative min-w-[280px] max-w-[360px]">

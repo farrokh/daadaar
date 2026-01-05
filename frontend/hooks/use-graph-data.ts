@@ -116,7 +116,8 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
 
         const allNodes = [orgNode, ...peopleNodes];
         const positionedNodes = calculateGridLayout(allNodes, peopleEdges);
-        const displayName = locale === 'en' ? (organization.nameEn || organization.name) : organization.name;
+        const displayName =
+          locale === 'en' ? organization.nameEn || organization.name : organization.name;
 
         setNodes(positionedNodes);
         setEdges(peopleEdges);
@@ -131,7 +132,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
 
       setLoading(false);
     },
-    [tPerson]
+    [tPerson, locale]
   );
 
   // Fetch reports for individual
@@ -162,7 +163,8 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
 
         const allNodes = [individualNode, ...reportNodes];
         const positionedNodes = calculateGridLayout(allNodes, reportEdges);
-        const displayName = locale === 'en' ? (individual.fullNameEn || individual.fullName) : individual.fullName;
+        const displayName =
+          locale === 'en' ? individual.fullNameEn || individual.fullName : individual.fullName;
 
         setNodes(positionedNodes);
         setEdges(reportEdges);
@@ -190,7 +192,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
 
       setLoading(false);
     },
-    [tPerson]
+    [tPerson, locale]
   );
 
   return {
