@@ -38,15 +38,15 @@ export function Navbar() {
         {/* Nav Links */}
         <nav className="flex items-center gap-6">
           <Link
-            href="/reports"
+            href="/"
             className={cn(
               'text-sm font-medium tracking-wide transition-all duration-300 hover:scale-105',
-              isActive('/reports')
+              pathname === '/' || pathname === `/${pathname.split('/')[1]}`
                 ? 'text-foreground font-semibold'
                 : 'text-foreground/60 hover:text-foreground'
             )}
           >
-            {t('reports')}
+            {t('graph')}
           </Link>
           <Link
             href="/about"

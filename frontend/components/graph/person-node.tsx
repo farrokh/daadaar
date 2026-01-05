@@ -1,18 +1,23 @@
 'use client';
 
 import { User } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { memo } from 'react';
 import { Handle, type NodeProps, Position } from 'reactflow';
 import type { PersonNodeData } from './types';
 
 function PersonNode({ data }: NodeProps<PersonNodeData>) {
+  const locale = useLocale();
+  const displayName = locale === 'en' ? (data.nameEn || data.name) : data.name;
+  const displayBiography = locale === 'en' ? (data.biographyEn || data.biography) : data.biography;
+
   return (
     <div className="group relative min-w-[240px] max-w-[320px]">
       {/* Glow Effect */}
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-secondary to-pink-500 rounded-xl opacity-20 group-hover:opacity-60 blur transition duration-500" />
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-secondary to-pink-500 rounded-xl opacity-20 group-hover:opacity-40 blur transition duration-500" />
 
       {/* Card Content */}
-      <div className="relative px-5 py-4 bg-background/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl transition-transform hover:-translate-y-1">
+      <div className="relative px-5 py-4 bg-background/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl transition-transform">
         {/* Source handle (right side - for outgoing edges to reports) */}
         <Handle type="source" position={Position.Right} className="!w-3 !h-3 !opacity-0" />
 
@@ -25,11 +30,11 @@ function PersonNode({ data }: NodeProps<PersonNodeData>) {
           </div>
           <div>
             <div className="font-bold text-base text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80">
-              {data.name}
+              {displayName}
             </div>
-            {data.biography && (
+            {displayBiography && (
               <div className="text-xs text-foreground/50 mt-1.5 line-clamp-2 leading-relaxed">
-                {data.biography}
+                {displayBiography}
               </div>
             )}
           </div>

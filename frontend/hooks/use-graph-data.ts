@@ -36,9 +36,10 @@ interface UseGraphDataProps {
   initialView?: ViewContext;
   tOrg: (key: string) => string;
   tPerson: (key: string) => string;
+  locale: string;
 }
 
-export const useGraphData = ({ initialView, tOrg, tPerson }: UseGraphDataProps) => {
+export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDataProps) => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,12 +116,14 @@ export const useGraphData = ({ initialView, tOrg, tPerson }: UseGraphDataProps) 
 
         const allNodes = [orgNode, ...peopleNodes];
         const positionedNodes = calculateGridLayout(allNodes, peopleEdges);
+        const displayName = locale === 'en' ? (organization.nameEn || organization.name) : organization.name;
+
         setNodes(positionedNodes);
         setEdges(peopleEdges);
         setViewContext({
           mode: 'people',
           organizationId: organization.id,
-          organizationName: organization.name,
+          organizationName: displayName,
         });
       } else {
         setError(response.error?.message || tPerson('error_create_failed'));
@@ -159,12 +162,14 @@ export const useGraphData = ({ initialView, tOrg, tPerson }: UseGraphDataProps) 
 
         const allNodes = [individualNode, ...reportNodes];
         const positionedNodes = calculateGridLayout(allNodes, reportEdges);
+        const displayName = locale === 'en' ? (individual.fullNameEn || individual.fullName) : individual.fullName;
+
         setNodes(positionedNodes);
         setEdges(reportEdges);
         setViewContext({
           mode: 'reports',
           individualId: individual.id,
-          individualName: individual.fullName,
+          individualName: displayName,
         });
 
         // Update time range limits based on reports

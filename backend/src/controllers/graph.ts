@@ -18,6 +18,7 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
         name: schema.organizations.name,
         nameEn: schema.organizations.nameEn,
         description: schema.organizations.description,
+        descriptionEn: schema.organizations.descriptionEn,
         parentId: schema.organizations.parentId,
       })
       .from(schema.organizations);
@@ -40,6 +41,7 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
         name: org.name,
         nameEn: org.nameEn,
         description: org.description,
+        descriptionEn: org.descriptionEn,
       },
       position: { x: 0, y: 0 }, // Will be calculated on frontend
     }));
@@ -163,6 +165,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
         biography: schema.individuals.biography,
+        biographyEn: schema.individuals.biographyEn,
       })
       .from(schema.individuals)
       .where(inArray(schema.individuals.id, individualIds));
@@ -177,6 +180,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
         name: individual.fullName,
         nameEn: individual.fullNameEn,
         biography: individual.biography,
+        biographyEn: individual.biographyEn,
       },
       position: { x: 0, y: 0 }, // Will be calculated on frontend
     }));
@@ -284,6 +288,7 @@ export async function getIndividualReports(req: Request, res: Response) {
         title: schema.reports.title,
         titleEn: schema.reports.titleEn,
         content: schema.reports.content,
+        contentEn: schema.reports.contentEn,
         incidentDate: schema.reports.incidentDate,
         upvoteCount: schema.reports.upvoteCount,
         downvoteCount: schema.reports.downvoteCount,
@@ -308,6 +313,7 @@ export async function getIndividualReports(req: Request, res: Response) {
         title: report.title,
         titleEn: report.titleEn,
         content: report.content,
+        contentEn: report.contentEn,
         incidentDate: report.incidentDate,
         upvoteCount: report.upvoteCount,
         downvoteCount: report.downvoteCount,
