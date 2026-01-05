@@ -139,7 +139,9 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
     if (!user) {
       // Redirect to frontend with error
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=invalid_token`);
+      return res.redirect(
+        `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=invalid_token`
+      );
     }
 
     // Update user: isVerified = true, verificationToken = null
@@ -152,10 +154,14 @@ export const verifyEmail = async (req: Request, res: Response) => {
       .where(eq(schema.users.id, user.id));
 
     // Redirect to frontend login with success
-    return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?verified=true`);
+    return res.redirect(
+      `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?verified=true`
+    );
   } catch (error) {
     console.error('Email verification error:', error);
-    return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=server_error`);
+    return res.redirect(
+      `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=server_error`
+    );
   }
 };
 
@@ -189,7 +195,6 @@ export const login = async (req: Request, res: Response) => {
 
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-
 
     if (!isPasswordValid) {
       return res.status(401).json({

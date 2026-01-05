@@ -16,7 +16,7 @@ export default function LoginPage() {
   const { refreshUser } = useAuth(); // Get refreshUser from context
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const verified = searchParams.get('verified') === 'true';
   const errorParam = searchParams.get('error');
 
@@ -62,7 +62,8 @@ export default function LoginPage() {
 
         {(error || errorParam) && (
           <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-lg text-sm mb-6">
-            {error || (errorParam === 'invalid_token' ? t('verification_failed') : t('login_failed'))}
+            {error ||
+              (errorParam === 'invalid_token' ? t('verification_failed') : t('login_failed'))}
           </div>
         )}
 
