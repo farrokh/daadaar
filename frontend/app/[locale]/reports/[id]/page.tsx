@@ -1,7 +1,9 @@
 'use client';
 
+import { VotingButtons } from '@/components/reports/voting-buttons';
 import { Button } from '@/components/ui/button';
 import { fetchApi } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { formatDate, getS3PublicUrl } from '@/lib/utils';
 import type { Media, ReportWithDetails } from '@/shared/types';
 import { useLocale, useTranslations } from 'next-intl';
@@ -13,6 +15,7 @@ export default function ReportDetailPage() {
   const locale = useLocale();
   const t = useTranslations('report');
   const commonT = useTranslations('common');
+  const { isAnonymous } = useAuth();
   const [report, setReport] = useState<ReportWithDetails | null>(null);
   const [selectedMedia, setSelectedMedia] = useState<(Media & { url?: string }) | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,7 +79,7 @@ export default function ReportDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-accent-primary border-t-transparent rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -118,19 +121,28 @@ export default function ReportDetailPage() {
         </button>
 
         {/* Hero Meta */}
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-accent-primary/20 text-accent-primary border border-accent-primary/30">
-            {t('verification_score')}: {report.aiVerification?.confidenceScore ?? 0}%
-          </span>
-          <span className="text-sm text-foreground/40">{displayDate}</span>
-          {report.incidentLocation && (
-            <span className="text-sm text-foreground/40 flex items-center gap-1">
-              📍{' '}
-              {isRtl
-                ? report.incidentLocation
-                : report.incidentLocationEn || report.incidentLocation}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/30">
+              {t('verification_score')}: {report.aiVerification?.confidenceScore ?? 0}%
             </span>
-          )}
+            <span className="text-sm text-foreground/40">{displayDate}</span>
+            {report.incidentLocation && (
+              <span className="text-sm text-foreground/40 flex items-center gap-1">
+                📍{' '}
+                {isRtl
+                  ? report.incidentLocation
+                  : report.incidentLocationEn || report.incidentLocation}
+              </span>
+            )}
+          </div>
+          <VotingButtons
+            reportId={report.id}
+            initialUpvoteCount={report.upvoteCount}
+            initialDownvoteCount={report.downvoteCount}
+            isAnonymous={isAnonymous}
+            compact
+          />
         </div>
 
         {/* Title */}
@@ -189,12 +201,12 @@ export default function ReportDetailPage() {
         {/* Associations */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-12 border-t border-foreground/10 mt-12">
           {/* Reporter Info */}
-          <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10">
+          <div>
             <h3 className="text-sm font-bold text-foreground/40 uppercase tracking-widest mb-4">
               {t('reported_by')}
             </h3>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-accent-secondary/50 flex items-center justify-center text-lg text-white font-bold">
+              <div className="w-12 h-12 rounded-full bg-secondary/50 flex items-center justify-center text-lg text-white font-bold">
                 {report.user?.displayName?.[0] || 'A'}
               </div>
               <div>
@@ -210,14 +222,14 @@ export default function ReportDetailPage() {
 
           {/* Linked Individuals */}
           {report.reportLinks && report.reportLinks.length > 0 && (
-            <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10">
+            <div>
               <h3 className="text-sm font-bold text-foreground/40 uppercase tracking-widest mb-4">
                 {t('linked_individuals')}
               </h3>
               <div className="space-y-4">
                 {report.reportLinks.map(link => (
                   <div key={link.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-accent-primary/50 flex items-center justify-center text-xs text-white">
+                    <div className="w-8 h-8 rounded-full bg-primary/50 flex items-center justify-center text-xs text-white">
                       {link.individual?.fullName?.[0] || 'P'}
                     </div>
                     <div>
@@ -227,7 +239,7 @@ export default function ReportDetailPage() {
                           : link.individual?.fullNameEn || link.individual?.fullName}
                       </div>
                       {link.role && (
-                        <div className="text-xs text-accent-primary">
+                        <div className="text-xs text-primary">
                           {isRtl ? link.role.title : link.role.titleEn || link.role.title}
                         </div>
                       )}
@@ -237,22 +249,6 @@ export default function ReportDetailPage() {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Voting Placeholder */}
-        <div className="mt-16 bg-gradient-to-r from-accent-primary/10 to-accent-secondary/10 p-8 rounded-3xl border border-foreground/10 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">{t('votes')}</h2>
-            <p className="text-foreground/60 text-sm">Community verification in progress</p>
-          </div>
-          <div className="flex gap-4">
-            <Button className="bg-accent-primary text-white font-bold px-8">
-              👍 {t('upvote')} ({report.upvoteCount})
-            </Button>
-            <Button variant="outline" className="text-foreground border-foreground/20 px-8">
-              👎 {t('downvote')} ({report.downvoteCount})
-            </Button>
-          </div>
         </div>
 
         {/* Lightbox Modal */}

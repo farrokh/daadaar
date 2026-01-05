@@ -30,7 +30,11 @@ export function getS3PublicUrl(key: string, bucket?: string): string {
 /**
  * Format a date string to a localized date
  */
-export function formatDate(dateString: string, locale: string): string {
+export function formatDate(dateString: string | null | undefined, locale: string): string {
+  if (!dateString) {
+    return '';
+  }
+
   const d = new Date(dateString);
 
   if (Number.isNaN(d.getTime())) {
@@ -43,4 +47,11 @@ export function formatDate(dateString: string, locale: string): string {
     month: 'long',
     day: 'numeric',
   });
+}
+
+/**
+ * Utility for combining class names
+ */
+export function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(' ');
 }

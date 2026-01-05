@@ -1,5 +1,7 @@
+import { AuthProvider } from '@/components/auth/auth-provider';
 import { SessionManager } from '@/components/auth/session-manager';
 import { Navbar } from '@/components/layout/navbar';
+import { ToolProvider } from '@/components/providers/tool-provider';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -15,9 +17,10 @@ export const metadata = {
   description: 'Decentralized, anonymous platform for exposing government injustices',
 };
 
-import { Inter } from 'next/font/google';
+import { Inter, Vazirmatn } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
+const vazirmatn = Vazirmatn({ subsets: ['arabic', 'latin'], display: 'swap' });
 
 export default async function LocaleLayout({
   children,
@@ -41,12 +44,16 @@ export default async function LocaleLayout({
     <html lang={locale} dir={locale === 'fa' ? 'rtl' : 'ltr'}>
       <body
         suppressHydrationWarning
-        className={`${inter.className} bg-background text-foreground antialiased min-h-screen selection:bg-accent-primary/30`}
+        className={`${locale === 'fa' ? vazirmatn.className : inter.className} bg-background text-foreground antialiased min-h-screen selection:bg-accent-primary/30`}
       >
         <NextIntlClientProvider messages={messages}>
-          <Navbar />
-          <SessionManager />
-          <main className="pt-16">{children}</main>
+          <AuthProvider>
+            <ToolProvider>
+              <Navbar />
+              <SessionManager />
+              <main className="pt-0">{children}</main>
+            </ToolProvider>
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>

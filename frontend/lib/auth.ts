@@ -1,4 +1,6 @@
+import { AuthContext } from '@/components/auth/auth-provider';
 import type { CurrentUser } from '@/shared/types';
+import { useContext } from 'react';
 import { fetchApi } from './api';
 
 /**
@@ -121,4 +123,15 @@ export async function register(data: {
 export function getOAuthUrl(provider: 'google' | 'github'): string {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
   return `${apiUrl}/auth/${provider}`;
+}
+
+/**
+ * React hook to get the current authenticated user from the AuthContext
+ */
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }

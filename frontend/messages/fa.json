@@ -76,7 +76,10 @@
     "hide_minimap": "پنهان کردن نقشه کوچک",
     "zoom_in": "بزرگنمایی",
     "zoom_out": "کوچک‌نمایی",
-    "fit_view": "تنظیم اندازه"
+    "fit_view": "تنظیم اندازه",
+    "search": "جستجو",
+    "search_coming_soon": "قابلیت جستجو به زودی اضافه می‌شود...",
+    "add_item": "افزودن آیتم"
   },
   "organization": {
     "add_title": "افزودن سازمان جدید",
@@ -183,5 +186,18 @@
     "content_required": "محتوا الزامی است",
     "media_upload_error": "بارگذاری رسانه ناموفق بود",
     "media_delete_error": "حذف رسانه ناموفق بود"
+  },
+  "voting": {
+    "upvote": "موافقم",
+    "downvote": "مخالفم",
+    "removeVote": "حذف رأی",
+    "upvotes": "موافقان",
+    "downvotes": "مخالفان",
+    "voteCast": "رأی با موفقیت ثبت شد",
+    "voteRemoved": "رأی با موفقیت حذف شد",
+    "voteError": "خطا در ثبت رأی",
+    "removeVoteError": "خطا در حذف رأی",
+    "solvingPow": "در حال حل اثبات کار...",
+    "powRequired": "رأی‌دهی ناشناس نیازمند تأیید اثبات کار است"
   }
 }
