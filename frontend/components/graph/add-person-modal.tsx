@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { ImageUploader } from '@/components/ui/image-uploader';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import { Select, type SelectOption } from '@/components/ui/select';
@@ -59,6 +60,7 @@ export function AddPersonModal({
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [roleId, setRoleId] = useState<string>('');
   const [startDate, setStartDate] = useState('');
+  const [profileImageUrl, setProfileImageUrl] = useState('');
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchingRoles, setFetchingRoles] = useState(false);
@@ -101,6 +103,7 @@ export function AddPersonModal({
     setDateOfBirth('');
     setRoleId('');
     setStartDate('');
+    setProfileImageUrl('');
     setIsCreatingNewRole(false);
     setNewRoleTitle('');
     setNewRoleTitleEn('');
@@ -195,6 +198,7 @@ export function AddPersonModal({
         roleId: finalRoleId,
         organizationId,
         startDate: startDate || null,
+        profileImageUrl: profileImageUrl || null,
       }),
     });
 
@@ -287,6 +291,14 @@ export function AddPersonModal({
             rows={3}
           />
         </div>
+        
+        <ImageUploader
+          label={t('profile_image')}
+          currentImageUrl={profileImageUrl}
+          onImageUploaded={setProfileImageUrl}
+          disabled={loading}
+          helperText={t('profile_image_helper')}
+        />
 
         <Input
           label={t('date_of_birth')}

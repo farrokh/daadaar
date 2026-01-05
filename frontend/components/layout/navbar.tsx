@@ -68,6 +68,17 @@ export function Navbar() {
       <div className="pointer-events-auto flex items-center gap-4">
         {isAuthenticated ? (
           <div className="flex items-center gap-2">
+            {(registeredUser?.role === 'admin' || registeredUser?.role === 'moderator') && (
+              <Link href="/admin/content-reports">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-accent-primary hover:text-accent-primary/80 font-semibold"
+                >
+                  {t('admin')}
+                </Button>
+              </Link>
+            )}
             <Link href="/profile" title={t('profile')}>
               <Button
                 variant="ghost"

@@ -36,6 +36,13 @@
       "when": 1767560408431,
       "tag": "0004_wise_toad_men",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1767585406341,
+      "tag": "0005_groovy_makkari",
+      "breakpoints": true
     }
   ]
 }

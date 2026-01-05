@@ -4,6 +4,7 @@
 import { and, eq, inArray } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
+import { generatePresignedGetUrl } from '../lib/s3-client';
 
 /**
  * GET /api/graph/organizations
@@ -19,6 +20,7 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
         nameEn: schema.organizations.nameEn,
         description: schema.organizations.description,
         descriptionEn: schema.organizations.descriptionEn,
+        logoUrl: schema.organizations.logoUrl,
         parentId: schema.organizations.parentId,
       })
       .from(schema.organizations);
@@ -31,20 +33,29 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
       })
       .from(schema.organizationHierarchy);
 
-    // Build nodes and edges
-    const nodes = organizations.map(org => ({
-      id: `org-${org.id}`,
-      type: 'organization' as const,
-      label: org.name,
-      data: {
-        id: org.id,
-        name: org.name,
-        nameEn: org.nameEn,
-        description: org.description,
-        descriptionEn: org.descriptionEn,
-      },
-      position: { x: 0, y: 0 }, // Will be calculated on frontend
-    }));
+    // Generate presigned URLs for logos
+    const nodes = await Promise.all(
+      organizations.map(async org => ({
+        id: `org-${org.id}`,
+        type: 'organization' as const,
+        label: org.name,
+        data: {
+          id: org.id,
+          name: org.name,
+          nameEn: org.nameEn,
+          description: org.description,
+          descriptionEn: org.descriptionEn,
+          logoUrl: org.logoUrl,
+          s3Key: org.logoUrl, // The raw key from DB
+          url: org.logoUrl
+            ? org.logoUrl.startsWith('http')
+              ? org.logoUrl
+              : await generatePresignedGetUrl(org.logoUrl)
+            : null,
+        },
+        position: { x: 0, y: 0 }, // Will be calculated on frontend
+      }))
+    );
 
     const edges = hierarchies.map(hierarchy => ({
       id: `edge-${hierarchy.parentId}-${hierarchy.childId}`,
@@ -97,6 +108,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
         name: schema.organizations.name,
         nameEn: schema.organizations.nameEn,
         description: schema.organizations.description,
+        logoUrl: schema.organizations.logoUrl,
       })
       .from(schema.organizations)
       .where(eq(schema.organizations.id, organizationId));
@@ -123,11 +135,23 @@ export async function getOrganizationPeople(req: Request, res: Response) {
 
     const roleIds = roles.map(r => r.id);
 
+    // Generate presigned URL for organization logo
+    const orgWithPresignedLogo = {
+      ...organization,
+      logoUrl: organization.logoUrl,
+      s3Key: organization.logoUrl,
+      url: organization.logoUrl
+        ? organization.logoUrl.startsWith('http')
+          ? organization.logoUrl
+          : await generatePresignedGetUrl(organization.logoUrl)
+        : null,
+    };
+
     if (roleIds.length === 0) {
       return res.json({
         success: true,
         data: {
-          organization,
+          organization: orgWithPresignedLogo,
           nodes: [],
           edges: [],
         },
@@ -151,7 +175,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
       return res.json({
         success: true,
         data: {
-          organization,
+          organization: orgWithPresignedLogo,
           nodes: [],
           edges: [],
         },
@@ -166,24 +190,34 @@ export async function getOrganizationPeople(req: Request, res: Response) {
         fullNameEn: schema.individuals.fullNameEn,
         biography: schema.individuals.biography,
         biographyEn: schema.individuals.biographyEn,
+        profileImageUrl: schema.individuals.profileImageUrl,
       })
       .from(schema.individuals)
       .where(inArray(schema.individuals.id, individualIds));
 
     // Build nodes and edges
-    const nodes = individuals.map(individual => ({
-      id: `individual-${individual.id}`,
-      type: 'individual' as const,
-      label: individual.fullName,
-      data: {
-        id: individual.id,
-        name: individual.fullName,
-        nameEn: individual.fullNameEn,
-        biography: individual.biography,
-        biographyEn: individual.biographyEn,
-      },
-      position: { x: 0, y: 0 }, // Will be calculated on frontend
-    }));
+    const nodes = await Promise.all(
+      individuals.map(async individual => ({
+        id: `individual-${individual.id}`,
+        type: 'individual' as const,
+        label: individual.fullName,
+        data: {
+          id: individual.id,
+          name: individual.fullName,
+          nameEn: individual.fullNameEn,
+          biography: individual.biography,
+          biographyEn: individual.biographyEn,
+          profileImageUrl: individual.profileImageUrl,
+          s3Key: individual.profileImageUrl, // The raw key from DB
+          url: individual.profileImageUrl
+            ? individual.profileImageUrl.startsWith('http')
+              ? individual.profileImageUrl
+              : await generatePresignedGetUrl(individual.profileImageUrl)
+            : null,
+        },
+        position: { x: 0, y: 0 }, // Will be calculated on frontend
+      }))
+    );
 
     // Create edges from organization to people (via roles)
     const edges = roleOccupancies.map(occupancy => ({
@@ -201,7 +235,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
     res.json({
       success: true,
       data: {
-        organization,
+        organization: orgWithPresignedLogo,
         nodes,
         edges,
       },
@@ -243,6 +277,7 @@ export async function getIndividualReports(req: Request, res: Response) {
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
         biography: schema.individuals.biography,
+        profileImageUrl: schema.individuals.profileImageUrl,
       })
       .from(schema.individuals)
       .where(eq(schema.individuals.id, individualId));
@@ -270,11 +305,23 @@ export async function getIndividualReports(req: Request, res: Response) {
 
     const reportIds = reportLinks.map(rl => rl.reportId);
 
+    // Generate presigned URL for individual profile image
+    const individualWithPresignedImage = {
+      ...individual,
+      profileImageUrl: individual.profileImageUrl,
+      s3Key: individual.profileImageUrl,
+      url: individual.profileImageUrl
+        ? individual.profileImageUrl.startsWith('http')
+          ? individual.profileImageUrl
+          : await generatePresignedGetUrl(individual.profileImageUrl)
+        : null,
+    };
+
     if (reportIds.length === 0) {
       return res.json({
         success: true,
         data: {
-          individual,
+          individual: individualWithPresignedImage,
           nodes: [],
           edges: [],
         },
@@ -340,7 +387,7 @@ export async function getIndividualReports(req: Request, res: Response) {
     res.json({
       success: true,
       data: {
-        individual,
+        individual: individualWithPresignedImage,
         nodes,
         edges,
       },

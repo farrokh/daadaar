@@ -1,5 +1,6 @@
 'use client';
 
+import { getS3PublicUrl } from '@/lib/utils';
 import { User } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { memo } from 'react';
@@ -10,6 +11,8 @@ function PersonNode({ data }: NodeProps<PersonNodeData>) {
   const locale = useLocale();
   const displayName = locale === 'en' ? data.nameEn || data.name : data.name;
   const displayBiography = locale === 'en' ? data.biographyEn || data.biography : data.biography;
+
+  const imageUrl = data.url || (data.s3Key ? getS3PublicUrl(data.s3Key) : null);
 
   return (
     <div className="group relative min-w-[240px] max-w-[320px]">
@@ -25,8 +28,12 @@ function PersonNode({ data }: NodeProps<PersonNodeData>) {
         <Handle type="target" position={Position.Left} className="!w-3 !h-3 !opacity-0" />
 
         <div className="flex items-start gap-4">
-          <div className="p-2.5 bg-secondary/10 rounded-lg shrink-0">
-            <User className="w-5 h-5 text-secondary" />
+          <div className="relative w-10 h-10 rounded-lg shrink-0 overflow-hidden bg-secondary/10 flex items-center justify-center">
+            {imageUrl ? (
+              <img src={imageUrl} alt={displayName} className="w-full h-full object-cover" />
+            ) : (
+              <User className="w-5 h-5 text-secondary" />
+            )}
           </div>
           <div>
             <div className="font-bold text-base text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80">

@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { FileText, Music } from 'lucide-react';
 import { fetchApi } from '../../lib/api';
 import { validateMediaFile } from '../../lib/validation/report-form-schema';
 
@@ -336,9 +337,15 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved }: MediaUploader
               )}
               {!media.preview && (
                 <div className="w-full h-32 bg-foreground/5 rounded-2xl flex items-center justify-center mb-3">
-                  <span className="text-foreground/40 font-bold uppercase tracking-tight text-xs">
-                    {media.file.type.split('/')[1] || _t('file')}
-                  </span>
+                  {media.file.type === 'application/pdf' ? (
+                    <FileText className="w-10 h-10 text-primary opacity-40" />
+                  ) : media.file.type.startsWith('audio/') ? (
+                    <Music className="w-10 h-10 text-primary opacity-40" />
+                  ) : (
+                    <span className="text-foreground/40 font-bold uppercase tracking-tight text-xs">
+                      {media.file.type.split('/')[1] || _t('file')}
+                    </span>
+                  )}
                 </div>
               )}
 

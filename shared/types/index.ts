@@ -101,6 +101,7 @@ export interface Organization {
   nameEn: string | null;
   description: string | null;
   descriptionEn: string | null;
+  logoUrl: string | null;
   parentId: number | null;
   createdByUserId: number | null;
   createdAt: string;

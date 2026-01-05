@@ -134,6 +134,19 @@ export interface GetMyVoteResponse {
   } | null;
 }
 
+// Content Report Types
+export interface CreateContentReportRequest {
+  contentType: 'report' | 'organization' | 'individual' | 'user' | 'media';
+  contentId: number;
+  reason: 'spam' | 'misinformation' | 'harassment' | 'inappropriate' | 'duplicate' | 'other';
+  description?: string;
+}
+
+export interface CreateContentReportResponse {
+  contentReportId: number;
+}
+
+
 // Helper function to handle API responses
 export function handleApiResponse<T>(response: ApiResponse<T>): T {
   if (!response.success || !response.data) {
