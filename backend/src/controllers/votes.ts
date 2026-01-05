@@ -222,17 +222,24 @@ export async function castVote(req: Request, res: Response) {
         }
       }
 
-      return { vote, voteAction };
-    });
+      // Fetch updated report vote counts inside transaction for consistency
+      const updatedReport = await tx.query.reports.findFirst({
+        where: eq(schema.reports.id, body.reportId),
+        columns: {
+          id: true,
+          upvoteCount: true,
+          downvoteCount: true,
+        },
+      });
 
-    // Fetch updated report vote counts
-    const updatedReport = await db.query.reports.findFirst({
-      where: eq(schema.reports.id, body.reportId),
-      columns: {
-        id: true,
-        upvoteCount: true,
-        downvoteCount: true,
-      },
+      return { 
+        vote, 
+        voteAction,
+        reportVoteCounts: {
+          upvoteCount: updatedReport?.upvoteCount || 0,
+          downvoteCount: updatedReport?.downvoteCount || 0,
+        },
+      };
     });
 
     return res.status(result.voteAction === 'created' ? 201 : 200).json({
@@ -240,10 +247,7 @@ export async function castVote(req: Request, res: Response) {
       data: {
         vote: result.vote,
         voteAction: result.voteAction,
-        reportVoteCounts: {
-          upvoteCount: updatedReport?.upvoteCount || 0,
-          downvoteCount: updatedReport?.downvoteCount || 0,
-        },
+        reportVoteCounts: result.reportVoteCounts,
       },
     });
   } catch (error) {
@@ -386,7 +390,24 @@ export async function removeVote(req: Request, res: Response) {
           .where(eq(schema.reports.id, reportId));
       }
 
-      return { success: true, notFound: false };
+      // Fetch updated report vote counts inside transaction for consistency
+      const updatedReport = await tx.query.reports.findFirst({
+        where: eq(schema.reports.id, reportId),
+        columns: {
+          id: true,
+          upvoteCount: true,
+          downvoteCount: true,
+        },
+      });
+
+      return { 
+        success: true, 
+        notFound: false,
+        reportVoteCounts: {
+          upvoteCount: updatedReport?.upvoteCount || 0,
+          downvoteCount: updatedReport?.downvoteCount || 0,
+        },
+      };
     });
 
     // Check if vote was not found
@@ -400,23 +421,10 @@ export async function removeVote(req: Request, res: Response) {
       });
     }
 
-    // Fetch updated report vote counts
-    const updatedReport = await db.query.reports.findFirst({
-      where: eq(schema.reports.id, reportId),
-      columns: {
-        id: true,
-        upvoteCount: true,
-        downvoteCount: true,
-      },
-    });
-
     return res.status(200).json({
       success: true,
       data: {
-        reportVoteCounts: {
-          upvoteCount: updatedReport?.upvoteCount || 0,
-          downvoteCount: updatedReport?.downvoteCount || 0,
-        },
+        reportVoteCounts: result.reportVoteCounts,
       },
     });
   } catch (error) {
