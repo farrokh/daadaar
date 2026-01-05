@@ -17,6 +17,7 @@ interface CreateIndividualBody {
   roleId?: number | null;
   organizationId?: number | null;
   startDate?: string | null;
+  endDate?: string | null;
 }
 
 /**
@@ -114,6 +115,7 @@ export async function createIndividual(req: Request, res: Response) {
         individualId: newIndividual.id,
         roleId: body.roleId,
         startDate: body.startDate ? new Date(body.startDate) : new Date(),
+        endDate: body.endDate ? new Date(body.endDate) : null,
         createdByUserId: userId,
         sessionId,
       });
