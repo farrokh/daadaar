@@ -4,6 +4,7 @@ import { db, schema } from '../db';
 import { validatePowSolution } from '../lib/pow-validator';
 import { checkReportSubmissionLimit } from '../lib/rate-limiter';
 import { generatePresignedGetUrl } from '../lib/s3-client';
+import { notifyNewReport } from '../lib/slack';
 
 /**
  * Escape special characters in a string for use in SQL LIKE patterns.
@@ -198,6 +199,15 @@ export async function createReport(req: Request, res: Response) {
         },
       },
     });
+
+    if (completeReport) {
+      // Notify Slack about new report
+      notifyNewReport({
+        id: completeReport.id,
+        title: completeReport.title,
+        author: completeReport.user?.displayName || completeReport.user?.username || 'Anonymous',
+      }).catch(err => console.error('Slack notification error:', err));
+    }
 
     return res.status(201).json({
       success: true,
