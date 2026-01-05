@@ -150,7 +150,7 @@ export function useVoting(
       error: null,
     }));
 
-    const response = await removeVote(reportId);
+    const response = await removeVote(reportId, isAnonymous);
 
     const { data } = response;
 
@@ -170,7 +170,7 @@ export function useVoting(
         error: response.error?.message || 'Failed to remove vote',
       });
     }
-  }, [reportId, state]);
+  }, [reportId, isAnonymous, state]);
 
   return {
     ...state,

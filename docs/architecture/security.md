@@ -7,8 +7,9 @@ Security at Daadaar is multi-layered, designed to protect both the platform's in
 ### 1. Proof-of-Work (PoW)
 To prevent automated abuse and "sybil attacks" without blocking VPN users via IP-based rate limiting, we implement a cryptographic challenge-response system.
 - **Mechanism**: SHA-256 partial hash inversion.
-- **Difficulty**: Dynamic based on activity (e.g., 5 leading zeros for reports, 2 for voting).
+- **Difficulty**: Dynamic based on activity (e.g., 5 leading zeros for reports, 2 for voting/vote removal).
 - **Validation**: The backend recomputes the hash using the provided solution and challenge nonce to ensure legitimacy.
+- **Required For**: Report submissions, vote casting, and vote removal (anonymous users only).
 
 ### 2. Session-Based Rate Limiting
 Limits are tied to session IDs (anonymous) or User IDs (registered), not IP addresses.

@@ -270,13 +270,26 @@ export async function castVote(req: Request, res: Response) {
   }
 }
 
+interface RemoveVoteBody {
+  // PoW is required for anonymous users only
+  powChallengeId?: string;
+  powSolution?: string;
+  powSolutionNonce?: number;
+}
+
 /**
  * Remove a vote from a report
  * DELETE /api/votes/:reportId
+ *
+ * Supports:
+ * - Vote removal (deletes existing vote)
+ * - PoW validation for anonymous users
+ * - Atomic vote count updates
  */
 export async function removeVote(req: Request, res: Response) {
   try {
     const reportId = Number.parseInt(req.params.reportId, 10);
+    const body = req.body as RemoveVoteBody;
 
     if (Number.isNaN(reportId)) {
       return res.status(400).json({
@@ -291,6 +304,37 @@ export async function removeVote(req: Request, res: Response) {
     // Get user/session info
     const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
+
+    // Anonymous users must provide PoW
+    if (!userId) {
+      if (!body.powChallengeId || !body.powSolution || body.powSolutionNonce === undefined) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'POW_REQUIRED',
+            message:
+              'Anonymous users must provide PoW: powChallengeId, powSolution, powSolutionNonce',
+          },
+        });
+      }
+
+      // Validate PoW solution
+      const powValidation = await validatePowSolution(
+        body.powChallengeId,
+        body.powSolution,
+        body.powSolutionNonce
+      );
+
+      if (!powValidation.valid) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_POW',
+            message: powValidation.error || 'Invalid proof-of-work solution',
+          },
+        });
+      }
+    }
 
     // Find existing vote
     let whereClause: SQL | undefined;

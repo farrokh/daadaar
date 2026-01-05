@@ -8,6 +8,7 @@ import type {
   CastVoteResponse,
   GetMyVoteResponse,
   PowChallengeResponse,
+  RemoveVoteRequest,
   RemoveVoteResponse,
 } from '@/shared/api-types';
 import type { ApiResponse } from '@/shared/types';
@@ -81,13 +82,31 @@ export async function castVote(
 /**
  * Remove a vote from a report
  * @param reportId - The report ID to remove vote from
+ * @param isAnonymous - Whether the user is anonymous (requires PoW)
  * @returns Updated vote counts
  */
-export async function removeVote(reportId: number): Promise<ApiResponse<RemoveVoteResponse>> {
+export async function removeVote(
+  reportId: number,
+  isAnonymous: boolean
+): Promise<ApiResponse<RemoveVoteResponse>> {
   try {
+    // Prepare request body
+    const requestBody: RemoveVoteRequest = {};
+
+    // If anonymous, solve PoW challenge
+    if (isAnonymous) {
+      const challenge = await getPowChallenge();
+      const solution = await solvePowChallenge(challenge);
+
+      requestBody.powChallengeId = challenge.challengeId;
+      requestBody.powSolution = solution.solution;
+      requestBody.powSolutionNonce = solution.solutionNonce;
+    }
+
     // Remove vote
     const response = await fetchApi<RemoveVoteResponse>(`/votes/${reportId}`, {
       method: 'DELETE',
+      body: Object.keys(requestBody).length > 0 ? JSON.stringify(requestBody) : undefined,
     });
 
     return response;
