@@ -14,8 +14,9 @@ export default function AdminContentReportsPage() {
 
   useEffect(() => {
     if (!loading) {
-      const isAuthorized = isAuthenticated && 
-        currentUser?.type === 'registered' && 
+      const isAuthorized =
+        isAuthenticated &&
+        currentUser?.type === 'registered' &&
         (currentUser.role === 'admin' || currentUser.role === 'moderator');
 
       if (!isAuthorized) {
@@ -25,13 +26,14 @@ export default function AdminContentReportsPage() {
   }, [loading, isAuthenticated, currentUser, router]);
 
   if (loading) {
-    return <div className="min-h-screen pt-32 flex justify-center">{tCommon('loading')}</div>; 
+    return <div className="min-h-screen pt-32 flex justify-center">{tCommon('loading')}</div>;
   }
 
   // Prevent flash of content before redirect
-  const isAuthorized = isAuthenticated && 
-        currentUser?.type === 'registered' && 
-        (currentUser.role === 'admin' || currentUser.role === 'moderator');
+  const isAuthorized =
+    isAuthenticated &&
+    currentUser?.type === 'registered' &&
+    (currentUser.role === 'admin' || currentUser.role === 'moderator');
 
   if (!isAuthorized) {
     return null;
@@ -41,12 +43,8 @@ export default function AdminContentReportsPage() {
     <main className="min-h-screen pt-32 pb-20 px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight mb-2">
-            {t('dashboard_title')}
-          </h1>
-          <p className="text-foreground/60">
-            {t('dashboard_subtitle')}
-          </p>
+          <h1 className="text-4xl font-bold tracking-tight mb-2">{t('dashboard_title')}</h1>
+          <p className="text-foreground/60">{t('dashboard_subtitle')}</p>
         </div>
 
         <ContentReportsList />

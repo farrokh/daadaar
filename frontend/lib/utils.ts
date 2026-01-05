@@ -9,7 +9,7 @@ export function getS3PublicUrl(key: string, bucket?: string): string {
       'S3 bucket configuration is missing. Please provide a bucket argument or set NEXT_PUBLIC_AWS_S3_BUCKET environment variable.';
     console.warn(errorMessage);
     // Don't throw for now to prevent app crash, return a placeholder or empty string
-    return ''; 
+    return '';
   }
 
   const region = process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';

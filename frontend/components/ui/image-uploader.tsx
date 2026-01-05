@@ -1,8 +1,8 @@
 'use client';
 
+import { fetchApi } from '@/lib/api';
 import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
-import { fetchApi } from '@/lib/api';
 
 interface ImageUploadResponse {
   mediaId: number;
@@ -92,7 +92,10 @@ export function ImageUploader({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label
+        htmlFor="image-upload"
+        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+      >
         {label}
       </label>
 
@@ -101,11 +104,7 @@ export function ImageUploader({
         <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700">
           {preview ? (
             <>
-              <img
-                src={preview}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
+              <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               {uploading && (
                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                   <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -121,6 +120,8 @@ export function ImageUploader({
                 strokeWidth={1.5}
                 stroke="currentColor"
                 className="w-8 h-8"
+                role="img"
+                aria-label="Image placeholder"
               >
                 <path
                   strokeLinecap="round"
@@ -171,9 +172,7 @@ export function ImageUploader({
       )}
 
       {/* Error message */}
-      {error && (
-        <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
     </div>
   );
 }

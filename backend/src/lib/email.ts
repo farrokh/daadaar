@@ -7,18 +7,13 @@ import nodemailer from 'nodemailer';
 
 const getTransporter = async () => {
   // Use environment variables for SMTP configuration
-  const {
-    SMTP_HOST,
-    SMTP_PORT,
-    SMTP_USER,
-    SMTP_PASS,
-  } = process.env;
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
 
   if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS) {
     return nodemailer.createTransport({
       host: SMTP_HOST,
-      port: parseInt(SMTP_PORT),
-      secure: parseInt(SMTP_PORT) === 465,
+      port: Number.parseInt(SMTP_PORT),
+      secure: Number.parseInt(SMTP_PORT) === 465,
       auth: {
         user: SMTP_USER,
         pass: SMTP_PASS,
@@ -41,7 +36,7 @@ const getTransporter = async () => {
           pass: testAccount.pass,
         },
       });
-    } catch (error) {
+    } catch (_error) {
       console.warn('Failed to create Ethereal test account, falling back to dummy logger');
     }
   }
@@ -55,7 +50,7 @@ const getTransporter = async () => {
       console.log('Body:', mailOptions.text || mailOptions.html);
       console.log('------------------------');
       return { messageId: 'dummy-id' };
-    }
+    },
   } as nodemailer.Transporter;
 };
 
@@ -81,7 +76,7 @@ export async function sendEmail({
     });
 
     console.log('Email sent: %s', info.messageId);
-    
+
     // If using Ethereal, log the preview URL
     const previewUrl = nodemailer.getTestMessageUrl(info);
     if (previewUrl) {
@@ -106,7 +101,7 @@ export async function notifyModeratorsOfReport(report: any) {
   }
 
   const dashboardUrl = `${process.env.FRONTEND_URL}/admin/content-reports`;
-  
+
   await sendEmail({
     to: moderatorEmail,
     subject: `[Moderation] New Content Report - ${report.contentType} #${report.contentId}`,

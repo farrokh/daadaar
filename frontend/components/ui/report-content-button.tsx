@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { createPortal } from 'react-dom';
 import { fetchApi } from '@/lib/api';
 import type { CreateContentReportRequest } from '@/shared/api-types';
+import { useTranslations } from 'next-intl';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface ReportContentButtonProps {
   contentType: 'report' | 'organization' | 'individual' | 'user' | 'media';
@@ -68,14 +68,15 @@ export function ReportContentButton({
 
   const modalContent = (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
-      <div 
+      <div
         className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200"
         onClick={e => e.stopPropagation()}
+        onKeyDown={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
       >
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {t('title')}
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('title')}</h2>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
@@ -89,12 +90,9 @@ export function ReportContentButton({
               strokeWidth={1.5}
               stroke="currentColor"
               className="w-6 h-6"
+              aria-hidden="true"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18 18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -109,6 +107,8 @@ export function ReportContentButton({
                 strokeWidth={1.5}
                 stroke="currentColor"
                 className="w-16 h-16 mx-auto"
+                role="img"
+                aria-label="Success"
               >
                 <path
                   strokeLinecap="round"
@@ -117,9 +117,7 @@ export function ReportContentButton({
                 />
               </svg>
             </div>
-            <p className="text-lg font-medium text-gray-900 dark:text-white">
-              {t('success')}
-            </p>
+            <p className="text-lg font-medium text-gray-900 dark:text-white">{t('success')}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
@@ -133,13 +131,11 @@ export function ReportContentButton({
               <select
                 id="reason"
                 value={reason}
-                onChange={(e) =>
-                  setReason(e.target.value as (typeof REASON_OPTIONS)[number])
-                }
+                onChange={e => setReason(e.target.value as (typeof REASON_OPTIONS)[number])}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               >
-                {REASON_OPTIONS.map((opt) => (
+                {REASON_OPTIONS.map(opt => (
                   <option key={opt} value={opt}>
                     {t(`reasons.${opt}`)}
                   </option>
@@ -157,7 +153,7 @@ export function ReportContentButton({
               <textarea
                 id="description"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={e => setDescription(e.target.value)}
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 placeholder={t('descriptionPlaceholder')}
@@ -209,6 +205,7 @@ export function ReportContentButton({
           strokeWidth={2}
           stroke="currentColor"
           className="w-4 h-4"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -218,10 +215,7 @@ export function ReportContentButton({
         </svg>
       </button>
 
-      {isOpen && typeof document !== 'undefined' && createPortal(
-        modalContent,
-        document.body
-      )}
+      {isOpen && typeof document !== 'undefined' && createPortal(modalContent, document.body)}
     </>
   );
 }

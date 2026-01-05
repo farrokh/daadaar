@@ -120,7 +120,7 @@ export async function createIndividual(req: Request, res: Response) {
     }
 
     // Generate presigned URL for profile image
-    if (newIndividual && newIndividual.profileImageUrl && !newIndividual.profileImageUrl.startsWith('http')) {
+    if (newIndividual?.profileImageUrl && !newIndividual.profileImageUrl.startsWith('http')) {
       newIndividual.profileImageUrl = await generatePresignedGetUrl(newIndividual.profileImageUrl);
     }
 
@@ -325,8 +325,13 @@ export async function updateIndividual(req: Request, res: Response) {
       .returning();
 
     // Generate presigned URL for profile image
-    if (updatedIndividual.profileImageUrl && !updatedIndividual.profileImageUrl.startsWith('http')) {
-      updatedIndividual.profileImageUrl = await generatePresignedGetUrl(updatedIndividual.profileImageUrl);
+    if (
+      updatedIndividual.profileImageUrl &&
+      !updatedIndividual.profileImageUrl.startsWith('http')
+    ) {
+      updatedIndividual.profileImageUrl = await generatePresignedGetUrl(
+        updatedIndividual.profileImageUrl
+      );
     }
 
     res.json({

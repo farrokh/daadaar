@@ -104,7 +104,7 @@ export async function createOrganization(req: Request, res: Response) {
     }
 
     // Generate presigned URL for logo
-    if (newOrg && newOrg.logoUrl && !newOrg.logoUrl.startsWith('http')) {
+    if (newOrg?.logoUrl && !newOrg.logoUrl.startsWith('http')) {
       newOrg.logoUrl = await generatePresignedGetUrl(newOrg.logoUrl);
     }
 

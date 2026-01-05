@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import {
-  listContentReports,
   getContentReport,
-  updateContentReportStatus,
   getContentReportStats,
+  listContentReports,
+  updateContentReportStatus,
 } from '../../controllers/admin/content-reports';
 import { csrfProtection } from '../../lib/csrf-protection';
 import { authMiddleware, moderatorMiddleware } from '../../middleware/auth';
@@ -11,7 +11,7 @@ import { authMiddleware, moderatorMiddleware } from '../../middleware/auth';
 const router: Router = Router();
 
 // Apply auth and moderator middleware to all admin routes
-// Note: We use moderatorMiddleware for general viewing, 
+// Note: We use moderatorMiddleware for general viewing,
 // though some actions might require adminMiddleware in the future.
 router.use(authMiddleware);
 router.use(moderatorMiddleware);
