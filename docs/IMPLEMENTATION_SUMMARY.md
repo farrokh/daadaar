@@ -197,6 +197,51 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 
 ---
 
+### 9. End Date Support for Role Occupancy ✅
+
+**Files**:
+- `frontend/components/graph/add-person-modal.tsx`
+- `backend/src/controllers/individuals.ts`
+- `frontend/messages/en.json`
+- `frontend/messages/fa.json`
+- `docs/END_DATE_IMPLEMENTATION.md`
+
+**Features**:
+- ✅ Optional end date field for individual-organization relationships
+- ✅ Tracks when individuals left roles/organizations
+- ✅ Null end date indicates ongoing/current position
+- ✅ Bilingual support (English and Persian)
+- ✅ UI displays start and end dates side-by-side
+
+**Database**:
+- Schema already supported this via `role_occupancy.endDate` (nullable)
+- No migration needed
+
+---
+
+### 10. Unified Image Upload Format ✅
+
+**Files**:
+- `backend/src/controllers/media.ts`
+- `frontend/components/ui/image-uploader.tsx`
+- `frontend/components/reports/media-uploader.tsx`
+- `docs/IMAGE_UPLOAD_FORMAT.md`
+
+**Features**:
+- ✅ All images converted to AVIF format (individuals, organizations, reports)
+- ✅ Consistent quality settings across platform (quality: 60, effort: 4)
+- ✅ Max width: 2048px with aspect ratio preservation
+- ✅ ~50% better compression than JPEG
+- ✅ Single endpoint for all image uploads: `POST /api/media/upload`
+
+**Benefits**:
+- Consistent image quality across platform
+- Reduced storage and bandwidth costs
+- Faster page load times
+- Simplified codebase (one upload handler)
+
+---
+
 ### 8. Rich Media Support ✅
 
 **Files**:

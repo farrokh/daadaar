@@ -60,6 +60,7 @@ export function AddPersonModal({
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [roleId, setRoleId] = useState<string>('');
   const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('');
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(false);
@@ -103,6 +104,7 @@ export function AddPersonModal({
     setDateOfBirth('');
     setRoleId('');
     setStartDate('');
+    setEndDate('');
     setProfileImageUrl('');
     setIsCreatingNewRole(false);
     setNewRoleTitle('');
@@ -198,6 +200,7 @@ export function AddPersonModal({
         roleId: finalRoleId,
         organizationId,
         startDate: startDate || null,
+        endDate: endDate || null,
         profileImageUrl: profileImageUrl || null,
       }),
     });
@@ -383,18 +386,29 @@ export function AddPersonModal({
                 />
               </div>
 
-              <Input
-                label={t('start_date')}
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                disabled={loading}
-                helperText={t('start_date_helper')}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label={t('start_date')}
+                  type="date"
+                  value={startDate}
+                  onChange={e => setStartDate(e.target.value)}
+                  disabled={loading}
+                  helperText={t('start_date_helper')}
+                />
+
+                <Input
+                  label={t('end_date')}
+                  type="date"
+                  value={endDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  disabled={loading}
+                  helperText={t('end_date_helper')}
+                />
+              </div>
             </div>
           ) : (
             /* Existing Role Selection */
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <Select
                 label={t('role')}
                 placeholder={fetchingRoles ? t('loading_roles') : t('role_placeholder')}
@@ -407,14 +421,25 @@ export function AddPersonModal({
                 }
               />
 
-              <Input
-                label={t('start_date')}
-                type="date"
-                value={startDate}
-                onChange={e => setStartDate(e.target.value)}
-                disabled={loading || !roleId}
-                helperText={t('start_date_helper')}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label={t('start_date')}
+                  type="date"
+                  value={startDate}
+                  onChange={e => setStartDate(e.target.value)}
+                  disabled={loading || !roleId}
+                  helperText={t('start_date_helper')}
+                />
+
+                <Input
+                  label={t('end_date')}
+                  type="date"
+                  value={endDate}
+                  onChange={e => setEndDate(e.target.value)}
+                  disabled={loading || !roleId}
+                  helperText={t('end_date_helper')}
+                />
+              </div>
             </div>
           )}
         </div>
