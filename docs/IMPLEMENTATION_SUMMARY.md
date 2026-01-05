@@ -182,7 +182,138 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 
 ---
 
-### 6. CDN Configuration Documentation ✅
+### 7. Content Reporting System ✅
+
+**Files**:
+- `backend/src/controllers/content-reports.ts`
+- `frontend/components/ui/report-content-button.tsx`
+- `docs/CONTENT_REPORTING_PLAN.md`
+
+**Features**:
+- ✅ Universal reporting for reports, organizations, individuals, and users
+- ✅ Standardized "Report" button component
+- ✅ Backend storage with reason codes and descriptions
+- ✅ Admin dashboard readiness (schema supports review workflow)
+
+---
+
+### 9. End Date Support for Role Occupancy ✅
+
+**Files**:
+- `frontend/components/graph/add-person-modal.tsx`
+- `backend/src/controllers/individuals.ts`
+- `frontend/messages/en.json`
+- `frontend/messages/fa.json`
+- `docs/END_DATE_IMPLEMENTATION.md`
+
+**Features**:
+- ✅ Optional end date field for individual-organization relationships
+- ✅ Tracks when individuals left roles/organizations
+- ✅ Null end date indicates ongoing/current position
+- ✅ Bilingual support (English and Persian)
+- ✅ UI displays start and end dates side-by-side
+
+**Database**:
+- Schema already supported this via `role_occupancy.endDate` (nullable)
+- No migration needed
+
+---
+
+### 10. Unified Image Upload Format ✅
+
+**Files**:
+- `backend/src/controllers/media.ts`
+- `frontend/components/ui/image-uploader.tsx`
+- `frontend/components/reports/media-uploader.tsx`
+- `docs/IMAGE_UPLOAD_FORMAT.md`
+
+**Features**:
+- ✅ All images converted to AVIF format (individuals, organizations, reports)
+- ✅ Consistent quality settings across platform (quality: 60, effort: 4)
+- ✅ Max width: 2048px with aspect ratio preservation
+- ✅ ~50% better compression than JPEG
+- ✅ Single endpoint for all image uploads: `POST /api/media/upload`
+
+**Benefits**:
+- Consistent image quality across platform
+- Reduced storage and bandwidth costs
+- Faster page load times
+- Simplified codebase (one upload handler)
+
+---
+
+### 11. Email Verification System ✅
+
+**Files**:
+- `backend/src/controllers/auth.ts`
+- `backend/src/lib/email.ts`
+- `backend/src/routes/auth.ts`
+- `frontend/app/[locale]/signup/page.tsx`
+- `database/schema.ts`
+
+**Features**:
+- ✅ User accounts created with `isVerified: false`
+- ✅ Verification token generation and storage in `users` table
+- ✅ Automated email sending with verification link
+- ✅ Verification endpoint `GET /api/auth/verify-email`
+- ✅ Login page updated to handle verification status messages
+
+**Security**:
+- ✅ Tokens are unique and secure
+- ✅ Email validation before allowing full account access (optional enforcement)
+- ✅ Prevents fake account proliferation
+
+---
+
+### 12. Signup Page Implementation ✅
+
+**Files**:
+- `frontend/app/[locale]/signup/page.tsx`
+- `frontend/app/[locale]/register/page.tsx` (redirect)
+- `docs/SIGNUP_IMPLEMENTATION.md`
+
+**Features**:
+- ✅ Dedicated signup page with premium glassmorphism design
+- ✅ Real-time client-side validation for all fields
+- ✅ Password strength requirements enforced
+- ✅ Bilingual support (English/Persian)
+- ✅ Terms of Service integration preparation
+
+---
+
+### 13. SEO & Legal Compliance Features ✅
+
+**Files**:
+- `frontend/app/sitemap.ts`
+- `frontend/app/robots.ts`
+- `frontend/app/manifest.ts`
+- `frontend/app/[locale]/legal/*` (Terms, Privacy, About)
+- `frontend/components/layout/legal-menu.tsx`
+
+**Features**:
+- ✅ Dynamic Sitemap generation for all routes and entities
+- ✅ Robots.txt configuration for search engine crawling
+- ✅ Web App Manifest for PWA support
+- ✅ Dedicated legal pages (Privacy Policy, Terms of Service)
+- ✅ Legal menu navigation component
+
+---
+
+### 14. Rich Media Support ✅
+
+**Files**:
+- `frontend/components/reports/media-uploader.tsx`
+- `backend/src/controllers/reports.ts` (media linking)
+
+**Features**:
+- ✅ Support for PDF documents and Audio files
+- ✅ File type specific icons (when preview is unavailable)
+- ✅ Presigned URL generation for secure access
+- ✅ Improved drag-and-drop interface with progress tracking
+
+---
+
+### 15. CDN Configuration Documentation ✅
 
 **File**: `docs/CDN_CONFIGURATION.md`
 

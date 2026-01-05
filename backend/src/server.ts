@@ -6,7 +6,9 @@ import passport from 'passport';
 import { checkDatabaseConnection, closeDatabaseConnection } from './db';
 import { getRedisUnavailableCount } from './lib/rate-limiter';
 import { checkRedisConnection } from './lib/redis';
+import adminContentReportsRoutes from './routes/admin/content-reports';
 import authRoutes from './routes/auth';
+import contentReportsRoutes from './routes/content-reports';
 import csrfRoutes from './routes/csrf';
 import graphRoutes from './routes/graph';
 import individualsRoutes from './routes/individuals';
@@ -25,7 +27,19 @@ const PORT = process.env.PORT || 4000;
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        process.env.FRONTEND_URL,
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+      ].filter(Boolean);
+
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   })
 );
@@ -45,6 +59,8 @@ app.use('/api/pow', powRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/votes', votesRoutes);
+app.use('/api/content-reports', contentReportsRoutes);
+app.use('/api/admin/content-reports', adminContentReportsRoutes);
 
 // Health check endpoint
 app.get('/api/health', async (_req, res) => {

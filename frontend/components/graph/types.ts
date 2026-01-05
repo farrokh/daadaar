@@ -6,6 +6,9 @@ export interface OrganizationNodeData {
   nameEn?: string | null;
   description?: string | null;
   descriptionEn?: string | null;
+  logoUrl?: string | null;
+  url?: string | null; // Fully-qualified URL (pre-resolved)
+  s3Key?: string | null; // Raw S3 key
 }
 
 export interface PersonNodeData {
@@ -14,6 +17,9 @@ export interface PersonNodeData {
   nameEn?: string | null;
   biography?: string | null;
   biographyEn?: string | null;
+  profileImageUrl?: string | null;
+  url?: string | null; // Fully-qualified URL (pre-resolved)
+  s3Key?: string | null; // Raw S3 key
 }
 
 export interface ReportNodeData {

@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { ImageUploader } from '@/components/ui/image-uploader';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
 import { Select, type SelectOption } from '@/components/ui/select';
@@ -35,6 +36,7 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
   const [nameEn, setNameEn] = useState('');
   const [description, setDescription] = useState('');
   const [descriptionEn, setDescriptionEn] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
   const [parentId, setParentId] = useState<string>('');
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [loading, setLoading] = useState(false);
@@ -69,6 +71,7 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
     setNameEn('');
     setDescription('');
     setDescriptionEn('');
+    setLogoUrl('');
     setParentId('');
     setErrors({});
     setSubmitError(null);
@@ -115,6 +118,7 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
         nameEn: nameEn.trim() || null,
         description: description.trim() || null,
         descriptionEn: descriptionEn.trim() || null,
+        logoUrl: logoUrl || null,
         parentId: parentId ? Number.parseInt(parentId, 10) : null,
       }),
     });
@@ -186,12 +190,20 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
           />
         </div>
 
+        <ImageUploader
+          label={t('logo')}
+          currentImageUrl={logoUrl}
+          onImageUploaded={setLogoUrl}
+          disabled={loading}
+          helperText={t('logo_helper')}
+        />
+
         <Select
           label={t('parent')}
           placeholder={fetchingOrgs ? t('loading_organizations') : t('parent_placeholder')}
           options={parentOptions}
           value={parentId}
-          onChange={e => setParentId(e.target.value)}
+          onChange={value => setParentId(value)}
           disabled={loading || fetchingOrgs}
           helperText={t('parent_helper')}
         />

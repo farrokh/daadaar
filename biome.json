@@ -53,6 +53,9 @@
       "suspicious": {
         "noExplicitAny": "warn",
         "noArrayIndexKey": "warn"
+      },
+      "a11y": {
+        "useSemanticElements": "warn"
       }
     }
   },
