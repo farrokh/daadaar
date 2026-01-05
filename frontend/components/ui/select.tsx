@@ -24,8 +24,19 @@ export interface SelectProps {
 
 const Select = React.forwardRef<HTMLDivElement, SelectProps>(
   (
-    { className = '', label, error, helperText, options, placeholder, value, onChange, disabled, id },
-    ref
+    {
+      className = '',
+      label,
+      error,
+      helperText,
+      options,
+      placeholder,
+      value,
+      onChange,
+      disabled,
+      id,
+    },
+    _ref
   ) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -54,10 +65,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     return (
       <div className={`w-full ${className}`} ref={containerRef}>
         {label && (
-          <label
-            htmlFor={selectId}
-            className="block text-sm font-medium text-foreground/60 mb-1.5"
-          >
+          <label htmlFor={selectId} className="block text-sm font-medium text-foreground/60 mb-1.5">
             {label}
           </label>
         )}
@@ -91,7 +99,9 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
             </span>
             <ChevronDown
               className={`w-4 h-4 opacity-70 transition-transform duration-300 ease-in-out ${
-                isOpen ? 'transform rotate-180 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]' : 'text-foreground/70'
+                isOpen
+                  ? 'transform rotate-180 text-primary drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]'
+                  : 'text-foreground/70'
               }`}
             />
           </button>
@@ -101,6 +111,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
               <div
                 className="max-h-60 overflow-auto custom-scrollbar px-1"
                 role="listbox"
+                tabIndex={-1}
               >
                 {options.length === 0 ? (
                   <div className="px-4 py-3 text-sm text-foreground/50 text-center italic">

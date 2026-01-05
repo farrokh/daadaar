@@ -1,14 +1,10 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://daadaar.org';
 
   // Static routes
-  const routes = [
-    '',
-    '/en',
-    '/fa',
-  ].map((route) => ({
+  const routes = ['', '/en', '/fa'].map(route => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: 'daily' as const,
