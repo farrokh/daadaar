@@ -232,8 +232,8 @@ export async function castVote(req: Request, res: Response) {
         },
       });
 
-      return { 
-        vote, 
+      return {
+        vote,
         voteAction,
         reportVoteCounts: {
           upvoteCount: updatedReport?.upvoteCount || 0,
@@ -400,8 +400,8 @@ export async function removeVote(req: Request, res: Response) {
         },
       });
 
-      return { 
-        success: true, 
+      return {
+        success: true,
         notFound: false,
         reportVoteCounts: {
           upvoteCount: updatedReport?.upvoteCount || 0,
