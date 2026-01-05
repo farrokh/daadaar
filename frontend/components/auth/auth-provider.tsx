@@ -2,7 +2,8 @@
 
 import { getCurrentUser, logout as logoutApi } from '@/lib/auth';
 import type { CurrentUser } from '@/shared/types';
-import React, { createContext, useCallback, useEffect, useState } from 'react';
+import type React from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 
 interface AuthContextType {
   currentUser: CurrentUser | null;
@@ -37,12 +38,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchUser();
   }, [fetchUser]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     const success = await logoutApi();
     if (success) {
       setCurrentUser(null);
     }
-  };
+  }, []);
 
   const value = {
     currentUser,

@@ -49,4 +49,19 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  .liquid-glass {
+    /* Top/Left Highlights (White Reflection) */
+    box-shadow:
+      1px -1px 2px hsl(0 0% 100% / 0.15) inset,
+      0px -1px 2px hsl(0 0% 100% / 0.15) inset,
+      -1px -1px 2px hsl(0 0% 100% / 0.15) inset,
+      /* Soft Subtle Depth (Very faint dark, or removed) */
+      /* Removed the muddy dark grey insets that caused the bezel overlay look */
+
+      /* Bottom/Right Rim (Light reflection for glass edge on dark bg) */
+      -2px -1px 2px hsl(0 0% 100% / 0.25) inset,
+      /* External Drop Shadow */
+      0px 4px 20px -8px hsl(0 0% 0% / 0.15);
+  }
 }

@@ -36,7 +36,7 @@ app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/csrf', csrfRoutes);
+app.use('/api', csrfRoutes);
 app.use('/api/graph', graphRoutes);
 app.use('/api/organizations', organizationsRoutes);
 app.use('/api/individuals', individualsRoutes);

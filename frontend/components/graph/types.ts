@@ -5,6 +5,7 @@ export interface OrganizationNodeData {
   name: string;
   nameEn?: string | null;
   description?: string | null;
+  descriptionEn?: string | null;
 }
 
 export interface PersonNodeData {
@@ -12,6 +13,7 @@ export interface PersonNodeData {
   name: string;
   nameEn?: string | null;
   biography?: string | null;
+  biographyEn?: string | null;
 }
 
 export interface ReportNodeData {
@@ -19,6 +21,7 @@ export interface ReportNodeData {
   title: string;
   titleEn?: string | null;
   content?: string | null;
+  contentEn?: string | null;
   incidentDate?: string | null;
   upvoteCount: number;
   downvoteCount: number;
