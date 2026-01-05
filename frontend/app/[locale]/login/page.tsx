@@ -5,16 +5,21 @@ import { Input } from '@/components/ui/input';
 import { login, useAuth } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 export default function LoginPage() {
   const t = useTranslations('auth');
   const tCommon = useTranslations('common');
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { refreshUser } = useAuth(); // Get refreshUser from context
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  const verified = searchParams.get('verified') === 'true';
+  const errorParam = searchParams.get('error');
+
   const [formData, setFormData] = useState({
     identifier: '',
     password: '',
@@ -49,9 +54,15 @@ export default function LoginPage() {
           <p className="text-muted-foreground">{t('login_subtitle')}</p>
         </div>
 
-        {error && (
+        {verified && (
+          <div className="bg-green-500/10 border border-green-500/20 text-green-500 px-4 py-2 rounded-lg text-sm mb-6">
+            {t('email_verified')}
+          </div>
+        )}
+
+        {(error || errorParam) && (
           <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-lg text-sm mb-6">
-            {error}
+            {error || (errorParam === 'invalid_token' ? t('verification_failed') : t('login_failed'))}
           </div>
         )}
 
@@ -87,7 +98,7 @@ export default function LoginPage() {
 
           <div className="flex justify-center text-sm mt-4">
             <Link
-              href="/register"
+              href="/signup"
               className="text-muted-foreground hover:text-primary transition-colors"
             >
               {t('register_link')}

@@ -35,6 +35,7 @@ Our authentication layer is uniquely designed to support both anonymous and regi
 
 ### 2. Registered Users
 - **Standard**: Email/Password with bcrypt hashing and JWT tokens.
+- **Verification**: Email verification flow required for account activation (configurable).
 - **OAuth**: Google OAuth integration via Passport.js.
 - **Security**: Strict "No Auto-Link" policy to prevent account takeover from OAuth provider email matches.
 

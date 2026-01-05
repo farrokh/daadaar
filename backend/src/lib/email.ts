@@ -119,3 +119,23 @@ export async function notifyModeratorsOfReport(report: any) {
     `,
   });
 }
+
+export async function sendVerificationEmail(email: string, token: string) {
+  // Use the backend URL for the API endpoint directly to verify logic or frontend URL if we want a page.
+  // Assuming strict separation, better to hit Backend API -> Redirect to Frontend.
+  const backendUrl = process.env.API_URL || 'http://localhost:4000';
+  const verificationUrl = `${backendUrl}/api/auth/verify-email?token=${token}`;
+
+  await sendEmail({
+    to: email,
+    subject: 'Verify your Daadaar account',
+    text: `Welcome to Daadaar! Please verify your email by clicking the following link: ${verificationUrl}`,
+    html: `
+      <h2>Welcome to Daadaar</h2>
+      <p>Please verify your email address to activate your account.</p>
+      <p><a href="${verificationUrl}">Click here to verify your email</a></p>
+      <p>Or copy and paste this link into your browser:</p>
+      <p>${verificationUrl}</p>
+    `,
+  });
+}

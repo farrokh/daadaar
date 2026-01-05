@@ -208,6 +208,8 @@ export const users = pgTable(
     bannedAt: timestamp('banned_at', { withTimezone: true }),
     bannedUntil: timestamp('banned_until', { withTimezone: true }), // null = permanent ban
     banReason: text('ban_reason'),
+    isVerified: boolean('is_verified').default(false).notNull(),
+    verificationToken: varchar('verification_token', { length: 255 }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   },

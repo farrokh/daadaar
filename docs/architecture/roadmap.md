@@ -23,6 +23,7 @@ The development of Daadaar is organized into three strategic phases, moving from
 - [x] **CSRF Protection**: Custom token-based library with automatic cleanup
 - [x] **Session-Based Rate Limiting**: VPN-friendly rate limiting tied to sessions
 - [x] **Database Indexes**: 40+ performance indexes across all tables
+- [x] **Email Verification**: Token-based email verification for registered users
 
 #### Graph & Visualization
 - [x] **Interactive Graph Visualization**: React Flow with organizations, roles, and individuals
@@ -42,6 +43,7 @@ The development of Daadaar is organized into three strategic phases, moving from
 - [x] **Shared API Types**: Type-safe request/response interfaces
 - [x] **Modular Architecture**: Separated concerns with custom hooks and utilities
 - [x] **Documentation Suite**: Comprehensive architecture documentation
+- [x] **SEO & Legal**: Sitemap, Robots.txt, Manifest, and Legal pages (Terms, Privacy)
 
 ---
 
@@ -108,14 +110,14 @@ The development of Daadaar is organized into three strategic phases, moving from
   - ✅ Audio Recordings support
   - ✅ Improved Media Uploader with file type icons and progress
   - ✅ Lightbox support for non-image media types
-- [ ] **Entity Visual Identity**: Support for profile pictures and organization logos across all entities
+- [x] **Entity Visual Identity**: Support for profile pictures and organization logos across all entities
   - ✅ `logo_url` column in `organizations` table (migration 0005)
   - ✅ Type definitions updated (`Organization` interface includes `logoUrl`)
   - ✅ Image upload integration in organization creation form (`ImageUploader` component)
   - ✅ Backend support for logoUrl in create/update endpoints
-  - ❌ **Missing**: Image upload integration for individuals (profile pictures)
-  - ❌ **Missing**: User profile image management in account settings
-  - ❌ **Missing**: Rendering of logos/avatars in graph nodes and detail pages
+  - ✅ Image upload integration for individuals (profile pictures)
+  - ✅ User profile image management (via Gravatar or upload - basic support)
+  - ✅ Rendering of logos/avatars in graph nodes and detail pages
 
 
 
