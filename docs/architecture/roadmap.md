@@ -91,6 +91,12 @@ The development of Daadaar is organized into three strategic phases, moving from
   - ❌ **Missing**: Ban management controller (ban/unban operations)
   - ❌ **Missing**: Admin middleware for role-based access control
   - ❌ **Missing**: Ban history tracking on ban/unban actions
+- [ ] **Entity Visual Identity**: Support for profile pictures and organization logos across all entities
+  - ❌ **Missing**: `logo_url` column in `organizations` table
+  - ❌ **Missing**: Image upload integration in entity creation forms (Organizations, Individuals)
+  - ❌ **Missing**: User profile image management in account settings
+  - ❌ **Missing**: Rendering of logos/avatars in graph nodes and detail pages
+
 
 ---
 
@@ -169,7 +175,9 @@ The development of Daadaar is organized into three strategic phases, moving from
 ### Short-Term (Next Month)
 4. **Trust Score System**: Implement calculation logic and database tracking
 5. **Content Reporting**: Build universal reporting system with admin review workflow
-6. **Admin Dashboard**: Create moderation interface for content review and ban management
+6. **Entity Visual Identity**: Add logo/image support to organizations, individuals, and users
+7. **Admin Dashboard**: Create moderation interface for content review and ban management
+
 
 ### Medium-Term (Next Quarter)
 7. **AWS Deployment**: Complete infrastructure setup and production deployment
