@@ -29,7 +29,7 @@ export function Navbar() {
             <Image
               src="/logo_navbar_en.svg"
               alt="Daadaar Logo"
-              layout="fill"
+              fill
               className="object-contain drop-shadow-lg"
             />
           </div>
