@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
   Background,
@@ -17,6 +17,7 @@ import 'reactflow/dist/style.css';
 import { useGraphData } from '@/hooks/use-graph-data';
 import { type ViewContext, defaultEdgeOptions, nodeTypes } from './config';
 import { GraphControls } from './graph-controls';
+import { GraphDock } from './graph-dock';
 import { GraphMarkers } from './graph-markers';
 import { GraphToolbar } from './graph-toolbar';
 import TimelineFilter from './timeline-filter';
@@ -26,6 +27,7 @@ import { AddOrganizationModal } from './add-organization-modal';
 import { AddPersonModal } from './add-person-modal';
 import type { OrganizationNodeData, PersonNodeData, ReportNodeData } from './types';
 
+import { useToolContext } from '@/components/providers/tool-provider';
 import { Button } from '@/components/ui/button';
 import { Map as MapIcon } from 'lucide-react';
 
@@ -46,6 +48,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const [isSubmitReportModalOpen, setIsSubmitReportModalOpen] = useState(false);
   const [showMiniMap, setShowMiniMap] = useState(false);
 
+  const locale = useLocale();
   const t = useTranslations('graph');
   const tOrg = useTranslations('organization');
   const tPerson = useTranslations('person');
@@ -68,6 +71,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     initialView,
     tOrg,
     tPerson,
+    locale,
   });
 
   // Handle node click
@@ -108,6 +112,50 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       fetchIndividualReports(viewContext.individualId, viewContext.individualName);
     }
   }, [viewContext, fetchOrganizations, fetchOrganizationPeople, fetchIndividualReports]);
+
+  const { setTools } = useToolContext();
+
+  // Push tools to the navbar
+  useEffect(() => {
+    setTools(
+      <GraphDock
+        showMiniMap={showMiniMap}
+        onToggleMiniMap={() => setShowMiniMap(prev => !prev)}
+        timelineContent={
+          <TimelineFilter
+            minYear={timeRangeLimit[0]}
+            maxYear={timeRangeLimit[1]}
+            selectedRange={dateRange}
+            onRangeChange={setDateRange}
+            isVisible={true}
+            compact
+          />
+        }
+        addContent={
+          <GraphToolbar
+            onAddOrganization={() => setIsAddOrgModalOpen(true)}
+            onAddPerson={() => setIsAddPersonModalOpen(true)}
+            onAddReport={() => setIsSubmitReportModalOpen(true)}
+            onRefresh={handleRefresh}
+            viewMode={viewContext.mode}
+            isLoading={loading}
+            compact
+          />
+        }
+      />
+    );
+
+    return () => setTools(null);
+  }, [
+    timeRangeLimit,
+    dateRange,
+    setDateRange,
+    viewContext.mode,
+    loading,
+    handleRefresh,
+    setTools,
+    showMiniMap,
+  ]);
 
   // Load initial data
   // biome-ignore lint/correctness/useExhaustiveDependencies: This effect should only run once on mount
@@ -214,38 +262,11 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
               if (node.type === 'report') return '#22c55e';
               return '#6b7280';
             }}
-            className="!bg-background/60 !backdrop-blur-xl !border !border-white/10 !rounded-2xl !shadow-2xl !bottom-20 !right-6 !m-0 !w-[200px] !h-[150px]"
-            maskColor="rgba(0, 0, 0, 0.1)"
+            className="!bg-white/5 !backdrop-blur-2xl liquid-glass !border-none !rounded-2xl !bottom-20 !right-6 !m-0 !w-[200px] !h-[150px]"
+            maskColor="transparent"
           />
         )}
       </ReactFlow>
-
-      {/* MiniMap Toggle Button */}
-      <div className="absolute bottom-6 right-6 z-10">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowMiniMap(!showMiniMap)}
-          className={`h-12 w-12 p-0 rounded-2xl shadow-xl border border-white/10 backdrop-blur-xl transition-all ${
-            showMiniMap
-              ? 'bg-accent-primary text-white hover:bg-accent-primary/90'
-              : 'bg-background/60 text-foreground/80 hover:bg-background/80 hover:text-foreground'
-          }`}
-          title={showMiniMap ? t('hide_minimap') : t('show_minimap')}
-        >
-          <MapIcon className="h-5 w-5" />
-        </Button>
-      </div>
-
-      {/* Toolbar */}
-      <GraphToolbar
-        onAddOrganization={() => setIsAddOrgModalOpen(true)}
-        onAddPerson={() => setIsAddPersonModalOpen(true)}
-        onAddReport={() => setIsSubmitReportModalOpen(true)}
-        onRefresh={handleRefresh}
-        viewMode={viewContext.mode}
-        isLoading={loading}
-      />
 
       {/* Add Organization Modal */}
       <AddOrganizationModal
@@ -324,15 +345,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           </span>
         </p>
       </div>
-
-      {/* Timeline Filter */}
-      <TimelineFilter
-        minYear={timeRangeLimit[0]}
-        maxYear={timeRangeLimit[1]}
-        selectedRange={dateRange}
-        onRangeChange={setDateRange}
-        isVisible={true}
-      />
     </div>
   );
 }

@@ -30,4 +30,3 @@ router.delete('/:reportId', csrfProtection, removeVote);
 router.get('/:reportId/my-vote', getMyVote);
 
 export default router;
-

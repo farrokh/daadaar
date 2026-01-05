@@ -108,6 +108,13 @@ export interface CastVoteResponse {
   };
 }
 
+export interface RemoveVoteRequest {
+  // PoW is required for anonymous users only
+  powChallengeId?: string;
+  powSolution?: string;
+  powSolutionNonce?: number;
+}
+
 export interface RemoveVoteResponse {
   reportVoteCounts: {
     upvoteCount: number;

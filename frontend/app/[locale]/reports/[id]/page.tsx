@@ -15,7 +15,7 @@ export default function ReportDetailPage() {
   const locale = useLocale();
   const t = useTranslations('report');
   const commonT = useTranslations('common');
-  const { currentUser, isAnonymous } = useAuth();
+  const { isAnonymous } = useAuth();
   const [report, setReport] = useState<ReportWithDetails | null>(null);
   const [selectedMedia, setSelectedMedia] = useState<(Media & { url?: string }) | null>(null);
   const [loading, setLoading] = useState(true);
@@ -121,19 +121,28 @@ export default function ReportDetailPage() {
         </button>
 
         {/* Hero Meta */}
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/30">
-            {t('verification_score')}: {report.aiVerification?.confidenceScore ?? 0}%
-          </span>
-          <span className="text-sm text-foreground/40">{displayDate}</span>
-          {report.incidentLocation && (
-            <span className="text-sm text-foreground/40 flex items-center gap-1">
-              📍{' '}
-              {isRtl
-                ? report.incidentLocation
-                : report.incidentLocationEn || report.incidentLocation}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/30">
+              {t('verification_score')}: {report.aiVerification?.confidenceScore ?? 0}%
             </span>
-          )}
+            <span className="text-sm text-foreground/40">{displayDate}</span>
+            {report.incidentLocation && (
+              <span className="text-sm text-foreground/40 flex items-center gap-1">
+                📍{' '}
+                {isRtl
+                  ? report.incidentLocation
+                  : report.incidentLocationEn || report.incidentLocation}
+              </span>
+            )}
+          </div>
+          <VotingButtons
+            reportId={report.id}
+            initialUpvoteCount={report.upvoteCount}
+            initialDownvoteCount={report.downvoteCount}
+            isAnonymous={isAnonymous}
+            compact
+          />
         </div>
 
         {/* Title */}
@@ -144,19 +153,6 @@ export default function ReportDetailPage() {
         {/* Content */}
         <div className="prose dark:prose-invert prose-lg max-w-none mb-12 whitespace-pre-wrap text-foreground/80 leading-relaxed">
           {content}
-        </div>
-
-        {/* Voting Section */}
-        <div className="bg-foreground/5 backdrop-blur-md border border-foreground/10 rounded-2xl p-6 mb-12">
-          <h3 className="text-sm font-bold text-foreground/40 uppercase tracking-widest mb-4">
-            {t('votes')}
-          </h3>
-          <VotingButtons
-            reportId={report.id}
-            initialUpvoteCount={report.upvoteCount}
-            initialDownvoteCount={report.downvoteCount}
-            isAnonymous={isAnonymous}
-          />
         </div>
 
         {/* Media Gallery (Thumbnails) */}
@@ -205,7 +201,7 @@ export default function ReportDetailPage() {
         {/* Associations */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-12 border-t border-foreground/10 mt-12">
           {/* Reporter Info */}
-          <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10">
+          <div>
             <h3 className="text-sm font-bold text-foreground/40 uppercase tracking-widest mb-4">
               {t('reported_by')}
             </h3>
@@ -226,7 +222,7 @@ export default function ReportDetailPage() {
 
           {/* Linked Individuals */}
           {report.reportLinks && report.reportLinks.length > 0 && (
-            <div className="bg-foreground/5 p-6 rounded-2xl border border-foreground/10">
+            <div>
               <h3 className="text-sm font-bold text-foreground/40 uppercase tracking-widest mb-4">
                 {t('linked_individuals')}
               </h3>
@@ -254,8 +250,6 @@ export default function ReportDetailPage() {
             </div>
           )}
         </div>
-
-
 
         {/* Lightbox Modal */}
         {selectedMedia && (

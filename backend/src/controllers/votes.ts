@@ -1,4 +1,4 @@
-import { and, eq, or, sql } from 'drizzle-orm';
+import { type SQL, and, eq, or, sql } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { validatePowSolution } from '../lib/pow-validator';
@@ -16,7 +16,7 @@ interface CastVoteBody {
 /**
  * Cast a vote on a report (upvote or downvote)
  * POST /api/votes
- * 
+ *
  * Supports:
  * - Voting (creates new vote)
  * - Vote changes (upvote -> downvote or vice versa)
@@ -61,7 +61,8 @@ export async function castVote(req: Request, res: Response) {
           success: false,
           error: {
             code: 'POW_REQUIRED',
-            message: 'Anonymous users must provide PoW: powChallengeId, powSolution, powSolutionNonce',
+            message:
+              'Anonymous users must provide PoW: powChallengeId, powSolution, powSolutionNonce',
           },
         });
       }
@@ -119,16 +120,32 @@ export async function castVote(req: Request, res: Response) {
     }
 
     // Check for existing vote
+    let whereClause: SQL | undefined;
+    if (userId) {
+      whereClause = and(eq(schema.votes.reportId, body.reportId), eq(schema.votes.userId, userId));
+    } else if (sessionId) {
+      whereClause = and(
+        eq(schema.votes.reportId, body.reportId),
+        eq(schema.votes.sessionId, sessionId)
+      );
+    } else {
+      return res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required to vote',
+        },
+      });
+    }
+
     const existingVote = await db.query.votes.findFirst({
-      where: userId
-        ? and(eq(schema.votes.reportId, body.reportId), eq(schema.votes.userId, userId))
-        : and(eq(schema.votes.reportId, body.reportId), eq(schema.votes.sessionId, sessionId)),
+      where: whereClause,
     });
 
     // Execute vote in a transaction (for atomic count updates)
     const result = await db.transaction(async tx => {
       let voteAction: 'created' | 'updated' | 'unchanged' = 'created';
-      let vote;
+      let vote: typeof existingVote;
 
       if (existingVote) {
         // Vote exists - check if it's the same type
@@ -205,17 +222,24 @@ export async function castVote(req: Request, res: Response) {
         }
       }
 
-      return { vote, voteAction };
-    });
+      // Fetch updated report vote counts inside transaction for consistency
+      const updatedReport = await tx.query.reports.findFirst({
+        where: eq(schema.reports.id, body.reportId),
+        columns: {
+          id: true,
+          upvoteCount: true,
+          downvoteCount: true,
+        },
+      });
 
-    // Fetch updated report vote counts
-    const updatedReport = await db.query.reports.findFirst({
-      where: eq(schema.reports.id, body.reportId),
-      columns: {
-        id: true,
-        upvoteCount: true,
-        downvoteCount: true,
-      },
+      return {
+        vote,
+        voteAction,
+        reportVoteCounts: {
+          upvoteCount: updatedReport?.upvoteCount || 0,
+          downvoteCount: updatedReport?.downvoteCount || 0,
+        },
+      };
     });
 
     return res.status(result.voteAction === 'created' ? 201 : 200).json({
@@ -223,15 +247,12 @@ export async function castVote(req: Request, res: Response) {
       data: {
         vote: result.vote,
         voteAction: result.voteAction,
-        reportVoteCounts: {
-          upvoteCount: updatedReport?.upvoteCount || 0,
-          downvoteCount: updatedReport?.downvoteCount || 0,
-        },
+        reportVoteCounts: result.reportVoteCounts,
       },
     });
   } catch (error) {
     console.error('Cast vote error:', error);
-    
+
     // Handle unique constraint violation (should not happen due to checks, but defensive)
     if (error instanceof Error && 'code' in error && error.code === '23505') {
       return res.status(409).json({
@@ -253,13 +274,26 @@ export async function castVote(req: Request, res: Response) {
   }
 }
 
+interface RemoveVoteBody {
+  // PoW is required for anonymous users only
+  powChallengeId?: string;
+  powSolution?: string;
+  powSolutionNonce?: number;
+}
+
 /**
  * Remove a vote from a report
  * DELETE /api/votes/:reportId
+ *
+ * Supports:
+ * - Vote removal (deletes existing vote)
+ * - PoW validation for anonymous users
+ * - Atomic vote count updates
  */
 export async function removeVote(req: Request, res: Response) {
   try {
     const reportId = Number.parseInt(req.params.reportId, 10);
+    const body = req.body as RemoveVoteBody;
 
     if (Number.isNaN(reportId)) {
       return res.status(400).json({
@@ -275,29 +309,69 @@ export async function removeVote(req: Request, res: Response) {
     const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
-    // Find existing vote
-    const existingVote = await db.query.votes.findFirst({
-      where: userId
-        ? and(eq(schema.votes.reportId, reportId), eq(schema.votes.userId, userId))
-        : and(eq(schema.votes.reportId, reportId), eq(schema.votes.sessionId, sessionId)),
-    });
+    // Anonymous users must provide PoW
+    if (!userId) {
+      if (!body.powChallengeId || !body.powSolution || body.powSolutionNonce === undefined) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'POW_REQUIRED',
+            message:
+              'Anonymous users must provide PoW: powChallengeId, powSolution, powSolutionNonce',
+          },
+        });
+      }
 
-    if (!existingVote) {
-      return res.status(404).json({
+      // Validate PoW solution
+      const powValidation = await validatePowSolution(
+        body.powChallengeId,
+        body.powSolution,
+        body.powSolutionNonce
+      );
+
+      if (!powValidation.valid) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'INVALID_POW',
+            message: powValidation.error || 'Invalid proof-of-work solution',
+          },
+        });
+      }
+    }
+
+    // Build where clause for finding the vote
+    let whereClause: SQL | undefined;
+    if (userId) {
+      whereClause = and(eq(schema.votes.reportId, reportId), eq(schema.votes.userId, userId));
+    } else if (sessionId) {
+      whereClause = and(eq(schema.votes.reportId, reportId), eq(schema.votes.sessionId, sessionId));
+    } else {
+      return res.status(401).json({
         success: false,
         error: {
-          code: 'VOTE_NOT_FOUND',
-          message: 'You have not voted on this report',
+          code: 'UNAUTHORIZED',
+          message: 'Authentication required to remove vote',
         },
       });
     }
 
     // Remove vote and update counts atomically
-    await db.transaction(async tx => {
+    // All reads and writes happen inside the transaction to prevent race conditions
+    const result = await db.transaction(async tx => {
+      // Find existing vote inside the transaction
+      const existingVote = await tx.query.votes.findFirst({
+        where: whereClause,
+      });
+
+      if (!existingVote) {
+        return { success: false, notFound: true };
+      }
+
       // Delete the vote
       await tx.delete(schema.votes).where(eq(schema.votes.id, existingVote.id));
 
-      // Decrement the appropriate vote count
+      // Decrement the appropriate vote count using SQL arithmetic
       if (existingVote.voteType === 'upvote') {
         await tx
           .update(schema.reports)
@@ -315,25 +389,42 @@ export async function removeVote(req: Request, res: Response) {
           })
           .where(eq(schema.reports.id, reportId));
       }
-    });
 
-    // Fetch updated report vote counts
-    const updatedReport = await db.query.reports.findFirst({
-      where: eq(schema.reports.id, reportId),
-      columns: {
-        id: true,
-        upvoteCount: true,
-        downvoteCount: true,
-      },
-    });
+      // Fetch updated report vote counts inside transaction for consistency
+      const updatedReport = await tx.query.reports.findFirst({
+        where: eq(schema.reports.id, reportId),
+        columns: {
+          id: true,
+          upvoteCount: true,
+          downvoteCount: true,
+        },
+      });
 
-    return res.status(200).json({
-      success: true,
-      data: {
+      return {
+        success: true,
+        notFound: false,
         reportVoteCounts: {
           upvoteCount: updatedReport?.upvoteCount || 0,
           downvoteCount: updatedReport?.downvoteCount || 0,
         },
+      };
+    });
+
+    // Check if vote was not found
+    if (result.notFound) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'VOTE_NOT_FOUND',
+          message: 'You have not voted on this report',
+        },
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        reportVoteCounts: result.reportVoteCounts,
       },
     });
   } catch (error) {
@@ -370,11 +461,25 @@ export async function getMyVote(req: Request, res: Response) {
     const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
+    // Construct where clause based on user authentication
+    let whereClause: SQL | undefined;
+    if (userId) {
+      whereClause = and(eq(schema.votes.reportId, reportId), eq(schema.votes.userId, userId));
+    } else if (sessionId) {
+      whereClause = and(eq(schema.votes.reportId, reportId), eq(schema.votes.sessionId, sessionId));
+    } else {
+      // No user/session identified - guest cannot have a vote
+      return res.status(200).json({
+        success: true,
+        data: {
+          vote: null,
+        },
+      });
+    }
+
     // Find existing vote
     const vote = await db.query.votes.findFirst({
-      where: userId
-        ? and(eq(schema.votes.reportId, reportId), eq(schema.votes.userId, userId))
-        : and(eq(schema.votes.reportId, reportId), eq(schema.votes.sessionId, sessionId)),
+      where: whereClause,
     });
 
     return res.status(200).json({
@@ -394,4 +499,3 @@ export async function getMyVote(req: Request, res: Response) {
     });
   }
 }
-

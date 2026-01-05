@@ -28,7 +28,6 @@ export function SubmitReportModal({
   roleId,
   roleName,
   organizationName,
-  apiUrl,
   onSuccess,
 }: SubmitReportModalProps) {
   const [mediaIds, setMediaIds] = useState<number[]>([]);
@@ -93,12 +92,13 @@ export function SubmitReportModal({
         throw new Error(response.error?.message || 'Failed to submit report');
       }
 
-      const result = response;
+      const { data: responseData } = response;
+      if (!responseData) throw new Error('No data received');
 
       // Success!
       reset();
       setMediaIds([]);
-      onSuccess?.(result.data!.id);
+      onSuccess?.(responseData.id);
       onClose();
     } catch (err) {
       console.error('Submit error:', err);
@@ -290,7 +290,6 @@ export function SubmitReportModal({
               <MediaUploader
                 onMediaUploaded={handleMediaUploaded}
                 onMediaRemoved={handleMediaRemoved}
-                apiUrl={apiUrl}
               />
             </div>
           </form>
