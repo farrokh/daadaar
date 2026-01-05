@@ -291,7 +291,7 @@ export function AddPersonModal({
             rows={3}
           />
         </div>
-        
+
         <ImageUploader
           label={t('profile_image')}
           currentImageUrl={profileImageUrl}

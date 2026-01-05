@@ -199,7 +199,10 @@ export default function ReportDetailPage() {
                   {item.mediaType === 'document' && (
                     <div className="w-full h-full flex flex-col items-center justify-center bg-secondary/10 p-4 text-center">
                       <FileText className="w-10 h-10 text-primary mb-2 opacity-60" />
-                      <span className="text-[10px] text-foreground/60 truncate w-full px-2" title={item.originalFilename || ''}>
+                      <span
+                        className="text-[10px] text-foreground/60 truncate w-full px-2"
+                        title={item.originalFilename || ''}
+                      >
                         {item.originalFilename}
                       </span>
                     </div>
@@ -376,7 +379,8 @@ export default function ReportDetailPage() {
                 )}
                 {selectedMedia.mediaType === 'document' && (
                   <div className="w-full flex flex-col items-center gap-6">
-                    {selectedMedia.mimeType === 'application/pdf' || selectedMedia.originalFilename?.toLowerCase().endsWith('.pdf') ? (
+                    {selectedMedia.mimeType === 'application/pdf' ||
+                    selectedMedia.originalFilename?.toLowerCase().endsWith('.pdf') ? (
                       <div className="w-full max-w-4xl h-[70vh] rounded-2xl overflow-hidden border border-white/10 bg-white/5 shadow-2xl">
                         <embed
                           src={

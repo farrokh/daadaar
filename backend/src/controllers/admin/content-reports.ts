@@ -1,4 +1,4 @@
-import { eq, and, sql, desc, count } from 'drizzle-orm';
+import { and, count, desc, eq, sql } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../../db';
 
@@ -11,8 +11,8 @@ export async function listContentReports(req: Request, res: Response) {
     const status = req.query.status as string;
     const contentType = req.query.contentType as string;
     const reason = req.query.reason as string;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
+    const page = Number.parseInt(req.query.page as string) || 1;
+    const limit = Number.parseInt(req.query.limit as string) || 20;
     const offset = (page - 1) * limit;
 
     const where = [];
@@ -33,81 +33,87 @@ export async function listContentReports(req: Request, res: Response) {
             id: true,
             username: true,
             displayName: true,
-          }
+          },
         },
         reviewer: {
           columns: {
             id: true,
             username: true,
             displayName: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     // Post-process to get content details
     const contentIdsByType: Record<string, number[]> = {};
-    reports.forEach(r => {
+    for (const r of reports) {
       if (!contentIdsByType[r.contentType]) {
         contentIdsByType[r.contentType] = [];
       }
       contentIdsByType[r.contentType].push(r.contentId);
-    });
+    }
 
-    const contentDetails: Record<string, Record<number, { title: string, subtitle?: string }>> = {};
+    const contentDetails: Record<string, Record<number, { title: string; subtitle?: string }>> = {};
 
     // Fetch Organizations
-    if (contentIdsByType['organization']?.length) {
-       const orgs = await db.query.organizations.findMany({
-         where: (orgs, { inArray }) => inArray(orgs.id, contentIdsByType['organization']),
-         columns: { id: true, name: true, nameEn: true }
-       });
-       contentDetails['organization'] = {};
-       orgs.forEach(o => {
-         contentDetails['organization'][o.id] = { title: o.nameEn || o.name, subtitle: o.name };
-       });
+    if (contentIdsByType.organization?.length) {
+      const orgs = await db.query.organizations.findMany({
+        where: (orgs, { inArray }) => inArray(orgs.id, contentIdsByType.organization),
+        columns: { id: true, name: true, nameEn: true },
+      });
+      contentDetails.organization = {};
+      for (const o of orgs) {
+        contentDetails.organization[o.id] = { title: o.nameEn || o.name, subtitle: o.name };
+      }
     }
 
     // Fetch Individuals
-    if (contentIdsByType['individual']?.length) {
-       const inds = await db.query.individuals.findMany({
-         where: (inds, { inArray }) => inArray(inds.id, contentIdsByType['individual']),
-         columns: { id: true, fullName: true, fullNameEn: true }
-       });
-       contentDetails['individual'] = {};
-       inds.forEach(i => {
-         contentDetails['individual'][i.id] = { title: i.fullNameEn || i.fullName, subtitle: i.fullName };
-       });
+    if (contentIdsByType.individual?.length) {
+      const inds = await db.query.individuals.findMany({
+        where: (inds, { inArray }) => inArray(inds.id, contentIdsByType.individual),
+        columns: { id: true, fullName: true, fullNameEn: true },
+      });
+      contentDetails.individual = {};
+      for (const i of inds) {
+        contentDetails.individual[i.id] = {
+          title: i.fullNameEn || i.fullName,
+          subtitle: i.fullName,
+        };
+      }
     }
 
     // Fetch Reports
-    if (contentIdsByType['report']?.length) {
-       const reps = await db.query.reports.findMany({
-         where: (reps, { inArray }) => inArray(reps.id, contentIdsByType['report']),
-         columns: { id: true, title: true, titleEn: true }
-       });
-       contentDetails['report'] = {};
-       reps.forEach(r => {
-         contentDetails['report'][r.id] = { title: r.titleEn || r.title, subtitle: r.title };
-       });
+    if (contentIdsByType.report?.length) {
+      const reps = await db.query.reports.findMany({
+        where: (reps, { inArray }) => inArray(reps.id, contentIdsByType.report),
+        columns: { id: true, title: true, titleEn: true },
+      });
+      contentDetails.report = {};
+      for (const r of reps) {
+        contentDetails.report[r.id] = { title: r.titleEn || r.title, subtitle: r.title };
+      }
     }
 
     // Fetch Users
-    if (contentIdsByType['user']?.length) {
-       const usrs = await db.query.users.findMany({
-         where: (usrs, { inArray }) => inArray(usrs.id, contentIdsByType['user']),
-         columns: { id: true, username: true, displayName: true }
-       });
-       contentDetails['user'] = {};
-       usrs.forEach(u => {
-         contentDetails['user'][u.id] = { title: u.displayName || u.username, subtitle: `@${u.username}` };
-       });
+    if (contentIdsByType.user?.length) {
+      const usrs = await db.query.users.findMany({
+        where: (usrs, { inArray }) => inArray(usrs.id, contentIdsByType.user),
+        columns: { id: true, username: true, displayName: true },
+      });
+      contentDetails.user = {};
+      for (const u of usrs) {
+        contentDetails.user[u.id] = {
+          title: u.displayName || u.username,
+          subtitle: `@${u.username}`,
+        };
+      }
     }
 
     // Map details back to reports
     const reportsWithDetails = reports.map(r => ({
       ...r,
-      contentDetails: contentDetails[r.contentType]?.[r.contentId] || null
+      contentDetails: contentDetails[r.contentType]?.[r.contentId] || null,
     }));
 
     const [totalCount] = await db
@@ -124,14 +130,14 @@ export async function listContentReports(req: Request, res: Response) {
           page,
           limit,
           totalPages: Math.ceil(totalCount.count / limit),
-        }
-      }
+        },
+      },
     });
   } catch (error) {
     console.error('Error listing content reports:', error);
     res.status(500).json({
       success: false,
-      error: { code: 'INTERNAL_ERROR', message: 'Failed to list content reports' }
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to list content reports' },
     });
   }
 }
@@ -142,11 +148,11 @@ export async function listContentReports(req: Request, res: Response) {
  */
 export async function getContentReport(req: Request, res: Response) {
   try {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
+    const id = Number.parseInt(req.params.id);
+    if (Number.isNaN(id)) {
       return res.status(400).json({
         success: false,
-        error: { code: 'INVALID_ID', message: 'Invalid report ID' }
+        error: { code: 'INVALID_ID', message: 'Invalid report ID' },
       });
     }
 
@@ -158,34 +164,34 @@ export async function getContentReport(req: Request, res: Response) {
             id: true,
             username: true,
             displayName: true,
-          }
+          },
         },
         reviewer: {
           columns: {
             id: true,
             username: true,
             displayName: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     if (!report) {
       return res.status(404).json({
         success: false,
-        error: { code: 'NOT_FOUND', message: 'Content report not found' }
+        error: { code: 'NOT_FOUND', message: 'Content report not found' },
       });
     }
 
     res.json({
       success: true,
-      data: report
+      data: report,
     });
   } catch (error) {
     console.error('Error getting content report:', error);
     res.status(500).json({
       success: false,
-      error: { code: 'INTERNAL_ERROR', message: 'Failed to get content report' }
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to get content report' },
     });
   }
 }
@@ -196,13 +202,13 @@ export async function getContentReport(req: Request, res: Response) {
  */
 export async function updateContentReportStatus(req: Request, res: Response) {
   try {
-    const id = parseInt(req.params.id);
+    const id = Number.parseInt(req.params.id);
     const { status, adminNotes } = req.body;
 
-    if (isNaN(id)) {
+    if (Number.isNaN(id)) {
       return res.status(400).json({
         success: false,
-        error: { code: 'INVALID_ID', message: 'Invalid report ID' }
+        error: { code: 'INVALID_ID', message: 'Invalid report ID' },
       });
     }
 
@@ -210,7 +216,7 @@ export async function updateContentReportStatus(req: Request, res: Response) {
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
-        error: { code: 'INVALID_STATUS', message: 'Invalid status value' }
+        error: { code: 'INVALID_STATUS', message: 'Invalid status value' },
       });
     }
 
@@ -231,19 +237,19 @@ export async function updateContentReportStatus(req: Request, res: Response) {
     if (!updatedReport) {
       return res.status(404).json({
         success: false,
-        error: { code: 'NOT_FOUND', message: 'Content report not found' }
+        error: { code: 'NOT_FOUND', message: 'Content report not found' },
       });
     }
 
     res.json({
       success: true,
-      data: updatedReport
+      data: updatedReport,
     });
   } catch (error) {
     console.error('Error updating content report:', error);
     res.status(500).json({
       success: false,
-      error: { code: 'INTERNAL_ERROR', message: 'Failed to update content report' }
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to update content report' },
     });
   }
 }
@@ -257,7 +263,7 @@ export async function getContentReportStats(_req: Request, res: Response) {
     const statusStats = await db
       .select({
         status: schema.contentReports.status,
-        count: count()
+        count: count(),
       })
       .from(schema.contentReports)
       .groupBy(schema.contentReports.status);
@@ -265,7 +271,7 @@ export async function getContentReportStats(_req: Request, res: Response) {
     const typeStats = await db
       .select({
         contentType: schema.contentReports.contentType,
-        count: count()
+        count: count(),
       })
       .from(schema.contentReports)
       .groupBy(schema.contentReports.contentType);
@@ -274,14 +280,14 @@ export async function getContentReportStats(_req: Request, res: Response) {
       success: true,
       data: {
         byStatus: statusStats,
-        byType: typeStats
-      }
+        byType: typeStats,
+      },
     });
   } catch (error) {
     console.error('Error getting content report stats:', error);
     res.status(500).json({
       success: false,
-      error: { code: 'INTERNAL_ERROR', message: 'Failed to get content report stats' }
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to get content report stats' },
     });
   }
 }

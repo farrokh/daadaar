@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { login, useAuth } from '@/lib/auth';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const t = useTranslations('auth');
@@ -34,7 +34,7 @@ export default function LoginPage() {
       } else {
         setError(result.error || t('login_failed'));
       }
-    } catch (err) {
+    } catch (_err) {
       setError(t('login_failed'));
     } finally {
       setLoading(false);
@@ -45,9 +45,7 @@ export default function LoginPage() {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
       <div className="w-full max-w-md p-8 rounded-2xl liquid-glass border border-white/20 backdrop-blur-xl">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold mb-2 tracking-tight">
-            {t('login_title')}
-          </h1>
+          <h1 className="text-2xl font-semibold mb-2 tracking-tight">{t('login_title')}</h1>
           <p className="text-muted-foreground">{t('login_subtitle')}</p>
         </div>
 
@@ -63,7 +61,7 @@ export default function LoginPage() {
             type="text"
             placeholder={t('email_placeholder')}
             value={formData.identifier}
-            onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
+            onChange={e => setFormData({ ...formData, identifier: e.target.value })}
             required
             className="transition-colors"
           />
@@ -73,24 +71,27 @@ export default function LoginPage() {
             type="password"
             placeholder={t('password_placeholder')}
             value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            onChange={e => setFormData({ ...formData, password: e.target.value })}
             required
             className="transition-colors"
           />
 
-          <Button 
-            type="submit" 
-            className="w-full transaction-all duration-200" 
-            disabled={loading} 
+          <Button
+            type="submit"
+            className="w-full transaction-all duration-200"
+            disabled={loading}
             size="lg"
           >
             {loading ? tCommon('loading') : t('login_button')}
           </Button>
 
           <div className="flex justify-center text-sm mt-4">
-             <Link href="/register" className="text-muted-foreground hover:text-primary transition-colors">
-               {t('register_link')}
-             </Link>
+            <Link
+              href="/register"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              {t('register_link')}
+            </Link>
           </div>
         </form>
       </div>

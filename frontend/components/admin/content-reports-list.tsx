@@ -1,13 +1,13 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
-import { useState, useEffect } from 'react';
-import { fetchApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import { fetchApi } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import type { ContentReport, ContentReportStatus } from '../../../shared/types';
 import { format } from 'date-fns';
-import { faIR, enUS } from 'date-fns/locale';
+import { enUS, faIR } from 'date-fns/locale';
+import { useLocale, useTranslations } from 'next-intl';
+import { useCallback, useEffect, useState } from 'react';
+import type { ContentReport, ContentReportStatus } from '../../../shared/types';
 
 interface ContentReportsResponse {
   reports: (ContentReport & {
@@ -34,7 +34,7 @@ export function ContentReportsList() {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [page, setPage] = useState(1);
 
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     setLoading(true);
     const query = new URLSearchParams({
       page: page.toString(),
@@ -42,16 +42,18 @@ export function ContentReportsList() {
       ...(statusFilter && { status: statusFilter }),
     });
 
-    const response = await fetchApi<ContentReportsResponse>(`/admin/content-reports?${query.toString()}`);
+    const response = await fetchApi<ContentReportsResponse>(
+      `/admin/content-reports?${query.toString()}`
+    );
     if (response.success && response.data) {
       setReports(response.data);
     }
     setLoading(false);
-  };
+  }, [page, statusFilter]);
 
   useEffect(() => {
     fetchReports();
-  }, [page, statusFilter]);
+  }, [fetchReports]);
 
   const handleUpdateStatus = async (id: number, status: ContentReportStatus) => {
     const response = await fetchApi(`/admin/content-reports/${id}/status`, {
@@ -66,11 +68,16 @@ export function ContentReportsList() {
 
   const getStatusColor = (status: ContentReportStatus) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-      case 'reviewing': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-      case 'resolved': return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'dismissed': return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
-      default: return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
+      case 'pending':
+        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+      case 'reviewing':
+        return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      case 'resolved':
+        return 'bg-green-500/10 text-green-500 border-green-500/20';
+      case 'dismissed':
+        return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
+      default:
+        return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
     }
   };
 
@@ -82,9 +89,9 @@ export function ContentReportsList() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">{t('content_reports_title')}</h2>
-        
+
         <div className="flex gap-2">
-          {['', 'pending', 'reviewing', 'resolved', 'dismissed'].map((s) => (
+          {['', 'pending', 'reviewing', 'resolved', 'dismissed'].map(s => (
             <Button
               key={s}
               variant={statusFilter === s ? 'default' : 'outline'}
@@ -114,7 +121,7 @@ export function ContentReportsList() {
             </tr>
           </thead>
           <tbody className="divide-y divide-white/10 text-sm">
-            {reports?.reports.map((report) => (
+            {reports?.reports.map(report => (
               <tr key={report.id} className="hover:bg-white/5 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex flex-col gap-1">
@@ -126,7 +133,9 @@ export function ContentReportsList() {
                         {report.contentType} #{report.contentId}
                       </span>
                       {report.contentDetails?.subtitle && (
-                        <span className="truncate max-w-[150px]">{report.contentDetails.subtitle}</span>
+                        <span className="truncate max-w-[150px]">
+                          {report.contentDetails.subtitle}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -134,7 +143,10 @@ export function ContentReportsList() {
                 <td className="px-6 py-4">
                   <div className="font-medium">{t(`reason_${report.reason}`)}</div>
                   {report.description && (
-                    <div className="text-xs opacity-50 truncate max-w-[200px]" title={report.description}>
+                    <div
+                      className="text-xs opacity-50 truncate max-w-[200px]"
+                      title={report.description}
+                    >
                       {report.description}
                     </div>
                   )}
@@ -158,26 +170,42 @@ export function ContentReportsList() {
                   {format(new Date(report.createdAt), 'PPp', { locale: dateLocale })}
                 </td>
                 <td className="px-6 py-4">
-                  <span className={cn(
-                    "px-2 py-0.5 rounded-full text-[10px] font-bold border",
-                    getStatusColor(report.status)
-                  )}>
+                  <span
+                    className={cn(
+                      'px-2 py-0.5 rounded-full text-[10px] font-bold border',
+                      getStatusColor(report.status)
+                    )}
+                  >
                     {t(`status_${report.status}`)}
                   </span>
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
                     {report.status === 'pending' && (
-                      <Button size="xs" variant="outline" onClick={() => handleUpdateStatus(report.id, 'reviewing')}>
+                      <Button
+                        size="xs"
+                        variant="outline"
+                        onClick={() => handleUpdateStatus(report.id, 'reviewing')}
+                      >
                         {t('action_review')}
                       </Button>
                     )}
                     {(report.status === 'pending' || report.status === 'reviewing') && (
                       <>
-                        <Button size="xs" variant="default" className="bg-green-600 hover:bg-green-700" onClick={() => handleUpdateStatus(report.id, 'resolved')}>
+                        <Button
+                          size="xs"
+                          variant="default"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => handleUpdateStatus(report.id, 'resolved')}
+                        >
                           {t('action_resolve')}
                         </Button>
-                        <Button size="xs" variant="outline" className="text-red-500 hover:text-red-600" onClick={() => handleUpdateStatus(report.id, 'dismissed')}>
+                        <Button
+                          size="xs"
+                          variant="outline"
+                          className="text-red-500 hover:text-red-600"
+                          onClick={() => handleUpdateStatus(report.id, 'dismissed')}
+                        >
                           {t('action_dismiss')}
                         </Button>
                       </>

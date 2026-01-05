@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
-import { db } from '../db';
 import { contentReports } from '../../../database/schema';
-import { notifyModeratorsOfReport } from '../lib/email';
 import type {
   CreateContentReportRequest,
   CreateContentReportResponse,
 } from '../../../shared/api-types';
 import type { ApiResponse } from '../../../shared/types';
+import { db } from '../db';
+import { notifyModeratorsOfReport } from '../lib/email';
 
 /**
  * Create a new content report
@@ -17,8 +17,7 @@ export async function createContentReport(
   res: Response<ApiResponse<CreateContentReportResponse>>
 ): Promise<void> {
   try {
-    const { contentType, contentId, reason, description } =
-      req.body as CreateContentReportRequest;
+    const { contentType, contentId, reason, description } = req.body as CreateContentReportRequest;
 
     // Validate required fields
     if (!contentType || !contentId || !reason) {
@@ -33,10 +32,8 @@ export async function createContentReport(
     }
 
     // Get user or session from request
-    const userId =
-      req.currentUser?.type === 'registered' ? req.currentUser.id : null;
-    const sessionId =
-      req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
+    const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
+    const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
     // Create the content report
     const [contentReport] = await db

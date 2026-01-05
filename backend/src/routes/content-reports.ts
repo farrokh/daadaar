@@ -15,4 +15,3 @@ router.use(authMiddleware);
 router.post('/', csrfProtection, createContentReport);
 
 export default router;
-
