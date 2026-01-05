@@ -12,9 +12,7 @@ async function seedOrganizations(): Promise<void> {
   let updated = 0;
 
   for (const organization of iranianGovernmentOrganizations) {
-    const parentId = organization.parentKey
-      ? idByKey.get(organization.parentKey) ?? null
-      : null;
+    const parentId = organization.parentKey ? (idByKey.get(organization.parentKey) ?? null) : null;
 
     if (organization.parentKey && parentId === null) {
       throw new Error(`Parent ${organization.parentKey} not processed before ${organization.key}`);
