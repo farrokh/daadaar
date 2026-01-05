@@ -48,3 +48,10 @@ export function formatDate(dateString: string | null | undefined, locale: string
     day: 'numeric',
   });
 }
+
+/**
+ * Utility for combining class names
+ */
+export function cn(...classes: (string | undefined | null | false)[]) {
+  return classes.filter(Boolean).join(' ');
+}

@@ -3,9 +3,9 @@
  * Custom React hook for managing voting state and operations
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import type { GetMyVoteResponse } from '@/shared/api-types';
 import { castVote, getMyVote, removeVote } from '@/lib/voting-api';
+import type { GetMyVoteResponse } from '@/shared/api-types';
+import { useCallback, useEffect, useState } from 'react';
 
 interface VotingState {
   currentVote: 'upvote' | 'downvote' | null;
@@ -48,10 +48,11 @@ export function useVoting(
 
     const response = await getMyVote(reportId);
 
-    if (response.success && response.data) {
+    const { data } = response;
+    if (response.success && data) {
       setState(prev => ({
         ...prev,
-        currentVote: response.data!.vote?.voteType || null,
+        currentVote: data.vote?.voteType || null,
         isLoading: false,
       }));
     } else {
@@ -73,7 +74,7 @@ export function useVoting(
     async (voteType: 'upvote' | 'downvote') => {
       // Optimistic update
       const previousState = { ...state };
-      
+
       // Calculate optimistic counts
       let newUpvoteCount = state.upvoteCount;
       let newDownvoteCount = state.downvoteCount;
@@ -107,13 +108,15 @@ export function useVoting(
 
       const response = await castVote(reportId, voteType, isAnonymous);
 
-      if (response.success && response.data) {
+      const { data } = response;
+
+      if (response.success && data) {
         // Update with server counts
         setState(prev => ({
           ...prev,
-          currentVote: response.data!.vote.voteType,
-          upvoteCount: response.data!.reportVoteCounts.upvoteCount,
-          downvoteCount: response.data!.reportVoteCounts.downvoteCount,
+          currentVote: data.vote.voteType,
+          upvoteCount: data.reportVoteCounts.upvoteCount,
+          downvoteCount: data.reportVoteCounts.downvoteCount,
           isLoading: false,
         }));
       } else {
@@ -149,13 +152,15 @@ export function useVoting(
 
     const response = await removeVote(reportId);
 
-    if (response.success && response.data) {
+    const { data } = response;
+
+    if (response.success && data) {
       // Update with server counts
       setState(prev => ({
         ...prev,
         currentVote: null,
-        upvoteCount: response.data!.reportVoteCounts.upvoteCount,
-        downvoteCount: response.data!.reportVoteCounts.downvoteCount,
+        upvoteCount: data.reportVoteCounts.upvoteCount,
+        downvoteCount: data.reportVoteCounts.downvoteCount,
         isLoading: false,
       }));
     } else {
@@ -174,4 +179,3 @@ export function useVoting(
     refetch: fetchVote,
   };
 }
-

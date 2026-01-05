@@ -1,6 +1,7 @@
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { SessionManager } from '@/components/auth/session-manager';
 import { Navbar } from '@/components/layout/navbar';
+import { ToolProvider } from '@/components/providers/tool-provider';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -46,9 +47,11 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
-            <Navbar />
-            <SessionManager />
-            <main className="pt-16">{children}</main>
+            <ToolProvider>
+              <Navbar />
+              <SessionManager />
+              <main className="pt-0">{children}</main>
+            </ToolProvider>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

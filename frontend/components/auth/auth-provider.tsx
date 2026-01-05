@@ -2,7 +2,8 @@
 
 import { getCurrentUser, logout as logoutApi } from '@/lib/auth';
 import type { CurrentUser } from '@/shared/types';
-import React, { createContext, useCallback, useEffect, useState } from 'react';
+import type React from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 
 interface AuthContextType {
   currentUser: CurrentUser | null;

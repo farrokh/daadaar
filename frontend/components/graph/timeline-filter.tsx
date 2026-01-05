@@ -19,7 +19,9 @@ export function TimelineFilter({
   selectedRange,
   onRangeChange,
   isVisible,
-}: TimelineFilterProps) {
+  compact = false,
+  className,
+}: TimelineFilterProps & { compact?: boolean; className?: string }) {
   const t = useTranslations('graph');
   const [localRange, setLocalRange] = useState<[number, number]>(selectedRange);
 
@@ -49,8 +51,67 @@ export function TimelineFilter({
     onRangeChange([minYear, maxYear]);
   };
 
+  if (compact) {
+    return (
+      <div className={`flex items-center gap-4 w-64 md:w-80 ${className || ''}`}>
+        <span className="text-xs font-mono font-medium text-foreground/60 whitespace-nowrap hidden md:block">
+          {localRange[0]}
+        </span>
+
+        <div className="relative h-6 flex-1 flex items-center">
+          {/* Track */}
+          <div className="absolute left-0 right-0 h-1 bg-foreground/10 rounded-full" />
+          {/* Active Range */}
+          <div
+            className="absolute h-1 bg-primary rounded-full"
+            style={{
+              left: `calc( ${((localRange[0] - minYear) / (maxYear - minYear)) * 100}% )`,
+              right: `calc( ${(1 - (localRange[1] - minYear) / (maxYear - minYear)) * 100}% )`,
+            }}
+          />
+          {/* Inputs */}
+          <input
+            type="range"
+            min={minYear}
+            max={maxYear}
+            value={localRange[0]}
+            onChange={handleMinChange}
+            onMouseUp={handleMouseUp}
+            onTouchEnd={handleMouseUp}
+            className="absolute w-full appearance-none bg-transparent pointer-events-none z-20 
+              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
+              [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full 
+              [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary 
+              [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-sm"
+          />
+          <input
+            type="range"
+            min={minYear}
+            max={maxYear}
+            value={localRange[1]}
+            onChange={handleMaxChange}
+            onMouseUp={handleMouseUp}
+            onTouchEnd={handleMouseUp}
+            className="absolute w-full appearance-none bg-transparent pointer-events-none z-30
+              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
+              [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full 
+              [&::-webkit-slider-thumb]:bg-background [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary 
+              [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-sm"
+          />
+        </div>
+
+        <span className="text-xs font-mono font-medium text-foreground/60 whitespace-nowrap hidden md:block">
+          {localRange[1]}
+        </span>
+      </div>
+    );
+  }
+
+  // Original Card Layout (preserved but wrapped in className logic removal if needed, but for now we keep it as fallback)
   return (
     <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-2xl bg-background/60 backdrop-blur-xl px-6 py-5 rounded-3xl shadow-2xl border border-white/10 z-10 transition-all hover:bg-background/80 group">
+      {/* ... existing card content ... */}
+      {/* I will only replace the return block and keep the logic above */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-accent-primary/10 rounded-xl text-accent-primary group-hover:scale-110 transition-transform">
