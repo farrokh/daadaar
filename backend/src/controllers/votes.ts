@@ -336,7 +336,7 @@ export async function removeVote(req: Request, res: Response) {
       }
     }
 
-    // Find existing vote
+    // Build where clause for finding the vote
     let whereClause: SQL | undefined;
     if (userId) {
       whereClause = and(eq(schema.votes.reportId, reportId), eq(schema.votes.userId, userId));
@@ -352,26 +352,22 @@ export async function removeVote(req: Request, res: Response) {
       });
     }
 
-    const existingVote = await db.query.votes.findFirst({
-      where: whereClause,
-    });
-
-    if (!existingVote) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'VOTE_NOT_FOUND',
-          message: 'You have not voted on this report',
-        },
-      });
-    }
-
     // Remove vote and update counts atomically
-    await db.transaction(async tx => {
+    // All reads and writes happen inside the transaction to prevent race conditions
+    const result = await db.transaction(async tx => {
+      // Find existing vote inside the transaction
+      const existingVote = await tx.query.votes.findFirst({
+        where: whereClause,
+      });
+
+      if (!existingVote) {
+        return { success: false, notFound: true };
+      }
+
       // Delete the vote
       await tx.delete(schema.votes).where(eq(schema.votes.id, existingVote.id));
 
-      // Decrement the appropriate vote count
+      // Decrement the appropriate vote count using SQL arithmetic
       if (existingVote.voteType === 'upvote') {
         await tx
           .update(schema.reports)
@@ -389,7 +385,20 @@ export async function removeVote(req: Request, res: Response) {
           })
           .where(eq(schema.reports.id, reportId));
       }
+
+      return { success: true, notFound: false };
     });
+
+    // Check if vote was not found
+    if (result.notFound) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'VOTE_NOT_FOUND',
+          message: 'You have not voted on this report',
+        },
+      });
+    }
 
     // Fetch updated report vote counts
     const updatedReport = await db.query.reports.findFirst({
