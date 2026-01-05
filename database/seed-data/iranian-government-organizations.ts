@@ -213,8 +213,7 @@ export const iranianGovernmentOrganizations: OrganizationSeed[] = [
     parentKey: 'iri_government',
     name: 'قوه مقننه',
     nameEn: 'Legislative Branch',
-    description:
-      'ساختار قانون‌گذاری شامل مجلس شورای اسلامی و شوراهای نظارتی وابسته.',
+    description: 'ساختار قانون‌گذاری شامل مجلس شورای اسلامی و شوراهای نظارتی وابسته.',
     descriptionEn:
       'Legislative structure anchored by the Islamic Consultative Assembly and its oversight councils.',
   },
@@ -223,8 +222,7 @@ export const iranianGovernmentOrganizations: OrganizationSeed[] = [
     parentKey: 'legislative_branch',
     name: 'مجلس شورای اسلامی',
     nameEn: 'Islamic Consultative Assembly (Majlis)',
-    description:
-      'پارلمان تک‌مجلسی با نمایندگان منتخب که قوانین، بودجه و طرح‌های ملی را تصویب می‌کند.',
+    description: 'پارلمان تک‌مجلسی با نمایندگان منتخب که قوانین، بودجه و طرح‌های ملی را تصویب می‌کند.',
     descriptionEn:
       'Unicameral parliament whose elected members pass laws, budgets, and national development bills.',
   },
@@ -233,8 +231,7 @@ export const iranianGovernmentOrganizations: OrganizationSeed[] = [
     parentKey: 'majlis',
     name: 'هیئت رئیسه مجلس',
     nameEn: 'Parliament Presidium',
-    description:
-      'هیئت مدیریتی برای اداره جلسات، تعیین دستور کار و نظارت اداری بر کمیسیون‌ها.',
+    description: 'هیئت مدیریتی برای اداره جلسات، تعیین دستور کار و نظارت اداری بر کمیسیون‌ها.',
     descriptionEn:
       'Leadership board that schedules floor business and administers parliamentary commissions.',
   },
@@ -243,8 +240,7 @@ export const iranianGovernmentOrganizations: OrganizationSeed[] = [
     parentKey: 'majlis',
     name: 'کمیسیون اصل نود قانون اساسی',
     nameEn: 'Article 90 Oversight Commission',
-    description:
-      'کمیسیون رسیدگی به شکایات مردم و نظارت بر عملکرد سه قوه طبق اصل ۹۰ قانون اساسی.',
+    description: 'کمیسیون رسیدگی به شکایات مردم و نظارت بر عملکرد سه قوه طبق اصل ۹۰ قانون اساسی.',
     descriptionEn:
       'Commission handling citizen complaints and monitoring all three branches under Article 90.',
   },
@@ -283,8 +279,7 @@ export const iranianGovernmentOrganizations: OrganizationSeed[] = [
     parentKey: 'judiciary_branch',
     name: 'دادستانی کل کشور',
     nameEn: 'Office of the Attorney General',
-    description:
-      'مرجع تعقیب عمومی، نظارت بر دادسراها و طرح دعاوی علیه مقام‌ها و نهادها.',
+    description: 'مرجع تعقیب عمومی، نظارت بر دادسراها و طرح دعاوی علیه مقام‌ها و نهادها.',
     descriptionEn:
       'Prosecution authority overseeing all public prosecutors and filing national-level charges.',
   },
@@ -303,8 +298,7 @@ export const iranianGovernmentOrganizations: OrganizationSeed[] = [
     parentKey: 'judiciary_branch',
     name: 'سازمان زندان‌ها و اقدامات تأمینی',
     nameEn: 'Prisons and Security-Corrective Organization',
-    description:
-      'پایش و اداره زندان‌ها، بازداشتگاه‌ها و برنامه‌های بازپروری و مراقبت‌های پس از آزادی.',
+    description: 'پایش و اداره زندان‌ها، بازداشتگاه‌ها و برنامه‌های بازپروری و مراقبت‌های پس از آزادی.',
     descriptionEn:
       'Manages prisons, detention centers, rehabilitation, and post-release supervision programs.',
   },
@@ -313,8 +307,7 @@ export const iranianGovernmentOrganizations: OrganizationSeed[] = [
     parentKey: 'judiciary_branch',
     name: 'دادگاه‌های انقلاب اسلامی',
     nameEn: 'Islamic Revolutionary Courts',
-    description:
-      'شبکه‌ای از دادگاه‌های ویژه برای رسیدگی به جرائم امنیتی، سیاسی و اقتصادی حساس.',
+    description: 'شبکه‌ای از دادگاه‌های ویژه برای رسیدگی به جرائم امنیتی، سیاسی و اقتصادی حساس.',
     descriptionEn:
       'Specialized court system addressing security, political, and major economic offenses.',
   },
