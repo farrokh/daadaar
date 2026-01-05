@@ -38,12 +38,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchUser();
   }, [fetchUser]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     const success = await logoutApi();
     if (success) {
       setCurrentUser(null);
     }
-  };
+  }, []);
 
   const value = {
     currentUser,
