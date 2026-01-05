@@ -1,11 +1,16 @@
 'use client';
 
 import { Building2 } from 'lucide-react';
+import { useLocale } from 'next-intl';
 import { memo } from 'react';
 import { Handle, type NodeProps, Position } from 'reactflow';
 import type { OrganizationNodeData } from './types';
 
 function OrganizationNode({ data }: NodeProps<OrganizationNodeData>) {
+  const locale = useLocale();
+  const displayName = locale === 'en' ? (data.nameEn || data.name) : data.name;
+  const displayDescription = locale === 'en' ? (data.descriptionEn || data.description) : data.description;
+
   return (
     <div className="group relative min-w-[240px] max-w-[320px]">
       {/* Glow Effect */}
@@ -25,11 +30,11 @@ function OrganizationNode({ data }: NodeProps<OrganizationNodeData>) {
           </div>
           <div>
             <div className="font-bold text-base text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80">
-              {data.name}
+              {displayName}
             </div>
-            {data.description && (
+            {displayDescription && (
               <div className="text-xs text-foreground/50 mt-1.5 line-clamp-2 leading-relaxed">
-                {data.description}
+                {displayDescription}
               </div>
             )}
           </div>

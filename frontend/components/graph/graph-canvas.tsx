@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
 import ReactFlow, {
   Background,
@@ -48,6 +48,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const [isSubmitReportModalOpen, setIsSubmitReportModalOpen] = useState(false);
   const [showMiniMap, setShowMiniMap] = useState(false);
 
+  const locale = useLocale();
   const t = useTranslations('graph');
   const tOrg = useTranslations('organization');
   const tPerson = useTranslations('person');
@@ -70,6 +71,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     initialView,
     tOrg,
     tPerson,
+    locale,
   });
 
   // Handle node click
