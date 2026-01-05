@@ -8,8 +8,9 @@ import type { OrganizationNodeData } from './types';
 
 function OrganizationNode({ data }: NodeProps<OrganizationNodeData>) {
   const locale = useLocale();
-  const displayName = locale === 'en' ? (data.nameEn || data.name) : data.name;
-  const displayDescription = locale === 'en' ? (data.descriptionEn || data.description) : data.description;
+  const displayName = locale === 'en' ? data.nameEn || data.name : data.name;
+  const displayDescription =
+    locale === 'en' ? data.descriptionEn || data.description : data.description;
 
   return (
     <div className="group relative min-w-[240px] max-w-[320px]">

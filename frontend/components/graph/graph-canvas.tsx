@@ -154,11 +154,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     loading,
     handleRefresh,
     setTools,
-    setIsAddOrgModalOpen,
-    setIsAddPersonModalOpen,
-    setIsSubmitReportModalOpen,
-    showMiniMap, // Add showMiniMap dependency
-    setShowMiniMap, // Add setShowMiniMap dependency
+    showMiniMap,
   ]);
 
   // Load initial data
