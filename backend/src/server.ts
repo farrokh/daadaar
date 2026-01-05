@@ -15,6 +15,7 @@ import organizationsRoutes from './routes/organizations';
 import powRoutes from './routes/pow';
 import reportsRoutes from './routes/reports';
 import rolesRoutes from './routes/roles';
+import votesRoutes from './routes/votes';
 
 dotenv.config();
 
@@ -35,7 +36,7 @@ app.use(passport.initialize());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/csrf', csrfRoutes);
+app.use('/api', csrfRoutes);
 app.use('/api/graph', graphRoutes);
 app.use('/api/organizations', organizationsRoutes);
 app.use('/api/individuals', individualsRoutes);
@@ -43,6 +44,7 @@ app.use('/api/roles', rolesRoutes);
 app.use('/api/pow', powRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/reports', reportsRoutes);
+app.use('/api/votes', votesRoutes);
 
 // Health check endpoint
 app.get('/api/health', async (_req, res) => {

@@ -2,7 +2,19 @@
 
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { fetchApi } from '../../lib/api';
 import { validateMediaFile } from '../../lib/validation/report-form-schema';
+
+interface MediaUploadResponse {
+  mediaId: number;
+  s3Key: string;
+}
+
+interface PresignedUrlResponse {
+  mediaId: number;
+  uploadUrl: string;
+  s3Key: string;
+}
 
 export interface UploadedMedia {
   id: number;
@@ -18,10 +30,9 @@ export interface UploadedMedia {
 interface MediaUploaderProps {
   onMediaUploaded: (mediaId: number) => void;
   onMediaRemoved: (mediaId: number) => void;
-  apiUrl: string;
 }
 
-export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: MediaUploaderProps) {
+export function MediaUploader({ onMediaUploaded, onMediaRemoved }: MediaUploaderProps) {
   const [mediaFiles, setMediaFiles] = useState<UploadedMedia[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
@@ -115,28 +126,21 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
           const formData = new FormData();
           formData.append('file', file);
 
-          const uploadResponse = await fetch(`${apiUrl}/api/media/upload`, {
+          const response = await fetchApi<MediaUploadResponse>('/media/upload', {
             method: 'POST',
-            credentials: 'include',
             body: formData,
           });
 
-          if (!uploadResponse.ok) {
-            const error = await uploadResponse.json();
-            throw new Error(error.error?.message || _t('uploadImageFailed'));
+          if (!response.success || !response.data) {
+            throw new Error(response.error?.message || _t('uploadImageFailed'));
           }
 
-          const { data } = await uploadResponse.json();
-          mediaId = data.mediaId;
-          s3Key = data.s3Key;
+          mediaId = response.data.mediaId;
+          s3Key = response.data.s3Key;
         } else {
           // 1. Request presigned URL from backend for non-images
-          const presignedResponse = await fetch(`${apiUrl}/api/media/presigned-url`, {
+          const presignedResponse = await fetchApi<PresignedUrlResponse>('/media/presigned-url', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
             body: JSON.stringify({
               filename: file.name,
               contentType: file.type,
@@ -144,15 +148,13 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
             }),
           });
 
-          if (!presignedResponse.ok) {
-            const error = await presignedResponse.json();
-            throw new Error(error.error?.message || _t('getUploadUrlFailed'));
+          if (!presignedResponse.success || !presignedResponse.data) {
+            throw new Error(presignedResponse.error?.message || _t('getUploadUrlFailed'));
           }
 
-          const { data } = await presignedResponse.json();
-          mediaId = data.mediaId;
-          uploadUrl = data.uploadUrl;
-          s3Key = data.s3Key;
+          mediaId = presignedResponse.data.mediaId;
+          uploadUrl = presignedResponse.data.uploadUrl;
+          s3Key = presignedResponse.data.s3Key;
 
           // 2. Upload file to S3 using presigned URL
           const s3Response = await fetch(uploadUrl, {
@@ -166,9 +168,8 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
           if (!s3Response.ok) {
             // S3 upload failed - cleanup the database record
             try {
-              await fetch(`${apiUrl}/api/media/${mediaId}`, {
+              await fetchApi(`/media/${mediaId}`, {
                 method: 'DELETE',
-                credentials: 'include',
               });
             } catch (cleanupError) {
               console.error('Failed to cleanup media record:', cleanupError);
@@ -207,7 +208,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
         );
       }
     },
-    [apiUrl, onMediaUploaded, _t]
+    [onMediaUploaded, _t]
   );
 
   const handleDrop = useCallback(
@@ -232,9 +233,8 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
   const removeMedia = async (mediaId: number) => {
     try {
       // Call backend to soft delete
-      await fetch(`${apiUrl}/api/media/${mediaId}`, {
+      await fetchApi(`/media/${mediaId}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
 
       // Remove from local state and revoke preview URL
@@ -271,7 +271,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
       <div
         className={`relative border-2 border-dashed rounded-3xl p-10 text-center transition-all duration-300 ${
           dragActive
-            ? 'border-accent-primary bg-accent-primary/10 scale-[1.02]'
+            ? 'border-primary bg-primary/10 scale-[1.02]'
             : 'border-foreground/10 hover:border-foreground/20 bg-foreground/5'
         }`}
         onDragEnter={handleDrag}
@@ -288,9 +288,9 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
           onChange={handleFileInput}
         />
         <label htmlFor="media-upload" className="cursor-pointer group flex flex-col items-center">
-          <div className="w-16 h-16 rounded-2xl bg-foreground/5 flex items-center justify-center mb-4 group-hover:bg-accent-primary/20 transition-colors">
+          <div className="w-16 h-16 rounded-2xl bg-foreground/5 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
             <svg
-              className="w-8 h-8 text-foreground/40 group-hover:text-accent-primary"
+              className="w-8 h-8 text-foreground/40 group-hover:text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -329,7 +329,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
                   />
                   {media.uploading && (
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                      <div className="w-8 h-8 border-2 border-accent-primary border-t-transparent rounded-full animate-spin" />
+                      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                     </div>
                   )}
                 </div>
@@ -355,7 +355,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
                 <div className="mt-3 px-1">
                   <div className="w-full bg-foreground/5 rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="bg-accent-primary h-full rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(var(--accent-primary-rgb),0.5)]"
+                      className="bg-primary h-full rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(59,130,246,0.5)]"
                       style={{ width: `${media.progress}%` }}
                     />
                   </div>
@@ -372,7 +372,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved, apiUrl }: Media
                 <button
                   type="button"
                   onClick={() => removeMedia(media.id)}
-                  className="absolute top-4 right-4 bg-foreground/10 hover:bg-red-500/80 text-foreground hover:text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md transition-all border border-foreground/10 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-primary focus:ring-offset-background"
+                  className="absolute top-4 right-4 bg-foreground/10 hover:bg-red-500/80 text-foreground hover:text-white rounded-full w-8 h-8 flex items-center justify-center backdrop-blur-md transition-all border border-foreground/10 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <title>{_t('remove')}</title>
