@@ -60,8 +60,10 @@
     "feature_privacy_title": "Privacy First",
     "feature_privacy_desc": "Participate completely anonymously. We don't log your IP or personal data.",
     "footer_tagline": "Truth is the first step towards justice.",
-    "footer_terms": "Terms",
-    "footer_privacy": "Privacy"
+    "footer_terms": "Terms of Service",
+    "footer_privacy": "Privacy Policy",
+    "footer_content": "Content Policy",
+    "footer_copyright": "Copyright"
   },
   "graph": {
     "organizations": "Organizations",
@@ -276,6 +278,32 @@
     "login_failed": "Login failed",
     "invalid_credentials": "Invalid email or password",
     "email_placeholder": "name@example.com",
-    "password_placeholder": "••••••••"
+    "password_placeholder": "••••••••",
+    "signup_title": "Join Daadaar",
+    "signup_subtitle": "Create your account to contribute to transparency",
+    "signup_button": "Create Account",
+    "login_link": "Already have an account? Login",
+    "username_label": "Username",
+    "username_placeholder": "Choose a username",
+    "email_only_label": "Email",
+    "display_name_label": "Display Name",
+    "display_name_placeholder": "How should we call you?",
+    "display_name_helper": "Optional - defaults to your username",
+    "confirm_password_label": "Confirm Password",
+    "confirm_password_placeholder": "Re-enter your password",
+    "signup_success": "Account created successfully",
+    "signup_failed": "Registration failed",
+    "email_required": "Email is required",
+    "email_invalid": "Invalid email format",
+    "username_required": "Username is required",
+    "username_invalid": "Username must be 3-50 characters, alphanumeric and underscores only",
+    "password_required": "Password is required",
+    "password_min_length": "Password must be at least 8 characters",
+    "password_mismatch": "Passwords do not match",
+    "user_already_exists": "User with this email or username already exists",
+    "creating_account": "Creating account...",
+    "verification_email_sent": "We sent you an email with a verification link. Please check your inbox and click the link to verify your account.",
+    "email_verified": "Email verified successfully! You can now login.",
+    "verification_failed": "Invalid or expired verification token."
   }
 }

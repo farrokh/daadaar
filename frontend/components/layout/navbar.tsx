@@ -1,5 +1,7 @@
 'use client';
 
+import { LegalMenu } from '@/components/layout/legal-menu';
+
 import { useToolContext } from '@/components/providers/tool-provider';
 import { Button } from '@/components/ui/button';
 import { Link, usePathname } from '@/i18n/routing';
@@ -48,6 +50,17 @@ export function Navbar() {
             {t('graph')}
           </Link>
           <Link
+            href="/reports"
+            className={cn(
+              'text-sm font-medium tracking-wide transition-all duration-300 hover:scale-105',
+              isActive('/reports')
+                ? 'text-foreground font-semibold'
+                : 'text-foreground/60 hover:text-foreground'
+            )}
+          >
+            {t('reports')}
+          </Link>
+          <Link
             href="/about"
             className={cn(
               'text-sm font-medium tracking-wide transition-all duration-300 hover:scale-105',
@@ -66,6 +79,7 @@ export function Navbar() {
 
       {/* Right: Auth */}
       <div className="pointer-events-auto flex items-center gap-4">
+        <LegalMenu />
         {isAuthenticated ? (
           <div className="flex items-center gap-2">
             {(registeredUser?.role === 'admin' || registeredUser?.role === 'moderator') && (

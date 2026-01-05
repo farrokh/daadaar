@@ -4,6 +4,7 @@ import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { db, schema } from '../db';
+import { sendVerificationEmail } from '../lib/email';
 import { redis } from '../lib/redis';
 import type { SessionData } from '../middleware/auth';
 
@@ -78,6 +79,9 @@ export const register = async (req: Request, res: Response) => {
     // Hash password with bcrypt (cost factor 10)
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // Generate verification token
+    const verificationToken = uuidv4();
+
     // Create user
     const [newUser] = await db
       .insert(schema.users)
@@ -87,28 +91,21 @@ export const register = async (req: Request, res: Response) => {
         passwordHash,
         displayName: displayName || username,
         role: 'user',
+        isVerified: false,
+        verificationToken,
       })
       .returning();
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: newUser.id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-
-    // Set httpOnly cookie
-    res.cookie('authToken', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    });
+    // Send verification email
+    await sendVerificationEmail(newUser.email, verificationToken);
 
     res.status(201).json({
       success: true,
+      message: 'Registration successful. Please check your email to verify your account.',
       data: {
         id: newUser.id,
         email: newUser.email,
         username: newUser.username,
-        displayName: newUser.displayName,
-        role: newUser.role,
       },
     });
   } catch (error) {
@@ -117,6 +114,48 @@ export const register = async (req: Request, res: Response) => {
       success: false,
       error: { code: 'SERVER_ERROR', message: 'Internal server error' },
     });
+  }
+};
+
+/**
+ * GET /api/auth/verify-email
+ * Verify user email with token
+ */
+export const verifyEmail = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.query;
+
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'Verification token is required' },
+      });
+    }
+
+    // Find user with this token
+    const user = await db.query.users.findFirst({
+      where: eq(schema.users.verificationToken, token),
+    });
+
+    if (!user) {
+      // Redirect to frontend with error
+      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=invalid_token`);
+    }
+
+    // Update user: isVerified = true, verificationToken = null
+    await db
+      .update(schema.users)
+      .set({
+        isVerified: true,
+        verificationToken: null,
+      })
+      .where(eq(schema.users.id, user.id));
+
+    // Redirect to frontend login with success
+    return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?verified=true`);
+  } catch (error) {
+    console.error('Email verification error:', error);
+    return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=server_error`);
   }
 };
 
@@ -151,10 +190,22 @@ export const login = async (req: Request, res: Response) => {
     // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
+
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email/username or password' },
+      });
+    }
+
+    // Check if user is verified
+    if (!user.isVerified) {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'EMAIL_NOT_VERIFIED',
+          message: 'Please verify your email address to log in',
+        },
       });
     }
 

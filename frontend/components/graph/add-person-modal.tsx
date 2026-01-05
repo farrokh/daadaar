@@ -414,7 +414,7 @@ export function AddPersonModal({
                 placeholder={fetchingRoles ? t('loading_roles') : t('role_placeholder')}
                 options={roleOptions}
                 value={roleId}
-                onChange={e => setRoleId(e.target.value)}
+                onChange={value => setRoleId(value)}
                 disabled={loading || fetchingRoles}
                 helperText={
                   roles.length === 0 && !fetchingRoles ? t('no_roles_helper') : t('role_helper')

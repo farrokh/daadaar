@@ -20,7 +20,7 @@ Persian (fa) is our primary locale, with full Right-to-Left (RTL) support.
 - **Localized Routing**: Prefixed URLs (e.g., `/fa/reports`, `/en/reports`).
 - **Server Components**: next-intl handles translations in React Server Components for optimal performance.
 - **RTL Support**: Automatic layout direction adjustment based on the locale.
-- **SEO**: `hreflang` tags and localized metadata for all pages.
+- **SEO**: `hreflang` tags, localized metadata, dynamic `sitemap.xml`, and `robots.txt` configuration.
 
 ---
 
@@ -52,11 +52,15 @@ Our design system prioritizes a "Premium, State-of-the-art" feel.
 
 1. **Organization Gallery**: Hierarchical view of government bodies.
 2. **Individual Profiles**: Detailed timelines of an individual's roles and linked reports.
-3. **Report Submission**: A multi-step, validated form featuring:
+3. **Authentication System**:
+   - **Signup**: Premium glassmorphic registration flow with email verification.
+   - **Login**: Secure access with persistent sessions.
+4. **Report Submission**: A multi-step, validated form featuring:
    - Proof-of-Work (PoW) client-side solver.
    - Tiptap rich text editor.
    - Secure media uploader with AVIF processing.
-4. **Voting Interface**: Optimistic UI for instant feedback.
+5. **Voting Interface**: Optimistic UI for instant feedback.
+6. **Legal & Compliance**: Dedicated pages for Terms of Service and Privacy Policy.
 
 ---
 

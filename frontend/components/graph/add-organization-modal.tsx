@@ -203,7 +203,7 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
           placeholder={fetchingOrgs ? t('loading_organizations') : t('parent_placeholder')}
           options={parentOptions}
           value={parentId}
-          onChange={e => setParentId(e.target.value)}
+          onChange={value => setParentId(value)}
           disabled={loading || fetchingOrgs}
           helperText={t('parent_helper')}
         />
