@@ -2,13 +2,12 @@
 
 import { useToolContext } from '@/components/providers/tool-provider';
 import { Button } from '@/components/ui/button';
-import { Link } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { FileText, Info, LayoutGrid, LogIn, LogOut, User, UserPlus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
 
 export function Navbar() {
   const t = useTranslations('navigation');
@@ -41,7 +40,7 @@ export function Navbar() {
             href="/"
             className={cn(
               'text-sm font-medium tracking-wide transition-all duration-300 hover:scale-105',
-              pathname === '/' || pathname === `/${pathname.split('/')[1]}`
+              isActive('/')
                 ? 'text-foreground font-semibold'
                 : 'text-foreground/60 hover:text-foreground'
             )}
