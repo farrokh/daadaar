@@ -1,0 +1,25 @@
+version: 0.2
+
+env:
+  variables:
+    ORGANIZATION_ID: ""
+    ORGANIZATION_NAME: ""
+    INDIVIDUAL_ID: ""
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging in to ECR..."
+      - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$(echo "$IMAGE_URI" | cut -d/ -f1)"
+  build:
+    commands:
+      - echo "Pulling image $IMAGE_URI"
+      - docker pull "$IMAGE_URI"
+      - |
+        docker run --rm \
+          -e DATABASE_URL="$DATABASE_URL" \
+          -e ORGANIZATION_ID="$ORGANIZATION_ID" \
+          -e ORGANIZATION_NAME="$ORGANIZATION_NAME" \
+          -e INDIVIDUAL_ID="$INDIVIDUAL_ID" \
+          "$IMAGE_URI" \
+          bun /usr/src/app/backend/src/db/backfill-latest-individual-member-role.ts
