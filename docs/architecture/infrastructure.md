@@ -12,6 +12,8 @@ Our infrastructure is designed for high availability, security, and global deliv
 - **Database**: AWS RDS (PostgreSQL) in private subnets (not publicly accessible). Backup retention is currently 0 days (no automated backups).
 - **Caching**: AWS ElastiCache Serverless Redis for caching, sessions, and rate limiting (TLS `rediss://`).
 - **Object Storage**: AWS S3 for media assets (`daadaar-media-v1-317430950654`).
+  - **Access**: App Runner instance role provides S3 permissions (no static access keys in production).
+  - **Policy**: Bucket policy explicitly allows the App Runner role to `List/Get/Put/Delete`.
 
 ### Current Deployment (New Account)
 - **Backend Service**: `daadaar-backend` (AWS App Runner)
