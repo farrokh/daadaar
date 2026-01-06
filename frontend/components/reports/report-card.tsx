@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { getS3PublicUrl } from '@/lib/utils';
 import type { ReportWithDetails } from '@/shared/types';
+import { BadgeCheck, Calendar, FileText, Image as ImageIcon, MessageSquare } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import type React from 'react';
@@ -23,19 +24,19 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
   const content = isRtl ? report.content : report.contentEn || report.content;
 
   // Truncate content for card view
-  const truncatedContent = content.length > 200 ? `${content.substring(0, 200)}...` : content;
+  const truncatedContent = content.length > 150 ? `${content.substring(0, 150)}...` : content;
 
   // Format date
   const date = report.incidentDate
     ? new Date(report.incidentDate).toLocaleDateString(locale, {
         year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric',
       })
     : report.createdAt
       ? new Date(report.createdAt).toLocaleDateString(locale, {
           year: 'numeric',
-          month: 'long',
+          month: 'short',
           day: 'numeric',
         })
       : '';
@@ -48,67 +49,105 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
     ? previewImage.url || getS3PublicUrl(previewImage.s3Key, previewImage.s3Bucket)
     : null;
 
+  const hasMedia = report.media && report.media.length > 0;
+  const mediaCount = report.media?.length || 0;
+
   return (
-    <div className="bg-foreground/5 backdrop-blur-md border border-foreground/10 rounded-2xl overflow-hidden hover:border-accent-primary/50 transition-all duration-300 group flex flex-col h-full">
-      {imageUrl && (
-        <div className="relative h-48 overflow-hidden">
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-        </div>
-      )}
+    <div className="group relative h-full flex flex-col bg-card-bg backdrop-blur-xl border border-card-border rounded-3xl overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-accent-primary/5 hover:-translate-y-2">
+      {/* Image Section */}
+      <div className="relative h-56 overflow-hidden bg-foreground/5">
+        {imageUrl ? (
+          <>
+            <img
+              src={imageUrl}
+              alt={title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80" />
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground/5 to-foreground/10">
+            <FileText className="w-12 h-12 text-foreground/10" />
+          </div>
+        )}
 
-      <div className="p-6 flex-grow flex flex-col">
-        <div className="flex justify-between items-start mb-3">
-          <span className="text-xs font-medium px-2 py-1 rounded-full bg-accent-primary/20 text-accent-primary border border-accent-primary/30">
-            {t('verification_score')}: {report.aiVerification?.confidenceScore ?? 0}%
-          </span>
-          <span className="text-xs text-foreground/40">{date}</span>
+        {/* Floating Badges */}
+        <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+          <div className="flex gap-2">
+            {report.aiVerification && (
+              <div
+                className={`backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${
+                  report.aiVerification.confidenceScore > 70
+                    ? 'bg-green-500/20 text-green-600 border-green-500/30'
+                    : 'bg-amber-500/20 text-amber-600 border-amber-500/30'
+                }`}
+              >
+                <BadgeCheck className="w-3.5 h-3.5" />
+                {report.aiVerification.confidenceScore}%
+              </div>
+            )}
+          </div>
+
+          {hasMedia && (
+            <div className="bg-black/40 backdrop-blur-md text-white/90 px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1.5">
+              <ImageIcon className="w-3 h-3" />
+              {mediaCount}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="p-6 pt-4 flex-grow flex flex-col relative">
+        {/* Date Row */}
+        <div className="flex items-center text-xs font-medium text-foreground/40 mb-3 gap-2">
+          <Calendar className="w-3.5 h-3.5" />
+          <span>{date}</span>
         </div>
 
-        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-accent-primary transition-colors line-clamp-2">
+        {/* Title */}
+        <h3
+          className={`text-xl font-bold text-foreground mb-3 leading-tight group-hover:text-accent-primary transition-colors line-clamp-2 ${isRtl ? 'font-sans' : ''}`}
+        >
           {title}
         </h3>
 
-        <p className="text-foreground/70 text-sm mb-6 line-clamp-3 overflow-hidden text-ellipsis">
+        {/* Content Preview */}
+        <p className="text-foreground/60 text-sm leading-relaxed mb-6 line-clamp-3">
           {truncatedContent}
         </p>
 
-        <div className="mt-auto pt-4 space-y-4">
-          {/* Voting Buttons */}
-          <VotingButtons
-            reportId={report.id}
-            initialUpvoteCount={report.upvoteCount}
-            initialDownvoteCount={report.downvoteCount}
-            isAnonymous={isAnonymous}
-            compact
-          />
-
-          {/* Footer */}
-          <div className="pt-4 border-t border-foreground/5 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-accent-secondary/50 flex items-center justify-center text-[10px] text-white">
-                {report.user?.displayName?.[0] || 'A'}
-              </div>
-              <span className="text-xs text-foreground/60">
-                {report.user?.displayName || t('anonymous_reporter')}
-              </span>
+        {/* Footer Area */}
+        <div className="mt-auto pt-5 border-t border-foreground/5 flex items-center justify-between gap-4">
+          {/* Reporter Info */}
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-primary/20 to-accent-secondary/20 flex items-center justify-center text-xs font-bold text-accent-primary shrink-0">
+              {report.user?.displayName?.[0]?.toUpperCase() || 'A'}
             </div>
+            <span className="text-xs text-foreground/70 font-medium truncate">
+              {report.user?.displayName || t('anonymous_reporter')}
+            </span>
+          </div>
 
-            <Link href={`/${locale}/reports/${report.id}`}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-accent-primary hover:text-accent-primary hover:bg-accent-primary/10"
-              >
-                {t('report_details')} →
-              </Button>
-            </Link>
+          {/* Voting Buttons (Just the display for now or interactive) */}
+          <div className="shrink-0 relative z-20">
+            <VotingButtons
+              reportId={report.id}
+              initialUpvoteCount={report.upvoteCount}
+              initialDownvoteCount={report.downvoteCount}
+              isAnonymous={isAnonymous}
+              compact
+            />
           </div>
         </div>
+
+        {/* View Details Click Overlay */}
+        <Link
+          href={`/${locale}/reports/${report.id}`}
+          className="absolute inset-0 z-10 focus:outline-none focus:ring-2 focus:ring-accent-primary/50 rounded-3xl"
+        >
+          <span className="sr-only">{t('report_details')}</span>
+        </Link>
       </div>
     </div>
   );
