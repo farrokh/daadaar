@@ -91,6 +91,49 @@ export async function sendSlackNotification(options: SlackMessageOptions): Promi
   }
 }
 
+export async function checkSlackNotifierHealth(): Promise<{
+  ok: boolean;
+  configured: boolean;
+  mode: 'lambda' | 'webhook' | 'disabled';
+  error?: string;
+  note?: string;
+}> {
+  if (SLACK_LAMBDA_FUNCTION) {
+    try {
+      await getLambdaClient().send(
+        new InvokeCommand({
+          FunctionName: SLACK_LAMBDA_FUNCTION,
+          InvocationType: 'DryRun',
+        })
+      );
+      return { ok: true, configured: true, mode: 'lambda' };
+    } catch (error) {
+      return {
+        ok: false,
+        configured: true,
+        mode: 'lambda',
+        error: error instanceof Error ? error.message : 'Slack lambda dry-run failed',
+      };
+    }
+  }
+
+  if (SLACK_WEBHOOK_URL) {
+    return {
+      ok: true,
+      configured: true,
+      mode: 'webhook',
+      note: 'Webhook configured; no dry-run check available.',
+    };
+  }
+
+  return {
+    ok: false,
+    configured: false,
+    mode: 'disabled',
+    error: 'Slack notifier is not configured.',
+  };
+}
+
 /**
  * Format and send a notification for a new user
  */

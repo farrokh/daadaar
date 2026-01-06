@@ -6,6 +6,7 @@ import passport from 'passport';
 import { checkDatabaseConnection, closeDatabaseConnection } from './db';
 import { getRedisUnavailableCount } from './lib/rate-limiter';
 import { checkRedisConnection } from './lib/redis';
+import { checkSlackNotifierHealth } from './lib/slack';
 import adminContentReportsRoutes from './routes/admin/content-reports';
 import authRoutes from './routes/auth';
 import contentReportsRoutes from './routes/content-reports';
@@ -103,6 +104,15 @@ app.get('/api/health', async (_req, res) => {
       redisUnavailableCount: rateLimiterRedisUnavailableCount,
       usingInMemoryFallback: !redisStatus.connected && rateLimiterRedisUnavailableCount > 0,
     },
+  });
+});
+
+// Slack notifications health check (safe dry-run)
+app.get('/api/health/notifications/slack', async (_req, res) => {
+  const slackHealth = await checkSlackNotifierHealth();
+  res.status(slackHealth.ok ? 200 : 503).json({
+    success: slackHealth.ok,
+    data: slackHealth,
   });
 });
 

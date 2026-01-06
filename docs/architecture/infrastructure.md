@@ -25,6 +25,7 @@ Our infrastructure is designed for high availability, security, and global deliv
 - **S3 Bucket**: daadaar-media-v1-317430950654
 - **SMTP**: Amazon SES SMTP (`email-smtp.us-east-1.amazonaws.com:587`)
 - **Slack Notifications**: Lambda `daadaar-slack-notifier` (invoked by App Runner)
+- **Slack Health Check**: `GET /api/health/notifications/slack` (Lambda dry-run)
 - **Frontend**: https://www.daadaar.com (Vercel)
 
 ---

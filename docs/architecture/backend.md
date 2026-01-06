@@ -93,27 +93,30 @@ We use a shared library (`shared/api-types.ts`) to synchronize types between the
    API_URL=https://api.daadaar.com
    ```
  
- ### 2. Slack Notifications
- We send Slack notifications via a dedicated Lambda function to avoid NAT costs while App Runner egresses through the VPC.
- - **Utility**: `backend/src/lib/slack.ts`
- - **Events Tracked**:
-   - New User Registrations
-   - New Incident Reports
-   - New Individuals/Organizations added to the graph
-   - Content Reports (Abuse/Moderation)
- - **Implementation**: Fire-and-forget async calls. App Runner invokes Lambda asynchronously; Lambda posts to Slack webhook.
- - **Configuration**:
-   ```bash
-   SLACK_LAMBDA_FUNCTION_NAME=daadaar-slack-notifier
-   ```
-   Lambda environment:
-   ```bash
-   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
-   ```
-   Local dev fallback:
-   ```bash
-   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
-   ```
+### 2. Slack Notifications
+We send Slack notifications via a dedicated Lambda function to avoid NAT costs while App Runner egresses through the VPC.
+- **Utility**: `backend/src/lib/slack.ts`
+- **Events Tracked**:
+  - New User Registrations
+  - New Incident Reports
+  - New Individuals/Organizations added to the graph
+  - Content Reports (Abuse/Moderation)
+- **Implementation**: Fire-and-forget async calls. App Runner invokes Lambda asynchronously; Lambda posts to Slack webhook.
+- **Configuration**:
+  ```bash
+  SLACK_LAMBDA_FUNCTION_NAME=daadaar-slack-notifier
+  ```
+  Lambda environment:
+  ```bash
+  SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+  ```
+  Local dev fallback:
+  ```bash
+  SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+  ```
+ - **Health Check**:
+   - `GET /api/health/notifications/slack` (Lambda dry-run, no message sent)
+   - Returns `200` when the Lambda invocation permission is valid.
  
  ---
  
