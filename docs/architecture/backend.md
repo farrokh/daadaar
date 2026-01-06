@@ -72,7 +72,29 @@ We use a shared library (`shared/api-types.ts`) to synchronize types between the
  
  ## 🔌 External Integrations
  
- ### 1. Slack Notifications
+ ### 1. Email Service (Transactional Emails)
+ We use **Amazon SES (Simple Email Service)** for sending transactional emails.
+ - **Utility**: `backend/src/lib/email.ts`
+ - **Provider**: Amazon SES (SMTP Interface)
+ - **Throughput**: 62,000 emails/month free tier (from AWS sources)
+ - **Email Types**:
+   - Email Verification (signup)
+   - Password Reset
+   - Moderation Notifications
+ - **Implementation**: 
+   - Uses Nodemailer with SMTP transport.
+   - **Network**: Connects via a private **VPC Endpoint** (email-smtp.us-east-1.amazonaws.com) to bypass the lack of internet/NAT Gateway in the private subnets.
+ - **Configuration**:
+   ```bash
+   SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+   SMTP_PORT=587
+   SMTP_USER=<SES_ACCESS_KEY_ID>
+   SMTP_PASS=<SES_SMTP_PASSWORD>
+   EMAIL_FROM="Daadaar Platform" <no-reply@daadaar.com>
+   API_URL=https://api.daadaar.com
+   ```
+ 
+ ### 2. Slack Notifications
  We utilize Slack Webhooks for real-time monitoring of critical platform events. This allows our team to respond quickly to new content and potential abuse.
  - **Utility**: `backend/src/lib/slack.ts`
  - **Events Tracked**:
@@ -81,6 +103,10 @@ We use a shared library (`shared/api-types.ts`) to synchronize types between the
    - New Individuals/Organizations added to the graph
    - Content Reports (Abuse/Moderation)
  - **Implementation**: Fire-and-forget async calls to avoid blocking the main thread.
+ - **Configuration**:
+   ```bash
+   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+   ```
  
  ---
  
@@ -112,13 +138,32 @@ The backend allows only the configured frontend origin:
 - `FRONTEND_URL=https://www.daadaar.com`
 
 ### Required Environment Variables (Production)
-- `DATABASE_URL`
-- `REDIS_URL`
-- `JWT_SECRET`
-- `SESSION_SECRET`
-- `ENCRYPTION_KEY`
-- `AWS_REGION`
-- `AWS_S3_BUCKET`
+
+**Core:**
+- `DATABASE_URL` - PostgreSQL connection string
+- `REDIS_URL` - Redis connection string
+- `JWT_SECRET` - JWT signing secret
+- `SESSION_SECRET` - Session encryption secret
+- `ENCRYPTION_KEY` - Data encryption key
+
+**AWS:**
+- `AWS_REGION` - AWS region (us-east-1)
+- `AWS_S3_BUCKET` - S3 bucket for media storage
+
+**URLs:**
+- `FRONTEND_URL` - Frontend URL (https://www.daadaar.com)
+- `API_URL` - Backend API URL (https://api.daadaar.com)
+- `CDN_URL` - CDN URL for media (https://media.daadaar.com)
+
+**Email (SMTP):**
+- `SMTP_HOST` - SMTP server (smtp-relay.brevo.com)
+- `SMTP_PORT` - SMTP port (587)
+- `SMTP_USER` - SMTP username (no-reply@daadaar.com)
+- `SMTP_PASS` - SMTP password/API key
+- `EMAIL_FROM` - Email from address (optional, defaults to SMTP_USER)
+
+**Notifications (Optional):**
+- `SLACK_WEBHOOK_URL` - Slack webhook for notifications
 
 ### Health Endpoints
 - `GET /health` (App Runner liveness)

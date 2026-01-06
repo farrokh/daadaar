@@ -61,3 +61,15 @@ apprunner-service.json
 .aws/DEPLOYMENT_STATUS.md
 amplify.yml
 .aws/*.*
+.smtp_credentials
+cleanup-users.py
+cleanup-users.sql
+update-app-runner.py
+update-codebuild-iam.py
+run-cleanup-codebuild.py
+monitor-deployment.sh
+.aws/
+# Also ignore backup/temp files
+*.py.patch
+*.yml.bak
+

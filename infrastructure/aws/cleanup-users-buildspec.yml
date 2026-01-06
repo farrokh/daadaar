@@ -1,0 +1,93 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing PostgreSQL client and Python dependencies..."
+      - pip install psycopg2-binary boto3
+      
+  pre_build:
+    commands:
+      - echo "Retrieving database credentials from Secrets Manager..."
+      - |
+        export DB_PASSWORD=$(aws secretsmanager get-secret-value \
+          --secret-id daadaar/prod/db-password \
+          --region us-east-1 \
+          --query SecretString \
+          --output text)
+      - echo "Database password retrieved successfully"
+      
+  build:
+    commands:
+      - echo "Running database cleanup script..."
+      - |
+        cat > cleanup_users_simple.py << 'PYEOF'
+        import os
+        import sys
+        import psycopg2
+
+        DB_HOST = "daadaar-prod.cq5go4qemamj.us-east-1.rds.amazonaws.com"
+        DB_NAME = "daadaar"
+        DB_USER = "daadaar_admin"
+        DB_PASSWORD = os.environ.get("DB_PASSWORD")
+
+        if not DB_PASSWORD:
+            print("❌ DB_PASSWORD not set")
+            sys.exit(1)
+
+        database_url = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}?sslmode=require"
+
+        print(f"🔌 Connecting to database: {DB_NAME}")
+        print(f"   Host: {DB_HOST}")
+        print()
+
+        try:
+            conn = psycopg2.connect(database_url)
+            cursor = conn.cursor()
+            
+            # Get list of users
+            cursor.execute("SELECT id, email, username, created_at FROM users ORDER BY created_at DESC")
+            users = cursor.fetchall()
+            
+            if not users:
+                print("✅ No users found in database")
+                sys.exit(0)
+            
+            print(f"📋 Found {len(users)} user(s):")
+            print()
+            for user_id, email, username, created_at in users:
+                print(f"  #{user_id}: {username} ({email}) - Created: {created_at}")
+            print()
+            
+            # Delete all users (auto-confirm in CodeBuild)
+            print(f"🗑️  Deleting ALL {len(users)} user(s)...")
+            cursor.execute("DELETE FROM users")
+            deleted_count = cursor.rowcount
+            conn.commit()
+            
+            print(f"✅ Deleted {deleted_count} user(s)")
+            print()
+            
+            # Verify
+            cursor.execute("SELECT COUNT(*) FROM users")
+            remaining = cursor.fetchone()[0]
+            
+            if remaining == 0:
+                print("✅ All users deleted successfully")
+            else:
+                print(f"⚠️  Warning: {remaining} user(s) still remain")
+            
+            cursor.close()
+            conn.close()
+            
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            sys.exit(1)
+        PYEOF
+      - python cleanup_users_simple.py
+      
+  post_build:
+    commands:
+      - echo "Cleanup complete!"

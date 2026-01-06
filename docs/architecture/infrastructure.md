@@ -24,12 +24,39 @@ Our infrastructure is designed for high availability, security, and global deliv
 
 ---
 
-### Migration Runner (CodeBuild)
-- **Project**: `daadaar-migrations` (CodeBuild, VPC-enabled)
+### Database Operations (CodeBuild)
+
+For database operations that require direct access to RDS (which is not publicly accessible), we use **AWS CodeBuild** running inside the VPC.
+
+#### Project Configuration
+- **Project Name**: `daadaar-migrations`
+- **Type**: CodeBuild (VPC-enabled)
 - **Buildspec**: `infrastructure/aws/codebuild-migrations.buildspec.yml`
-- **Secrets**: `DATABASE_URL` stored in Secrets Manager (example: `daadaar/prod/database-url`)
-- **Flags**: `RUN_MIGRATIONS=true` and optional `RUN_SEED=true`
-- **VPC Endpoints**: Secrets Manager, ECR (API + DKR), CloudWatch Logs, STS, and S3 gateway
+- **Compute**: `BUILD_GENERAL1_SMALL` (3 GB memory, 2 vCPUs)
+- **Service Role**: `daadaar-codebuild-migrations-role`
+
+#### Secrets Management
+All sensitive credentials stored in AWS Secrets Manager:
+- `daadaar/prod/database-url` - Full PostgreSQL connection string
+- `daadaar/prod/db-password` - Database password only
+
+#### VPC Configuration
+- **VPC**: vpc-0e9cd2c204069ca54
+- **Subnets**: Private subnets across us-east-1a, us-east-1c, and us-east-1d.
+- **Security Group**: sg-0b55ecfafd3522b27
+
+**Required VPC Endpoints** (enabling private access to AWS services):
+- `com.amazonaws.us-east-1.secretsmanager` - Retrieve DB/SMTP credentials.
+- `com.amazonaws.us-east-1.ecr.api` / `dkr` - Pull Docker images.
+- `com.amazonaws.us-east-1.logs` - CloudWatch logs egress.
+- `com.amazonaws.us-east-1.s3` - Gateway for media and ECR layers.
+- `com.amazonaws.us-east-1.email-smtp` - **Private SMTP egress to Amazon SES**.
+
+#### Use Cases
+1. **Database Migrations / Cleanup**:
+   - Running scripts via CodeBuild in the VPC.
+2. **Transactional Emails**:
+   - App Runner → VPC Endpoint → SES (Private path).
 
 ---
 
