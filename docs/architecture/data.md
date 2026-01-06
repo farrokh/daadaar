@@ -5,7 +5,7 @@ The platform manages complex relational data and high-volume media assets with a
 ## Storage Layers
 
 1. **PostgreSQL**: Primary relational storage for entities, reports, and relationships.
-2. **Redis (ElastiCache Serverless)**: Ephemeral storage for sessions, rate limits, and PoW challenges. **Required runtime dependency** for production. See [Infrastructure docs](infrastructure.md#-redis-configuration--operations) for configuration and deployment details.
+2. **Redis (ElastiCache Serverless)**: Ephemeral storage for sessions, rate limits, and PoW challenges. **Required runtime dependency** for production. Configured via `REDIS_URL` with TLS, currently `rediss://daadaar-redis-rrp0fe.serverless.use1.cache.amazonaws.com:6379`. See [Infrastructure docs](infrastructure.md#-redis-configuration--operations) for configuration and deployment details.
 3. **AWS S3**: Object storage for evidence-based media (images/videos).
 
 ---

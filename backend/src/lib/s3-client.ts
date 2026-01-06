@@ -19,7 +19,13 @@ const s3Client = new S3Client({
 });
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET || 'daadaar-media-v1-317430950654';
-const USE_S3 = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
+
+// Determine if we should use real S3 or mock
+// In production, we always assume S3 (using IAM roles if env vars are missing)
+// In development, we use S3 only if credentials are explicitly provided
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const HAS_CREDS = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY;
+const USE_S3 = IS_PRODUCTION || HAS_CREDS;
 
 /**
  * Generate a presigned URL for uploading a file to S3

@@ -3,21 +3,67 @@
  * Handles sending messages to Slack via Webhooks
  */
 
+import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
+
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
+const SLACK_LAMBDA_FUNCTION =
+  process.env.SLACK_LAMBDA_FUNCTION_NAME || process.env.SLACK_LAMBDA_FUNCTION_ARN;
+const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
+
+let lambdaClient: LambdaClient | null = null;
+
+const getLambdaClient = () => {
+  if (!lambdaClient) {
+    lambdaClient = new LambdaClient({ region: AWS_REGION });
+  }
+  return lambdaClient;
+};
 
 interface SlackMessageOptions {
   text: string;
-  blocks?: any[];
+  blocks?: Record<string, unknown>[];
 }
 
 /**
  * Send a notification to Slack
  */
 export async function sendSlackNotification(options: SlackMessageOptions): Promise<void> {
+  if (SLACK_LAMBDA_FUNCTION) {
+    try {
+      const payload = Buffer.from(
+        JSON.stringify({
+          text: options.text,
+          blocks: options.blocks,
+        }),
+        'utf-8'
+      );
+
+      const response = await getLambdaClient().send(
+        new InvokeCommand({
+          FunctionName: SLACK_LAMBDA_FUNCTION,
+          InvocationType: 'Event',
+          Payload: payload,
+        })
+      );
+
+      if (response.StatusCode && response.StatusCode !== 202) {
+        console.error(`Slack Lambda invocation failed: ${response.StatusCode}`);
+      }
+    } catch (error) {
+      console.error('Error invoking Slack Lambda:', error);
+    }
+    return;
+  }
+
   if (!SLACK_WEBHOOK_URL) {
     console.warn('SLACK_WEBHOOK_URL is not defined. Skipping notification.');
     return;
   }
+
+  // We use a AbortController to set a small timeout (e.g. 2s)
+  // so we don't hang the request if the VPC has no internet access
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2000);
 
   try {
     const response = await fetch(SLACK_WEBHOOK_URL, {
@@ -26,15 +72,66 @@ export async function sendSlackNotification(options: SlackMessageOptions): Promi
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(options),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`Failed to send Slack notification: ${response.status} ${errorText}`);
     }
-  } catch (error) {
-    console.error('Error sending Slack notification:', error);
+  } catch (error: unknown) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.warn('Slack notification timed out (likely due to VPC internet restrictions).');
+    } else {
+      console.error('Error sending Slack notification:', error);
+    }
   }
+}
+
+export async function checkSlackNotifierHealth(): Promise<{
+  ok: boolean;
+  configured: boolean;
+  mode: 'lambda' | 'webhook' | 'disabled';
+  error?: string;
+  note?: string;
+}> {
+  if (SLACK_LAMBDA_FUNCTION) {
+    try {
+      await getLambdaClient().send(
+        new InvokeCommand({
+          FunctionName: SLACK_LAMBDA_FUNCTION,
+          InvocationType: 'DryRun',
+        })
+      );
+      return { ok: true, configured: true, mode: 'lambda' };
+    } catch (error) {
+      return {
+        ok: false,
+        configured: true,
+        mode: 'lambda',
+        error: error instanceof Error ? error.message : 'Slack lambda dry-run failed',
+      };
+    }
+  }
+
+  if (SLACK_WEBHOOK_URL) {
+    return {
+      ok: true,
+      configured: true,
+      mode: 'webhook',
+      note: 'Webhook configured; no dry-run check available.',
+    };
+  }
+
+  return {
+    ok: false,
+    configured: false,
+    mode: 'disabled',
+    error: 'Slack notifier is not configured.',
+  };
 }
 
 /**

@@ -12,6 +12,7 @@ export default function SignupPage() {
   const t = useTranslations('auth');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [requiresEmailVerification, setRequiresEmailVerification] = useState(true);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string;
@@ -88,6 +89,7 @@ export default function SignupPage() {
       });
 
       if (result.success) {
+        setRequiresEmailVerification(result.requiresEmailVerification ?? true);
         setSuccess(true);
       } else {
         // Handle specific error messages
@@ -107,7 +109,7 @@ export default function SignupPage() {
   if (success) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
-        <div className="w-full max-w-md p-8 rounded-2xl liquid-glass border border-white/20 backdrop-blur-xl text-center">
+        <div className="w-full max-w-md p-8 rounded-2xl liquid-glass border border-white/[0.05] backdrop-blur-xl text-center">
           <div className="mb-6 flex justify-center">
             <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
               <svg
@@ -128,7 +130,11 @@ export default function SignupPage() {
             </div>
           </div>
           <h2 className="text-2xl font-bold mb-4">{t('signup_success')}</h2>
-          <p className="text-muted-foreground mb-8">{t('verification_email_sent')}</p>
+          <p className="text-muted-foreground mb-8">
+            {requiresEmailVerification
+              ? t('verification_email_sent')
+              : t('verification_not_required')}
+          </p>
           <Link href="/login">
             <Button className="w-full">{t('login_button')}</Button>
           </Link>
@@ -139,7 +145,7 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center p-4">
-      <div className="w-full max-w-md p-8 rounded-2xl liquid-glass border border-white/20 backdrop-blur-xl">
+      <div className="w-full max-w-md p-8 rounded-2xl liquid-glass border border-white/[0.05] backdrop-blur-xl">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-semibold mb-2 tracking-tight">{t('signup_title')}</h1>
           <p className="text-muted-foreground">{t('signup_subtitle')}</p>

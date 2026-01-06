@@ -68,12 +68,11 @@ export function ReportContentButton({
 
   const modalContent = (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
-      <div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200"
+      <dialog
+        open
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200 border-0"
         onClick={e => e.stopPropagation()}
         onKeyDown={e => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('title')}</h2>
@@ -185,7 +184,7 @@ export function ReportContentButton({
             </div>
           </form>
         )}
-      </div>
+      </dialog>
     </div>
   );
 

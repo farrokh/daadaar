@@ -1,5 +1,6 @@
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { SessionManager } from '@/components/auth/session-manager';
+import { LanguageToggle } from '@/components/layout/language-toggle';
 import { Navbar } from '@/components/layout/navbar';
 import { ToolProvider } from '@/components/providers/tool-provider';
 import { NextIntlClientProvider } from 'next-intl';
@@ -54,8 +55,12 @@ export const viewport: Viewport = {
 
 import { Inter, Vazirmatn } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'], display: 'swap' });
-const vazirmatn = Vazirmatn({ subsets: ['arabic', 'latin'], display: 'swap' });
+const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' });
+const vazirmatn = Vazirmatn({
+  subsets: ['arabic', 'latin'],
+  display: 'swap',
+  variable: '--font-vazirmatn',
+});
 
 export default async function LocaleLayout({
   children,
@@ -79,12 +84,13 @@ export default async function LocaleLayout({
     <html lang={locale} dir={locale === 'fa' ? 'rtl' : 'ltr'}>
       <body
         suppressHydrationWarning
-        className={`${locale === 'fa' ? vazirmatn.className : inter.className} bg-background text-foreground antialiased min-h-screen selection:bg-accent-primary/30`}
+        className={`${locale === 'fa' ? vazirmatn.className : inter.className} ${inter.variable} ${vazirmatn.variable} bg-background text-foreground antialiased min-h-screen selection:bg-accent-primary/30`}
       >
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
             <ToolProvider>
               <Navbar />
+              <LanguageToggle />
               <SessionManager />
               <main className="pt-0">{children}</main>
             </ToolProvider>

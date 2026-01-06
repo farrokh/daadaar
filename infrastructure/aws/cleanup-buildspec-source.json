@@ -1,0 +1,4 @@
+{
+  "type": "NO_SOURCE",
+  "buildspec": "version: 0.2\n\nenv:\n  variables:\n    CLEANUP_USERS: \"true\"\n\nphases:\n  pre_build:\n    commands:\n      - echo \"Logging in to ECR...\"\n      - aws ecr get-login-password --region \"$AWS_REGION\" | docker login --username AWS --password-stdin \"$(echo \"$IMAGE_URI\" | cut -d/ -f1)\"\n  build:\n    commands:\n      - echo \"Pulling image $IMAGE_URI\"\n      - docker pull \"$IMAGE_URI\"\n      - |\n        if [ \"$CLEANUP_USERS\" = \"true\" ]; then \n          echo \"Running user cleanup...\"\n          docker run --rm -e DATABASE_URL=\"$DATABASE_URL\" \"$IMAGE_URI\" bun /usr/src/app/backend/src/db/cleanup-users.ts\n        fi\n"
+}

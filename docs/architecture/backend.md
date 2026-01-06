@@ -72,15 +72,51 @@ We use a shared library (`shared/api-types.ts`) to synchronize types between the
  
  ## 🔌 External Integrations
  
- ### 1. Slack Notifications
- We utilize Slack Webhooks for real-time monitoring of critical platform events. This allows our team to respond quickly to new content and potential abuse.
- - **Utility**: `backend/src/lib/slack.ts`
- - **Events Tracked**:
-   - New User Registrations
-   - New Incident Reports
-   - New Individuals/Organizations added to the graph
-   - Content Reports (Abuse/Moderation)
- - **Implementation**: Fire-and-forget async calls to avoid blocking the main thread.
+ ### 1. Email Service (Transactional Emails)
+ We use **Amazon SES (Simple Email Service)** for sending transactional emails.
+ - **Utility**: `backend/src/lib/email.ts`
+ - **Provider**: Amazon SES (SMTP Interface)
+ - **Email Types**:
+   - Email Verification (signup)
+   - Password Reset
+   - Moderation Notifications
+ - **Implementation**:
+   - Uses Nodemailer with SMTP transport.
+   - **Network**: App Runner egresses through VPC and reaches SES via the `email-smtp` VPC endpoint.
+ - **Configuration**:
+   ```bash
+   SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+   SMTP_PORT=587
+   SMTP_USER=<SES_ACCESS_KEY_ID>
+   SMTP_PASS=<SES_SMTP_PASSWORD>
+   EMAIL_FROM="Daadaar Platform" <no-reply@daadaar.com>
+   API_URL=https://api.daadaar.com
+   ```
+ 
+### 2. Slack Notifications
+We send Slack notifications via a dedicated Lambda function to avoid NAT costs while App Runner egresses through the VPC.
+- **Utility**: `backend/src/lib/slack.ts`
+- **Events Tracked**:
+  - New User Registrations
+  - New Incident Reports
+  - New Individuals/Organizations added to the graph
+  - Content Reports (Abuse/Moderation)
+- **Implementation**: Fire-and-forget async calls. App Runner invokes Lambda asynchronously; Lambda posts to Slack webhook.
+- **Configuration**:
+  ```bash
+  SLACK_LAMBDA_FUNCTION_NAME=daadaar-slack-notifier
+  ```
+  Lambda environment:
+  ```bash
+  SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+  ```
+  Local dev fallback:
+  ```bash
+  SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+  ```
+ - **Health Check**:
+   - `GET /api/health/notifications/slack` (Lambda dry-run, no message sent)
+   - Returns `200` when the Lambda invocation permission is valid.
  
  ---
  
@@ -107,18 +143,49 @@ We use **BullMQ** (powered by Redis) for tasks that should not block the main re
 - **AWS App Runner** (containerized service)
 - **Custom Domain**: https://api.daadaar.com
 
+### S3 Access & Credentials
+- **Production**: Use the App Runner instance role for S3 access. Do not set `AWS_ACCESS_KEY_ID` or `AWS_SECRET_ACCESS_KEY` in production; static keys override role credentials.
+- **Local dev**: Static keys are optional and can be set in `backend/.env` when testing S3 locally.
+- **Bucket policy**: The media bucket explicitly allows the App Runner instance role to `List/Get/Put/Delete` objects.
+
+### Environment Loading
+- **Production**: The container does not load `dotenv` and the image excludes `.env` files via `.dockerignore`.
+- **Development**: `dotenv` is loaded locally for convenience.
+
 ### CORS
 The backend allows only the configured frontend origin:
 - `FRONTEND_URL=https://www.daadaar.com`
 
 ### Required Environment Variables (Production)
-- `DATABASE_URL`
-- `REDIS_URL`
-- `JWT_SECRET`
-- `SESSION_SECRET`
-- `ENCRYPTION_KEY`
-- `AWS_REGION`
-- `AWS_S3_BUCKET`
+
+**Core:**
+- `DATABASE_URL` - PostgreSQL connection string
+- `REDIS_URL` - Redis connection string
+- `JWT_SECRET` - JWT signing secret
+- `SESSION_SECRET` - Session encryption secret
+- `ENCRYPTION_KEY` - Data encryption key
+- `EMAIL_VERIFICATION_ENABLED` - Enable email verification checks (`true`/`false`)
+
+**AWS:**
+- `AWS_REGION` - AWS region (us-east-1)
+- `AWS_S3_BUCKET` - S3 bucket for media storage
+  - **Note**: App Runner instance role provides S3 access in production.
+
+**URLs:**
+- `FRONTEND_URL` - Frontend URL (https://www.daadaar.com)
+- `API_URL` - Backend API URL (https://api.daadaar.com)
+- **CDN**: Media is fronted by Cloudflare (proxy/DNS). The backend issues signed S3 URLs for read/write.
+
+**Email (SMTP):**
+- `SMTP_HOST` - SMTP server (email-smtp.us-east-1.amazonaws.com)
+- `SMTP_PORT` - SMTP port (587)
+- `SMTP_USER` - SMTP username (SES SMTP user)
+- `SMTP_PASS` - SMTP password
+- `EMAIL_FROM` - Email from address (optional, defaults to SMTP_USER)
+
+**Notifications (Optional):**
+- `SLACK_LAMBDA_FUNCTION_NAME` - Lambda function name or ARN (production)
+- `SLACK_WEBHOOK_URL` - Direct webhook (local dev fallback)
 
 ### Health Endpoints
 - `GET /health` (App Runner liveness)

@@ -9,27 +9,61 @@ Our infrastructure is designed for high availability, security, and global deliv
 - **Frontend**: Vercel (Next.js) with global edge CDN.
 
 ### Persistence
-- **Database**: AWS RDS (PostgreSQL) with automated daily backups and point-in-time recovery.
-- **Caching**: AWS ElastiCache Serverless Redis for caching, sessions, and rate limiting.
+- **Database**: AWS RDS (PostgreSQL) in private subnets (not publicly accessible). Backup retention is currently 0 days (no automated backups).
+- **Caching**: AWS ElastiCache Serverless Redis for caching, sessions, and rate limiting (TLS `rediss://`).
 - **Object Storage**: AWS S3 for media assets (`daadaar-media-v1-317430950654`).
+  - **Access**: App Runner instance role provides S3 permissions (no static access keys in production).
+  - **Policy**: Bucket policy explicitly allows the App Runner role to `List/Get/Put/Delete`.
 
 ### Current Deployment (New Account)
+- **Backend Service**: `daadaar-backend` (AWS App Runner)
 - **Backend URL**: https://bxg6ycd8ym.us-east-1.awsapprunner.com
 - **Custom Domain**: https://api.daadaar.com (active)
 - **Health Check**: https://api.daadaar.com/health
 - **RDS Endpoint**: daadaar-prod.cq5go4qemamj.us-east-1.rds.amazonaws.com:5432
-- **Redis Endpoint**: daadaar-redis-rrp0fe.serverless.use1.cache.amazonaws.com:6379
+- **Redis Endpoint**: daadaar-redis-rrp0fe.serverless.use1.cache.amazonaws.com:6379 (TLS via `rediss://`)
 - **S3 Bucket**: daadaar-media-v1-317430950654
+- **SMTP**: Amazon SES SMTP (`email-smtp.us-east-1.amazonaws.com:587`)
+- **Slack Notifications**: Lambda `daadaar-slack-notifier` (invoked by App Runner)
+- **Slack Health Check**: `GET /api/health/notifications/slack` (Lambda dry-run)
 - **Frontend**: https://www.daadaar.com (Vercel)
 
 ---
 
-### Migration Runner (CodeBuild)
-- **Project**: `daadaar-migrations` (CodeBuild, VPC-enabled)
+### Database Operations (CodeBuild)
+
+For database operations that require direct access to RDS (which is not publicly accessible), we use **AWS CodeBuild** running inside the VPC.
+
+#### Project Configuration
+- **Project Name**: `daadaar-migrations`
+- **Type**: CodeBuild (VPC-enabled)
 - **Buildspec**: `infrastructure/aws/codebuild-migrations.buildspec.yml`
-- **Secrets**: `DATABASE_URL` stored in Secrets Manager (example: `daadaar/prod/database-url`)
-- **Flags**: `RUN_MIGRATIONS=true` and optional `RUN_SEED=true`
-- **VPC Endpoints**: Secrets Manager, ECR (API + DKR), CloudWatch Logs, STS, and S3 gateway
+- **Compute**: `BUILD_GENERAL1_SMALL` (3 GB memory, 2 vCPUs)
+- **Service Role**: `daadaar-codebuild-migrations-role`
+
+#### Secrets Management
+All sensitive credentials stored in AWS Secrets Manager:
+- `daadaar/prod/database-url` - Full PostgreSQL connection string
+- `daadaar/prod/db-password` - Database password only
+
+#### VPC Configuration
+- **VPC**: vpc-0e9cd2c204069ca54
+- **Subnets**: Private subnets across us-east-1a, us-east-1c, and us-east-1d.
+- **Security Group**: sg-0b55ecfafd3522b27
+
+**Required VPC Endpoints** (enabling private access to AWS services):
+- `com.amazonaws.us-east-1.secretsmanager` - Retrieve DB credentials (and SMTP if stored here).
+- `com.amazonaws.us-east-1.ecr.api` / `dkr` - Pull Docker images.
+- `com.amazonaws.us-east-1.logs` - CloudWatch logs egress.
+- `com.amazonaws.us-east-1.s3` - Gateway for media and ECR layers.
+- `com.amazonaws.us-east-1.email-smtp` - **Private SMTP egress to Amazon SES**.
+- `com.amazonaws.us-east-1.lambda` - Invoke Slack notifier Lambda from App Runner without NAT.
+
+#### Use Cases
+1. **Database Migrations / Cleanup**:
+   - Running scripts via CodeBuild in the VPC.
+2. **Transactional Emails**:
+   - App Runner → VPC Endpoint → SES (private path).
 
 ---
 
@@ -44,7 +78,7 @@ Redis is a **required runtime dependency** for production deployments, used for 
   - Format: `redis://[username:password@]host:port[/database]` or `rediss://` for TLS
   - Examples:
     - Local: `redis://localhost:6379`
-    - AWS ElastiCache Serverless (current): `redis://daadaar-redis-rrp0fe.serverless.use1.cache.amazonaws.com:6379`
+    - AWS ElastiCache Serverless (current): `rediss://daadaar-redis-rrp0fe.serverless.use1.cache.amazonaws.com:6379`
     - TLS-enabled Redis: `rediss://user:pass@host.cache.amazonaws.com:6380/0`
 
 **Optional** (for advanced configurations):
@@ -165,7 +199,7 @@ Redis is a **required runtime dependency** for production deployments, used for 
 
 **Production Deployment**:
 1. **Provision Redis**: Set up managed Redis (AWS ElastiCache) or self-hosted cluster
-2. **Configure Connection**: Set `REDIS_URL` environment variable in App Runner service config
+2. **Configure Connection**: Set `REDIS_URL` (TLS `rediss://`) in App Runner service config
 3. **Security**: Use TLS (`rediss://`) and authentication (password in URL) when enabled
 4. **Network**: Ensure App Runner can reach Redis via the VPC connector and security groups
 5. **Health Checks**: Configure application health endpoint to monitor Redis

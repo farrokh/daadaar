@@ -3,6 +3,13 @@ import type { CurrentUser } from '@/shared/types';
 import { useContext } from 'react';
 import { fetchApi } from './api';
 
+type RegisterResponseData = {
+  id: number;
+  email: string;
+  username: string;
+  requiresEmailVerification: boolean;
+};
+
 /**
  * Get current authenticated user
  * Works for both registered users and anonymous sessions
@@ -101,14 +108,17 @@ export async function register(data: {
   username: string;
   password: string;
   displayName?: string;
-}): Promise<{ success: boolean; error?: string }> {
-  const response = await fetchApi<CurrentUser>('/auth/register', {
+}): Promise<{ success: boolean; error?: string; requiresEmailVerification?: boolean }> {
+  const response = await fetchApi<RegisterResponseData>('/auth/register', {
     method: 'POST',
     body: JSON.stringify(data),
   });
 
   if (response.success) {
-    return { success: true };
+    return {
+      success: true,
+      requiresEmailVerification: response.data?.requiresEmailVerification,
+    };
   }
 
   return {

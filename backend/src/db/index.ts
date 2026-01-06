@@ -1,7 +1,9 @@
 // Database connection and client for Daadaar Backend
 // Uses Drizzle ORM with PostgreSQL
 
+import type { PgDatabase } from 'drizzle-orm/pg-core';
 import { drizzle } from 'drizzle-orm/postgres-js';
+import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from '../../../database/schema';
 
@@ -18,7 +20,7 @@ const connectionString = DATABASE_URL || 'postgresql://localhost:5432/daadaar';
 
 // Lazy initialization - don't connect until first query
 let queryClient: ReturnType<typeof postgres> | null = null;
-let dbInstance: ReturnType<typeof drizzle> | null = null;
+let dbInstance: PostgresJsDatabase<typeof schema> | null = null;
 
 function getQueryClient() {
   if (!queryClient) {
@@ -31,13 +33,20 @@ function getQueryClient() {
   return queryClient;
 }
 
-// Create Drizzle ORM instance with schema (lazy)
-export const db = new Proxy({} as ReturnType<typeof drizzle>, {
-  get(_target, prop) {
-    if (!dbInstance) {
-      dbInstance = drizzle(getQueryClient(), { schema });
-    }
-    return (dbInstance as any)[prop];
+function getDbInstance(): PostgresJsDatabase<typeof schema> {
+  if (!dbInstance) {
+    dbInstance = drizzle(getQueryClient(), { schema });
+  }
+  return dbInstance;
+}
+
+// Create Drizzle ORM instance with schema (lazy) - properly typed
+export const db = new Proxy({} as PostgresJsDatabase<typeof schema>, {
+  get(_target, prop: string | symbol) {
+    const instance = getDbInstance();
+    // biome-ignore lint/suspicious/noExplicitAny: Proxy requires dynamic property access
+    const value = (instance as any)[prop];
+    return typeof value === 'function' ? value.bind(instance) : value;
   },
 });
 
@@ -45,7 +54,7 @@ export const db = new Proxy({} as ReturnType<typeof drizzle>, {
 export { schema };
 
 // Export types
-export type Database = typeof db;
+export type Database = PostgresJsDatabase<typeof schema>;
 
 // Health check function for database connection
 export async function checkDatabaseConnection(): Promise<{

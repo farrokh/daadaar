@@ -43,7 +43,12 @@ const getTransporter = async () => {
 
   // Fallback: Dummy logger transporter
   return {
-    sendMail: async (mailOptions: any) => {
+    sendMail: async (mailOptions: {
+      to: string;
+      subject: string;
+      text?: string;
+      html?: string;
+    }) => {
       console.log('--- DUMMY EMAIL SENT ---');
       console.log('To:', mailOptions.to);
       console.log('Subject:', mailOptions.subject);
@@ -93,7 +98,12 @@ export async function sendEmail({
 /**
  * Notify moderators of a new content report
  */
-export async function notifyModeratorsOfReport(report: any) {
+export async function notifyModeratorsOfReport(report: {
+  contentType: string;
+  contentId: number;
+  reason: string;
+  description?: string | null;
+}) {
   const moderatorEmail = process.env.MODERATOR_EMAIL;
   if (!moderatorEmail) {
     console.warn('MODERATOR_EMAIL is not set, skipping notification');

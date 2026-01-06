@@ -7,7 +7,18 @@ import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getS3PublicUrl } from '@/lib/utils';
 import type { Media, ReportWithDetails } from '@/shared/types';
-import { Download, ExternalLink, FileText, Music } from 'lucide-react';
+import {
+  Calendar,
+  Download,
+  ExternalLink,
+  FileText,
+  Link as LinkIcon,
+  MapPin,
+  Music,
+  Play,
+  Shield,
+  User,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
@@ -23,55 +34,35 @@ export default function ReportDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Fetch Logic
   useEffect(() => {
     const fetchReport = async () => {
       setLoading(true);
       try {
         const response = await fetchApi<ReportWithDetails>(`/reports/${params.id}`);
-        if (response.success && response.data) {
-          setReport(response.data);
-        } else {
-          setError(response.error?.message || t('error_not_found'));
-        }
+        if (response.success && response.data) setReport(response.data);
+        else setError(response.error?.message || t('error_not_found'));
       } catch (_err) {
         setError(t('error_fetching'));
       } finally {
         setLoading(false);
       }
     };
-
-    if (params.id) {
-      fetchReport();
-    }
+    if (params.id) fetchReport();
   }, [params.id, t]);
 
-  // Focus management and Escape key handling for lightbox
+  // Lightbox Logic
   useEffect(() => {
     if (!selectedMedia) {
       dialogRef.current?.close();
+      document.body.style.overflow = '';
       return;
     }
-
-    // Show the dialog
     dialogRef.current?.showModal();
-
-    // Focus the close button when dialog opens
-    closeButtonRef.current?.focus();
-
-    // Handle Escape key at document level
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setSelectedMedia(null);
-      }
-    };
-
-    // Prevent body scroll when modal is open
     document.body.style.overflow = 'hidden';
-
+    const handleEscape = (e: KeyboardEvent) => e.key === 'Escape' && setSelectedMedia(null);
     document.addEventListener('keydown', handleEscape);
-
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
@@ -80,20 +71,22 @@ export default function ReportDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-32 pb-20 px-4 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen pt-32 pb-32 px-6 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
       </div>
     );
   }
 
   if (error || !report) {
     return (
-      <div className="min-h-screen pt-32 pb-20 px-4 flex flex-col items-center justify-center text-center">
-        <h1 className="text-3xl font-bold text-foreground mb-4">{error || t('error_not_found')}</h1>
+      <div className="min-h-screen pt-32 pb-32 px-6 flex flex-col items-center justify-center text-center max-w-md mx-auto">
+        <h1 className="text-xl font-medium text-foreground mb-6">
+          {error || t('error_not_found')}
+        </h1>
         <Button
           onClick={() => window.history.back()}
           variant="outline"
-          className="text-foreground border-foreground/10"
+          className="text-xs font-medium uppercase tracking-wider"
         >
           ← {commonT('cancel')}
         </Button>
@@ -109,184 +102,127 @@ export default function ReportDetailPage() {
     : formatDate(report.createdAt, locale);
 
   return (
-    <div
-      className={`min-h-screen bg-transparent pt-16 pb-20 px-4 sm:px-6 lg:px-8 ${isRtl ? 'rtl' : 'ltr'}`}
-    >
-      <div className="max-w-4xl mx-auto">
-        {/* Navigation */}
-        <div className="flex items-center justify-between mb-8">
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="flex items-center gap-2 text-foreground/40 hover:text-foreground transition-colors"
-          >
-            {isRtl ? '→' : '←'} {t('all_reports')}
-          </button>
-          <ReportContentButton contentType="report" contentId={report.id} />
-        </div>
-
-        {/* Hero Meta */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <div className="min-h-screen pt-32 pb-32 px-6 md:px-12 max-w-5xl mx-auto font-sans">
+      {/* Header */}
+      <header className="mb-24 space-y-12">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-foreground/10 pb-4">
           <div className="flex items-center gap-4">
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/30">
-              {t('verification_score')}: {report.aiVerification?.confidenceScore ?? 0}%
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="text-sm font-medium uppercase text-foreground/50 hover:text-foreground transition-colors tracking-[0.2em]"
+            >
+              {t('reports')}
+            </button>
+            <span className="text-foreground/20">/</span>
+            <span className="text-sm font-medium uppercase text-foreground/50 tracking-[0.2em]">
+              ID: {String(report.id).slice(0, 8)}
             </span>
-            <span className="text-sm text-foreground/40">{displayDate}</span>
-            {report.incidentLocation && (
-              <span className="text-sm text-foreground/40 flex items-center gap-1">
-                📍{' '}
-                {isRtl
-                  ? report.incidentLocation
-                  : report.incidentLocationEn || report.incidentLocation}
-              </span>
-            )}
           </div>
-          <VotingButtons
-            reportId={report.id}
-            initialUpvoteCount={report.upvoteCount}
-            initialDownvoteCount={report.downvoteCount}
-            isAnonymous={isAnonymous}
-            compact
-          />
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-foreground/5 border border-foreground/10">
+              <Shield className="w-3 h-3 text-foreground/70" />
+              <span className="text-xs font-medium text-foreground/70 uppercase tracking-wider">
+                {t('verification_score')}: {report.aiVerification?.confidenceScore ?? 0}%
+              </span>
+            </div>
+            <ReportContentButton contentType="report" contentId={report.id} />
+          </div>
         </div>
 
-        {/* Title */}
-        <h1 className="text-4xl sm:text-6xl font-extrabold text-foreground mb-10 tracking-tight leading-tight">
+        <h1
+          className={`text-3xl md:text-5xl lg:text-6xl font-bold text-foreground max-w-4xl ${isRtl ? 'leading-normal' : 'tracking-tight leading-[1.1]'}`}
+        >
           {title}
         </h1>
+      </header>
 
-        {/* Content */}
-        <div className="prose dark:prose-invert prose-lg max-w-none mb-12 whitespace-pre-wrap text-foreground/80 leading-relaxed">
-          {content}
-        </div>
-
-        {/* Media Gallery (Thumbnails) */}
-        {report.media && report.media.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-16">
-            {report.media.map(item => {
-              const mediaUrl = item.url || getS3PublicUrl(item.s3Key, item.s3Bucket);
-              return (
-                <button
-                  type="button"
-                  key={item.id}
-                  className="aspect-square rounded-2xl overflow-hidden border border-foreground/10 bg-foreground/5 cursor-zoom-in group relative"
-                  onClick={() => setSelectedMedia(item)}
-                  onKeyDown={e => e.key === 'Enter' && setSelectedMedia(item)}
-                >
-                  {item.mediaType === 'image' && (
-                    <img
-                      src={mediaUrl}
-                      alt={item.originalFilename || 'Media'}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                  )}
-                  {item.mediaType === 'video' && (
-                    <div className="w-full h-full flex items-center justify-center bg-black/40">
-                      <svg
-                        className="w-8 h-8 text-white/60"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <title>Video</title>
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  )}
-                  {item.mediaType === 'document' && (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-secondary/10 p-4 text-center">
-                      <FileText className="w-10 h-10 text-primary mb-2 opacity-60" />
-                      <span
-                        className="text-[10px] text-foreground/60 truncate w-full px-2"
-                        title={item.originalFilename || ''}
-                      >
-                        {item.originalFilename}
-                      </span>
-                    </div>
-                  )}
-                  {item.mediaType === 'audio' && (
-                    <div className="w-full h-full flex items-center justify-center bg-secondary/10 p-4">
-                      <Music className="w-10 h-10 text-primary opacity-60" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                </button>
-              );
-            })}
+      {/* Content Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+        {/* Sidebar (Meta) */}
+        <div className="md:col-span-4 space-y-10">
+          {/* Actions */}
+          <div className="p-6 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl">
+            <VotingButtons
+              reportId={report.id}
+              initialUpvoteCount={report.upvoteCount}
+              initialDownvoteCount={report.downvoteCount}
+              isAnonymous={isAnonymous}
+            />
           </div>
-        )}
 
-        {/* Associations */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-12 border-t border-foreground/10 mt-12">
-          {/* Reporter Info */}
-          <div>
-            <h3 className="text-sm font-bold text-foreground/40 uppercase tracking-widest mb-4">
-              {t('reported_by')}
-            </h3>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-secondary/50 flex items-center justify-center text-lg text-white font-bold shrink-0">
-                {report.user?.profileImageUrl ? (
-                  <img
-                    src={
-                      report.user.profileImageUrl.startsWith('http')
-                        ? report.user.profileImageUrl
-                        : getS3PublicUrl(report.user.profileImageUrl)
-                    }
-                    alt={report.user.displayName || 'User'}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  report.user?.displayName?.[0] || 'A'
-                )}
+          {/* Details List */}
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-foreground/40 text-sm font-medium uppercase tracking-wider">
+                <Calendar className="w-4 h-4" />
+                {t('incident_date')}
               </div>
-              <div>
-                <div className="text-foreground font-bold">
-                  {report.user?.displayName || t('anonymous_reporter')}
+              <p className="text-lg font-light pl-6">{displayDate}</p>
+            </div>
+
+            {report.incidentLocation && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-foreground/40 text-sm font-medium uppercase tracking-wider">
+                  <MapPin className="w-4 h-4" />
+                  {t('incident_location')}
                 </div>
-                <div className="text-xs text-foreground/40">
-                  {report.user ? `@${report.user.username}` : t('anonymous_reporter')}
+                <p className="text-lg font-light pl-6">
+                  {isRtl
+                    ? report.incidentLocation
+                    : report.incidentLocationEn || report.incidentLocation}
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-foreground/40 text-sm font-medium uppercase tracking-wider">
+                <User className="w-4 h-4" />
+                {t('reported_by')}
+              </div>
+              <div className="pl-6 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center text-xs font-bold">
+                  {report.user?.displayName?.[0] || 'A'}
+                </div>
+                <div>
+                  <p className="text-sm font-medium">
+                    {report.user?.displayName || t('anonymous_reporter')}
+                  </p>
+                  {report.user && (
+                    <p className="text-xs text-foreground/40">@{report.user.username}</p>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Linked Individuals */}
+          {/* Linked entities */}
           {report.reportLinks && report.reportLinks.length > 0 && (
-            <div>
-              <h3 className="text-sm font-bold text-foreground/40 uppercase tracking-widest mb-4">
+            <div className="space-y-6 pt-8 border-t border-foreground/10">
+              <div className="flex items-center gap-2 text-foreground/40 text-sm font-medium uppercase tracking-wider">
+                <LinkIcon className="w-4 h-4" />
                 {t('linked_individuals')}
-              </h3>
+              </div>
               <div className="space-y-4">
                 {report.reportLinks.map(link => (
-                  <div key={link.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/50 flex items-center justify-center text-xs text-white shrink-0">
-                      {link.individual?.profileImageUrl ? (
-                        <img
-                          src={
-                            link.individual.profileImageUrl.startsWith('http')
-                              ? link.individual.profileImageUrl
-                              : getS3PublicUrl(link.individual.profileImageUrl)
-                          }
-                          alt={link.individual.fullName}
-                          className="w-full h-8 object-cover"
-                        />
-                      ) : (
-                        link.individual?.fullName?.[0] || 'P'
-                      )}
+                  <div
+                    key={link.id}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-foreground/[0.02] border border-foreground/[0.05]"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center text-xs text-foreground/60 shrink-0">
+                      {link.individual?.fullName?.[0] || 'P'}
                     </div>
                     <div>
-                      <div className="text-foreground font-medium text-sm">
+                      <p className="text-sm font-medium">
                         {isRtl
                           ? link.individual?.fullName
                           : link.individual?.fullNameEn || link.individual?.fullName}
-                      </div>
+                      </p>
                       {link.role && (
-                        <div className="text-xs text-primary">
+                        <p className="text-xs text-foreground/50">
                           {isRtl ? link.role.title : link.role.titleEn || link.role.title}
-                        </div>
+                        </p>
                       )}
                     </div>
                   </div>
@@ -296,157 +232,135 @@ export default function ReportDetailPage() {
           )}
         </div>
 
-        {/* Lightbox Modal */}
+        {/* Main Content (Body) */}
+        <div className="md:col-span-8 space-y-12">
+          <div className="prose dark:prose-invert max-w-none">
+            <p className="text-lg md:text-xl leading-relaxed font-light text-foreground/90 whitespace-pre-wrap">
+              {content}
+            </p>
+          </div>
+
+          {/* Media Grid */}
+          {report.media && report.media.length > 0 && (
+            <div className="space-y-6 pt-12 border-t border-foreground/10">
+              <h3 className="text-sm font-medium uppercase text-foreground/50 tracking-[0.2em]">
+                {t('media_attachments')}
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                {report.media.map(item => {
+                  const mediaUrl = item.url || getS3PublicUrl(item.s3Key, item.s3Bucket);
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setSelectedMedia(item)}
+                      className="group relative aspect-square rounded-xl overflow-hidden bg-foreground/5 border border-foreground/10 transition-all hover:border-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                    >
+                      {item.mediaType === 'image' && (
+                        <img
+                          src={mediaUrl}
+                          alt="Evidence"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      )}
+                      {item.mediaType === 'video' && (
+                        <div className="w-full h-full flex items-center justify-center bg-black/10">
+                          <Play className="w-8 h-8 text-foreground/70" fill="currentColor" />
+                        </div>
+                      )}
+                      {item.mediaType === 'document' && (
+                        <div className="w-full h-full flex flex-col items-center justify-center p-4">
+                          <FileText className="w-8 h-8 text-foreground/40 mb-2" />
+                          <span className="text-[10px] text-foreground/40 truncate w-full text-center">
+                            {item.originalFilename}
+                          </span>
+                        </div>
+                      )}
+                      {item.mediaType === 'audio' && (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Music className="w-8 h-8 text-foreground/40" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      <dialog
+        ref={dialogRef}
+        className="fixed inset-0 z-[100] w-full h-full bg-background/95 backdrop-blur-xl p-0 m-0 border-0 flex items-center justify-center"
+        onClick={() => setSelectedMedia(null)}
+        onKeyDown={e => e.key === 'Escape' && setSelectedMedia(null)}
+      >
         {selectedMedia && (
-          <dialog
-            ref={dialogRef}
-            aria-labelledby="lightbox-title"
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 sm:p-10 border-0"
-            onClick={() => setSelectedMedia(null)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                setSelectedMedia(null);
-              }
-            }}
+          <div
+            className="relative w-full h-full flex flex-col items-center justify-center p-6 md:p-12"
+            onClick={e => e.stopPropagation()}
+            onKeyDown={e => e.stopPropagation()}
           >
             <button
-              ref={closeButtonRef}
               type="button"
-              className="absolute top-6 right-6 text-white/60 hover:text-white z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
               onClick={() => setSelectedMedia(null)}
-              aria-label={commonT('close')}
+              className="absolute top-6 right-6 p-2 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground transition-colors"
             >
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <title>{commonT('close')}</title>
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                role="img"
+                aria-label="Close"
+              >
+                <title>Close</title>
+                <path d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <div
-              className="max-w-7xl w-full max-h-full flex flex-col items-center"
-              onClick={e => e.stopPropagation()}
-              onKeyDown={e => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.stopPropagation();
-                }
-              }}
-            >
-              <div className="w-full flex justify-center mb-6">
-                {selectedMedia.mediaType === 'image' && (
-                  <img
-                    src={
-                      selectedMedia.url ||
-                      getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
-                    }
-                    alt={selectedMedia.originalFilename || 'Media'}
-                    className="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl border border-foreground/10"
-                  />
-                )}
-                {selectedMedia.mediaType === 'video' && (
-                  <video
-                    src={
-                      selectedMedia.url ||
-                      getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
-                    }
-                    controls
-                    className="max-w-full max-h-[80vh] rounded-2xl shadow-2xl border border-foreground/10"
-                  >
-                    <track kind="captions" />
-                  </video>
-                )}
-                {selectedMedia.mediaType === 'audio' && (
-                  <div className="w-full max-w-2xl bg-white/5 backdrop-blur-md p-8 rounded-3xl border border-white/10 flex flex-col items-center gap-6">
-                    <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center text-primary">
-                      <Music className="w-10 h-10" />
-                    </div>
-                    <audio
-                      src={
-                        selectedMedia.url ||
-                        getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
-                      }
-                      controls
-                      className="w-full"
-                    >
-                      <track kind="captions" />
-                    </audio>
-                  </div>
-                )}
-                {selectedMedia.mediaType === 'document' && (
-                  <div className="w-full flex flex-col items-center gap-6">
-                    {selectedMedia.mimeType === 'application/pdf' ||
-                    selectedMedia.originalFilename?.toLowerCase().endsWith('.pdf') ? (
-                      <div className="w-full max-w-4xl h-[70vh] rounded-2xl overflow-hidden border border-white/10 bg-white/5 shadow-2xl">
-                        <embed
-                          src={
-                            selectedMedia.url ||
-                            getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
-                          }
-                          type="application/pdf"
-                          width="100%"
-                          height="100%"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-64 h-64 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 flex flex-col items-center justify-center gap-4">
-                        <FileText className="w-20 h-20 text-primary opacity-40" />
-                      </div>
-                    )}
-                    <div className="flex gap-4">
-                      <a
-                        href={
-                          selectedMedia.url ||
-                          getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center rounded-full px-6 py-2 gap-2 text-sm font-medium transition-colors bg-secondary text-white hover:opacity-90 backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        {commonT('open')}
-                      </a>
-                      <a
-                        href={
-                          selectedMedia.url ||
-                          getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
-                        }
-                        download={selectedMedia.originalFilename || 'document'}
-                        className="inline-flex items-center justify-center rounded-full px-6 py-2 gap-2 text-sm font-medium transition-colors border border-white/10 bg-transparent hover:bg-white/10 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                      >
-                        <Download className="w-4 h-4" />
-                        {commonT('download')}
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="text-center flex flex-col items-center gap-2">
-                <div className="flex items-center gap-3">
-                  <h4 id="lightbox-title" className="text-white font-bold text-xl">
-                    {selectedMedia.originalFilename}
-                  </h4>
-                  <ReportContentButton
-                    contentType="media"
-                    contentId={selectedMedia.id}
-                    className="scale-90"
-                  />
-                </div>
-                <p className="text-white/40 text-sm">
-                  {selectedMedia.fileSizeBytes
-                    ? (selectedMedia.fileSizeBytes / 1024 / 1024).toFixed(2)
-                    : '0'}
-                  MB
-                </p>
-              </div>
+            <div className="w-full max-w-5xl max-h-[80vh] flex items-center justify-center">
+              {selectedMedia.mediaType === 'image' && (
+                <img
+                  src={
+                    selectedMedia.url || getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                  }
+                  alt="Evidence"
+                  className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                />
+              )}
+              {selectedMedia.mediaType === 'video' && (
+                <video
+                  src={
+                    selectedMedia.url || getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                  }
+                  controls
+                  className="max-w-full max-h-full rounded-lg shadow-2xl"
+                >
+                  <track kind="captions" />
+                </video>
+              )}
+              {/* Add other types as needed */}
             </div>
-          </dialog>
+
+            <div className="mt-6 flex items-center gap-4">
+              <a
+                href={
+                  selectedMedia.url || getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2 rounded-full bg-foreground text-background text-sm font-medium hover:bg-foreground/90 transition-colors"
+              >
+                {commonT('open')}
+              </a>
+            </div>
+          </div>
         )}
-      </div>
+      </dialog>
     </div>
   );
 }

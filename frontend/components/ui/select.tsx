@@ -41,6 +41,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
     const selectId = id || React.useId();
+    const listId = `${selectId}-list`;
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -87,8 +88,8 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
               ${isOpen ? 'ring-2 ring-primary/50 border-primary/50' : ''}
               ${className}
             `}
-            aria-haspopup="listbox"
             aria-expanded={isOpen}
+            aria-controls={listId}
             aria-invalid={error ? 'true' : 'false'}
             aria-describedby={
               error ? `${selectId}-error` : helperText ? `${selectId}-helper` : undefined
@@ -108,43 +109,39 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
 
           {isOpen && (
             <div className="absolute z-50 w-full mt-2 p-1.5 rounded-xl border border-white/10 bg-[#020617]/60 backdrop-blur-xl shadow-2xl liquid-glass animate-in fade-in zoom-in-95 duration-200 origin-top">
-              <div
-                className="max-h-60 overflow-auto custom-scrollbar px-1"
-                role="listbox"
-                tabIndex={-1}
-              >
+              <ul className="max-h-60 overflow-auto custom-scrollbar px-1" id={listId}>
                 {options.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-foreground/50 text-center italic">
+                  <li className="px-4 py-3 text-sm text-foreground/50 text-center italic">
                     No options available
-                  </div>
+                  </li>
                 ) : (
                   options.map(option => {
                     const isSelected = String(option.value) === String(value);
                     return (
-                      <button
-                        key={String(option.value)}
-                        type="button"
-                        onClick={() => handleSelect(option.value)}
-                        className={`
-                          w-full flex items-center justify-between px-3 py-2.5 my-0.5 text-sm rounded-lg text-left transition-all duration-200
-                          ${
-                            isSelected
-                              ? 'bg-primary/20 text-primary font-medium shadow-[0_0_10px_rgba(59,130,246,0.3)] border border-primary/20'
-                              : 'text-foreground/80 hover:bg-white/10 hover:text-foreground hover:pl-4 border border-transparent'
-                          }
-                        `}
-                        role="option"
-                        aria-selected={isSelected}
-                      >
-                        <span className="truncate mr-2">{option.label}</span>
-                        {isSelected && (
-                          <Check className="w-4 h-4 text-primary shrink-0 drop-shadow-[0_0_5px_rgba(59,130,246,0.8)]" />
-                        )}
-                      </button>
+                      <li key={String(option.value)}>
+                        <button
+                          type="button"
+                          onClick={() => handleSelect(option.value)}
+                          className={`
+                            w-full flex items-center justify-between px-3 py-2.5 my-0.5 text-sm rounded-lg text-left transition-all duration-200
+                            ${
+                              isSelected
+                                ? 'bg-primary/20 text-primary font-medium shadow-[0_0_10px_rgba(59,130,246,0.3)] border border-primary/20'
+                                : 'text-foreground/80 hover:bg-white/10 hover:text-foreground hover:pl-4 border border-transparent'
+                            }
+                          `}
+                          aria-selected={isSelected}
+                        >
+                          <span className="truncate mr-2">{option.label}</span>
+                          {isSelected && (
+                            <Check className="w-4 h-4 text-primary shrink-0 drop-shadow-[0_0_5px_rgba(59,130,246,0.8)]" />
+                          )}
+                        </button>
+                      </li>
                     );
                   })
                 )}
-              </div>
+              </ul>
             </div>
           )}
         </div>

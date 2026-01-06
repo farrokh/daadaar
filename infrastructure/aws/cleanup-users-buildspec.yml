@@ -1,0 +1,20 @@
+version: 0.2
+
+env:
+  variables:
+    CLEANUP_USERS: "true"
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging in to ECR..."
+      - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$(echo "$IMAGE_URI" | cut -d/ -f1)"
+  build:
+    commands:
+      - echo "Pulling image $IMAGE_URI"
+      - docker pull "$IMAGE_URI"
+      - |
+        if [ "$CLEANUP_USERS" = "true" ]; then 
+          echo "Running user cleanup..."
+          docker run --rm -e DATABASE_URL="$DATABASE_URL" "$IMAGE_URI" bun /usr/src/app/backend/src/db/cleanup-users.ts
+        fi

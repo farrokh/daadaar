@@ -15,6 +15,8 @@ if (!JWT_SECRET) {
 }
 const JWT_EXPIRES_IN = '30d';
 const SESSION_EXPIRY = 30 * 24 * 60 * 60; // 30 days in seconds
+const isEmailVerificationEnabled = () =>
+  (process.env.EMAIL_VERIFICATION_ENABLED ?? 'true').toLowerCase() === 'true';
 
 /**
  * POST /api/auth/register
@@ -80,8 +82,10 @@ export const register = async (req: Request, res: Response) => {
     // Hash password with bcrypt (cost factor 10)
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Generate verification token
-    const verificationToken = uuidv4();
+    const emailVerificationEnabled = isEmailVerificationEnabled();
+
+    // Generate verification token only when verification is enabled
+    const verificationToken = emailVerificationEnabled ? uuidv4() : null;
 
     // Create user
     const [newUser] = await db
@@ -92,13 +96,15 @@ export const register = async (req: Request, res: Response) => {
         passwordHash,
         displayName: displayName || username,
         role: 'user',
-        isVerified: false,
+        isVerified: !emailVerificationEnabled,
         verificationToken,
       })
       .returning();
 
-    // Send verification email
-    await sendVerificationEmail(newUser.email, verificationToken);
+    // Send verification email only when verification is enabled
+    if (emailVerificationEnabled && verificationToken) {
+      await sendVerificationEmail(newUser.email, verificationToken);
+    }
 
     // Notify Slack about new user
     notifyNewUser({
@@ -109,11 +115,14 @@ export const register = async (req: Request, res: Response) => {
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful. Please check your email to verify your account.',
+      message: emailVerificationEnabled
+        ? 'Registration successful. Please check your email to verify your account.'
+        : 'Registration successful. Your account is active.',
       data: {
         id: newUser.id,
         email: newUser.email,
         username: newUser.username,
+        requiresEmailVerification: emailVerificationEnabled,
       },
     });
   } catch (error) {
@@ -211,8 +220,8 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if user is verified
-    if (!user.isVerified) {
+    // Check if user is verified (if verification is enabled)
+    if (isEmailVerificationEnabled() && !user.isVerified) {
       return res.status(403).json({
         success: false,
         error: {

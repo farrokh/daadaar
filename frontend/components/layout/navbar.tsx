@@ -19,14 +19,22 @@ export function Navbar() {
   const registeredUser = currentUser?.type === 'registered' ? currentUser : null;
 
   const isActive = (path: string) => pathname === path || pathname?.endsWith(path);
+  const showGlass = !tools;
+  const glassClasses =
+    'liquid-glass bg-white/5 backdrop-blur-lg rounded-full px-6 h-16 transition-all duration-500 ease-out border border-white/10';
 
   return (
     <div className="fixed bottom-4 left-0 right-0 flex items-center justify-between p-6 z-50 pointer-events-none">
       {/* Left Section: Logo & Nav */}
-      <div className="pointer-events-auto flex items-center gap-8 pl-4">
+      <div
+        className={cn(
+          'pointer-events-auto flex items-center gap-8',
+          showGlass ? glassClasses : 'pl-4'
+        )}
+      >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-48 h-10 scale-50 -translate-y-[6px] transition-transform duration-300 group-hover:scale-52">
+          <div className="relative w-28 h-8 transition-transform duration-300 group-hover:scale-102 -translate-y-[6px]">
             <Image
               src="/logo_navbar_en.svg"
               alt="Daadaar Logo"
@@ -78,7 +86,7 @@ export function Navbar() {
       <div className="pointer-events-auto absolute left-1/2 -translate-x-1/2">{tools}</div>
 
       {/* Right: Auth */}
-      <div className="pointer-events-auto flex items-center gap-4">
+      <div className={cn('pointer-events-auto flex items-center gap-4', showGlass && glassClasses)}>
         <LegalMenu />
         {isAuthenticated ? (
           <div className="flex items-center gap-2">

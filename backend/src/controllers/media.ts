@@ -139,10 +139,12 @@ export async function uploadImage(req: Request, res: Response) {
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
     // Process image with Sharp: convert to AVIF (Sharp can read from file path)
+    console.log(`[Media Upload] Starting Sharp processing for ${file.originalname}`);
     const avifBuffer = await sharp(file.path)
       .resize({ width: 2048, withoutEnlargement: true }) // Limit size for performance
-      .avif({ quality: 60, effort: 4 }) // Good balance of size and quality
+      .avif({ quality: 60, effort: 2 }) // Lower effort for faster processing, avoiding timeouts
       .toBuffer();
+    console.log(`[Media Upload] Sharp processing complete. Buffer size: ${avifBuffer.length}`);
 
     // Generate S3 key (force .avif extension)
     const originalName = file.originalname;
@@ -150,9 +152,12 @@ export async function uploadImage(req: Request, res: Response) {
     const s3Key = generateS3Key(avifFilename, userId, sessionId);
 
     // Upload AVIF buffer to S3
+    console.log(`[Media Upload] Uploading to S3 key: ${s3Key}`);
     await uploadS3Object(s3Key, avifBuffer, 'image/avif');
+    console.log('[Media Upload] S3 upload complete');
 
     // Create media record in database
+    console.log('[Media Upload] Inserting into database');
     const [media] = await db
       .insert(schema.media)
       .values({
@@ -169,6 +174,7 @@ export async function uploadImage(req: Request, res: Response) {
         isDeleted: false,
       })
       .returning();
+    console.log(`[Media Upload] Database insert complete. ID: ${media.id}`);
 
     return res.status(200).json({
       success: true,
@@ -179,7 +185,10 @@ export async function uploadImage(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error('Image upload error:', error);
+    console.error('Image upload error DETAILS:', error);
+    if (error instanceof Error) {
+      console.error('Stack:', error.stack);
+    }
     return res.status(500).json({
       success: false,
       error: { code: 'UPLOAD_FAILED', message: 'Failed to process and upload image' },

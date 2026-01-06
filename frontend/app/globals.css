@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #f8fafc;
@@ -8,6 +9,9 @@
   --card-bg: rgba(255, 255, 255, 0.7);
   --card-border: rgba(2, 6, 23, 0.08);
   --muted-text: rgba(2, 6, 23, 0.5);
+  /* Light mode shadow */
+  --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1), inset 0 1px
+    0 0 rgba(255, 255, 255, 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,6 +21,9 @@
     --card-bg: rgba(2, 6, 23, 0.4);
     --card-border: rgba(255, 255, 255, 0.08);
     --muted-text: rgba(248, 250, 252, 0.4);
+    /* Dark mode shadow - Tuned for better contrast and subtlety */
+    --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3), inset 0
+      1px 0 0 rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -36,6 +43,13 @@
     monospace;
 }
 
+@layer base {
+  button,
+  a {
+    cursor: pointer;
+  }
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
@@ -51,18 +65,8 @@ body {
   }
 
   .liquid-glass {
-    /* Top/Left Highlights (White Reflection) */
-    box-shadow:
-      1px -1px 2px hsl(0 0% 100% / 0.15) inset,
-      0px -1px 2px hsl(0 0% 100% / 0.15) inset,
-      -1px -1px 2px hsl(0 0% 100% / 0.15) inset,
-      /* Soft Subtle Depth (Very faint dark, or removed) */
-      /* Removed the muddy dark grey insets that caused the bezel overlay look */
-
-      /* Bottom/Right Rim (Light reflection for glass edge on dark bg) */
-      -2px -1px 2px hsl(0 0% 100% / 0.25) inset,
-      /* External Drop Shadow */
-      0px 4px 20px -8px hsl(0 0% 0% / 0.15);
+    /* Using variable for better light/dark mode support */
+    box-shadow: var(--glass-shadow);
   }
 
   /* Custom Scrollbar for Webkit/Blink */

@@ -75,8 +75,12 @@ docker push <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/daadaar-backend:lat
         *   `CDN_URL`: `https://media.daadaar.com`
         *   `AWS_REGION`: `us-east-1`
         *   `AWS_S3_BUCKET`: `daadaar-media-v1-<account-id>`
+        *   `SLACK_LAMBDA_FUNCTION_NAME`: `daadaar-slack-notifier`
         *   **IAM**: Use the App Runner instance role for S3 access (avoid static access keys).
     *   **Health Check path**: `/health`
+    *   **Secrets hygiene**:
+        *   Ensure `.dockerignore` excludes `.env` files.
+        *   Do not load `dotenv` in production containers.
 
 ---
 
@@ -124,6 +128,21 @@ Use the CodeBuild runner so migrations execute inside the VPC:
      --region us-east-1 \
      --environment-variables-override name=RUN_MIGRATIONS,value=true,type=PLAINTEXT
    ```
+
+---
+
+## Operational Checks
+
+### Slack Notifications
+- Health check: `GET /api/health/notifications/slack`
+- Expect: `{"ok": true, "configured": true, "mode": "lambda"}`
+
+### Media (S3)
+- In production, the App Runner **instance role** must have `s3:ListBucket`, `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` on the media bucket.
+- Do not set `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` in App Runner.
+
+### Email Verification Toggle
+- `EMAIL_VERIFICATION_ENABLED=false` allows logins without verification.
 4. Optional seed:
    ```bash
    aws codebuild start-build \

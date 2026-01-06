@@ -16,9 +16,36 @@ export async function listContentReports(req: Request, res: Response) {
     const offset = (page - 1) * limit;
 
     const where = [];
-    if (status) where.push(eq(schema.contentReports.status, status as any));
-    if (contentType) where.push(eq(schema.contentReports.contentType, contentType as any));
-    if (reason) where.push(eq(schema.contentReports.reason, reason as any));
+    if (status) {
+      where.push(
+        eq(
+          schema.contentReports.status,
+          status as 'pending' | 'reviewing' | 'resolved' | 'dismissed'
+        )
+      );
+    }
+    if (contentType) {
+      where.push(
+        eq(
+          schema.contentReports.contentType,
+          contentType as 'report' | 'organization' | 'individual' | 'user' | 'media'
+        )
+      );
+    }
+    if (reason) {
+      where.push(
+        eq(
+          schema.contentReports.reason,
+          reason as
+            | 'spam'
+            | 'misinformation'
+            | 'harassment'
+            | 'inappropriate'
+            | 'duplicate'
+            | 'other'
+        )
+      );
+    }
 
     const queryWhere = where.length > 0 ? and(...where) : undefined;
 
@@ -111,7 +138,7 @@ export async function listContentReports(req: Request, res: Response) {
     }
 
     // Map details back to reports
-    const reportsWithDetails = reports.map(r => ({
+    const reportsWithDetails = reports.map((r: (typeof reports)[number]) => ({
       ...r,
       contentDetails: contentDetails[r.contentType]?.[r.contentId] || null,
     }));
@@ -225,7 +252,7 @@ export async function updateContentReportStatus(req: Request, res: Response) {
     const [updatedReport] = await db
       .update(schema.contentReports)
       .set({
-        status: status as any,
+        status: status as 'pending' | 'reviewing' | 'resolved' | 'dismissed',
         adminNotes: adminNotes || null,
         reviewedByUserId: status !== 'pending' ? reviewerId : null,
         reviewedAt: status !== 'pending' ? new Date() : null,

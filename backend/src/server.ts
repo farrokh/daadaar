@@ -6,6 +6,7 @@ import passport from 'passport';
 import { checkDatabaseConnection, closeDatabaseConnection } from './db';
 import { getRedisUnavailableCount } from './lib/rate-limiter';
 import { checkRedisConnection } from './lib/redis';
+import { checkSlackNotifierHealth } from './lib/slack';
 import adminContentReportsRoutes from './routes/admin/content-reports';
 import authRoutes from './routes/auth';
 import contentReportsRoutes from './routes/content-reports';
@@ -19,7 +20,9 @@ import reportsRoutes from './routes/reports';
 import rolesRoutes from './routes/roles';
 import votesRoutes from './routes/votes';
 
-dotenv.config();
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const app: Express = express();
 const PORT = process.env.PORT || 4000;
@@ -30,6 +33,8 @@ app.use(
     origin: (origin, callback) => {
       const allowedOrigins = [
         process.env.FRONTEND_URL,
+        'https://daadaar.com',
+        'https://www.daadaar.com',
         'http://localhost:3000',
         'http://127.0.0.1:3000',
       ].filter(Boolean);
@@ -99,6 +104,15 @@ app.get('/api/health', async (_req, res) => {
       redisUnavailableCount: rateLimiterRedisUnavailableCount,
       usingInMemoryFallback: !redisStatus.connected && rateLimiterRedisUnavailableCount > 0,
     },
+  });
+});
+
+// Slack notifications health check (safe dry-run)
+app.get('/api/health/notifications/slack', async (_req, res) => {
+  const slackHealth = await checkSlackNotifierHealth();
+  res.status(slackHealth.ok ? 200 : 503).json({
+    success: slackHealth.ok,
+    data: slackHealth,
   });
 });
 
