@@ -187,7 +187,7 @@ export async function uploadImage(req: Request, res: Response) {
   } catch (error) {
     console.error('Image upload error DETAILS:', error);
     if (error instanceof Error) {
-        console.error('Stack:', error.stack);
+      console.error('Stack:', error.stack);
     }
     return res.status(500).json({
       success: false,

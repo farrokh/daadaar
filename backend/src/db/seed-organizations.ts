@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
-import { eq, and } from 'drizzle-orm';
-import { closeDatabaseConnection, db, schema } from './index';
+import { and, eq } from 'drizzle-orm';
 import { iranianGovernmentOrganizations } from '../../../database/seed-data/iranian-government-organizations';
+import { closeDatabaseConnection, db, schema } from './index';
 
 type OrganizationRecord = typeof schema.organizations.$inferInsert;
 
@@ -93,7 +93,9 @@ async function seedOrganizations(): Promise<void> {
     }
   }
 
-  console.log(`\nSeeding complete. Created: ${created}, Updated: ${updated}, Edges: ${edgesCreated}`);
+  console.log(
+    `\nSeeding complete. Created: ${created}, Updated: ${updated}, Edges: ${edgesCreated}`
+  );
 }
 
 async function main() {
