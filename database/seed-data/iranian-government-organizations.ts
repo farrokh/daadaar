@@ -21,7 +21,7 @@ export const iranianGovernmentOrganizations: OrganizationSeed[] = [
   {
     key: 'supreme_leader_office',
     parentKey: 'iri_government',
-    name: 'دفتر مقام معظم رهبری',
+    name: 'دفتر رهبری',
     nameEn: 'Office of the Supreme Leader',
     description:
       'نهاد اجرایی و اداری که دستورات و سیاست‌های رهبری را به سایر ارگان‌ها ابلاغ و بر اجرای آن نظارت می‌کند.',

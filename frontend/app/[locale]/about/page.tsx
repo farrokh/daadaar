@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowUpRight, Github, Lock, Network, Share2, Shield, Check } from 'lucide-react';
+import { ArrowUpRight, Check, Github, Lock, Network, Share2, Shield } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -43,14 +43,18 @@ export default function AboutPage() {
       {/* Introduction */}
       <section className="mb-24 space-y-12">
         <header className="space-y-6">
-          <h1 className={`text-sm font-medium uppercase text-foreground/50 border-b border-foreground/10 pb-4 ${
-            isRtl ? '' : 'tracking-[0.2em]'
-          }`}>
+          <h1
+            className={`text-sm font-medium uppercase text-foreground/50 border-b border-foreground/10 pb-4 ${
+              isRtl ? '' : 'tracking-[0.2em]'
+            }`}
+          >
             {t('title')}
           </h1>
-          <p className={`text-4xl md:text-6xl font-bold text-foreground max-w-4xl ${
-            isRtl ? 'leading-normal' : 'tracking-tight leading-[1.1]'
-          }`}>
+          <p
+            className={`text-4xl md:text-6xl font-bold text-foreground max-w-4xl ${
+              isRtl ? 'leading-normal' : 'tracking-tight leading-[1.1]'
+            }`}
+          >
             {t('subtitle')}
           </p>
         </header>
@@ -88,7 +92,7 @@ export default function AboutPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-          {steps.map((step, idx) => (
+          {steps.map((step, _idx) => (
             <div key={step.title} className="space-y-4">
               <div className="w-10 h-10 flex items-center justify-center rounded-full bg-foreground/5 text-foreground/80 mb-6">
                 <step.icon className="w-5 h-5" strokeWidth={1.5} />
@@ -125,7 +129,11 @@ export default function AboutPage() {
                 className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/70 transition-colors bg-transparent border-none cursor-pointer"
                 onClick={handleShare}
               >
-                {copied ? <Check className="w-4 h-4 text-green-500" /> : <Share2 className="w-4 h-4" />}
+                {copied ? (
+                  <Check className="w-4 h-4 text-green-500" />
+                ) : (
+                  <Share2 className="w-4 h-4" />
+                )}
                 {copied ? t('copied') : t('share_initiative')}
               </button>
             </div>

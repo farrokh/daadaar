@@ -15,4 +15,4 @@ phases:
       - echo "Pulling image $IMAGE_URI"
       - docker pull "$IMAGE_URI"
       - if [ "$RUN_MIGRATIONS" = "true" ]; then docker run --rm -e DATABASE_URL="$DATABASE_URL" "$IMAGE_URI" bun /usr/src/app/backend/src/db/migrate.ts; fi
-      - if [ "$RUN_SEED" = "true" ]; then docker run --rm -e DATABASE_URL="$DATABASE_URL" "$IMAGE_URI" bun /usr/src/app/scripts/seed-organizations.ts; fi
+      - if [ "$RUN_SEED" = "true" ]; then docker run --rm -e DATABASE_URL="$DATABASE_URL" -e CLEAN="$CLEAN" "$IMAGE_URI" bun /usr/src/app/backend/src/db/seed-organizations.ts; fi

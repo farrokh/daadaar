@@ -10,7 +10,6 @@ COPY database/package.json ./database/
 COPY backend ./backend
 COPY shared ./shared
 COPY database ./database
-COPY scripts ./scripts
 
 # Create workspace package.json
 RUN echo '{"name":"daadaar-backend-docker","workspaces":["backend","shared","database"]}' > package.json

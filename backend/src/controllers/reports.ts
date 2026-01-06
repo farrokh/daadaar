@@ -442,15 +442,21 @@ export async function getReportById(req: Request, res: Response) {
       // Generate presigned URLs for linked individuals
       if (report.reportLinks && report.reportLinks.length > 0) {
         await Promise.all(
-          report.reportLinks.map(async link => {
-            if (
-              link.individual?.profileImageUrl &&
-              !link.individual.profileImageUrl.startsWith('http')
-            ) {
-              const presignedUrl = await generatePresignedGetUrl(link.individual.profileImageUrl);
-              Object.assign(link.individual, { profileImageUrl: presignedUrl });
+          report.reportLinks.map(
+            async (
+              link: typeof schema.reportLinks.$inferSelect & {
+                individual?: typeof schema.individuals.$inferSelect | null;
+              }
+            ) => {
+              if (
+                link.individual?.profileImageUrl &&
+                !link.individual.profileImageUrl.startsWith('http')
+              ) {
+                const presignedUrl = await generatePresignedGetUrl(link.individual.profileImageUrl);
+                Object.assign(link.individual, { profileImageUrl: presignedUrl });
+              }
             }
-          })
+          )
         );
       }
     }

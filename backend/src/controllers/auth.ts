@@ -94,7 +94,7 @@ export const register = async (req: Request, res: Response) => {
         passwordHash,
         displayName: displayName || username,
         role: 'user',
-        isVerified: EMAIL_VERIFICATION_ENABLED ? false : true,
+        isVerified: !EMAIL_VERIFICATION_ENABLED,
         verificationToken,
       })
       .returning();

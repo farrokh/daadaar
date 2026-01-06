@@ -26,25 +26,26 @@ Use this when you are iterating quickly and don't need a stable migration histor
 1. Run: `bun run db:migrate`
 
 ## 4. Apply Changes to Production (CodeBuild)
-Production migrations run inside the VPC using CodeBuild so they can reach RDS:
+## 4. Apply Changes to Production (CodeBuild)
 
-1. Build and push the backend image to ECR.
-2. Create or update the CodeBuild project (example: `daadaar-migrations`) using `infrastructure/aws/codebuild-migrations.buildspec.yml`.
-3. Store `DATABASE_URL` in Secrets Manager (example secret: `daadaar/prod/database-url`).
-4. Start the build:
-   ```bash
-   aws codebuild start-build \
-     --project-name daadaar-migrations \
-     --region us-east-1 \
-     --environment-variables-override name=RUN_MIGRATIONS,value=true,type=PLAINTEXT
-   ```
-5. Optional seed:
-   ```bash
-   aws codebuild start-build \
-     --project-name daadaar-migrations \
-     --region us-east-1 \
-     --environment-variables-override name=RUN_SEED,value=true,type=PLAINTEXT
-   ```
+For detailed instructions on setting up and running production migrations and seeds via CodeBuild, please refer to:
+[Production Deployment Guide](../docs/production-deployment.md)
+
+Quick command for migrations:
+```bash
+aws codebuild start-build \
+  --project-name daadaar-migrations \
+  --region us-east-1 \
+  --environment-variables-override name=RUN_MIGRATIONS,value=true,type=PLAINTEXT
+```
+
+Quick command for seeds:
+```bash
+aws codebuild start-build \
+  --project-name daadaar-migrations \
+  --region us-east-1 \
+  --environment-variables-override name=RUN_SEED,value=true,type=PLAINTEXT name=RUN_MIGRATIONS,value=false,type=PLAINTEXT
+```
 
 ## 5. Troubleshooting
 - If `drizzle-kit` hangs, check your `DATABASE_URL` in `database/.env`.

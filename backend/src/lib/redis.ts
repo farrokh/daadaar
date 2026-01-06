@@ -14,12 +14,12 @@ let redisInstance: Redis | null = null;
 
 function getRedisClient(): Redis | null {
   if (!redisUrl) return null;
-  
+
   if (!redisInstance) {
     redisInstance = new Redis(redisUrl, {
       lazyConnect: true, // Don't connect immediately
       maxRetriesPerRequest: 3,
-      retryStrategy: (times) => {
+      retryStrategy: times => {
         if (times > 3) {
           console.error('Redis connection failed after 3 retries');
           return null; // Stop retrying
@@ -29,26 +29,27 @@ function getRedisClient(): Redis | null {
       connectTimeout: 10000,
       ...(useTls ? { tls: {} } : {}),
     });
-    
+
     // Handle connection errors gracefully
-    redisInstance.on('error', (err) => {
+    redisInstance.on('error', err => {
       console.error('Redis connection error:', err.message);
     });
-    
+
     // Attempt to connect but don't wait for it
-    redisInstance.connect().catch((err) => {
+    redisInstance.connect().catch(err => {
       console.error('Failed to connect to Redis:', err.message);
     });
   }
-  
+
   return redisInstance;
 }
 
 // Export getter function instead of direct instance
 export const redis = new Proxy({} as Redis, {
-  get(_target, prop) {
+  get(_target, prop: string | symbol) {
     const client = getRedisClient();
     if (!client) return undefined;
+    // biome-ignore lint/suspicious/noExplicitAny: Proxy requires dynamic property access
     const value = (client as any)[prop];
     return typeof value === 'function' ? value.bind(client) : value;
   },

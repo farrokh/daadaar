@@ -59,7 +59,6 @@ export async function createContentReport(
 
     // Notify moderators (background task, don't wait for it)
     notifyModeratorsOfReport({
-      id: contentReport.id,
       contentType,
       contentId,
       reason,

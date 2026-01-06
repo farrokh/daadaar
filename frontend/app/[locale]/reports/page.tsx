@@ -200,7 +200,6 @@ export default function ReportsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (
               <div
-                // biome-ignore lint/suspicious/noArrayIndexKey: skeleton items have no stable id
                 key={i}
                 className="bg-card-bg border border-card-border rounded-3xl h-[400px] animate-pulse flex flex-col p-6"
               >

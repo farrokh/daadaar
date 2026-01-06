@@ -54,9 +54,8 @@
 ### Recent Fixes
 | Document | Issue | Resolution Date | Status |
 |----------|-------|-----------------|--------|
-| [SIGNUP_FIX_COMPLETE.md](./SIGNUP_FIX_COMPLETE.md) | Initial Email/Slack fix | 2026-01-05 | ✅ Fixed |
 | [SMTP_TIMEOUT_ISSUE.md](./SMTP_TIMEOUT_ISSUE.md) | SMTP Connection Timeouts | 2026-01-05 | ✅ Fixed (Migrated to SES) |
-| [SECURITY_AUDIT.md](./SECURITY_AUDIT.md) | Sensitive data exposure check | 2026-01-05 | ✅ Clean |
+| [SECURITY_AUDIT.md](./SECURITY_AUDIT.md) | Sensitive data exposure check | 2026-01-06 | ✅ Clean |
 
 
 ---
@@ -85,7 +84,7 @@
 | Deploy Backend | [architecture/infrastructure.md](./architecture/infrastructure.md) | `update-app-runner.py` |
 | Deploy Frontend | [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) | Vercel auto-deploy |
 | Run Migrations | [CODEBUILD_DATABASE_OPS.md](./CODEBUILD_DATABASE_OPS.md) | CodeBuild |
-| Update Env Vars | [SIGNUP_FIX_COMPLETE.md](./SIGNUP_FIX_COMPLETE.md) | `update-app-runner.py` |
+| Update Env Vars | [SES_SETUP_GUIDE.md](./SES_SETUP_GUIDE.md) | `update-app-runner.py` |
 
 ### Maintenance
 | Task | Documentation | Script/Command |
@@ -101,7 +100,7 @@
 ### Security Documentation
 | Document | Purpose | Last Review |
 |----------|---------|-------------|
-| [SECURITY_AUDIT.md](./SECURITY_AUDIT.md) | Security audit results | 2026-01-05 |
+| [SECURITY_AUDIT.md](./SECURITY_AUDIT.md) | Security audit results | 2026-01-06 |
 | [architecture/security.md](./architecture/security.md) | Security architecture | 2026-01-04 |
 
 ### Secrets Management
@@ -109,7 +108,8 @@
 |--------|----------|---------|
 | Database credentials | `.aws/.prod_db_creds` | RDS access |
 | JWT/Session secrets | `.aws/.prod_env_secrets` | Auth tokens |
-| SMTP credentials | `.aws/.smtp_credentials` | Email sending |
+| SMTP credentials | `.aws/.ses_smtp_credentials` | Email sending (SES SMTP) |
+| Slack webhook | Lambda env (`daadaar-slack-notifier`) | Slack notifications |
 | All production secrets | AWS Secrets Manager | Secure storage |
 
 **⚠️ All secret files are gitignored**
@@ -120,7 +120,7 @@
 
 | Date | Summary | Link |
 |------|---------|------|
-| 2026-01-05 | Signup fix + CodeBuild setup | [SESSION_SUMMARY.md](./SESSION_SUMMARY.md) |
+| 2026-01-06 | SES + Slack Lambda rollout | [session-summaries/2026-01-06-email-slack-lambda.md](./session-summaries/2026-01-06-email-slack-lambda.md) |
 | 2026-01-04 | Content reporting & logos | [session-summaries/2026-01-04-content-reporting-and-logos.md](./session-summaries/2026-01-04-content-reporting-and-logos.md) |
 
 ---
@@ -141,7 +141,8 @@
 ### Services
 | Service | Purpose | Dashboard |
 |---------|---------|-----------|
-| Brevo | Email sending (SMTP) | https://app.brevo.com |
+| Amazon SES | Email sending (SMTP) | https://console.aws.amazon.com/ses/ |
+| Slack | Notifications | https://api.slack.com/apps |
 | AWS | Infrastructure | https://console.aws.amazon.com |
 | Vercel | Frontend hosting | https://vercel.com/dashboard |
 | Cloudflare | CDN & DNS | https://dash.cloudflare.com |
@@ -204,10 +205,10 @@
 ### Common Issues
 | Issue | Documentation | Quick Fix |
 |-------|---------------|-----------|
-| No emails sending | [SIGNUP_FIX_COMPLETE.md](./SIGNUP_FIX_COMPLETE.md) | Check SMTP env vars |
+| No emails sending | [SES_SETUP_GUIDE.md](./SES_SETUP_GUIDE.md) | Check SES SMTP env vars |
 | CodeBuild timeout | [CODEBUILD_DATABASE_OPS.md](./CODEBUILD_DATABASE_OPS.md) | Check VPC endpoints |
 | RDS connection fails | [architecture/infrastructure.md](./architecture/infrastructure.md) | Check security groups |
-| Signup slow | [SIGNUP_ISSUE_RESOLUTION.md](./SIGNUP_ISSUE_RESOLUTION.md) | SMTP configuration |
+| Signup slow | [SMTP_TIMEOUT_ISSUE.md](./SMTP_TIMEOUT_ISSUE.md) | SES SMTP configuration |
 
 ---
 
@@ -220,12 +221,12 @@
 - ✅ Database: RDS PostgreSQL (private)
 - ✅ Cache: ElastiCache Redis (private)
 
-### Recent Updates (2026-01-05)
-- ✅ Email service configured (Brevo SMTP)
-- ✅ Slack notifications enabled
-- ✅ CodeBuild database operations working
-- ✅ Security audit passed
-- ✅ Documentation updated
+### Recent Updates (2026-01-06)
+- ✅ SES SMTP in App Runner (VPC endpoint, no NAT)
+- ✅ Slack notifications via Lambda (no NAT)
+- ✅ Email verification toggle (`EMAIL_VERIFICATION_ENABLED`)
+- ✅ SES SMTP credentials rotated
+- ✅ Docs updated for current configuration
 
 ---
 

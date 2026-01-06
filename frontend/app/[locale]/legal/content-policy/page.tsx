@@ -23,9 +23,7 @@ export default function ContentPolicyPage() {
         <p className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1] text-foreground max-w-4xl">
           {t('title')}
         </p>
-        <p className="text-lg text-foreground/60 font-light">
-          {commonT('lastUpdated')}
-        </p>
+        <p className="text-lg text-foreground/60 font-light">{commonT('lastUpdated')}</p>
       </header>
 
       {/* Sections */}
@@ -50,19 +48,28 @@ export default function ContentPolicyPage() {
           </p>
           <ul className="space-y-4">
             <li className="text-lg leading-relaxed text-foreground/80 font-light">
-              <strong className="font-medium text-foreground">{t('prohibited_hate_title')}</strong> {t('prohibited_hate_body')}
+              <strong className="font-medium text-foreground">{t('prohibited_hate_title')}</strong>{' '}
+              {t('prohibited_hate_body')}
             </li>
             <li className="text-lg leading-relaxed text-foreground/80 font-light">
-              <strong className="font-medium text-foreground">{t('prohibited_harassment_title')}</strong> {t('prohibited_harassment_body')}
+              <strong className="font-medium text-foreground">
+                {t('prohibited_harassment_title')}
+              </strong>{' '}
+              {t('prohibited_harassment_body')}
             </li>
             <li className="text-lg leading-relaxed text-foreground/80 font-light">
-              <strong className="font-medium text-foreground">{t('prohibited_spam_title')}</strong> {t('prohibited_spam_body')}
+              <strong className="font-medium text-foreground">{t('prohibited_spam_title')}</strong>{' '}
+              {t('prohibited_spam_body')}
             </li>
             <li className="text-lg leading-relaxed text-foreground/80 font-light">
-              <strong className="font-medium text-foreground">{t('prohibited_illegal_title')}</strong> {t('prohibited_illegal_body')}
+              <strong className="font-medium text-foreground">
+                {t('prohibited_illegal_title')}
+              </strong>{' '}
+              {t('prohibited_illegal_body')}
             </li>
             <li className="text-lg leading-relaxed text-foreground/80 font-light">
-              <strong className="font-medium text-foreground">{t('prohibited_false_title')}</strong> {t('prohibited_false_body')}
+              <strong className="font-medium text-foreground">{t('prohibited_false_title')}</strong>{' '}
+              {t('prohibited_false_body')}
             </li>
           </ul>
         </div>

@@ -23,9 +23,7 @@ export default function TermsPage() {
         <p className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1] text-foreground max-w-4xl">
           {t('title')}
         </p>
-        <p className="text-lg text-foreground/60 font-light">
-          {commonT('lastUpdated')}
-        </p>
+        <p className="text-lg text-foreground/60 font-light">{commonT('lastUpdated')}</p>
       </header>
 
       {/* 1. Introduction */}
@@ -34,9 +32,7 @@ export default function TermsPage() {
           <h2 className="text-xl font-medium">{t('intro_title')}</h2>
         </div>
         <div className="md:col-span-8 space-y-8">
-          <p className="text-lg leading-relaxed text-foreground/80 font-light">
-            {t('intro_body')}
-          </p>
+          <p className="text-lg leading-relaxed text-foreground/80 font-light">{t('intro_body')}</p>
         </div>
       </div>
 
@@ -71,7 +67,7 @@ export default function TermsPage() {
         </div>
       </div>
 
-       {/* 4. Moderation */}
+      {/* 4. Moderation */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-t border-foreground/10 pt-12">
         <div className="md:col-span-4">
           <h2 className="text-xl font-medium">{t('moderation_title')}</h2>
@@ -126,7 +122,7 @@ export default function TermsPage() {
         </div>
         <div className="md:col-span-8 space-y-8">
           <p className="text-lg leading-relaxed text-foreground/80 font-light">
-             {t('governing_body')}
+            {t('governing_body')}
           </p>
         </div>
       </div>
@@ -138,11 +134,10 @@ export default function TermsPage() {
         </div>
         <div className="md:col-span-8 space-y-8">
           <p className="text-lg leading-relaxed text-foreground/80 font-light">
-             {t('contact_body')}
+            {t('contact_body')}
           </p>
         </div>
       </div>
-
     </div>
   );
 }
