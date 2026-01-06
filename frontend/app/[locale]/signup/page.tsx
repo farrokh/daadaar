@@ -12,6 +12,7 @@ export default function SignupPage() {
   const t = useTranslations('auth');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [requiresEmailVerification, setRequiresEmailVerification] = useState(true);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<{
     email?: string;
@@ -88,6 +89,7 @@ export default function SignupPage() {
       });
 
       if (result.success) {
+        setRequiresEmailVerification(result.requiresEmailVerification ?? true);
         setSuccess(true);
       } else {
         // Handle specific error messages
@@ -128,7 +130,11 @@ export default function SignupPage() {
             </div>
           </div>
           <h2 className="text-2xl font-bold mb-4">{t('signup_success')}</h2>
-          <p className="text-muted-foreground mb-8">{t('verification_email_sent')}</p>
+          <p className="text-muted-foreground mb-8">
+            {requiresEmailVerification
+              ? t('verification_email_sent')
+              : t('verification_not_required')}
+          </p>
           <Link href="/login">
             <Button className="w-full">{t('login_button')}</Button>
           </Link>

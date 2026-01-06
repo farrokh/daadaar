@@ -303,6 +303,7 @@
     "user_already_exists": "User with this email or username already exists",
     "creating_account": "Creating account...",
     "verification_email_sent": "We sent you an email with a verification link. Please check your inbox and click the link to verify your account.",
+    "verification_not_required": "Email verification is temporarily disabled. You can log in now.",
     "email_verified": "Email verified successfully! You can now login.",
     "verification_failed": "Invalid or expired verification token."
   },
