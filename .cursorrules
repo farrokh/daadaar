@@ -59,3 +59,7 @@ You are an expert AI developer working on the Daadaar Platform. You must follow 
 - **Health Checks**: Backend exposes `/api/health` endpoint that checks database and Redis connectivity. Use for monitoring and deployment health checks.
 - **Testing**: Run lint checks with `biome` before submitting code.
 - **Commits**: Use descriptive commit messages following the project's conventional style.
+## 11. Git Workflow
+- **Branch Strategy**: Use descriptive branch names (e.g., `fix/translation`, `feat/new-modal`).
+- **PR Management**: When creating a PR, wait for successful merge or follow the user's explicit merge instructions.
+- **Branch Deletion**: **NEVER** delete a branch (local or remote) before ensuring it has been fully merged into the base branch. Always `git pull origin main` (or the base branch) into the local workspace after a merge to verify consistency before cleaning up branches.
