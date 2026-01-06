@@ -138,6 +138,7 @@ The development of Daadaar is organized into three strategic phases, moving from
   - ❌ **Missing**: Report history and audit trail
   - ❌ **Missing**: Automated report categorization and prioritization
 - [ ] **Ban Management UI**: Interface for temporary/permanent bans with reason tracking
+- [ ] **Async Image Processing**: Implement background job queue (e.g., AWS SQS + Lambda or Kafka) to convert images after direct S3 upload, decoupling processing from user upload flow
 - [ ] **Content Moderation Workflow**: Review, resolve, dismiss, and escalate reported content
 
 ### Organization Management
