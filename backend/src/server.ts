@@ -8,6 +8,7 @@ import { getRedisUnavailableCount } from './lib/rate-limiter';
 import { checkRedisConnection } from './lib/redis';
 import { checkSlackNotifierHealth } from './lib/slack';
 import adminContentReportsRoutes from './routes/admin/content-reports';
+import adminUsersRoutes from './routes/admin/users';
 import authRoutes from './routes/auth';
 import contentReportsRoutes from './routes/content-reports';
 import csrfRoutes from './routes/csrf';
@@ -66,6 +67,7 @@ app.use('/api/reports', reportsRoutes);
 app.use('/api/votes', votesRoutes);
 app.use('/api/content-reports', contentReportsRoutes);
 app.use('/api/admin/content-reports', adminContentReportsRoutes);
+app.use('/api/admin/users', adminUsersRoutes);
 
 // Simple health check for App Runner (no DB/Redis checks to avoid timeouts)
 app.get('/health', (_req, res) => {

@@ -42,6 +42,9 @@ export interface User {
   profileImageUrl: string | null;
   role: UserRole;
   isBanned: boolean;
+  bannedAt?: string | null;
+  bannedUntil?: string | null;
+  banReason?: string | null;
   createdAt: string;
   updatedAt: string;
 }

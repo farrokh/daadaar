@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-export default function AdminContentReportsPage() {
+export default function AdminPage() {
   const tCommon = useTranslations('common');
   const { currentUser, isAuthenticated, loading } = useAuth();
   const router = useRouter();
@@ -28,7 +28,6 @@ export default function AdminContentReportsPage() {
     return <div className="min-h-screen pt-32 flex justify-center">{tCommon('loading')}</div>;
   }
 
-  // Prevent flash of content before redirect
   const isAuthorized =
     isAuthenticated &&
     currentUser?.type === 'registered' &&
@@ -38,5 +37,5 @@ export default function AdminContentReportsPage() {
     return null;
   }
 
-  return <AdminDashboard initialTab="reports" canManageUsers={currentUser.role === 'admin'} />;
+  return <AdminDashboard canManageUsers={currentUser.role === 'admin'} />;
 }
