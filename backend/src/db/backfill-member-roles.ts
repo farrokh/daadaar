@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
-import { closeDatabaseConnection, db, schema } from './index';
 import { and, eq, or } from 'drizzle-orm';
+import { closeDatabaseConnection, db, schema } from './index';
 
 const DEFAULT_MEMBER_ROLE_TITLE = 'Member';
 const DEFAULT_MEMBER_ROLE_DESCRIPTION = 'Default role for organization members';

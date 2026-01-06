@@ -3,11 +3,7 @@
     {
       "AllowedHeaders": ["*"],
       "AllowedMethods": ["GET", "HEAD", "PUT"],
-      "AllowedOrigins": [
-        "https://www.daadaar.com",
-        "https://daadaar.com",
-        "http://localhost:3000"
-      ],
+      "AllowedOrigins": ["https://www.daadaar.com", "https://daadaar.com", "http://localhost:3000"],
       "ExposeHeaders": ["ETag"],
       "MaxAgeSeconds": 3000
     }
