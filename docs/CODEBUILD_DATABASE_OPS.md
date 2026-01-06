@@ -275,6 +275,26 @@ Optional overrides:
 - `ORGANIZATION_NAME` (exact match on name or nameEn)
 - `INDIVIDUAL_ID` (target a specific individual instead of latest)
 
+### 5. Backfill Member Roles for All Organizations
+
+This ensures every organization has a default **Member** role.
+
+```bash
+aws codebuild start-build \
+  --project-name daadaar-migrations \
+  --region us-east-1 \
+  --buildspec-override file://infrastructure/aws/backfill-member-roles.buildspec.yml
+```
+
+Dry run (no inserts):
+```bash
+aws codebuild start-build \
+  --project-name daadaar-migrations \
+  --region us-east-1 \
+  --buildspec-override file://infrastructure/aws/backfill-member-roles.buildspec.yml \
+  --environment-variables-override name=DRY_RUN,value=true,type=PLAINTEXT
+```
+
 ---
 
 ## Buildspec Files
