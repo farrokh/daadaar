@@ -87,13 +87,19 @@ User Request → Cloudflare CDN → AWS S3 (Origin)
 [
   {
     "AllowedHeaders": ["*"],
-    "AllowedMethods": ["GET", "HEAD"],
-    "AllowedOrigins": ["https://www.daadaar.com", "https://media.daadaar.com"],
+    "AllowedMethods": ["GET", "HEAD", "PUT"],
+    "AllowedOrigins": [
+      "https://www.daadaar.com",
+      "https://daadaar.com",
+      "http://localhost:3000"
+    ],
     "ExposeHeaders": ["ETag"],
     "MaxAgeSeconds": 3000
   }
 ]
 ```
+
+**Note**: The `PUT` method is required for direct uploads to S3 using presigned URLs (videos, audio, documents). Images use direct backend upload and don't require this.
 
 ### 3. Backend Code Changes
 

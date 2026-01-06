@@ -1,7 +1,7 @@
 // Individuals controller
 // Handles CRUD operations for individuals (people)
 
-import { eq } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
@@ -20,6 +20,56 @@ interface CreateIndividualBody {
   startDate?: string | null;
   endDate?: string | null;
 }
+
+const DEFAULT_MEMBER_ROLE_TITLE = 'Member';
+const DEFAULT_MEMBER_ROLE_DESCRIPTION = 'Default role for organization members';
+
+const getOrCreateDefaultRoleId = async ({
+  organizationId,
+  userId,
+  sessionId,
+}: {
+  organizationId: number;
+  userId: number | null;
+  sessionId: string | null;
+}): Promise<number> => {
+  const [existingRole] = await db
+    .select({ id: schema.roles.id })
+    .from(schema.roles)
+    .where(
+      and(
+        eq(schema.roles.organizationId, organizationId),
+        or(
+          eq(schema.roles.title, DEFAULT_MEMBER_ROLE_TITLE),
+          eq(schema.roles.titleEn, DEFAULT_MEMBER_ROLE_TITLE)
+        )
+      )
+    )
+    .limit(1);
+
+  if (existingRole) {
+    return existingRole.id;
+  }
+
+  const [createdRole] = await db
+    .insert(schema.roles)
+    .values({
+      organizationId,
+      title: DEFAULT_MEMBER_ROLE_TITLE,
+      titleEn: DEFAULT_MEMBER_ROLE_TITLE,
+      description: DEFAULT_MEMBER_ROLE_DESCRIPTION,
+      descriptionEn: DEFAULT_MEMBER_ROLE_DESCRIPTION,
+      createdByUserId: userId,
+      sessionId,
+    })
+    .returning({ id: schema.roles.id });
+
+  if (!createdRole) {
+    throw new Error('Failed to create default role');
+  }
+
+  return createdRole.id;
+};
 
 /**
  * POST /api/individuals
@@ -95,6 +145,32 @@ export async function createIndividual(req: Request, res: Response) {
     const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
+    // Auto-create a default role when an organization is provided without a role
+    let resolvedRoleId = body.roleId ?? null;
+    if (!resolvedRoleId && body.organizationId) {
+      const [organization] = await db
+        .select({ id: schema.organizations.id })
+        .from(schema.organizations)
+        .where(eq(schema.organizations.id, body.organizationId))
+        .limit(1);
+
+      if (!organization) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Organization not found',
+          },
+        });
+      }
+
+      resolvedRoleId = await getOrCreateDefaultRoleId({
+        organizationId: body.organizationId,
+        userId,
+        sessionId,
+      });
+    }
+
     // Create the individual
     const [newIndividual] = await db
       .insert(schema.individuals)
@@ -110,11 +186,11 @@ export async function createIndividual(req: Request, res: Response) {
       })
       .returning();
 
-    // If role is specified, create role occupancy
-    if (body.roleId && newIndividual) {
+    // If role is specified or resolved, create role occupancy
+    if (resolvedRoleId && newIndividual) {
       await db.insert(schema.roleOccupancy).values({
         individualId: newIndividual.id,
-        roleId: body.roleId,
+        roleId: resolvedRoleId,
         startDate: body.startDate ? new Date(body.startDate) : new Date(),
         endDate: body.endDate ? new Date(body.endDate) : null,
         createdByUserId: userId,
@@ -326,6 +402,49 @@ export async function updateIndividual(req: Request, res: Response) {
 
     if (body.dateOfBirth !== undefined) {
       updateData.dateOfBirth = body.dateOfBirth ? new Date(body.dateOfBirth) : null;
+    }
+
+    if (body.organizationId) {
+      const [organization] = await db
+        .select({ id: schema.organizations.id })
+        .from(schema.organizations)
+        .where(eq(schema.organizations.id, body.organizationId))
+        .limit(1);
+
+      if (!organization) {
+        return res.status(400).json({
+          success: false,
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Organization not found',
+          },
+        });
+      }
+
+      const [existingRole] = await db
+        .select({ id: schema.roleOccupancy.id })
+        .from(schema.roleOccupancy)
+        .where(eq(schema.roleOccupancy.individualId, individualId))
+        .limit(1);
+
+      if (!existingRole) {
+        const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
+        const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
+        const memberRoleId = await getOrCreateDefaultRoleId({
+          organizationId: body.organizationId,
+          userId,
+          sessionId,
+        });
+
+        await db.insert(schema.roleOccupancy).values({
+          individualId,
+          roleId: memberRoleId,
+          startDate: new Date(),
+          endDate: null,
+          createdByUserId: userId,
+          sessionId,
+        });
+      }
     }
 
     // Update the individual

@@ -258,6 +258,43 @@ aws codebuild start-build \
     name=RUN_SEED,value=true,type=PLAINTEXT
 ```
 
+### 4. Backfill Latest Individual Role
+
+This assigns the default **Member** role to the latest individual who has no role occupancy.
+
+```bash
+aws codebuild start-build \
+  --project-name daadaar-migrations \
+  --region us-east-1 \
+  --buildspec-override file://infrastructure/aws/backfill-latest-individual-member-role.buildspec.yml \
+  --environment-variables-override \
+    name=ORGANIZATION_ID,value=123,type=PLAINTEXT
+```
+
+Optional overrides:
+- `ORGANIZATION_NAME` (exact match on name or nameEn)
+- `INDIVIDUAL_ID` (target a specific individual instead of latest)
+
+### 5. Backfill Member Roles for All Organizations
+
+This ensures every organization has a default **Member** role.
+
+```bash
+aws codebuild start-build \
+  --project-name daadaar-migrations \
+  --region us-east-1 \
+  --buildspec-override file://infrastructure/aws/backfill-member-roles.buildspec.yml
+```
+
+Dry run (no inserts):
+```bash
+aws codebuild start-build \
+  --project-name daadaar-migrations \
+  --region us-east-1 \
+  --buildspec-override file://infrastructure/aws/backfill-member-roles.buildspec.yml \
+  --environment-variables-override name=DRY_RUN,value=true,type=PLAINTEXT
+```
+
 ---
 
 ## Buildspec Files
