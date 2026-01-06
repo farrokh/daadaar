@@ -305,5 +305,30 @@
     "verification_email_sent": "We sent you an email with a verification link. Please check your inbox and click the link to verify your account.",
     "email_verified": "Email verified successfully! You can now login.",
     "verification_failed": "Invalid or expired verification token."
+  },
+  "aboutPage": {
+    "title": "About Daadaar",
+    "subtitle": "A decentralized initiative for transparency and justice.",
+    "intro_title": "The Mission",
+    "intro_body": "Daadaar is an open-source, decentralized platform dedicated to documenting and visualizing the complex web of relationships within the Iranian government and its affiliated institutions. Our primary objective is to expose institutional injustices by providing a secure, anonymous channel for citizens to report incidents and for the global community to verify them.",
+    "context_title": "Context",
+    "context_body": "In an environment where information is tightly controlled and transparency is non-existent, systemic corruption and human rights abuses thrive in the shadows. Daadaar aims to shine a light on these dark corners by leveraging the power of collective intelligence and modern technology. We believe that mapping the hierarchy of power is the first step towards holding it accountable.",
+    "how_it_works_title": "How It Works",
+    "how_it_works_step1_title": "Anonymous Reporting",
+    "how_it_works_step1_body": "Users can submit reports about specific individuals or organizations without revealing their identity. Our system is designed from the ground up to protect the reporter, utilizing advanced encryption and a strict zero-logging policy.",
+    "how_it_works_step2_title": "Community Verification",
+    "how_it_works_step2_body": "Every report undergoes a rigorous verification process. We employ a hybrid model that combines AI-driven analysis with trusted community moderation to ensure the accuracy and credibility of the data.",
+    "how_it_works_step3_title": "Graph Visualization",
+    "how_it_works_step3_body": "Verified data is fed into our global knowledge graph. This allows us to visualize connections, command structures, and spheres of influence, revealing patterns that would be impossible to detect in isolated reports.",
+    "tech_title": "Technical Architecture",
+    "tech_body": "Daadaar is built on a stack prioritizing security and resilience. We use a graph database to model complex relationships, IPFS for decentralized media storage, and a custom Proof-of-Work (PoW) mechanism to prevent spam without relying on invasive CAPTCHAs or IP tracking. The entire codebase is open-source, allowing security experts to audit our privacy claims.",
+    "privacy_title": "Uncompromising Privacy",
+    "privacy_body": "We do not track IP addresses. We do not use browser fingerprinting. We do not store any metadata that could link a user to a submission. Anonymity is not just a feature of Daadaar; it is our foundational promise. We encourage the use of VPNs and Tor to further protect your connection.",
+    "join_us_title": "Join the Initiative",
+    "join_us_body": "This is a community-driven project. Whether you are a developer, a researcher, or a citizen with a story to tell, your contribution is vital. Help us build the most comprehensive map of institutional power in Iran.",
+    "opensource_title": "Open Source",
+    "opensource_desc": "Trust requires transparency. Our code is fully open source on GitHub.",
+    "share_initiative": "Share Initiative",
+    "copied": "Copied!"
   }
 }
