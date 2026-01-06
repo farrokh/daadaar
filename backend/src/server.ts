@@ -19,7 +19,9 @@ import reportsRoutes from './routes/reports';
 import rolesRoutes from './routes/roles';
 import votesRoutes from './routes/votes';
 
-dotenv.config();
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config();
+}
 
 const app: Express = express();
 const PORT = process.env.PORT || 4000;
