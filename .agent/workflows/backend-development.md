@@ -17,6 +17,7 @@ Use this role for changes to the Express/Bun backend, AWS integrations, and depl
 - **S3 access**: Production uses the App Runner **instance role** (no static `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`).
 - **Email verification**: Toggled via `EMAIL_VERIFICATION_ENABLED` and read at request time.
 - **Migrations**: Use `bun run db:generate` + `bun run db:migrate`. Avoid `db:push` in production.
+ - **Slack notifications**: Require `SLACK_LAMBDA_FUNCTION_NAME` and the App Runner role permission to invoke Lambda.
 
 ## Local Dev
 ```bash
@@ -44,3 +45,7 @@ aws apprunner start-deployment --service-arn arn:aws:apprunner:us-east-1:<AWS_AC
 - `AWS_REGION`, `AWS_S3_BUCKET`
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`
 - `SLACK_LAMBDA_FUNCTION_NAME` (or `SLACK_LAMBDA_FUNCTION_ARN`)
+
+## Operational Checks
+- Slack notifier health: `GET /api/health/notifications/slack`
+- Media uploads: verify S3 access via instance role (no static keys).
