@@ -1,7 +1,7 @@
 // Individuals controller
 // Handles CRUD operations for individuals (people)
 
-import { eq } from 'drizzle-orm';
+import { and, eq, or } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
@@ -95,6 +95,47 @@ export async function createIndividual(req: Request, res: Response) {
     const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
     const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
+    // Auto-create a default role when an organization is provided without a role
+    let resolvedRoleId = body.roleId ?? null;
+    if (!resolvedRoleId && body.organizationId) {
+      const defaultRoleTitle = 'Member';
+      const [existingRole] = await db
+        .select({ id: schema.roles.id })
+        .from(schema.roles)
+        .where(
+          and(
+            eq(schema.roles.organizationId, body.organizationId),
+            or(
+              eq(schema.roles.title, defaultRoleTitle),
+              eq(schema.roles.titleEn, defaultRoleTitle)
+            )
+          )
+        )
+        .limit(1);
+
+      if (existingRole) {
+        resolvedRoleId = existingRole.id;
+      } else {
+        const [createdRole] = await db
+          .insert(schema.roles)
+          .values({
+            organizationId: body.organizationId,
+            title: defaultRoleTitle,
+            titleEn: defaultRoleTitle,
+            description: 'Default role for organization members',
+            descriptionEn: 'Default role for organization members',
+            createdByUserId: userId,
+            sessionId,
+          })
+          .returning({ id: schema.roles.id });
+
+        if (!createdRole) {
+          throw new Error('Failed to create default role');
+        }
+        resolvedRoleId = createdRole.id;
+      }
+    }
+
     // Create the individual
     const [newIndividual] = await db
       .insert(schema.individuals)
@@ -110,11 +151,11 @@ export async function createIndividual(req: Request, res: Response) {
       })
       .returning();
 
-    // If role is specified, create role occupancy
-    if (body.roleId && newIndividual) {
+    // If role is specified or resolved, create role occupancy
+    if (resolvedRoleId && newIndividual) {
       await db.insert(schema.roleOccupancy).values({
         individualId: newIndividual.id,
-        roleId: body.roleId,
+        roleId: resolvedRoleId,
         startDate: body.startDate ? new Date(body.startDate) : new Date(),
         endDate: body.endDate ? new Date(body.endDate) : null,
         createdByUserId: userId,
