@@ -293,7 +293,7 @@ export default function ReportDetailPage() {
       {/* Lightbox */}
       <dialog
         ref={dialogRef}
-        className="fixed inset-0 z-[100] w-full h-full bg-background/95 backdrop-blur-xl p-0 m-0 border-0 flex items-center justify-center"
+        className="fixed inset-0 z-[100] w-full h-full bg-background/95 backdrop-blur-xl p-0 m-0 border-0"
         onClick={() => setSelectedMedia(null)}
         onKeyDown={e => e.key === 'Escape' && setSelectedMedia(null)}
       >
