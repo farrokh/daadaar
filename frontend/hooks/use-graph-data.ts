@@ -16,6 +16,7 @@ interface OrganizationPeopleResponse {
     name: string;
     nameEn?: string | null;
     description?: string | null;
+    descriptionEn?: string | null;
     logoUrl?: string | null;
     url?: string | null;
     s3Key?: string | null;
@@ -30,6 +31,7 @@ interface IndividualReportsResponse {
     fullName: string;
     fullNameEn?: string | null;
     biography?: string | null;
+    biographyEn?: string | null;
     profileImageUrl?: string | null;
     url?: string | null;
     s3Key?: string | null;
@@ -116,6 +118,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
             name: organization.name,
             nameEn: organization.nameEn,
             description: organization.description,
+            descriptionEn: organization.descriptionEn,
             logoUrl: organization.logoUrl,
             url: organization.url,
             s3Key: organization.s3Key,
@@ -166,6 +169,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
             name: individual.fullName,
             nameEn: individual.fullNameEn,
             biography: individual.biography,
+            biographyEn: individual.biographyEn,
             profileImageUrl: individual.profileImageUrl,
             url: individual.url,
             s3Key: individual.s3Key,

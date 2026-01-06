@@ -101,13 +101,13 @@ export async function getOrganizationPeople(req: Request, res: Response) {
       });
     }
 
-    // Fetch the organization details
     const [organization] = await db
       .select({
         id: schema.organizations.id,
         name: schema.organizations.name,
         nameEn: schema.organizations.nameEn,
         description: schema.organizations.description,
+        descriptionEn: schema.organizations.descriptionEn,
         logoUrl: schema.organizations.logoUrl,
       })
       .from(schema.organizations)
@@ -277,6 +277,7 @@ export async function getIndividualReports(req: Request, res: Response) {
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
         biography: schema.individuals.biography,
+        biographyEn: schema.individuals.biographyEn,
         profileImageUrl: schema.individuals.profileImageUrl,
       })
       .from(schema.individuals)
