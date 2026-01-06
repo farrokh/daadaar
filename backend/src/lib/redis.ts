@@ -1,6 +1,7 @@
 import Redis from 'ioredis';
 
 const redisUrl = process.env.REDIS_URL;
+const useTls = redisUrl?.startsWith('rediss://') ?? false;
 
 if (!redisUrl) {
   console.warn(
@@ -26,6 +27,7 @@ function getRedisClient(): Redis | null {
         return Math.min(times * 100, 2000); // Exponential backoff
       },
       connectTimeout: 10000,
+      ...(useTls ? { tls: {} } : {}),
     });
     
     // Handle connection errors gracefully

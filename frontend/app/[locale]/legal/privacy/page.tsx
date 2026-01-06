@@ -1,134 +1,190 @@
-import type { Metadata } from 'next';
+import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy',
-  description: 'Privacy Policy for the Daadaar Platform',
-};
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }) {
+  const t = await getTranslations({ locale, namespace: 'legal.privacyPolicy' });
+  return {
+    title: t('title'),
+    description: t('description'),
+  };
+}
 
 export default function PrivacyPage() {
+  const t = useTranslations('legal.privacyPolicy');
+  const commonT = useTranslations('legal.common');
+
   return (
-    <div>
-      <h1>Privacy Policy</h1>
-      <p>Last updated: January 2026</p>
+    <div className="space-y-12">
+      {/* Header */}
+      <header className="space-y-6 mb-24">
+        <h1 className="text-sm font-medium uppercase text-foreground/50 border-b border-foreground/10 pb-4 tracking-[0.2em]">
+          {commonT('eyebrow')}
+        </h1>
+        <p className="text-4xl md:text-6xl font-bold tracking-tight leading-[1.1] text-foreground max-w-4xl">
+          {t('title')}
+        </p>
+        <p className="text-lg text-foreground/60 font-light">
+          {commonT('lastUpdated')}
+        </p>
+      </header>
 
-      <h2>1. Our Commitment to Privacy</h2>
-      <p>
-        Daadaar is built on the principle of privacy by default. We believe you should be able to
-        expose injustice without sacrificing your anonymity. This Privacy Policy explains what
-        information we collect, how we use it, and the steps we take to protect your identity.
-      </p>
+      {/* 1. Commitment */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+        <div className="md:col-span-4">
+          <h2 className="text-xl font-medium">{t('commitment_title')}</h2>
+        </div>
+        <div className="md:col-span-8 space-y-8">
+          <p className="text-lg leading-relaxed text-foreground/80 font-light">
+            {t('commitment_body')}
+          </p>
+        </div>
+      </div>
 
-      <h2>2. Information We DO NOT Collect</h2>
-      <p>
-        <strong>Zero IP Logging:</strong> We explicitly do not log or store your IP address. Our
-        infrastructure, including our Cloudflare integration, is configured to anonymize requests at
-        the edge.
-      </p>
-      <p>
-        <strong>No Usage Tracking:</strong> We do not track your browsing history or personal
-        behavior on the Platform beyond what is necessary for security (see Rate Limiting).
-      </p>
+      {/* 2. DO NOT Collect */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-t border-foreground/10 pt-12">
+        <div className="md:col-span-4">
+          <h2 className="text-xl font-medium">{t('not_collected_title')}</h2>
+        </div>
+        <div className="md:col-span-8 space-y-6">
+          <p className="text-lg leading-relaxed text-foreground/80 font-light">
+            <strong className="font-medium text-foreground">{t('zero_ip_title')}</strong> {t('zero_ip_body')}
+          </p>
+          <p className="text-lg leading-relaxed text-foreground/80 font-light">
+            <strong className="font-medium text-foreground">{t('no_tracking_title')}</strong> {t('no_tracking_body')}
+          </p>
+        </div>
+      </div>
 
-      <h2>3. Information We Collect</h2>
-      <h3>a. Anonymous Sessions</h3>
-      <p>
-        When you visit Daadaar, a random Session ID is generated and stored locally on your device.
-        This identifier is used solely for:
-      </p>
-      <ul>
-        <li>
-          Rate limiting to prevent spam (e.g., limiting the number of reports you can submit in an
-          hour).
-        </li>
-        <li>Managing your "upvotes" and "downvotes" to prevent double-voting.</li>
-      </ul>
-      <p>This Session ID is not linked to your real-world identity.</p>
+      {/* 3. We Collect */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-t border-foreground/10 pt-12">
+        <div className="md:col-span-4">
+          <h2 className="text-xl font-medium">{t('collected_title')}</h2>
+        </div>
+        <div className="md:col-span-8 space-y-10">
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-foreground">{t('sessions_title')}</h3>
+            <p className="text-lg leading-relaxed text-foreground/80 font-light">
+              {t('sessions_body')}
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-lg leading-relaxed text-foreground/80 font-light">
+              <li>{t('sessions_list_1')}</li>
+              <li>{t('sessions_list_2')}</li>
+            </ul>
+            <p className="text-lg leading-relaxed text-foreground/80 font-light">
+              {t('sessions_note')}
+            </p>
+          </div>
 
-      <h3>b. Optional Account Information</h3>
-      <p>If you choose to create an account, we collect:</p>
-      <ul>
-        <li>
-          <strong>Username:</strong> A pseudonym you choose.
-        </li>
-        <li>
-          <strong>Password:</strong> Hashed and salted securely.
-        </li>
-        <li>
-          <strong>Email (Optional):</strong> Only if you wish to recover your account. We recommend
-          using a secure, anonymous email provider.
-        </li>
-      </ul>
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-foreground">{t('account_title')}</h3>
+            <p className="text-lg leading-relaxed text-foreground/80 font-light">
+              {t('account_intro')}
+            </p>
+            <ul className="list-disc pl-5 space-y-2 text-lg leading-relaxed text-foreground/80 font-light">
+              <li>{t('account_list_1')}</li>
+              <li>{t('account_list_2')}</li>
+              <li>{t('account_list_3')}</li>
+            </ul>
+          </div>
 
-      <h3>c. Content You Submit</h3>
-      <p>
-        Any reports, images, or text you submit to the Platform are public. Please be mindful of any
-        personally identifiable information (PII) included in your submissions. We strive to
-        sanitize content, but you are responsible for what you share.
-      </p>
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-foreground">{t('submissions_title')}</h3>
+            <p className="text-lg leading-relaxed text-foreground/80 font-light">
+              {t('submissions_body')}
+            </p>
+          </div>
+        </div>
+      </div>
 
-      <h2>4. How We Use Information</h2>
-      <ul>
-        <li>
-          <strong>Security:</strong> To protect the Platform from abuse, spam, and "sybil attacks"
-          using Proof-of-Work (PoW) and rate limiting.
-        </li>
-        <li>
-          <strong>Platform Operation:</strong> To display reports, verify content via AI, and
-          maintain the knowledge graph.
-        </li>
-      </ul>
+      {/* 4. How We Use */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-t border-foreground/10 pt-12">
+        <div className="md:col-span-4">
+          <h2 className="text-xl font-medium">{t('usage_title')}</h2>
+        </div>
+        <div className="md:col-span-8 space-y-6">
+          <ul className="list-disc pl-5 space-y-4 text-lg leading-relaxed text-foreground/80 font-light">
+            <li>
+              <strong className="font-medium text-foreground">{t('usage_security_title')}</strong> {t('usage_security_body')}
+            </li>
+            <li>
+              <strong className="font-medium text-foreground">{t('usage_operation_title')}</strong> {t('usage_operation_body')}
+            </li>
+          </ul>
+        </div>
+      </div>
 
-      <h2>5. Cookies and Local Storage</h2>
-      <p>We use local storage and session cookies strictly for necessary functions:</p>
-      <ul>
-        <li>Maintaining your login state or anonymous session.</li>
-        <li>Storing your preferences (e.g., language, theme).</li>
-        <li>Completing Proof-of-Work challenges.</li>
-      </ul>
-      <p>We do not use third-party tracking cookies for advertising.</p>
+       {/* 5. Cookies */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-t border-foreground/10 pt-12">
+        <div className="md:col-span-4">
+          <h2 className="text-xl font-medium">{t('cookies_title')}</h2>
+        </div>
+        <div className="md:col-span-8 space-y-6">
+          <p className="text-lg leading-relaxed text-foreground/80 font-light">
+            {t('cookies_intro')}
+          </p>
+           <ul className="list-disc pl-5 space-y-2 text-lg leading-relaxed text-foreground/80 font-light">
+            <li>{t('cookies_list_1')}</li>
+            <li>{t('cookies_list_2')}</li>
+            <li>{t('cookies_list_3')}</li>
+          </ul>
+          <p className="text-lg leading-relaxed text-foreground/80 font-light italic">
+             {t('cookies_note')}
+          </p>
+        </div>
+      </div>
 
-      <h2>6. Data Security</h2>
-      <p>We employ robust security measures to protect your data:</p>
-      <ul>
-        <li>
-          <strong>Encryption:</strong> All data is encrypted in transit (HTTPS/TLS) and at rest
-          (stored encrypted in our databases and object storage).
-        </li>
-        <li>
-          <strong>Minimal Retention:</strong> We do not retain logs that could identify you. Rate
-          limit keys expire automatically.
-        </li>
-      </ul>
+      {/* 6. Data Security */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-t border-foreground/10 pt-12">
+        <div className="md:col-span-4">
+          <h2 className="text-xl font-medium">{t('security_title')}</h2>
+        </div>
+        <div className="md:col-span-8 space-y-6">
+           <ul className="list-disc pl-5 space-y-4 text-lg leading-relaxed text-foreground/80 font-light">
+            <li>
+              <strong className="font-medium text-foreground">{t('security_encryption_title')}</strong> {t('security_encryption_body')}
+            </li>
+            <li>
+              <strong className="font-medium text-foreground">{t('security_retention_title')}</strong> {t('security_retention_body')}
+            </li>
+          </ul>
+        </div>
+      </div>
 
-      <h2>7. Third-Party Services</h2>
-      <p>We use trusted third-party providers for infrastructure, including:</p>
-      <ul>
-        <li>
-          <strong>Cloudflare:</strong> For DDoS protection and content delivery.
-        </li>
-        <li>
-          <strong>AWS:</strong> For hosting and storage.
-        </li>
-        <li>
-          <strong>OpenAI:</strong> For verifying report content (only the report text is sent, not
-          metadata).
-        </li>
-      </ul>
-      <p>
-        These providers are vetted to ensure they align with our security and privacy standards.
-      </p>
+       {/* 7. Third Party */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-t border-foreground/10 pt-12">
+        <div className="md:col-span-4">
+          <h2 className="text-xl font-medium">{t('thirdparty_title')}</h2>
+        </div>
+        <div className="md:col-span-8 space-y-6">
+          <p className="text-lg leading-relaxed text-foreground/80 font-light">
+            {t('thirdparty_intro')}
+          </p>
+           <ul className="list-disc pl-5 space-y-2 text-lg leading-relaxed text-foreground/80 font-light">
+            <li><strong>{t('thirdparty_cf')}</strong> {t('thirdparty_cf_desc')}</li>
+            <li><strong>{t('thirdparty_aws')}</strong> {t('thirdparty_aws_desc')}</li>
+            <li><strong>{t('thirdparty_openai')}</strong> {t('thirdparty_openai_desc')}</li>
+          </ul>
+          <p className="text-lg leading-relaxed text-foreground/80 font-light">
+            {t('thirdparty_note')}
+          </p>
+        </div>
+      </div>
 
-      <h2>8. Changes to this Policy</h2>
-      <p>
-        We may update this Privacy Policy to reflect changes in our practices or legal requirements.
-        We will notify you of any material changes by posting the new Privacy Policy on this page.
-      </p>
+      {/* 8. Contact */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 border-t border-foreground/10 pt-12">
+        <div className="md:col-span-4">
+          <h2 className="text-xl font-medium">{t('contact_title')}</h2>
+        </div>
+        <div className="md:col-span-8 space-y-6">
+          <p className="text-lg leading-relaxed text-foreground/80 font-light">
+             {t('contact_updates')}
+          </p>
+          <p className="text-lg leading-relaxed text-foreground/80 font-light">
+             {t('contact_body')}
+          </p>
+        </div>
+      </div>
 
-      <h2>9. Contact Us</h2>
-      <p>
-        If you have concerns about your privacy, please contact the administrators via the
-        Platform's reporting channels.
-      </p>
     </div>
   );
 }

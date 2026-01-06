@@ -3,7 +3,21 @@
  * Handles sending messages to Slack via Webhooks
  */
 
+import { InvokeCommand, LambdaClient } from '@aws-sdk/client-lambda';
+
 const SLACK_WEBHOOK_URL = process.env.SLACK_WEBHOOK_URL;
+const SLACK_LAMBDA_FUNCTION =
+  process.env.SLACK_LAMBDA_FUNCTION_NAME || process.env.SLACK_LAMBDA_FUNCTION_ARN;
+const AWS_REGION = process.env.AWS_REGION || 'us-east-1';
+
+let lambdaClient: LambdaClient | null = null;
+
+const getLambdaClient = () => {
+  if (!lambdaClient) {
+    lambdaClient = new LambdaClient({ region: AWS_REGION });
+  }
+  return lambdaClient;
+};
 
 interface SlackMessageOptions {
   text: string;
@@ -14,6 +28,34 @@ interface SlackMessageOptions {
   * Send a notification to Slack
   */
  export async function sendSlackNotification(options: SlackMessageOptions): Promise<void> {
+   if (SLACK_LAMBDA_FUNCTION) {
+     try {
+       const payload = Buffer.from(
+         JSON.stringify({
+           text: options.text,
+           blocks: options.blocks,
+           attachments: options.attachments,
+         }),
+         'utf-8'
+       );
+
+       const response = await getLambdaClient().send(
+         new InvokeCommand({
+           FunctionName: SLACK_LAMBDA_FUNCTION,
+           InvocationType: 'Event',
+           Payload: payload,
+         })
+       );
+
+       if (response.StatusCode && response.StatusCode !== 202) {
+         console.error(`Slack Lambda invocation failed: ${response.StatusCode}`);
+       }
+     } catch (error) {
+       console.error('Error invoking Slack Lambda:', error);
+     }
+     return;
+   }
+
    if (!SLACK_WEBHOOK_URL) {
      console.warn('SLACK_WEBHOOK_URL is not defined. Skipping notification.');
      return;

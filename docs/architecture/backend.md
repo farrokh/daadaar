@@ -76,14 +76,13 @@ We use a shared library (`shared/api-types.ts`) to synchronize types between the
  We use **Amazon SES (Simple Email Service)** for sending transactional emails.
  - **Utility**: `backend/src/lib/email.ts`
  - **Provider**: Amazon SES (SMTP Interface)
- - **Throughput**: 62,000 emails/month free tier (from AWS sources)
  - **Email Types**:
    - Email Verification (signup)
    - Password Reset
    - Moderation Notifications
- - **Implementation**: 
+ - **Implementation**:
    - Uses Nodemailer with SMTP transport.
-   - **Network**: Connects via a private **VPC Endpoint** (email-smtp.us-east-1.amazonaws.com) to bypass the lack of internet/NAT Gateway in the private subnets.
+   - **Network**: App Runner egresses through VPC and reaches SES via the `email-smtp` VPC endpoint.
  - **Configuration**:
    ```bash
    SMTP_HOST=email-smtp.us-east-1.amazonaws.com
@@ -95,15 +94,23 @@ We use a shared library (`shared/api-types.ts`) to synchronize types between the
    ```
  
  ### 2. Slack Notifications
- We utilize Slack Webhooks for real-time monitoring of critical platform events. This allows our team to respond quickly to new content and potential abuse.
+ We send Slack notifications via a dedicated Lambda function to avoid NAT costs while App Runner egresses through the VPC.
  - **Utility**: `backend/src/lib/slack.ts`
  - **Events Tracked**:
    - New User Registrations
    - New Incident Reports
    - New Individuals/Organizations added to the graph
    - Content Reports (Abuse/Moderation)
- - **Implementation**: Fire-and-forget async calls to avoid blocking the main thread.
+ - **Implementation**: Fire-and-forget async calls. App Runner invokes Lambda asynchronously; Lambda posts to Slack webhook.
  - **Configuration**:
+   ```bash
+   SLACK_LAMBDA_FUNCTION_NAME=daadaar-slack-notifier
+   ```
+   Lambda environment:
+   ```bash
+   SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+   ```
+   Local dev fallback:
    ```bash
    SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
    ```
@@ -145,6 +152,7 @@ The backend allows only the configured frontend origin:
 - `JWT_SECRET` - JWT signing secret
 - `SESSION_SECRET` - Session encryption secret
 - `ENCRYPTION_KEY` - Data encryption key
+- `EMAIL_VERIFICATION_ENABLED` - Enable email verification checks (`true`/`false`)
 
 **AWS:**
 - `AWS_REGION` - AWS region (us-east-1)
@@ -156,14 +164,15 @@ The backend allows only the configured frontend origin:
 - `CDN_URL` - CDN URL for media (https://media.daadaar.com)
 
 **Email (SMTP):**
-- `SMTP_HOST` - SMTP server (smtp-relay.brevo.com)
+- `SMTP_HOST` - SMTP server (email-smtp.us-east-1.amazonaws.com)
 - `SMTP_PORT` - SMTP port (587)
-- `SMTP_USER` - SMTP username (no-reply@daadaar.com)
-- `SMTP_PASS` - SMTP password/API key
+- `SMTP_USER` - SMTP username (SES SMTP user)
+- `SMTP_PASS` - SMTP password
 - `EMAIL_FROM` - Email from address (optional, defaults to SMTP_USER)
 
 **Notifications (Optional):**
-- `SLACK_WEBHOOK_URL` - Slack webhook for notifications
+- `SLACK_LAMBDA_FUNCTION_NAME` - Lambda function name or ARN (production)
+- `SLACK_WEBHOOK_URL` - Direct webhook (local dev fallback)
 
 ### Health Endpoints
 - `GET /health` (App Runner liveness)

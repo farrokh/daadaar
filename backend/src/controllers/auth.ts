@@ -15,6 +15,8 @@ if (!JWT_SECRET) {
 }
 const JWT_EXPIRES_IN = '30d';
 const SESSION_EXPIRY = 30 * 24 * 60 * 60; // 30 days in seconds
+const EMAIL_VERIFICATION_ENABLED =
+  (process.env.EMAIL_VERIFICATION_ENABLED ?? 'true').toLowerCase() === 'true';
 
 /**
  * POST /api/auth/register
@@ -80,8 +82,8 @@ export const register = async (req: Request, res: Response) => {
     // Hash password with bcrypt (cost factor 10)
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Generate verification token
-    const verificationToken = uuidv4();
+    // Generate verification token only when verification is enabled
+    const verificationToken = EMAIL_VERIFICATION_ENABLED ? uuidv4() : null;
 
     // Create user
     const [newUser] = await db
@@ -92,13 +94,15 @@ export const register = async (req: Request, res: Response) => {
         passwordHash,
         displayName: displayName || username,
         role: 'user',
-        isVerified: false,
+        isVerified: EMAIL_VERIFICATION_ENABLED ? false : true,
         verificationToken,
       })
       .returning();
 
-    // Send verification email
-    await sendVerificationEmail(newUser.email, verificationToken);
+    // Send verification email only when verification is enabled
+    if (EMAIL_VERIFICATION_ENABLED && verificationToken) {
+      await sendVerificationEmail(newUser.email, verificationToken);
+    }
 
     // Notify Slack about new user
     notifyNewUser({
@@ -109,7 +113,9 @@ export const register = async (req: Request, res: Response) => {
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful. Please check your email to verify your account.',
+      message: EMAIL_VERIFICATION_ENABLED
+        ? 'Registration successful. Please check your email to verify your account.'
+        : 'Registration successful. Your account is active.',
       data: {
         id: newUser.id,
         email: newUser.email,
@@ -211,8 +217,8 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // Check if user is verified
-    if (!user.isVerified) {
+    // Check if user is verified (if verification is enabled)
+    if (EMAIL_VERIFICATION_ENABLED && !user.isVerified) {
       return res.status(403).json({
         success: false,
         error: {
