@@ -56,3 +56,8 @@ bun.lockb
 .prod_db_creds
 .prod_env_secrets
 apprunner-service.json
+.aws/*.json
+.aws/*.sh
+.aws/DEPLOYMENT_STATUS.md
+amplify.yml
+.aws/*.*

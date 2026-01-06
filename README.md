@@ -19,11 +19,11 @@ A decentralized, anonymous platform for exposing government injustices in Iran. 
 
 | Component | Technology |
 |-----------|------------|
-| Frontend | Next.js 16 (React 19) with App Router |
-| Backend | Express.js API server |
-| Database | PostgreSQL with Drizzle ORM |
-| Cache | Redis (Upstash) |
-| Infrastructure | AWS (ECS, S3, RDS) with Cloudflare |
+| Frontend | Next.js 16 (React 19) with App Router on Vercel |
+| Backend | Express.js API server (Bun runtime) on AWS App Runner |
+| Database | PostgreSQL with Drizzle ORM (AWS RDS) |
+| Cache | Redis (AWS ElastiCache Serverless) |
+| Infrastructure | AWS (App Runner, RDS, S3, ElastiCache) + Vercel + Cloudflare |
 
 For detailed architecture, see [ARCHITECTURE_SUMMARY.md](ARCHITECTURE_SUMMARY.md).
 
@@ -120,8 +120,11 @@ daadaar/
 We welcome contributions! This is a community-driven open-source project.
 
 1. Read our [Contributing Guide](CONTRIBUTING.md)
-2. Check out [good first issues](https://github.com/farrokh/daadaar/labels/good%20first%20issue)
-3. Join the discussion in [GitHub Discussions](https://github.com/farrokh/daadaar/discussions)
+2. Use the area-specific guides:
+   - [Frontend Contributors](docs/CONTRIBUTING_FRONTEND.md)
+   - [Backend Contributors](docs/CONTRIBUTING_BACKEND.md)
+3. Check out [good first issues](https://github.com/farrokh/daadaar/labels/good%20first%20issue)
+4. Join the discussion in [GitHub Discussions](https://github.com/farrokh/daadaar/discussions)
 
 ### Quick Contribution Steps
 
@@ -152,6 +155,8 @@ For security concerns, please see our [Security Policy](SECURITY.md) or contact 
 
 - [Architecture Summary](ARCHITECTURE_SUMMARY.md) - Technical architecture
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute
+- [Frontend Contributors](docs/CONTRIBUTING_FRONTEND.md) - Frontend-specific workflow
+- [Backend Contributors](docs/CONTRIBUTING_BACKEND.md) - Backend-specific workflow
 - [API Documentation](docs/api.md) - API reference (coming soon)
 
 ## 📜 License

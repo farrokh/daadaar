@@ -1,14 +1,13 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Building2, FileText, Plus, RefreshCw, User } from 'lucide-react';
+import { Building2, FileText, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 interface GraphToolbarProps {
   onAddOrganization: () => void;
   onAddPerson?: () => void;
   onAddReport?: () => void;
-  onRefresh: () => void;
   viewMode: 'organizations' | 'people' | 'reports';
   isLoading?: boolean;
 }
@@ -17,7 +16,6 @@ export function GraphToolbar({
   onAddOrganization,
   onAddPerson,
   onAddReport,
-  onRefresh,
   viewMode,
   isLoading = false,
   compact = false,
@@ -26,88 +24,72 @@ export function GraphToolbar({
   const t = useTranslations('graph');
 
   const content = (
-    <>
-      {/* Refresh Button */}
-      <Button
-        variant="ghost"
-        size={compact ? 'icon' : 'sm'}
-        onClick={onRefresh}
-        disabled={isLoading}
-        className={
-          compact
-            ? 'rounded-full'
-            : 'h-9 w-9 p-0 rounded-xl hover:bg-foreground/5 text-foreground/80 hover:text-foreground transition-all'
-        }
-        title={t('refresh')}
-      >
-        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-      </Button>
-
+    <div className="flex items-center gap-3">
       {/* Add Organization Button - Only show in organizations view */}
       {viewMode === 'organizations' && (
         <Button
-          variant={compact ? 'primary' : 'primary'}
-          size={compact ? 'icon' : 'sm'}
+          variant="ghost"
+          size="sm"
           onClick={onAddOrganization}
           disabled={isLoading}
-          className={
-            compact
-              ? 'rounded-xl shadow-sm'
-              : 'h-9 rounded-xl shadow-lg shadow-primary/20 transition-all font-medium px-4'
-          }
-          title={compact ? t('add_organization') : undefined}
+          className="group h-10 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-300"
+          title={t('add_organization')}
         >
-          <Building2 className="h-4 w-4" />
-          {!compact && <span className="ml-2">{t('add_organization')}</span>}
+          <div className="flex items-center gap-2">
+            <Building2 className="h-4 w-4 text-blue-400 group-hover:scale-110 transition-transform duration-300" />
+            <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">
+              {t('add_organization')}
+            </span>
+          </div>
         </Button>
       )}
 
       {/* Add Person Button - Only show in people view */}
       {viewMode === 'people' && onAddPerson && (
         <Button
-          variant={compact ? 'secondary' : 'secondary'}
-          size={compact ? 'icon' : 'sm'}
+          variant="ghost"
+          size="sm"
           onClick={onAddPerson}
           disabled={isLoading}
-          className={
-            compact
-              ? 'rounded-xl shadow-sm'
-              : 'h-9 rounded-xl shadow-lg shadow-secondary/20 transition-all font-medium px-4'
-          }
-          title={compact ? t('add_person') : undefined}
+          className="group h-10 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-300"
+          title={t('add_person')}
         >
-          <User className="h-4 w-4" />
-          {!compact && <span className="ml-2">{t('add_person')}</span>}
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4 text-purple-400 group-hover:scale-110 transition-transform duration-300" />
+            <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">
+              {t('add_person')}
+            </span>
+          </div>
         </Button>
       )}
 
       {/* Add Report Button - Only show in reports view */}
       {viewMode === 'reports' && onAddReport && (
         <Button
-          variant={compact ? 'default' : 'default'}
-          size={compact ? 'icon' : 'sm'}
+          variant="ghost"
+          size="sm"
           onClick={onAddReport}
           disabled={isLoading}
-          className={
-            compact
-              ? 'rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white shadow-sm'
-              : 'h-9 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-500/20 transition-all font-medium px-4'
-          }
-          title={compact ? t('add_report') : undefined}
+          className="group h-10 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all duration-300"
+          title={t('add_report')}
         >
-          <FileText className="h-4 w-4" />
-          {!compact && <span className="ml-2">{t('add_report')}</span>}
+          <div className="flex items-center gap-2">
+            <FileText className="h-4 w-4 text-emerald-400 group-hover:scale-110 transition-transform duration-300" />
+            <span className="text-sm font-medium text-foreground/80 group-hover:text-foreground">
+              {t('add_report')}
+            </span>
+          </div>
         </Button>
       )}
-    </>
+    </div>
   );
 
   if (compact) {
-    return <div className={`flex items-center gap-1 ${className || ''}`}>{content}</div>;
+    return <div className={`flex items-center ${className || ''}`}>{content}</div>;
   }
 
   return (
-    <div className="absolute top-4 right-4 z-10 flex items-center gap-2 p-1.5 bg-background/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+    <div className="absolute top-4 right-4 z-10 flex items-center p-1.5 bg-background/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
       {content}
     </div>
   );

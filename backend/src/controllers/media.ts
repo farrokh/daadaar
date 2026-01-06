@@ -63,7 +63,7 @@ export async function generatePresignedUrl(req: Request, res: Response) {
       .values({
         reportId: null as number | null,
         s3Key,
-        s3Bucket: process.env.AWS_S3_BUCKET || 'daadaar-media-frkia',
+        s3Bucket: process.env.AWS_S3_BUCKET || 'daadaar-media-v1-317430950654',
         originalFilename: filename,
         mimeType: contentType,
         mediaType: validation.mediaType as 'image' | 'video' | 'document' | 'audio',
@@ -158,7 +158,7 @@ export async function uploadImage(req: Request, res: Response) {
       .values({
         reportId: null as number | null,
         s3Key,
-        s3Bucket: process.env.AWS_S3_BUCKET || 'daadaar-media-frkia',
+        s3Bucket: process.env.AWS_S3_BUCKET || 'daadaar-media-v1-317430950654',
         originalFilename: avifFilename,
         mimeType: 'image/avif',
         mediaType: 'image',

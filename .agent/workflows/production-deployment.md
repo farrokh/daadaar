@@ -35,7 +35,7 @@ This workflow steps you through deploying the **Daadaar** platform to AWS.
     *   **URL**: Save the connection string (e.g., `rediss://...`).
 
 3.  **S3 Media Bucket**:
-    *   Create bucket: `daadaar-media-frkia` (as specified in docs).
+    *   Create bucket: `daadaar-media-v1-<account-id>` (current prod: `daadaar-media-v1-317430950654`).
     *   Region: `us-east-1`.
     *   **Permissions**: Configure Bucket Policy to allow Cloudflare IPs (see `docs/CDN_CONFIGURATION.md`).
 
@@ -68,39 +68,43 @@ docker push <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/daadaar-backend:lat
     *   **Instance**: `1 vCPU / 2 GB`.
     *   **Environment Variables**:
         *   `NODE_ENV`: `production`
-        *   `DATABASE_URL`: `postgres://daadaar_admin:PASS@HOST:5432/daadaar`
+        *   `DATABASE_URL`: `postgres://daadaar_admin:PASS@HOST:5432/daadaar?sslmode=require`
         *   `REDIS_URL`: `rediss://...`
-        *   `FRONTEND_URL`: `https://daadaar.com`
+        *   `FRONTEND_URL`: `https://www.daadaar.com`
         *   `USE_CDN`: `true`
         *   `CDN_URL`: `https://media.daadaar.com`
         *   `AWS_REGION`: `us-east-1`
-        *   `AWS_S3_BUCKET`: `daadaar-media-frkia`
-        *   `AWS_ACCESS_KEY_ID`: [Your Key]
-        *   `AWS_SECRET_ACCESS_KEY`: [Your Secret]
-    *   **Health Check path**: `/api/health`
+        *   `AWS_S3_BUCKET`: `daadaar-media-v1-<account-id>`
+        *   **IAM**: Use the App Runner instance role for S3 access (avoid static access keys).
+    *   **Health Check path**: `/health`
 
 ---
 
-## Step 3: Frontend Deployment (AWS Amplify)
+## Step 3: Frontend Deployment (Vercel)
 
-1.  **Connect Repo**: Go to AWS Amplify > Host Web App > GitHub.
-2.  **Build Settings**: Amplify auto-detects Next.js.
-3.  **Environment Variables**:
-    *   `NEXT_PUBLIC_API_URL`: `https://api.daadaar.com` (or your App Runner URL).
-    *   `NEXT_PUBLIC_CDN_URL`: `https://media.daadaar.com` (if needed by frontend).
+1.  **Create Project**: Import the repo in Vercel.
+2.  **Root Directory**: `frontend`
+3.  **Build Settings**: Use `frontend/vercel.json` (Bun install/build).
+4.  **Environment Variables**:
+    *   `NEXT_PUBLIC_API_URL`: `https://api.daadaar.com/api`
+    *   `NEXT_PUBLIC_APP_URL`: `https://www.daadaar.com`
+    *   `NEXT_PUBLIC_AWS_S3_BUCKET`: `daadaar-media-v1-<account-id>`
+    *   `NEXT_PUBLIC_AWS_REGION`: `us-east-1`
+    *   `NEXT_PUBLIC_MOCK_MEDIA_SERVER`: `false`
 
 ---
 
 ## Step 4: Domain & CDN Configuration
 
 ### 4.1 DNS (Namecheap + Cloudflare)
-Per `CDN_CONFIGURATION.md`, it is highly recommended to proxy traffic through Cloudflare.
+Per `CDN_CONFIGURATION.md`, it is highly recommended to proxy media traffic through Cloudflare.
 
 1.  **Point Namecheap to Cloudflare**: Change Nameservers in Namecheap to Cloudflare's.
 2.  **Cloudflare DNS Records**:
-    *   `A` `@` -> points to Amplify IP (or use CNAME `daadaar.com` -> Amplify Domain).
-    *   `CNAME` `api` -> points to App Runner default domain.
-    *   `CNAME` `media` -> points to `daadaar-media-frkia.s3.us-east-1.amazonaws.com` (Proxied).
+    *   `A` `@` -> `76.76.21.21` (Vercel apex, DNS only).
+    *   `CNAME` `www` -> `cname.vercel-dns.com` (DNS only).
+    *   `CNAME` `api` -> App Runner default domain (DNS only).
+    *   `CNAME` `media` -> `daadaar-media-v1-<account-id>.s3.us-east-1.amazonaws.com` (Proxied).
 
 ### 4.2 Cloudflare Rules
 *   **Media**: Set Page Rule for `media.daadaar.com/*` to "Cache Everything".
@@ -108,10 +112,22 @@ Per `CDN_CONFIGURATION.md`, it is highly recommended to proxy traffic through Cl
 
 ---
 
-## Step 5: Database Migration
+## Step 5: Database Migrations (Production)
 
-After backend is up:
-```bash
-# Run locally pointing to prod DB
-DATABASE_URL=postgres://... bun run db:migrate
-```
+Use the CodeBuild runner so migrations execute inside the VPC:
+1. Create a CodeBuild project (example name: `daadaar-migrations`) that uses `infrastructure/aws/codebuild-migrations.buildspec.yml`.
+2. Store `DATABASE_URL` in Secrets Manager (example secret: `daadaar/prod/database-url`).
+3. Run a build with overrides:
+   ```bash
+   aws codebuild start-build \
+     --project-name daadaar-migrations \
+     --region us-east-1 \
+     --environment-variables-override name=RUN_MIGRATIONS,value=true,type=PLAINTEXT
+   ```
+4. Optional seed:
+   ```bash
+   aws codebuild start-build \
+     --project-name daadaar-migrations \
+     --region us-east-1 \
+     --environment-variables-override name=RUN_SEED,value=true,type=PLAINTEXT
+   ```

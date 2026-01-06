@@ -9,6 +9,7 @@ The Daadaar frontend is a high-performance, localized web application built with
 - **Visualization**: React Flow
 - **State Management**: Zustand
 - **Internationalization**: next-intl
+- **Hosting**: Vercel (global edge CDN)
 
 ---
 
@@ -69,6 +70,30 @@ Our design system prioritizes a "Premium, State-of-the-art" feel.
 - **URL State**: Used for filters, search queries, and graph coordinates.
 - **Zustand**: Global state for user sessions, navigation, and theme preferences.
 - **React Context**: Used for localized, component-level state (e.g., Form contexts).
+
+---
+
+## 🚀 Deployment & Environment
+
+### Production URLs
+- **Frontend**: https://www.daadaar.com
+- **API**: https://api.daadaar.com/api
+
+### Vercel Environment Variables
+Required in production:
+- `NEXT_PUBLIC_API_URL=https://api.daadaar.com/api`
+- `NEXT_PUBLIC_APP_URL=https://www.daadaar.com`
+- `NEXT_PUBLIC_AWS_S3_BUCKET=daadaar-media-v1-317430950654`
+- `NEXT_PUBLIC_AWS_REGION=us-east-1`
+- `NEXT_PUBLIC_MOCK_MEDIA_SERVER=false`
+
+Optional:
+- `NEXT_PUBLIC_POSTHOG_KEY`
+- `NEXT_PUBLIC_POSTHOG_HOST`
+- `NEXT_PUBLIC_SENTRY_DSN`
+
+### Canonical Domain
+`www.daadaar.com` is the canonical frontend origin used for CORS and app metadata.
 
 ---
 *Back to [README](README.md)*

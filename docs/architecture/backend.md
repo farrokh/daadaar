@@ -3,7 +3,7 @@
 The Daadaar backend is a robust Node.js API designed for high-concurrency, secure data processing, and seamless integration with the frontend.
 
 ## Runtime & Framework
-- **Runtime**: Node.js 24+ LTS
+- **Runtime**: Bun 1.x (Node.js-compatible runtime)
 - **Language**: TypeScript
 - **Framework**: Express.js
 - **ORM**: Drizzle ORM
@@ -98,6 +98,31 @@ We use **BullMQ** (powered by Redis) for tasks that should not block the main re
 1. **Connection Pooling**: Managing database connections efficiently.
 2. **Caching**: Redis caching for sessions, rate limits, and frequent graph queries.
 3. **Optimistic Updates**: Backend designed to support fast client-side feedback.
+
+---
+ 
+## 🧩 Deployment & Configuration
+
+### Hosting
+- **AWS App Runner** (containerized service)
+- **Custom Domain**: https://api.daadaar.com
+
+### CORS
+The backend allows only the configured frontend origin:
+- `FRONTEND_URL=https://www.daadaar.com`
+
+### Required Environment Variables (Production)
+- `DATABASE_URL`
+- `REDIS_URL`
+- `JWT_SECRET`
+- `SESSION_SECRET`
+- `ENCRYPTION_KEY`
+- `AWS_REGION`
+- `AWS_S3_BUCKET`
+
+### Health Endpoints
+- `GET /health` (App Runner liveness)
+- `GET /api/health` (DB + Redis checks)
 
 ---
 *Back to [README](README.md)*

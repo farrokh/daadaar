@@ -3,11 +3,11 @@
 import { Button } from '@/components/ui/button';
 import { fetchApi } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import type { ContentReport, ContentReportStatus } from '@/shared/types';
 import { format } from 'date-fns';
 import { enUS, faIR } from 'date-fns/locale';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useEffect, useState } from 'react';
-import type { ContentReport, ContentReportStatus } from '../../../shared/types';
 
 interface ContentReportsResponse {
   reports: (ContentReport & {

@@ -8,14 +8,57 @@ if (!redisUrl) {
   );
 }
 
-export const redis = redisUrl ? new Redis(redisUrl) : null;
+// Lazy Redis connection to avoid blocking app startup
+let redisInstance: Redis | null = null;
+
+function getRedisClient(): Redis | null {
+  if (!redisUrl) return null;
+  
+  if (!redisInstance) {
+    redisInstance = new Redis(redisUrl, {
+      lazyConnect: true, // Don't connect immediately
+      maxRetriesPerRequest: 3,
+      retryStrategy: (times) => {
+        if (times > 3) {
+          console.error('Redis connection failed after 3 retries');
+          return null; // Stop retrying
+        }
+        return Math.min(times * 100, 2000); // Exponential backoff
+      },
+      connectTimeout: 10000,
+    });
+    
+    // Handle connection errors gracefully
+    redisInstance.on('error', (err) => {
+      console.error('Redis connection error:', err.message);
+    });
+    
+    // Attempt to connect but don't wait for it
+    redisInstance.connect().catch((err) => {
+      console.error('Failed to connect to Redis:', err.message);
+    });
+  }
+  
+  return redisInstance;
+}
+
+// Export getter function instead of direct instance
+export const redis = new Proxy({} as Redis, {
+  get(_target, prop) {
+    const client = getRedisClient();
+    if (!client) return undefined;
+    const value = (client as any)[prop];
+    return typeof value === 'function' ? value.bind(client) : value;
+  },
+});
 
 export const checkRedisConnection = async () => {
-  if (!redis) return { connected: false, error: 'Redis client not initialized' };
+  const client = getRedisClient();
+  if (!client) return { connected: false, error: 'Redis client not initialized' };
 
   try {
     const start = Date.now();
-    await redis.ping();
+    await client.ping();
     return {
       connected: true,
       latencyMs: Date.now() - start,

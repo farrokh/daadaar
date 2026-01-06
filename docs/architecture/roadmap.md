@@ -14,7 +14,7 @@ The development of Daadaar is organized into three strategic phases, moving from
 - [x] **Monorepo Setup**: Next.js 16, Express.js, TypeScript, Tailwind CSS 4
 - [x] **i18n Framework**: next-intl with Persian primary language and RTL support
 - [x] **Database Schema**: PostgreSQL with Drizzle ORM (15 tables implemented)
-- [x] **Redis Integration**: Upstash for sessions and rate limiting
+- [x] **Redis Integration**: ElastiCache Serverless for sessions and rate limiting
 - [x] **S3 Media Storage**: AWS S3 with AVIF optimization and presigned URLs
 
 #### Authentication & Security
@@ -151,8 +151,8 @@ The development of Daadaar is organized into three strategic phases, moving from
 
 ### Infrastructure & Deployment
 - [ ] **Cloudflare Configuration**: DDoS protection, rate limiting, encryption, security headers, and input validation
-- [ ] **AWS Infrastructure**: S3 bucket, ECS cluster, RDS PostgreSQL, ALB setup
-- [ ] **Production Deployment**: Frontend to AWS Amplify/EC2, backend to AWS ECS, environment variables, and monitoring (Sentry, PostHog, CloudWatch)
+- [x] **AWS Infrastructure**: S3 bucket, App Runner, RDS PostgreSQL, ElastiCache Redis, VPC connector
+- [x] **Production Deployment**: Frontend on Vercel, backend on App Runner, environment variables, and monitoring (Sentry, PostHog, CloudWatch)
 
 ---
 

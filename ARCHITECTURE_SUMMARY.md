@@ -12,13 +12,13 @@ Daadaar is a decentralized platform designed to visualize and expose institution
 ## Core Pillars
 
 ### 1. Privacy & Anonymity
-We prioritize user safety through an anonymous-first design. We do not track IP addresses, andparticipation does not require registration.
+We prioritize user safety through an anonymous-first design. We do not track IP addresses, and participation does not require registration.
 
 ### 2. VPN-Friendly Security
 Traditional IP-based rate limiting is replaced by **Session-based limits** and **Proof-of-Work (PoW)** challenges, ensuring accessibility for users in high-censorship regions.
 
 ### 3. Scalable Micro-Architecture
-The platform utilizes a separated frontend (Next.js) and backend (Express.js) architecture, allowing for independent scaling and specialized optimization.
+The platform utilizes a separated frontend (Next.js on Vercel) and backend (Express.js on AWS App Runner) architecture, allowing for independent scaling and specialized optimization.
 
 ## Strategic Documentation
 
@@ -26,7 +26,7 @@ The platform utilizes a separated frontend (Next.js) and backend (Express.js) ar
 | :--- | :--- |
 | 🏛️ [**Main Architecture Guide**](./docs/architecture/README.md) | Entry point for all technical design. |
 | 🖥️ [**Frontend Systems**](./docs/architecture/frontend.md) | Next.js, React Flow, and i18n strategy. |
-| ⚙️ [**Backend & API**](./docs/architecture/backend.md) | Node.js runtime, Auth middleware, and Job queues. |
+| ⚙️ [**Backend & API**](./docs/architecture/backend.md) | Bun runtime, Auth middleware, and job queues. |
 | 📊 [**Data Persistence**](./docs/architecture/data.md) | PostgreSQL schema, Drizzle ORM, and S3 storage. |
 | 🛡️ [**Security Framework**](./docs/architecture/security.md) | PoW, CSRF, and Moderation systems. |
 | ☁️ [**Infrastructure**](./docs/architecture/infrastructure.md) | AWS, Cloudflare, and CI/CD. |
@@ -39,8 +39,8 @@ The platform utilizes a separated frontend (Next.js) and backend (Express.js) ar
 ```mermaid
 graph TD
     User -->|TLS| CF[Cloudflare CDN/WAF]
-    CF --> frontend[Next.js App]
-    CF --> backend[Express API]
+    CF --> frontend[Next.js App - Vercel]
+    CF --> backend[Express API - App Runner]
     backend --> postgres[(PostgreSQL)]
     backend --> redis[(Redis)]
     backend --> s3[Media Storage]
@@ -48,4 +48,4 @@ graph TD
 ```
 
 ---
-*Last Updated: January 4, 2026*
+*Last Updated: January 5, 2026*

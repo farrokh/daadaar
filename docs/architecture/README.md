@@ -34,7 +34,7 @@ PostgreSQL schema design, Drizzle ORM, indexing strategy, and multi-tier storage
 Multi-layered defense: Proof-of-Work, CSRF protection, session-based rate limiting, and the banning/moderation system.
 
 ### ☁️ [Infrastructure & DevOps](infrastructure.md)
-AWS deployment (ECS, RDS, S3), Cloudflare CDN integration, and monitoring (Sentry, PostHog).
+AWS deployment (App Runner, RDS, S3, ElastiCache), Cloudflare CDN integration, and monitoring (Sentry, PostHog).
 
 ### 🚀 [Roadmap & Task Management](roadmap.md)
 Development phases, project milestones, and recent improvements.
@@ -46,11 +46,11 @@ Development phases, project milestones, and recent improvements.
 ```mermaid
 graph TD
     User((User)) --> CF[Cloudflare CDN / WAF]
-    CF --> Next[Next.js Frontend - AWS Amplify/EC2]
-    CF --> API[Express.js Backend - AWS ECS]
+    CF --> Next[Next.js Frontend - Vercel]
+    CF --> API[Express.js Backend - AWS App Runner]
     
-    API --> DB[(PostgreSQL - RDS/Neon)]
-    API --> Cache[(Redis - Upstash)]
+    API --> DB[(PostgreSQL - RDS)]
+    API --> Cache[(Redis - ElastiCache Serverless)]
     API --> S3[AWS S3 - Media Storage]
     
     subgraph "External Services"

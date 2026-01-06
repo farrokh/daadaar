@@ -46,7 +46,7 @@ ENCRYPTION_KEY=dev-encryption-key-32chars!!
 # AWS_ACCESS_KEY_ID=
 # AWS_SECRET_ACCESS_KEY=
 # AWS_REGION=us-east-1
-# AWS_S3_BUCKET=daadaar-media
+# AWS_S3_BUCKET=daadaar-media-v1-317430950654
 
 # =============================================================================
 # OAUTH (Optional for local dev)

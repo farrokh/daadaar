@@ -62,7 +62,16 @@ app.use('/api/votes', votesRoutes);
 app.use('/api/content-reports', contentReportsRoutes);
 app.use('/api/admin/content-reports', adminContentReportsRoutes);
 
-// Health check endpoint
+// Simple health check for App Runner (no DB/Redis checks to avoid timeouts)
+app.get('/health', (_req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: 'daadaar-backend',
+  });
+});
+
+// Detailed health check endpoint with DB/Redis status
 app.get('/api/health', async (_req, res) => {
   const dbStatus = await checkDatabaseConnection();
   const redisStatus = await checkRedisConnection();
@@ -94,8 +103,8 @@ app.get('/api/health', async (_req, res) => {
 });
 
 // Start server
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+const server = app.listen(Number(PORT), '0.0.0.0', () => {
+  console.log(`🚀 Backend server running on http://0.0.0.0:${PORT}`);
 });
 
 // Graceful shutdown

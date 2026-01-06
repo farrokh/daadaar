@@ -5,13 +5,31 @@ Our infrastructure is designed for high availability, security, and global deliv
 ## ☁️ Cloud Infrastructure (AWS)
 
 ### Compute
-- **Backend**: AWS ECS (Fargate) for containerized API deployment. Scaling is managed via Application Load Balancer (ALB) based on CPU/Memory metrics.
-- **Frontend**: AWS Amplify or EC2/ECS hosting the Next.js application.
+- **Backend**: AWS App Runner for containerized API deployment. Scaling is managed by App Runner autoscaling policies.
+- **Frontend**: Vercel (Next.js) with global edge CDN.
 
 ### Persistence
 - **Database**: AWS RDS (PostgreSQL) with automated daily backups and point-in-time recovery.
-- **Caching**: Upstash Redis (managed) for globally distributed caching and rate limiting.
-- **Object Storage**: AWS S3 for media assets (`daadaar-media-frkia`).
+- **Caching**: AWS ElastiCache Serverless Redis for caching, sessions, and rate limiting.
+- **Object Storage**: AWS S3 for media assets (`daadaar-media-v1-317430950654`).
+
+### Current Deployment (New Account)
+- **Backend URL**: https://bxg6ycd8ym.us-east-1.awsapprunner.com
+- **Custom Domain**: https://api.daadaar.com (active)
+- **Health Check**: https://api.daadaar.com/health
+- **RDS Endpoint**: daadaar-prod.cq5go4qemamj.us-east-1.rds.amazonaws.com:5432
+- **Redis Endpoint**: daadaar-redis-rrp0fe.serverless.use1.cache.amazonaws.com:6379
+- **S3 Bucket**: daadaar-media-v1-317430950654
+- **Frontend**: https://www.daadaar.com (Vercel)
+
+---
+
+### Migration Runner (CodeBuild)
+- **Project**: `daadaar-migrations` (CodeBuild, VPC-enabled)
+- **Buildspec**: `infrastructure/aws/codebuild-migrations.buildspec.yml`
+- **Secrets**: `DATABASE_URL` stored in Secrets Manager (example: `daadaar/prod/database-url`)
+- **Flags**: `RUN_MIGRATIONS=true` and optional `RUN_SEED=true`
+- **VPC Endpoints**: Secrets Manager, ECR (API + DKR), CloudWatch Logs, STS, and S3 gateway
 
 ---
 
@@ -26,8 +44,8 @@ Redis is a **required runtime dependency** for production deployments, used for 
   - Format: `redis://[username:password@]host:port[/database]` or `rediss://` for TLS
   - Examples:
     - Local: `redis://localhost:6379`
-    - Upstash: `rediss://default:password@host.upstash.io:6380`
-    - AWS ElastiCache: `redis://user:pass@cluster.cache.amazonaws.com:6379/0`
+    - AWS ElastiCache Serverless (current): `redis://daadaar-redis-rrp0fe.serverless.use1.cache.amazonaws.com:6379`
+    - TLS-enabled Redis: `rediss://user:pass@host.cache.amazonaws.com:6380/0`
 
 **Optional** (for advanced configurations):
 - `REDIS_PASSWORD` - Separate password (if not in URL)
@@ -64,7 +82,8 @@ Redis is a **required runtime dependency** for production deployments, used for 
 ### Health Checks & Monitoring
 
 **Health Check Endpoint**:
-- Endpoint: `GET /api/health`
+- Endpoint: `GET /health` (App Runner liveness)
+- Endpoint: `GET /api/health` (detailed DB/Redis checks)
 - Returns comprehensive health status including:
   - `redis.connected` - Redis connection status
   - `redis.latencyMs` - Redis ping latency
@@ -101,7 +120,7 @@ Redis is a **required runtime dependency** for production deployments, used for 
 - Redis restarts clear rate limit state (users can retry after restart)
 
 **Backup Strategy**:
-- **Managed Redis (Upstash/AWS ElastiCache)**: Automatic daily backups included
+- **Managed Redis (AWS ElastiCache)**: Automatic backups included
 - **Self-hosted**: Configure RDB snapshots or AOF persistence if needed
 - **Note**: Rate limit state loss is acceptable; no backup required for this use case
 
@@ -114,22 +133,23 @@ Redis is a **required runtime dependency** for production deployments, used for 
 
 ### High Availability Options
 
-**1. Redis Sentinel** (Recommended for self-hosted):
+**1. AWS ElastiCache** (Recommended for production):
+- Serverless or Multi-AZ deployments with automatic backups
+- VPC isolation and security group control
+
+**2. Redis Sentinel** (Recommended for self-hosted):
 - Automatic failover to replica if master fails
 - Multiple sentinel instances for quorum
 - Connection string format: `redis-sentinel://sentinel1:26379,sentinel2:26379/mymaster`
 - Configure in `REDIS_URL` with sentinel endpoints
 
-**2. Redis Cluster** (For horizontal scaling):
+**3. Redis Cluster** (For horizontal scaling):
 - Sharded data across multiple nodes
 - Automatic failover and replication
 - Connection string: `redis://node1:6379,node2:6379,node3:6379`
 - `ioredis` supports cluster mode natively
 
-**3. Managed Services** (Production recommended):
-- **Upstash**: Global distribution, automatic failover, serverless scaling
-- **AWS ElastiCache**: Multi-AZ deployment, automatic backups, VPC isolation
-- **Redis Cloud**: Enterprise features, high availability, monitoring
+**4. Redis Cloud**: Enterprise features, high availability, monitoring
 
 **Connection Pooling**:
 - `ioredis` manages connection pools automatically
@@ -144,10 +164,10 @@ Redis is a **required runtime dependency** for production deployments, used for 
 - Health check: `redis-cli ping` every 10s
 
 **Production Deployment**:
-1. **Provision Redis**: Set up managed Redis (Upstash/ElastiCache) or self-hosted cluster
-2. **Configure Connection**: Set `REDIS_URL` environment variable in ECS task definition
-3. **Security**: Use TLS (`rediss://`) and authentication (password in URL)
-4. **Network**: Ensure ECS tasks can reach Redis (VPC, security groups)
+1. **Provision Redis**: Set up managed Redis (AWS ElastiCache) or self-hosted cluster
+2. **Configure Connection**: Set `REDIS_URL` environment variable in App Runner service config
+3. **Security**: Use TLS (`rediss://`) and authentication (password in URL) when enabled
+4. **Network**: Ensure App Runner can reach Redis via the VPC connector and security groups
 5. **Health Checks**: Configure application health endpoint to monitor Redis
 6. **Alerts**: Set up CloudWatch/Sentry alerts for connection failures
 
@@ -231,8 +251,8 @@ Cloudflare acts as the first line of defense and performance optimization.
 
 1. **Lint & Test**: GitHub Actions runs ESLint, Prettier, and Vitest/Jest suites on every PR.
 2. **Build**: Docker images are built and pushed to Amazon ECR.
-3. **Deploy**: Blue/Green deployment to ECS ensures zero-downtime updates.
-4. **Database Migrations**: `drizzle-kit generate` followed by `drizzle-kit migrate` run as part of the deployment sequence. **Note**: Per `.cursorrules` section 2, `drizzle-kit push` is forbidden in production; always use the generate + migrate workflow to ensure proper versioning and rollback capabilities.
+3. **Deploy**: App Runner rolling deployments ensure zero-downtime updates.
+4. **Database Migrations**: Run via the CodeBuild migration runner (`daadaar-migrations`) using the ECR image and Secrets Manager `DATABASE_URL`. **Note**: Per `.cursorrules` section 2, `drizzle-kit push` is forbidden in production; always use the generate + migrate workflow to ensure proper versioning and rollback capabilities.
 
 ---
 *Back to [README](README.md)*

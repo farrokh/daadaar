@@ -30,7 +30,8 @@ import type { OrganizationNodeData, PersonNodeData, ReportNodeData } from './typ
 import { useToolContext } from '@/components/providers/tool-provider';
 import { Button } from '@/components/ui/button';
 import { ReportContentButton } from '@/components/ui/report-content-button';
-import { Map as MapIcon } from 'lucide-react';
+import { Building2, FileText, Map as MapIcon, User } from 'lucide-react';
+import { ContextMenu } from './context-menu';
 
 // Custom MiniMap Node (Dot)
 // biome-ignore lint/suspicious/noExplicitAny: ReactFlow types for MiniMapNodeProps are generic
@@ -48,6 +49,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState(false);
   const [isSubmitReportModalOpen, setIsSubmitReportModalOpen] = useState(false);
   const [showMiniMap, setShowMiniMap] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
 
   const locale = useLocale();
   const t = useTranslations('graph');
@@ -114,6 +116,15 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     }
   }, [viewContext, fetchOrganizations, fetchOrganizationPeople, fetchIndividualReports]);
 
+  const handleContextMenu = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    setContextMenu({ x: event.clientX, y: event.clientY });
+  }, []);
+
+  const onPaneClick = useCallback(() => {
+    if (contextMenu) setContextMenu(null);
+  }, [contextMenu]);
+
   const { setTools } = useToolContext();
 
   // Push tools to the navbar
@@ -122,6 +133,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       <GraphDock
         showMiniMap={showMiniMap}
         onToggleMiniMap={() => setShowMiniMap(prev => !prev)}
+        onRefresh={handleRefresh}
         timelineContent={
           <TimelineFilter
             minYear={timeRangeLimit[0]}
@@ -137,7 +149,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
             onAddOrganization={() => setIsAddOrgModalOpen(true)}
             onAddPerson={() => setIsAddPersonModalOpen(true)}
             onAddReport={() => setIsSubmitReportModalOpen(true)}
-            onRefresh={handleRefresh}
             viewMode={viewContext.mode}
             isLoading={loading}
             compact
@@ -230,14 +241,46 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     return sourceVisible && targetVisible;
   });
 
+  // Calculate context menu items based on view mode
+  const contextMenuItems = [
+    ...(viewContext.mode === 'organizations'
+      ? [
+          {
+            label: t('add_organization'),
+            icon: Building2,
+            onClick: () => setIsAddOrgModalOpen(true),
+          },
+        ]
+      : []),
+    ...(viewContext.mode === 'people' && viewContext.organizationId
+      ? [
+          {
+            label: t('add_person'),
+            icon: User,
+            onClick: () => setIsAddPersonModalOpen(true),
+          },
+        ]
+      : []),
+    ...(viewContext.mode === 'reports' && viewContext.individualId
+      ? [
+          {
+            label: t('add_report'),
+            icon: FileText,
+            onClick: () => setIsSubmitReportModalOpen(true),
+          },
+        ]
+      : []),
+  ];
+
   return (
-    <div className="w-full h-full text-foreground bg-background">
+    <div className="w-full h-full text-foreground bg-background" onContextMenu={handleContextMenu}>
       <ReactFlow
         nodes={visibleNodes}
         edges={visibleEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
+        onPaneClick={onPaneClick}
         nodeTypes={nodeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
         fitView
@@ -268,6 +311,16 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           />
         )}
       </ReactFlow>
+
+      {/* Context Menu */}
+      {contextMenu && contextMenuItems.length > 0 && (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          items={contextMenuItems}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
 
       {/* Add Organization Modal */}
       <AddOrganizationModal

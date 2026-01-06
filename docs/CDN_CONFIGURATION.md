@@ -20,7 +20,7 @@ User Request → Cloudflare CDN → AWS S3 (Origin)
    - Go to Cloudflare Dashboard → Your Domain → DNS
    - Add CNAME record:
      - Name: `media` (or `cdn`)
-     - Target: `daadaar-media-frkia.s3.us-east-1.amazonaws.com`
+     - Target: `daadaar-media-v1-317430950654.s3.us-east-1.amazonaws.com`
      - Proxy status: Proxied (orange cloud)
 
 2. **Page Rules** (Cloudflare Dashboard → Rules → Page Rules):
@@ -37,7 +37,7 @@ User Request → Cloudflare CDN → AWS S3 (Origin)
    ```
    URL Pattern: media.daadaar.com/*
    Response Headers:
-     - Access-Control-Allow-Origin: https://daadaar.com
+     - Access-Control-Allow-Origin: https://www.daadaar.com
      - Access-Control-Allow-Methods: GET, HEAD, OPTIONS
      - Access-Control-Max-Age: 86400
      - Cache-Control: public, max-age=604800
@@ -55,7 +55,7 @@ User Request → Cloudflare CDN → AWS S3 (Origin)
       "Effect": "Allow",
       "Principal": "*",
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::daadaar-media-frkia/*",
+      "Resource": "arn:aws:s3:::daadaar-media-v1-317430950654/*",
       "Condition": {
         "IpAddress": {
           "aws:SourceIp": [
@@ -88,7 +88,7 @@ User Request → Cloudflare CDN → AWS S3 (Origin)
   {
     "AllowedHeaders": ["*"],
     "AllowedMethods": ["GET", "HEAD"],
-    "AllowedOrigins": ["https://daadaar.com", "https://media.daadaar.com"],
+    "AllowedOrigins": ["https://www.daadaar.com", "https://media.daadaar.com"],
     "ExposeHeaders": ["ETag"],
     "MaxAgeSeconds": 3000
   }
@@ -249,7 +249,7 @@ Monitor S3:
 
 2. **Test CORS**:
    ```bash
-   curl -H "Origin: https://daadaar.com" \
+   curl -H "Origin: https://www.daadaar.com" \
         -H "Access-Control-Request-Method: GET" \
         -X OPTIONS \
         https://media.daadaar.com/test-image.avif

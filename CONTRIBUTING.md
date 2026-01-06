@@ -9,6 +9,7 @@ This is a community-driven, open-source platform for exposing government injusti
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
+- [Area-Specific Guides](#area-specific-guides)
 - [Project Structure](#project-structure)
 - [Making Changes](#making-changes)
 - [Commit Messages](#commit-messages)
@@ -91,6 +92,12 @@ bun run format
 # Type checking
 bun run type-check
 ```
+
+## Area-Specific Guides
+
+Use these guides when working on a specific part of the stack:
+- [Frontend Contributors](docs/CONTRIBUTING_FRONTEND.md)
+- [Backend Contributors](docs/CONTRIBUTING_BACKEND.md)
 
 ## Project Structure
 
@@ -334,4 +341,3 @@ Look for issues labeled [`good first issue`](https://github.com/farrokh/daadaar/
 ---
 
 Thank you for contributing to Daadaar! Your efforts help expose injustice and support those seeking accountability. 🙏
-

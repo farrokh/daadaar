@@ -16,15 +16,30 @@ if (!DATABASE_URL) {
 // For production, use connection pooling
 const connectionString = DATABASE_URL || 'postgresql://localhost:5432/daadaar';
 
-// Connection for queries (with connection pooling)
-const queryClient = postgres(connectionString, {
-  max: 10, // Maximum number of connections in the pool
-  idle_timeout: 20, // Close idle connections after 20 seconds
-  connect_timeout: 10, // Connection timeout in seconds
-});
+// Lazy initialization - don't connect until first query
+let queryClient: ReturnType<typeof postgres> | null = null;
+let dbInstance: ReturnType<typeof drizzle> | null = null;
 
-// Create Drizzle ORM instance with schema
-export const db = drizzle(queryClient, { schema });
+function getQueryClient() {
+  if (!queryClient) {
+    queryClient = postgres(connectionString, {
+      max: 10, // Maximum number of connections in the pool
+      idle_timeout: 20, // Close idle connections after 20 seconds
+      connect_timeout: 10, // Connection timeout in seconds
+    });
+  }
+  return queryClient;
+}
+
+// Create Drizzle ORM instance with schema (lazy)
+export const db = new Proxy({} as ReturnType<typeof drizzle>, {
+  get(_target, prop) {
+    if (!dbInstance) {
+      dbInstance = drizzle(getQueryClient(), { schema });
+    }
+    return (dbInstance as any)[prop];
+  },
+});
 
 // Export schema for use in queries
 export { schema };
@@ -41,7 +56,8 @@ export async function checkDatabaseConnection(): Promise<{
   const startTime = Date.now();
   try {
     // Simple query to test connection
-    await queryClient`SELECT 1`;
+    const client = getQueryClient();
+    await client`SELECT 1`;
     const latencyMs = Date.now() - startTime;
     return { connected: true, latencyMs };
   } catch (error) {
@@ -56,6 +72,8 @@ export async function checkDatabaseConnection(): Promise<{
 
 // Graceful shutdown function
 export async function closeDatabaseConnection(): Promise<void> {
-  await queryClient.end();
-  console.log('🔌 Database connection closed');
+  if (queryClient) {
+    await queryClient.end();
+    console.log('🔌 Database connection closed');
+  }
 }

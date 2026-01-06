@@ -1,9 +1,8 @@
-'use client';
-
+// ... imports
 import { Button } from '@/components/ui/button';
 import { FluidGlassFilters } from '@/components/ui/fluid-glass-filters';
 import { cn } from '@/lib/utils';
-import { Calendar, Map as MapIcon, Plus, Search } from 'lucide-react';
+import { Calendar, Map as MapIcon, Plus, RefreshCw, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useState } from 'react';
 
@@ -20,6 +19,9 @@ interface GraphDockProps {
   showMiniMap: boolean;
   onToggleMiniMap: () => void;
 
+  // Global Controls
+  onRefresh?: () => void;
+
   className?: string;
 }
 
@@ -28,13 +30,13 @@ export function GraphDock({
   addContent,
   showMiniMap,
   onToggleMiniMap,
+  onRefresh,
   className,
 }: GraphDockProps) {
   const t = useTranslations('graph');
 
-  // Default active tool to 'timeline' to match screenshot where timeline is visible
-  // Or user can toggle freely. Let's start with timeline active if available.
-  const [activeTool, setActiveTool] = useState<ToolType>('timeline');
+  // Default active tool to 'add' as requested
+  const [activeTool, setActiveTool] = useState<ToolType>('add');
 
   const toggleTool = (tool: ToolType) => {
     setActiveTool(current => (current === tool ? null : tool));
@@ -51,6 +53,19 @@ export function GraphDock({
       >
         {/* Left Triggers */}
         <div className="flex items-center gap-2 px-1">
+          {/* Refresh Trigger */}
+          {onRefresh && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onRefresh}
+              className="rounded-full w-12 h-12 hover:bg-transparent hover:scale-110 active:scale-95 transition-all duration-300"
+              title={t('refresh')}
+            >
+              <RefreshCw className="w-5 h-5 text-foreground/60 hover:text-foreground transition-all duration-300" />
+            </Button>
+          )}
+
           {/* Map Toggle */}
           <Button
             variant="ghost"
