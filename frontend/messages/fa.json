@@ -31,7 +31,10 @@
     "fileTypeNotAllowed": "نوع فایل {type} مجاز نیست. فرمت‌های پشتیبانی شده: تصاویر، ویدیوها، PDF، صدا",
     "fileSizeExceedsLimit": "حجم فایل {size} مگابایت از حداکثر {maxSize} مگابایت برای این نوع فایل بیشتر است",
     "open": "باز کردن",
-    "download": "دانلود"
+    "download": "دانلود",
+    "share": "اشتراک‌گذاری",
+    "copied": "کپی شد!",
+    "link_copied": "پیوند در کلیپ‌بورد کپی شد"
   },
   "navigation": {
     "home": "خانه",

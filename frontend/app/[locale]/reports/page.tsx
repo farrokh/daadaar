@@ -20,6 +20,14 @@ export default function ReportsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const loadingPlaceholders = [
+    'skeleton-1',
+    'skeleton-2',
+    'skeleton-3',
+    'skeleton-4',
+    'skeleton-5',
+    'skeleton-6',
+  ];
 
   const fetchReports = useCallback(
     async (pageNum: number, searchQuery = '') => {
@@ -198,9 +206,9 @@ export default function ReportsPage() {
         {/* Enhanced Skeleton Loading State */}
         {loading && reports.length === 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(6)].map((_, i) => (
+            {loadingPlaceholders.map(key => (
               <div
-                key={i}
+                key={key}
                 className="bg-card-bg border border-card-border rounded-3xl h-[400px] animate-pulse flex flex-col p-6"
               >
                 <div className="w-full h-48 bg-foreground/5 rounded-2xl mb-6" />
