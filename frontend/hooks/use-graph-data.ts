@@ -10,6 +10,12 @@ interface OrganizationsResponse {
   edges: Edge[];
 }
 
+export interface OrganizationPathItem {
+  id: number;
+  name: string;
+  nameEn?: string | null;
+}
+
 interface OrganizationPeopleResponse {
   organization: {
     id: number;
@@ -21,6 +27,7 @@ interface OrganizationPeopleResponse {
     url?: string | null;
     s3Key?: string | null;
   };
+  organizationPath: OrganizationPathItem[];
   nodes: Node[];
   edges: Edge[];
 }
@@ -36,6 +43,7 @@ interface IndividualReportsResponse {
     url?: string | null;
     s3Key?: string | null;
   };
+  organizationPath: OrganizationPathItem[];
   nodes: Node[];
   edges: Edge[];
 }
@@ -55,6 +63,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
   const [viewContext, setViewContext] = useState<ViewContext>(
     initialView || { mode: 'organizations' }
   );
+  const [organizationPath, setOrganizationPath] = useState<OrganizationPathItem[]>([]);
 
   const [dateRange, setDateRange] = useState<[number, number]>([2000, new Date().getFullYear()]);
   const [timeRangeLimit, setTimeRangeLimit] = useState<[number, number]>([
@@ -89,6 +98,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
       }
 
       setViewContext({ mode: 'organizations' });
+      setOrganizationPath([]); // Clear path when viewing all organizations
     } else {
       setError(response.error?.message || tOrg('error_create_failed'));
     }
@@ -133,6 +143,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
 
         setNodes(positionedNodes);
         setEdges(peopleEdges);
+        setOrganizationPath(response.data.organizationPath || []); // Store organization path
         setViewContext({
           mode: 'people',
           organizationId: organization.id,
@@ -184,6 +195,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
 
         setNodes(positionedNodes);
         setEdges(reportEdges);
+        setOrganizationPath(response.data.organizationPath || []); // Store organization path
         setViewContext({
           mode: 'reports',
           individualId: individual.id,
@@ -217,6 +229,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
     loading,
     error,
     viewContext,
+    organizationPath,
     dateRange,
     timeRangeLimit,
     setNodes,

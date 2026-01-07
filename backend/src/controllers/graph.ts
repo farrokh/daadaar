@@ -4,6 +4,7 @@
 import { and, eq, inArray } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
+import { getIndividualOrganizationPath, getOrganizationPath } from '../lib/organization-hierarchy';
 import { generatePresignedGetUrl } from '../lib/s3-client';
 
 /**
@@ -137,22 +138,33 @@ export async function getOrganizationPeople(req: Request, res: Response) {
     const roleIds = roles.map(r => r.id);
 
     // Generate presigned URL for organization logo
+    const logoUrl = organization.logoUrl;
     const orgWithPresignedLogo = {
       ...organization,
-      logoUrl: organization.logoUrl,
-      s3Key: organization.logoUrl,
-      url: organization.logoUrl
-        ? organization.logoUrl.startsWith('http')
-          ? organization.logoUrl
-          : await generatePresignedGetUrl(organization.logoUrl)
+      logoUrl: logoUrl,
+      s3Key: logoUrl,
+      url: logoUrl
+        ? logoUrl.startsWith('http')
+          ? logoUrl
+          : await generatePresignedGetUrl(logoUrl)
         : null,
     };
+
+    // Get the organization path for breadcrumb
+    // We fetch this early so it's available even if there are no people
+    let organizationPath: Awaited<ReturnType<typeof getOrganizationPath>> = [];
+    try {
+      organizationPath = await getOrganizationPath(organizationId);
+    } catch (pathError) {
+      console.error('Error getting organization path:', pathError);
+    }
 
     if (roleIds.length === 0) {
       return res.json({
         success: true,
         data: {
           organization: orgWithPresignedLogo,
+          organizationPath,
           nodes: [],
           edges: [],
         },
@@ -177,6 +189,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
         success: true,
         data: {
           organization: orgWithPresignedLogo,
+          organizationPath,
           nodes: [],
           edges: [],
         },
@@ -237,6 +250,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
       success: true,
       data: {
         organization: orgWithPresignedLogo,
+        organizationPath, // Full path from root to current organization
         nodes,
         edges,
       },
@@ -319,11 +333,21 @@ export async function getIndividualReports(req: Request, res: Response) {
         : null,
     };
 
+    // Get the organization path for this individual
+    // Fetch early so it's available even if there are no reports
+    let organizationPath: Awaited<ReturnType<typeof getIndividualOrganizationPath>> = [];
+    try {
+      organizationPath = await getIndividualOrganizationPath(individualId);
+    } catch (pathError) {
+      console.error('Error getting individual organization path:', pathError);
+    }
+
     if (reportIds.length === 0) {
       return res.json({
         success: true,
         data: {
           individual: individualWithPresignedImage,
+          organizationPath,
           nodes: [],
           edges: [],
         },
@@ -390,6 +414,7 @@ export async function getIndividualReports(req: Request, res: Response) {
       success: true,
       data: {
         individual: individualWithPresignedImage,
+        organizationPath, // Full path from root organization to individual's organization
         nodes,
         edges,
       },

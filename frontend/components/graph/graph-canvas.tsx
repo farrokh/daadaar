@@ -69,6 +69,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     loading,
     error,
     viewContext,
+    organizationPath,
     dateRange,
     timeRangeLimit,
     setNodes,
@@ -449,8 +450,42 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           >
             {t('organizations')}
           </button>
-          {viewContext.mode === 'people' && viewContext.organizationName && (
+          {/* Organization path for people view */}
+          {viewContext.mode === 'people' && organizationPath.length > 0 && (
             <>
+              {(() => {
+                // Filter out the current organization from the path as it matches the current view title
+                const path = organizationPath.filter(item => item.id !== viewContext.organizationId);
+                
+                if (path.length === 0) return null;
+
+                const displayPath: Array<typeof path[0] | 'ellipsis'> = [];
+
+                // If more than 4 items, show first 2, ellipsis, and last 1
+                if (path.length > 4) {
+                  displayPath.push(path[0], path[1], 'ellipsis', path[path.length - 1]);
+                } else {
+                  displayPath.push(...path);
+                }
+
+                return displayPath.map((item, index) => (
+                  <span key={item === 'ellipsis' ? `ellipsis-${index}` : `org-${item.id}`} className="flex items-center gap-2">
+                    <span className="text-foreground/40">/</span>
+                    {item === 'ellipsis' ? (
+                      <span className="text-foreground/60">...</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => fetchOrganizationPeople(item.id, item.name)}
+                        className="text-accent-primary hover:underline"
+                      >
+                        {locale === 'en' ? item.nameEn || item.name : item.name}
+                      </button>
+                    )}
+                  </span>
+                ));
+              })()}
+              
               <span className="text-foreground/40">/</span>
               <span className="text-foreground font-medium">{viewContext.organizationName}</span>
               {viewContext.organizationId && (
@@ -462,16 +497,51 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
               )}
             </>
           )}
-          {viewContext.mode === 'reports' && viewContext.individualName && (
+
+          {/* Organization path for reports view */}
+          {viewContext.mode === 'reports' && organizationPath.length > 0 && (
             <>
-              <span className="text-foreground/40">/</span>
-              <span className="text-foreground font-medium">{viewContext.individualName}</span>
-              {viewContext.individualId && (
-                <ReportContentButton
-                  contentType="individual"
-                  contentId={viewContext.individualId}
-                  className="ml-1"
-                />
+              {(() => {
+                const path = organizationPath;
+                const displayPath: Array<typeof path[0] | 'ellipsis'> = [];
+
+                // If more than 4 items, show first 2, ellipsis, and last 1
+                if (path.length > 4) {
+                  displayPath.push(path[0], path[1], 'ellipsis', path[path.length - 1]);
+                } else {
+                  displayPath.push(...path);
+                }
+
+                return displayPath.map((item, index) => (
+                  <span key={item === 'ellipsis' ? `ellipsis-${index}` : `org-${item.id}`} className="flex items-center gap-2">
+                    <span className="text-foreground/40">/</span>
+                    {item === 'ellipsis' ? (
+                      <span className="text-foreground/60">...</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => fetchOrganizationPeople(item.id, item.name)}
+                        className="text-accent-primary hover:underline"
+                      >
+                        {locale === 'en' ? item.nameEn || item.name : item.name}
+                      </button>
+                    )}
+                  </span>
+                ));
+              })()}
+              
+              {viewContext.individualName && (
+                <>
+                  <span className="text-foreground/40">/</span>
+                  <span className="text-foreground font-medium">{viewContext.individualName}</span>
+                  {viewContext.individualId && (
+                    <ReportContentButton
+                      contentType="individual"
+                      contentId={viewContext.individualId}
+                      className="ml-1"
+                    />
+                  )}
+                </>
               )}
             </>
           )}
