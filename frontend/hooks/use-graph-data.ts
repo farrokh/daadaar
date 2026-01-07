@@ -132,6 +132,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
             logoUrl: organization.logoUrl,
             url: organization.url,
             s3Key: organization.s3Key,
+            isDetailView: true,
           },
           position: { x: 0, y: 0 },
         };
@@ -184,6 +185,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
             profileImageUrl: individual.profileImageUrl,
             url: individual.url,
             s3Key: individual.s3Key,
+            isDetailView: true,
           },
           position: { x: 0, y: 0 },
         };
