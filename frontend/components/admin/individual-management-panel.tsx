@@ -1,0 +1,432 @@
+'use client';
+
+import { format } from 'date-fns';
+import { ChevronLeft, ChevronRight, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { fetchApi } from '@/lib/api';
+import type { Individual, Organization, Role } from '@/shared/types';
+
+export function IndividualManagementPanel() {
+  const t = useTranslations('admin');
+  const commonT = useTranslations('common');
+
+  const [indsData, setIndsData] = useState<{
+    individuals: Individual[];
+    pagination: { total: number; page: number; limit: number; totalPages: number };
+  } | null>(null);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [form, setForm] = useState({
+    fullName: '',
+    biography: '',
+    organizationId: '',
+    roleId: '',
+    startDate: '',
+  });
+
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const individuals = indsData?.individuals || [];
+
+  const organizationOptions = useMemo(
+    () =>
+      organizations.map(org => ({
+        value: String(org.id),
+        label: org.name,
+      })),
+    [organizations]
+  );
+
+  const filteredRoles = useMemo(() => {
+    if (!form.organizationId) return roles;
+    return roles.filter(role => String(role.organizationId) === form.organizationId);
+  }, [form.organizationId, roles]);
+
+  const fetchOrganizations = useCallback(async () => {
+    try {
+      setError(null);
+      const response = await fetchApi<Organization[]>('/organizations');
+      if (response.success && response.data) {
+        setOrganizations(response.data);
+      } else if (response.error) {
+        setError(response.error.message);
+      }
+    } catch (err) {
+      console.error('Failed to fetch organizations:', err);
+      setError('Failed to load organizations');
+    }
+  }, []);
+
+  const fetchRoles = useCallback(async () => {
+    try {
+      const response = await fetchApi<Role[]>('/roles');
+      if (response.success && response.data) {
+        setRoles(response.data);
+      } else if (response.error) {
+        setError(response.error.message);
+      }
+    } catch (err) {
+      console.error('Failed to fetch roles:', err);
+      setError('Failed to load roles');
+    }
+  }, []);
+
+  const fetchIndividuals = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const query = new URLSearchParams({
+        page: String(page),
+        q: search,
+      });
+      const response = await fetchApi<{
+        individuals: Individual[];
+        pagination: { total: number; page: number; limit: number; totalPages: number };
+      }>(`/admin/individuals?${query.toString()}`);
+
+      if (response.success && response.data) {
+        setIndsData(response.data);
+      } else if (response.error) {
+        setError(response.error.message);
+      }
+    } catch (err) {
+      console.error('Failed to fetch individuals:', err);
+      setError('Failed to load individuals');
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search]);
+
+  useEffect(() => {
+    fetchOrganizations();
+    fetchRoles();
+  }, [fetchOrganizations, fetchRoles]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchIndividuals();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [fetchIndividuals]);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsSubmitting(true);
+      setSubmitError(null);
+
+      const body = {
+        fullName: form.fullName,
+        biography: form.biography || null,
+        organizationId: form.organizationId ? Number(form.organizationId) : null,
+        roleId: form.roleId ? Number(form.roleId) : null,
+        startDate: form.startDate || null,
+      };
+
+      const response = editingId
+        ? await fetchApi(`/admin/individuals/${editingId}`, {
+            method: 'PATCH',
+            body: JSON.stringify(body),
+          })
+        : await fetchApi('/individuals', {
+            method: 'POST',
+            body: JSON.stringify(body),
+          });
+
+      if (response.success) {
+        setForm({ fullName: '', biography: '', organizationId: '', roleId: '', startDate: '' });
+        setEditingId(null);
+        setShowCreateForm(false);
+        fetchIndividuals();
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      } else if (response.error) {
+        setSubmitError(response.error.message);
+      }
+    } catch (err) {
+      console.error('Submission failed:', err);
+      setSubmitError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEdit = (person: Individual) => {
+    setEditingId(person.id);
+    setForm({
+      fullName: person.fullName,
+      biography: person.biography || '',
+      organizationId: '', // We might need to fetch current role to pre-fill these
+      roleId: '',
+      startDate: '',
+    });
+    setShowCreateForm(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm(t('delete_confirm'))) return;
+    setDeletingId(id);
+    const response = await fetchApi(`/admin/individuals/${id}`, {
+      method: 'DELETE',
+    });
+    setDeletingId(null);
+    if (response.success) {
+      fetchIndividuals();
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-sm animate-in fade-in duration-300">
+          {error}
+        </div>
+      )}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="relative w-full max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+          <Input
+            placeholder={commonT('search')}
+            value={search}
+            onChange={e => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            className="h-10 pl-9 bg-background/50 border-foreground/10"
+          />
+        </div>
+
+        {!showCreateForm && (
+          <Button onClick={() => setShowCreateForm(true)} className="gap-2">
+            <Plus className="w-4 h-4" />
+            {t('individuals_create_title')}
+          </Button>
+        )}
+      </div>
+
+      {showCreateForm && (
+        <div className="bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl p-6 animate-in fade-in slide-in-from-top-4 duration-300">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {submitError && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-2 rounded-lg text-sm mb-4">
+                {submitError}
+              </div>
+            )}
+            {showSuccess && (
+              <div className="bg-green-500/10 border border-green-500/20 text-green-500 px-4 py-2 rounded-lg text-sm mb-4">
+                {commonT('success')}
+              </div>
+            )}
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-medium tracking-tight">
+                {editingId ? t('edit') : t('individuals_create_title')}
+              </h3>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-foreground/40 hover:text-foreground"
+                onClick={() => {
+                  setEditingId(null);
+                  setForm({
+                    fullName: '',
+                    biography: '',
+                    organizationId: '',
+                    roleId: '',
+                    startDate: '',
+                  });
+                  setShowCreateForm(false);
+                }}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Input
+                required
+                value={form.fullName}
+                placeholder={t('individuals_name_label')}
+                onChange={e => setForm(prev => ({ ...prev, fullName: e.target.value }))}
+                className="bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+              <Input
+                type="date"
+                value={form.startDate}
+                onChange={e => setForm(prev => ({ ...prev, startDate: e.target.value }))}
+                placeholder={t('individuals_start_label')}
+                className="bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+            </div>
+            <Textarea
+              value={form.biography}
+              placeholder={t('individuals_bio_label')}
+              onChange={e => setForm(prev => ({ ...prev, biography: e.target.value }))}
+              className="bg-background/50 border-foreground/10 focus:border-foreground/20 min-h-[80px]"
+            />
+            <div className="grid md:grid-cols-2 gap-4">
+              <Select
+                options={organizationOptions}
+                value={form.organizationId}
+                onChange={value => setForm(prev => ({ ...prev, organizationId: value }))}
+                placeholder={t('individuals_org_label')}
+                className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+              <Select
+                options={filteredRoles.map(role => ({ value: String(role.id), label: role.title }))}
+                value={form.roleId}
+                onChange={value => setForm(prev => ({ ...prev, roleId: value }))}
+                placeholder={t('individuals_role_label')}
+                disabled={!form.organizationId || filteredRoles.length === 0}
+                className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCreateForm(false)}
+                disabled={isSubmitting}
+              >
+                {commonT('cancel')}
+              </Button>
+              <Button type="submit" variant="default" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    {commonT('saving')}
+                  </span>
+                ) : editingId ? (
+                  commonT('save')
+                ) : (
+                  t('individuals_submit')
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {loading && !indsData ? (
+        <div className="p-12 text-center text-foreground/40 italic">{commonT('loading')}</div>
+      ) : (
+        <div className="rounded-xl border border-foreground/[0.05] overflow-x-auto">
+          <table className="w-full text-left rtl:text-right min-w-[800px]">
+            <thead className="text-xs uppercase bg-foreground/[0.02] text-foreground/50 font-medium">
+              <tr>
+                <th className="px-6 py-3 tracking-wider">{t('individuals_table_name')}</th>
+                <th className="px-6 py-3 tracking-wider">{t('individuals_table_org')}</th>
+                <th className="px-6 py-3 tracking-wider">{t('individuals_table_created')}</th>
+                <th className="px-6 py-3 text-right tracking-wider w-[100px]">
+                  {t('col_actions')}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-foreground/[0.05] text-sm">
+              {individuals.map(person => (
+                <tr key={person.id} className="hover:bg-foreground/[0.01] transition-colors group">
+                  <td className="px-6 py-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-medium text-foreground/90">{person.fullName}</span>
+                      {person.biography && (
+                        <span className="text-xs text-foreground/50 truncate max-w-[200px]">
+                          {person.biography}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-3 text-foreground/70">
+                    {person.currentOrganization ? (
+                      <div className="flex flex-col">
+                        <span>{person.currentOrganization}</span>
+                        {person.currentRole && (
+                          <span className="text-xs opacity-60">{person.currentRole}</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="opacity-30 text-xs">—</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-3 text-foreground/60 text-xs">
+                    {format(new Date(person.createdAt), 'MMM d, yyyy')}
+                  </td>
+                  <td className="px-6 py-3">
+                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-foreground/50 hover:text-foreground hover:bg-foreground/5"
+                        onClick={() => handleEdit(person)}
+                        title={commonT('edit')}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-foreground/50 hover:text-red-500 hover:bg-red-500/10"
+                        onClick={() => handleDelete(person.id)}
+                        disabled={deletingId === person.id}
+                        title={commonT('delete')}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {individuals.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-foreground/40 italic">
+                    {t('individuals_empty')}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {indsData && indsData.pagination.totalPages > 1 && (
+        <div className="flex items-center justify-end gap-2 text-sm">
+          <span className="text-foreground/40 mr-2">
+            {t('pagination_page', { current: page, total: indsData.pagination.totalPages })}
+          </span>
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-8 w-8"
+            disabled={page === 1}
+            onClick={() => setPage(p => p - 1)}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            className="h-8 w-8"
+            disabled={page === indsData.pagination.totalPages}
+            onClick={() => setPage(p => p + 1)}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}

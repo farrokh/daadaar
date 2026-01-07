@@ -1,13 +1,12 @@
 'use client';
 
-import { ContentReportsList } from '@/components/admin/content-reports-list';
+import { AdminDashboard } from '@/components/admin/admin-dashboard';
 import { useAuth } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-export default function AdminContentReportsPage() {
-  const t = useTranslations('admin');
+export default function AdminPage() {
   const tCommon = useTranslations('common');
   const { currentUser, isAuthenticated, loading } = useAuth();
   const router = useRouter();
@@ -29,7 +28,6 @@ export default function AdminContentReportsPage() {
     return <div className="min-h-screen pt-32 flex justify-center">{tCommon('loading')}</div>;
   }
 
-  // Prevent flash of content before redirect
   const isAuthorized =
     isAuthenticated &&
     currentUser?.type === 'registered' &&
@@ -39,16 +37,5 @@ export default function AdminContentReportsPage() {
     return null;
   }
 
-  return (
-    <main className="min-h-screen pt-32 pb-20 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight mb-2">{t('dashboard_title')}</h1>
-          <p className="text-foreground/60">{t('dashboard_subtitle')}</p>
-        </div>
-
-        <ContentReportsList />
-      </div>
-    </main>
-  );
+  return <AdminDashboard canManageUsers={currentUser.role === 'admin'} />;
 }

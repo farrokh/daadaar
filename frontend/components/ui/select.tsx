@@ -64,7 +64,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
     };
 
     return (
-      <div className={`w-full ${className}`} ref={containerRef}>
+      <div className="w-full relative" ref={containerRef}>
         {label && (
           <label htmlFor={selectId} className="block text-sm font-medium text-foreground/60 mb-1.5">
             {label}
@@ -80,8 +80,8 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
               w-full rounded-xl border px-4 py-2.5 text-left
               flex items-center justify-between
               transition-all duration-300 ease-out
-              liquid-glass bg-white/5 backdrop-blur-lg border-white/10
-              hover:bg-white/10 hover:border-white/20
+              liquid-glass bg-black/5 dark:bg-white/5 backdrop-blur-lg border-black/5 dark:border-white/10
+              hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/10 dark:hover:border-white/20
               focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50
               disabled:cursor-not-allowed disabled:opacity-50
               ${error ? 'border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : ''}
@@ -108,7 +108,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
           </button>
 
           {isOpen && (
-            <div className="absolute z-50 w-full mt-2 p-1.5 rounded-xl border border-white/10 bg-[#020617]/60 backdrop-blur-xl shadow-2xl liquid-glass animate-in fade-in zoom-in-95 duration-200 origin-top">
+            <div className="absolute z-50 w-full mt-2 p-1.5 rounded-xl border border-black/5 dark:border-white/10 bg-white/60 dark:bg-[#020617]/60 backdrop-blur-xl shadow-2xl liquid-glass animate-in fade-in zoom-in-95 duration-200 origin-top">
               <ul className="max-h-60 overflow-auto custom-scrollbar px-1" id={listId}>
                 {options.length === 0 ? (
                   <li className="px-4 py-3 text-sm text-foreground/50 text-center italic">
@@ -127,7 +127,7 @@ const Select = React.forwardRef<HTMLDivElement, SelectProps>(
                             ${
                               isSelected
                                 ? 'bg-primary/20 text-primary font-medium shadow-[0_0_10px_rgba(59,130,246,0.3)] border border-primary/20'
-                                : 'text-foreground/80 hover:bg-white/10 hover:text-foreground hover:pl-4 border border-transparent'
+                                : 'text-foreground/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-foreground hover:pl-4 border border-transparent'
                             }
                           `}
                           aria-selected={isSelected}
