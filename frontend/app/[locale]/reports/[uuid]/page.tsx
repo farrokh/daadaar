@@ -41,7 +41,7 @@ export default function ReportDetailPage() {
     const fetchReport = async () => {
       setLoading(true);
       try {
-        const response = await fetchApi<ReportWithDetails>(`/reports/${params.id}`);
+        const response = await fetchApi<ReportWithDetails>(`/share/report/${params.uuid}`);
         if (response.success && response.data) setReport(response.data);
         else setError(response.error?.message || t('error_not_found'));
       } catch (_err) {
@@ -50,8 +50,8 @@ export default function ReportDetailPage() {
         setLoading(false);
       }
     };
-    if (params.id) fetchReport();
-  }, [params.id, t]);
+    if (params.uuid) fetchReport();
+  }, [params.uuid, t]);
 
   // Lightbox Logic
   useEffect(() => {
@@ -117,7 +117,7 @@ export default function ReportDetailPage() {
             </button>
             <span className="text-foreground/20">/</span>
             <span className="text-sm font-medium uppercase text-foreground/50 tracking-[0.2em]">
-              ID: {String(report.id).slice(0, 8)}
+              ID: {report.shareableUuid.slice(0, 8)}
             </span>
           </div>
 

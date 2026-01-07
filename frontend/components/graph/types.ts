@@ -26,6 +26,7 @@ export interface PersonNodeData {
 
 export interface ReportNodeData {
   id: number;
+  shareableUuid: string;
   title: string;
   titleEn?: string | null;
   content?: string | null;

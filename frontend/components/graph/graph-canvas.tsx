@@ -103,7 +103,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         fetchIndividualReports(data.id, data.name);
       } else if (node.type === 'report') {
         const data = node.data as ReportNodeData;
-        router.push(`/reports/${data.id}`);
+        router.push(`/reports/${data.shareableUuid}`);
       }
     },
     [fetchOrganizationPeople, fetchIndividualReports, router]
@@ -226,13 +226,21 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
     params.set('view', viewContext.mode);
 
-    if (viewContext.mode === 'people' && viewContext.organizationId) {
-      params.set('organizationId', String(viewContext.organizationId));
-      params.delete('individualId');
-    } else if (viewContext.mode === 'reports' && viewContext.individualId) {
-      params.set('individualId', String(viewContext.individualId));
+    if (viewContext.mode === 'people' && viewContext.organizationUuid) {
+      params.set('organizationUuid', viewContext.organizationUuid);
+      params.delete('individualUuid');
+      // Clean up old numeric params for backward compatibility
       params.delete('organizationId');
+      params.delete('individualId');
+    } else if (viewContext.mode === 'reports' && viewContext.individualUuid) {
+      params.set('individualUuid', viewContext.individualUuid);
+      params.delete('organizationUuid');
+      // Clean up old numeric params for backward compatibility
+      params.delete('organizationId');
+      params.delete('individualId');
     } else {
+      params.delete('organizationUuid');
+      params.delete('individualUuid');
       params.delete('organizationId');
       params.delete('individualId');
     }
