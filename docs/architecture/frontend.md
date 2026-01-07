@@ -32,6 +32,8 @@ The centerpiece of the platform is the interactive graph showing connections bet
 ### Interactive Components
 - **GraphCanvas**: The primary rendering area using React Flow.
 - **Node Design**: Glassmorphic cards with dynamic gradients.
+  - **Standard View**: Compact card with image and name.
+  - **Detail View**: Expanded card with full description/biography and larger imagery, used when drilling down into an entity.
 - **Layout Engine**: Custom BFS-based grid layout (`graph-layout.ts`) for clean node distribution.
 - **Temporal Filtering**: A dual-handle timeline slider allowing users to view the graph at different points in history.
 
