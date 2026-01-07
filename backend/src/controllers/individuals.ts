@@ -245,13 +245,16 @@ export async function listIndividuals(req: Request, res: Response) {
     const query = db
       .select({
         id: schema.individuals.id,
+        shareableUuid: schema.individuals.shareableUuid,
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
         biography: schema.individuals.biography,
         biographyEn: schema.individuals.biographyEn,
         profileImageUrl: schema.individuals.profileImageUrl,
         dateOfBirth: schema.individuals.dateOfBirth,
+        createdByUserId: schema.individuals.createdByUserId,
         createdAt: schema.individuals.createdAt,
+        updatedAt: schema.individuals.updatedAt,
       })
       .from(schema.individuals);
 
@@ -510,29 +513,67 @@ export async function updateIndividual(req: Request, res: Response) {
         });
       }
 
-      const [existingRole] = await db
+      // Find the latest role occupancy for this individual
+      const [latestRoleOccupancy] = await db
         .select({ id: schema.roleOccupancy.id })
         .from(schema.roleOccupancy)
         .where(eq(schema.roleOccupancy.individualId, individualId))
+        .orderBy(desc(schema.roleOccupancy.startDate))
         .limit(1);
 
-      if (!existingRole) {
+      if (latestRoleOccupancy) {
+        // Update existing latest role occupancy
+        const roleUpdateData: Partial<typeof schema.roleOccupancy.$inferInsert> = {};
+
+        if (body.roleId !== undefined) {
+          roleUpdateData.roleId = body.roleId || undefined;
+        }
+
+        if (body.startDate) {
+          // startDate is not null, so only update if we have a value
+          roleUpdateData.startDate = new Date(body.startDate);
+        }
+
+        if (body.endDate !== undefined) {
+          // endDate is nullable
+          // @ts-ignore - Drizzle type inference for nullable timestamp sometimes conflicts with strict null checks
+          roleUpdateData.endDate = body.endDate ? new Date(body.endDate) : null;
+        }
+
+        if (req.currentUser?.type === 'registered') {
+          roleUpdateData.createdByUserId = req.currentUser.id;
+        }
+        if (Object.keys(roleUpdateData).length > 0) {
+          await db
+            .update(schema.roleOccupancy)
+            .set(roleUpdateData)
+            .where(eq(schema.roleOccupancy.id, latestRoleOccupancy.id));
+        }
+      } else {
+        // Create new role occupancy if none exists
         const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
         const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
-        const memberRoleId = await getOrCreateDefaultRoleId({
-          organizationId: body.organizationId,
-          userId,
-          sessionId,
-        });
 
-        await db.insert(schema.roleOccupancy).values({
-          individualId,
-          roleId: memberRoleId,
-          startDate: new Date(),
-          endDate: null,
-          createdByUserId: userId,
-          sessionId,
-        });
+        let roleIdToUse = body.roleId;
+
+        if (!roleIdToUse) {
+          roleIdToUse = await getOrCreateDefaultRoleId({
+            organizationId: body.organizationId,
+            userId,
+            sessionId,
+          });
+        }
+
+        if (roleIdToUse) {
+          await db.insert(schema.roleOccupancy).values({
+            individualId,
+            roleId: roleIdToUse,
+            startDate: body.startDate ? new Date(body.startDate) : new Date(),
+            endDate: body.endDate ? new Date(body.endDate) : null,
+            createdByUserId: userId,
+            sessionId,
+          });
+        }
       }
     }
 
@@ -564,6 +605,68 @@ export async function updateIndividual(req: Request, res: Response) {
       error: {
         code: 'INTERNAL_ERROR',
         message: 'Failed to update individual',
+      },
+    });
+  }
+}
+
+/**
+ * GET /api/individuals/:id/roles
+ * Get all role occupancies for an individual
+ */
+export async function getIndividualRoles(req: Request, res: Response) {
+  try {
+    const individualId = Number.parseInt(req.params.id, 10);
+
+    if (Number.isNaN(individualId)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'INVALID_ID',
+          message: 'Invalid individual ID',
+        },
+      });
+    }
+
+    // Check if individual exists
+    const [individual] = await db
+      .select({ id: schema.individuals.id })
+      .from(schema.individuals)
+      .where(eq(schema.individuals.id, individualId));
+
+    if (!individual) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'Individual not found',
+        },
+      });
+    }
+
+    // Get role occupancies for this individual
+    const roleOccupancies = await db
+      .select({
+        id: schema.roleOccupancy.id,
+        roleId: schema.roleOccupancy.roleId,
+        startDate: schema.roleOccupancy.startDate,
+        endDate: schema.roleOccupancy.endDate,
+      })
+      .from(schema.roleOccupancy)
+      .where(eq(schema.roleOccupancy.individualId, individualId))
+      .orderBy(desc(schema.roleOccupancy.startDate));
+
+    res.json({
+      success: true,
+      data: roleOccupancies,
+    });
+  } catch (error) {
+    console.error('Error getting individual roles:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to get individual roles',
       },
     });
   }

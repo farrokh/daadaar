@@ -7,6 +7,7 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
 import type { Organization } from '@/shared/types';
@@ -26,7 +27,10 @@ export function OrganizationManagementPanel() {
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({
     name: '',
+    nameEn: '',
     description: '',
+    descriptionEn: '',
+    logoUrl: '',
     parentId: '',
   });
 
@@ -73,7 +77,10 @@ export function OrganizationManagementPanel() {
     e.preventDefault();
     const body = {
       name: form.name,
+      nameEn: form.nameEn || null,
       description: form.description || null,
+      descriptionEn: form.descriptionEn || null,
+      logoUrl: form.logoUrl || null,
       parentId: form.parentId ? Number(form.parentId) : null,
     };
 
@@ -88,7 +95,14 @@ export function OrganizationManagementPanel() {
         });
 
     if (response.success) {
-      setForm({ name: '', description: '', parentId: '' });
+      setForm({
+        name: '',
+        nameEn: '',
+        description: '',
+        descriptionEn: '',
+        logoUrl: '',
+        parentId: '',
+      });
       setEditingId(null);
       setShowCreateForm(false);
       fetchOrganizations();
@@ -99,7 +113,10 @@ export function OrganizationManagementPanel() {
     setEditingId(org.id);
     setForm({
       name: org.name,
+      nameEn: org.nameEn || '',
       description: org.description || '',
+      descriptionEn: org.descriptionEn || '',
+      logoUrl: org.logoUrl || '',
       parentId: org.parentId ? String(org.parentId) : '',
     });
     setShowCreateForm(true);
@@ -156,7 +173,14 @@ export function OrganizationManagementPanel() {
                 className="h-8 w-8 text-foreground/40 hover:text-foreground"
                 onClick={() => {
                   setEditingId(null);
-                  setForm({ name: '', description: '', parentId: '' });
+                  setForm({
+                    name: '',
+                    nameEn: '',
+                    description: '',
+                    descriptionEn: '',
+                    logoUrl: '',
+                    parentId: '',
+                  });
                   setShowCreateForm(false);
                 }}
               >
@@ -167,35 +191,50 @@ export function OrganizationManagementPanel() {
               <Input
                 required
                 value={form.name}
+                label={t('organizations_name_label')}
                 placeholder={t('organizations_name_label')}
                 onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
                 className="bg-background/50 border-foreground/10 focus:border-foreground/20"
               />
-              <div>
-                <select
-                  className="w-full h-10 rounded-md border border-foreground/10 bg-background/50 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/20"
-                  value={form.parentId}
-                  onChange={e => setForm(prev => ({ ...prev, parentId: e.target.value }))}
-                >
-                  <option value="">{t('organizations_parent_label')}</option>
-                  {parentOptions.map(option => (
-                    <option
-                      key={option.value}
-                      value={option.value}
-                      className="bg-background text-foreground"
-                    >
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <Input
+                value={form.nameEn}
+                label={`${t('organizations_name_label')} (English)`}
+                placeholder={`${t('organizations_name_label')} (English)`}
+                onChange={e => setForm(prev => ({ ...prev, nameEn: e.target.value }))}
+                className="bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
             </div>
             <Textarea
               value={form.description}
+              label={t('organizations_description_label')}
               placeholder={t('organizations_description_label')}
               onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
               className="bg-background/50 border-foreground/10 focus:border-foreground/20 min-h-[100px]"
             />
+            <Textarea
+              value={form.descriptionEn}
+              label={`${t('organizations_description_label')} (English)`}
+              placeholder={`${t('organizations_description_label')} (English)`}
+              onChange={e => setForm(prev => ({ ...prev, descriptionEn: e.target.value }))}
+              className="bg-background/50 border-foreground/10 focus:border-foreground/20 min-h-[100px]"
+            />
+            <div className="grid md:grid-cols-2 gap-4">
+              <Input
+                value={form.logoUrl}
+                label={t('organizations_logo_label')}
+                placeholder={t('organizations_logo_label')}
+                onChange={e => setForm(prev => ({ ...prev, logoUrl: e.target.value }))}
+                className="bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+              <Select
+                options={parentOptions.map(opt => ({ value: String(opt.value), label: opt.label }))}
+                value={form.parentId}
+                label={t('organizations_parent_label')}
+                onChange={value => setForm(prev => ({ ...prev, parentId: value }))}
+                placeholder={t('organizations_parent_label')}
+                className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+            </div>
             <div className="flex justify-end gap-3">
               <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
                 {commonT('cancel')}

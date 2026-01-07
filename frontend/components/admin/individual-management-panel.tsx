@@ -29,10 +29,15 @@ export function IndividualManagementPanel() {
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({
     fullName: '',
+    fullNameEn: '',
     biography: '',
+    biographyEn: '',
+    profileImageUrl: '',
+    dateOfBirth: '',
     organizationId: '',
     roleId: '',
     startDate: '',
+    endDate: '',
   });
 
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -132,10 +137,15 @@ export function IndividualManagementPanel() {
 
       const body = {
         fullName: form.fullName,
+        fullNameEn: form.fullNameEn || null,
         biography: form.biography || null,
+        biographyEn: form.biographyEn || null,
+        profileImageUrl: form.profileImageUrl || null,
+        dateOfBirth: form.dateOfBirth || null,
         organizationId: form.organizationId ? Number(form.organizationId) : null,
         roleId: form.roleId ? Number(form.roleId) : null,
         startDate: form.startDate || null,
+        endDate: form.endDate || null,
       };
 
       const response = editingId
@@ -149,7 +159,18 @@ export function IndividualManagementPanel() {
           });
 
       if (response.success) {
-        setForm({ fullName: '', biography: '', organizationId: '', roleId: '', startDate: '' });
+        setForm({
+          fullName: '',
+          fullNameEn: '',
+          biography: '',
+          biographyEn: '',
+          profileImageUrl: '',
+          dateOfBirth: '',
+          organizationId: '',
+          roleId: '',
+          startDate: '',
+          endDate: '',
+        });
         setEditingId(null);
         setShowCreateForm(false);
         fetchIndividuals();
@@ -166,17 +187,48 @@ export function IndividualManagementPanel() {
     }
   };
 
-  const handleEdit = (person: Individual) => {
+  const handleEdit = async (person: Individual) => {
     setEditingId(person.id);
-    setForm({
+
+    // Pre-populate basic fields
+    const baseForm = {
       fullName: person.fullName,
+      fullNameEn: person.fullNameEn || '',
       biography: person.biography || '',
-      organizationId: '', // We might need to fetch current role to pre-fill these
+      biographyEn: person.biographyEn || '',
+      profileImageUrl: person.profileImageUrl || '',
+      dateOfBirth: person.dateOfBirth ? person.dateOfBirth.split('T')[0] : '',
+      organizationId: person.currentOrganizationId ? String(person.currentOrganizationId) : '',
       roleId: '',
       startDate: '',
-    });
+      endDate: '',
+    };
+
+    setForm(baseForm);
     setShowCreateForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Fetch current role occupancy to get role and start date
+    if (person.currentOrganizationId) {
+      try {
+        const response = await fetchApi<
+          { id: number; roleId: number; startDate: string; endDate: string | null }[]
+        >(`/individuals/${person.id}/roles`);
+
+        if (response.success && response.data && response.data.length > 0) {
+          // Get the most recent role (first one, since backend orders by startDate desc)
+          const currentRole = response.data[0];
+          setForm(prev => ({
+            ...prev,
+            roleId: String(currentRole.roleId),
+            startDate: currentRole.startDate ? currentRole.startDate.split('T')[0] : '',
+            endDate: currentRole.endDate ? currentRole.endDate.split('T')[0] : '',
+          }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch role occupancy:', err);
+      }
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -246,10 +298,15 @@ export function IndividualManagementPanel() {
                   setEditingId(null);
                   setForm({
                     fullName: '',
+                    fullNameEn: '',
                     biography: '',
+                    biographyEn: '',
+                    profileImageUrl: '',
+                    dateOfBirth: '',
                     organizationId: '',
                     roleId: '',
                     startDate: '',
+                    endDate: '',
                   });
                   setShowCreateForm(false);
                 }}
@@ -261,35 +318,83 @@ export function IndividualManagementPanel() {
               <Input
                 required
                 value={form.fullName}
+                label={t('individuals_name_label')}
                 placeholder={t('individuals_name_label')}
                 onChange={e => setForm(prev => ({ ...prev, fullName: e.target.value }))}
                 className="bg-background/50 border-foreground/10 focus:border-foreground/20"
               />
               <Input
-                type="date"
-                value={form.startDate}
-                onChange={e => setForm(prev => ({ ...prev, startDate: e.target.value }))}
-                placeholder={t('individuals_start_label')}
+                value={form.fullNameEn}
+                label={`${t('individuals_name_label')} (English)`}
+                placeholder={`${t('individuals_name_label')} (English)`}
+                onChange={e => setForm(prev => ({ ...prev, fullNameEn: e.target.value }))}
                 className="bg-background/50 border-foreground/10 focus:border-foreground/20"
               />
             </div>
             <Textarea
               value={form.biography}
+              label={t('individuals_bio_label')}
               placeholder={t('individuals_bio_label')}
               onChange={e => setForm(prev => ({ ...prev, biography: e.target.value }))}
               className="bg-background/50 border-foreground/10 focus:border-foreground/20 min-h-[80px]"
             />
+            <Textarea
+              value={form.biographyEn}
+              label={`${t('individuals_bio_label')} (English)`}
+              placeholder={`${t('individuals_bio_label')} (English)`}
+              onChange={e => setForm(prev => ({ ...prev, biographyEn: e.target.value }))}
+              className="bg-background/50 border-foreground/10 focus:border-foreground/20 min-h-[80px]"
+            />
+            <div className="grid md:grid-cols-2 gap-4">
+              <Input
+                value={form.profileImageUrl}
+                label={t('individuals_image_label')}
+                placeholder={t('individuals_image_label')}
+                onChange={e => setForm(prev => ({ ...prev, profileImageUrl: e.target.value }))}
+                className="bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+              <Input
+                type="date"
+                value={form.dateOfBirth}
+                label={t('individuals_dob_label')}
+                onChange={e => setForm(prev => ({ ...prev, dateOfBirth: e.target.value }))}
+                placeholder={t('individuals_dob_label')}
+                className="bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Input
+                type="date"
+                value={form.startDate}
+                label={t('individuals_start_label')}
+                onChange={e => setForm(prev => ({ ...prev, startDate: e.target.value }))}
+                placeholder={t('individuals_start_label')}
+                className="bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+              <Input
+                type="date"
+                value={form.endDate}
+                label={t('individuals_end_label')}
+                onChange={e => setForm(prev => ({ ...prev, endDate: e.target.value }))}
+                placeholder={t('individuals_end_label')}
+                className="bg-background/50 border-foreground/10 focus:border-foreground/20"
+              />
+            </div>
             <div className="grid md:grid-cols-2 gap-4">
               <Select
                 options={organizationOptions}
                 value={form.organizationId}
-                onChange={value => setForm(prev => ({ ...prev, organizationId: value }))}
+                label={t('individuals_org_label')}
+                onChange={value =>
+                  setForm(prev => ({ ...prev, organizationId: value, roleId: '' }))
+                }
                 placeholder={t('individuals_org_label')}
                 className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
               />
               <Select
                 options={filteredRoles.map(role => ({ value: String(role.id), label: role.title }))}
                 value={form.roleId}
+                label={t('individuals_role_label')}
                 onChange={value => setForm(prev => ({ ...prev, roleId: value }))}
                 placeholder={t('individuals_role_label')}
                 disabled={!form.organizationId || filteredRoles.length === 0}

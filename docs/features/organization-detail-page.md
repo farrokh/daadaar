@@ -13,8 +13,10 @@ The Organization Detail Page provides a dedicated, shareable, and verifying pres
 - **Logo & Name**: Prominently displayed with official styling.
 - **Verified Status**: (Planned) Visual indicators for verified entities.
 - **Metadata**: Creation date and other public metadata.
+- **Error Handling**: Strict 404 (Not Found) response if the UUID is invalid or the organization does not exist, preventing generic empty pages.
 
 ### 2. Context & Hierarchy
+- **Localization**: Fully locale-aware navigation (preserving language preference across links).
 - **Description**: Full localized description of the organization.
 - **Parent Organization**: Links to the parent entity if applicable (currently displays ID, future update will link via UUID).
 

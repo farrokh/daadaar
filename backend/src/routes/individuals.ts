@@ -23,6 +23,9 @@ router.post('/', individualsController.createIndividual as RequestHandler);
 // GET /api/individuals/:id - Get single individual
 router.get('/:id', individualsController.getIndividual as RequestHandler);
 
+// GET /api/individuals/:id/roles - Get individual's role occupancies
+router.get('/:id/roles', individualsController.getIndividualRoles as RequestHandler);
+
 // PUT /api/individuals/:id - Update individual
 router.put('/:id', individualsController.updateIndividual as RequestHandler);
 
