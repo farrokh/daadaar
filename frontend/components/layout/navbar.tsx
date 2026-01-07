@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Link, usePathname } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
-import { FileText, Info, LayoutGrid, LogIn, LogOut, User, UserPlus } from 'lucide-react';
+import { BookOpen, FileText, Info, LayoutGrid, LogIn, LogOut, User, UserPlus, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export function Navbar() {
   const t = useTranslations('navigation');
@@ -17,6 +18,8 @@ export function Navbar() {
   const { tools } = useToolContext();
   const pathname = usePathname();
   const registeredUser = currentUser?.type === 'registered' ? currentUser : null;
+  const [showTutorialHint, setShowTutorialHint] = useState(false);
+  const tutorialLink = 'https://www.instagram.com/p/DTNBYSmAiKN/';
 
   const isActive = (path: string) => {
     if (path === '/') return pathname === '/';
@@ -25,6 +28,17 @@ export function Navbar() {
   const showGlass = !tools;
   const glassClasses =
     'liquid-glass bg-white/5 backdrop-blur-lg rounded-full px-6 h-16 transition-all duration-500 ease-out border border-white/10';
+
+  useEffect(() => {
+    const storageKey = 'daadaar:tutorial-hint-seen';
+    if (typeof window === 'undefined') return;
+    if (localStorage.getItem(storageKey)) return;
+
+    localStorage.setItem(storageKey, 'true');
+    setShowTutorialHint(true);
+    const timeoutId = window.setTimeout(() => setShowTutorialHint(false), 6000);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   return (
     <div className="fixed bottom-4 left-0 right-0 flex items-center justify-between p-6 z-50 pointer-events-none">
@@ -75,6 +89,42 @@ export function Navbar() {
 
       {/* Right: Auth */}
       <div className={cn('pointer-events-auto flex items-center gap-4', showGlass && glassClasses)}>
+        <div className="relative">
+          {showTutorialHint && (
+            <div className="absolute bottom-full right-0 mb-3 w-64 rounded-md border border-border bg-background/95 p-3 text-xs text-foreground/80 shadow-lg backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <div className="flex items-start gap-2">
+                <Info className="mt-0.5 h-4 w-4 text-accent-primary" />
+                <p className="flex-1">{t('tutorial_hint')}</p>
+                <button
+                  type="button"
+                  onClick={() => setShowTutorialHint(false)}
+                  className="text-foreground/50 transition-colors hover:text-foreground"
+                  aria-label={t('close')}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="absolute -bottom-1 right-4 h-2 w-2 rotate-45 border-b border-r border-border bg-background/95" />
+            </div>
+          )}
+          <a
+            href={tutorialLink}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setShowTutorialHint(false)}
+            title={t('tutorial')}
+            className="inline-flex"
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-foreground/60 hover:text-foreground transition-colors"
+              aria-label={t('tutorial')}
+            >
+              <BookOpen className="h-5 w-5" />
+            </Button>
+          </a>
+        </div>
         <LegalMenu />
         {isAuthenticated ? (
           <div className="flex items-center gap-2">
