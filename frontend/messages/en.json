@@ -39,7 +39,9 @@
     "download": "Download",
     "share": "Share",
     "copied": "Copied!",
-    "link_copied": "Link copied to clipboard"
+    "link_copied": "Link copied to clipboard",
+    "home": "Home",
+    "view_profile": "View Profile"
   },
   "navigation": {
     "home": "Home",
@@ -118,7 +120,15 @@
     "error_name_min": "Name must be at least 2 characters",
     "error_name_max": "Name must not exceed 255 characters",
     "error_name_en_max": "English name must not exceed 255 characters",
-    "error_create_failed": "Failed to create organization"
+    "error_create_failed": "Failed to create organization",
+    "view_on_graph": "View Interactive Graph",
+    "explore_graph": "Explore Graph",
+    "graph_description": "Explore connections, members, and reports associated with this organization in our interactive graph view.",
+    "parent_org": "Parent Organization",
+    "about": "About",
+    "no_description": "No description available.",
+    "added_on": "Added on",
+    "org_id": "ORG ID"
   },
   "person": {
     "add_title": "Add New Person",
