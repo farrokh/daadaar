@@ -143,4 +143,7 @@ Use the CodeBuild runner so migrations execute inside the VPC:
 
 ### Email Verification Toggle
 - `EMAIL_VERIFICATION_ENABLED=false` allows logins without verification.
-4. Seeding is not allowed in production.
+
+### Production seeding prohibition
+- Automatic/seeding scripts must not run in production (risking data overwrite or security issues).
+- **Seeding is not allowed in production.**

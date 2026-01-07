@@ -44,10 +44,7 @@
 - [operations/ses-setup-guide.md](./operations/ses-setup-guide.md)
 - [operations/cdn-configuration.md](./operations/cdn-configuration.md)
 
-**Operational scripts (local):**
-- `.aws/update-app-runner.py`
-- `.aws/monitor-apprunner.sh`
-- `.aws/manual_app_runner.md`
+
 
 ---
 

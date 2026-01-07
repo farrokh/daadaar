@@ -157,7 +157,6 @@ export default function ReportDetailPage() {
               isAnonymous={isAnonymous}
             />
           </div>
-
           {/* Details List */}
           <div className="space-y-6">
             {/* Author */}
