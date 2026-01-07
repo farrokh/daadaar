@@ -182,6 +182,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
           type: 'individual',
           data: {
             id: individual.id,
+            shareableUuid: individual.shareableUuid,
             name: individual.fullName,
             nameEn: individual.fullNameEn,
             biography: individual.biography,

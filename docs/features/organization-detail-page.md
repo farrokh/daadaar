@@ -18,24 +18,30 @@ The Organization Detail Page provides a dedicated, shareable, and verifying pres
 - **Description**: Full localized description of the organization.
 - **Parent Organization**: Links to the parent entity if applicable (currently displays ID, future update will link via UUID).
 
-### 3. Graph Integration
+### 3. Related Relations
+- **Member List**: Displays a list of individuals who are members of the organization, with their roles and profile images. Links directly to their Person Detail pages.
+
+### 4. Graph Integration
 - **"View on Graph" Button**: detailed deep-link into the interactive graph view, focusing on the specific organization.
 - **Graph Nodes**: Updated `OrganizationNode` in the graph view now includes a "View Profile" link that navigates back to this detail page, creating a seamless loop between exploration and detailing.
 
-### 4. Sharing
+### 5. Sharing & SEO
 - **Share Button**: Integrated share functionality copying the secure UUID-based link.
+- **Social Previews**: Optimized Open Graph and Twitter Card metadata with fallback images (site logo) to ensure robust previews on social platforms.
 
 ## Implementation Details
 
 ### Frontend
 - **Page Component**: `frontend/app/[locale]/org/[uuid]/page.tsx` uses `fetchApi` to retrieve organization details via the public `/share/org/:uuid` endpoint.
+- **Components**: 
+  - `OrganizationDetail`: UI component rendering header, description, graph link, and member list.
+  - `generateMetadata`: Server-side function for dynamic SEO tags with fallback image support.
 - **Graph Node**: `OrganizationNode` updated to receive `shareableUuid` and render `BaseNodeCard` with a `shareUrl` prop.
-- **BaseNodeCard**: Updated to render an `ExternalLink` icon when `shareUrl` is provided.
 
 ### Backend
-- **Graph Controllers**: Updated `getOrganizationsGraph` and `getOrganizationPeople` to include `shareableUuid` in their responses, enabling the frontend to construct deep links.
+- **Share Controller**: `getOrganizationByUuid` updated to fetch and return associated `members` (with signed profile images).
+- **Graph Controllers**: Updated `getOrganizationsGraph` and `getOrganizationPeople` to include `shareableUuid`.
 
 ## Future Enhancements
-- **Member List**: Display a preview of top members directly on the detail page.
 - **Related Reports**: List recent verification reports filed against this organization.
 - **Map Integration**: Show HQ location if available.

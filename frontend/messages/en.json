@@ -128,7 +128,9 @@
     "about": "About",
     "no_description": "No description available.",
     "added_on": "Added on",
-    "org_id": "ORG ID"
+    "org_id": "ORG ID",
+    "members": "Members",
+    "no_members": "No members found."
   },
   "person": {
     "add_title": "Add New Person",
@@ -163,7 +165,15 @@
     "create_new_role": "+ Create new role",
     "creating_new_role": "Creating new role",
     "profile_image": "Profile Image",
-    "profile_image_helper": "Upload a profile image (optional, max 5MB)"
+    "profile_image_helper": "Upload a profile image (optional, max 5MB)",
+    "view_on_graph": "View in Graph",
+    "graph_description": "Explore connections and roles associated with this individual.",
+    "explore_graph": "Explore Graph",
+    "person_id": "PERSON ID",
+    "no_biography": "No biography available.",
+    "unknown_role": "Unknown Role",
+    "associated_reports": "Associated Reports",
+    "no_reports": "No reports associated with this individual."
   },
   "role": {
     "title": "Role Title",

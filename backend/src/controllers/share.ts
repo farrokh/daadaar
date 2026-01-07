@@ -1,7 +1,7 @@
 // Share controller
 // Handles shareable link endpoints using UUIDs instead of sequential IDs
 
-import { eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
@@ -45,6 +45,39 @@ export async function getOrganizationByUuid(req: Request, res: Response) {
     if (organization.logoUrl && !organization.logoUrl.startsWith('http')) {
       organization.logoUrl = await generatePresignedGetUrl(organization.logoUrl);
     }
+
+    // Fetch members with roles
+    const members = await db
+      .select({
+        id: schema.individuals.id,
+        shareableUuid: schema.individuals.shareableUuid,
+        fullName: schema.individuals.fullName,
+        fullNameEn: schema.individuals.fullNameEn,
+        profileImageUrl: schema.individuals.profileImageUrl,
+        roleTitle: schema.roles.title,
+        roleTitleEn: schema.roles.titleEn,
+      })
+      .from(schema.individuals)
+      .innerJoin(schema.roleOccupancy, eq(schema.individuals.id, schema.roleOccupancy.individualId))
+      .innerJoin(schema.roles, eq(schema.roleOccupancy.roleId, schema.roles.id))
+      .where(eq(schema.roles.organizationId, organization.id))
+      .limit(50);
+
+    // Sign member image URLs
+    const membersWithSignedUrls = await Promise.all(
+      members.map(async member => {
+        if (member.profileImageUrl && !member.profileImageUrl.startsWith('http')) {
+          return {
+            ...member,
+            profileImageUrl: await generatePresignedGetUrl(member.profileImageUrl),
+          };
+        }
+        return member;
+      })
+    );
+
+    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with members
+    (organization as any).members = membersWithSignedUrls;
 
     res.json({
       success: true,
@@ -101,6 +134,31 @@ export async function getIndividualByUuid(req: Request, res: Response) {
     if (individual.profileImageUrl && !individual.profileImageUrl.startsWith('http')) {
       individual.profileImageUrl = await generatePresignedGetUrl(individual.profileImageUrl);
     }
+
+    // Fetch related reports
+    const individualReports = await db
+      .select({
+        id: schema.reports.id,
+        shareableUuid: schema.reports.shareableUuid,
+        title: schema.reports.title,
+        titleEn: schema.reports.titleEn,
+        incidentDate: schema.reports.incidentDate,
+        createdAt: schema.reports.createdAt,
+      })
+      .from(schema.reports)
+      .innerJoin(schema.reportLinks, eq(schema.reports.id, schema.reportLinks.reportId))
+      .where(
+        and(
+          eq(schema.reportLinks.individualId, individual.id),
+          eq(schema.reports.isPublished, true),
+          eq(schema.reports.isDeleted, false)
+        )
+      )
+      .orderBy(desc(schema.reports.incidentDate))
+      .limit(20);
+
+    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with reports
+    (individual as any).reports = individualReports;
 
     res.json({
       success: true,
@@ -163,6 +221,26 @@ export async function getReportByUuid(req: Request, res: Response) {
         },
       });
     }
+
+    // Fetch media
+    const mediaItems = await db
+      .select()
+      .from(schema.media)
+      .where(and(eq(schema.media.reportId, report.id), eq(schema.media.isDeleted, false)));
+
+    // Sign media URLs
+    const mediaWithUrls = await Promise.all(
+      mediaItems.map(async item => {
+        if (item.s3Key) {
+          const url = await generatePresignedGetUrl(item.s3Key);
+          return { ...item, url };
+        }
+        return item;
+      })
+    );
+
+    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with media
+    (report as any).media = mediaWithUrls;
 
     res.json({
       success: true,
