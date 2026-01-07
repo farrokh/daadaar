@@ -408,10 +408,9 @@ The voting mechanism is now **fully implemented**. Recommended next steps from t
 
 ### Documentation
 - ✅ `docs/architecture/roadmap.md` (modified - marked voting as complete)
-- ✅ `docs/VOTING_IMPLEMENTATION.md` (created - this file)
+- ✅ `docs/history/voting-implementation.md` (created - this file)
 
 ---
 
 *Last Updated: January 4, 2026*  
 *Implementation Status: Complete ✅*
-

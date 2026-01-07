@@ -8,11 +8,11 @@
 ## 🔍 Files Checked for Sensitive Information
 
 ### ✅ Clean Files (No Sensitive Data):
-1. `monitor-deployment.sh` - Safe, contains only AWS ARN and commands
+1. `.aws/monitor-apprunner.sh` - Safe, contains only AWS ARN and commands
 2. `docs/architecture/backend.md` - ✅ **Updated**, contains placeholders only
 
 ### ⚠️ Fixed Files (Had Sensitive Data):
-1. **`update-app-runner.py`** - Line 57
+1. **`.aws/update-app-runner.py`** - Line 57
    - **Issue:** Hardcoded Slack webhook URL
    - **Fix:** Removed default value, now reads from env only
    - **Status:** ✅ **FIXED**
@@ -38,10 +38,8 @@
 ## 📝 Files Safe to Commit
 
 ### New Files:
-- `update-app-runner.py` ✅ (after removing Slack webhook)
-- `monitor-deployment.sh` ✅
-- `cleanup-users.py` ✅
-- `cleanup-users.sql` ✅  
+- `.aws/update-app-runner.py` ✅ (after removing Slack webhook)
+- `.aws/monitor-apprunner.sh` ✅
 
 ### Modified Files:
 - `docs/architecture/backend.md` ✅
@@ -59,24 +57,14 @@ Your production RDS database contains test users created during the signup debug
 
 ### Solution Options:
 
-#### Option 1: Use cleanup-users.py (Recommended if you have VPC access)
-```python
-# From EC2, CodeBuild, or VPC-connected environment:
-python3 cleanup-users.py
-```
+#### Option 1: Use CodeBuild in the VPC
+- Run a custom cleanup script via CodeBuild (see `docs/operations/codebuild-database-ops.md`).
 
-#### Option 2: Use cleanup-users.sql
-```bash
-# Connect from within VPC (EC2/CodeBuild):
-PGPASSWORD="$DB_PASSWORD" psql -h daadaar-prod.cq5go4qemamj.us-east-1.rds.amazonaws.com \
-  -U daadaar_admin -d daadaar -f cleanup-users.sql
-```
-
-#### Option 3: Manual via Admin UI (Once built)
+#### Option 2: Manual via Admin UI
 - Create an admin panel to manage users
 - Delete test accounts via the UI
 
-#### Option 4: Via App Runner Shell (If exec is enabled)
+#### Option 3: Via App Runner Shell (If exec is enabled)
 ```bash
 # Connect to running App Runner container
 aws apprunner ... shell
@@ -159,7 +147,7 @@ If secrets are accidentally committed:
 1. **Test Users in Production Database**
    - Created during signup debugging
    - Have unverified email addresses
-   - Use `cleanup-users.py` or `cleanup-users.sql`
+   - Use CodeBuild or admin panel cleanup
 
 ### What's Already Clean:
 1. ✅ No sensitive data in committed files
@@ -173,8 +161,8 @@ If secrets are accidentally committed:
 
 1. **Delete test users:**
    ```bash
-   # Run cleanup-users.py from VPC-connected environment
-   # OR manually via admin panel when built
+   # Run cleanup via CodeBuild in the VPC
+   # OR manually via admin panel
    ```
 
 2. **Test signup flow with real email:**

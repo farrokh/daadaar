@@ -1,6 +1,6 @@
 # CodeBuild VPC Database Operations
 
-**Last Updated:** 2026-01-05  
+**Last Updated:** 2026-01-07  
 **Status:** ✅ WORKING
 
 ---
@@ -13,7 +13,7 @@ We use **AWS CodeBuild** running inside our VPC to perform database operations t
 - Running database migrations
 - Database cleanup/maintenance tasks
 - Emergency database operations
-- Data seeding
+- **Note:** Production seeding is forbidden.
 
 ---
 
@@ -175,10 +175,7 @@ The CodeBuild service role needs these permissions:
 }
 ```
 
-**Update existing role:**
-```bash
-python3 update-codebuild-iam.py
-```
+**Update existing role:** Apply the policy in the IAM console or via IaC.
 
 ---
 
@@ -236,26 +233,10 @@ aws codebuild start-build \
 ### 2. Clean Up Test Users
 
 ```bash
-# Using Python script (recommended)
-python3 run-cleanup-codebuild.py
-
-# Or manually
 aws codebuild start-build \
   --project-name daadaar-migrations \
   --region us-east-1 \
   --buildspec-override file://infrastructure/aws/cleanup-users-buildspec.yml
-```
-
-### 3. Seed Database (Optional)
-
-```bash
-aws codebuild start-build \
-  --project-name daadaar-migrations \
-  --region us-east-1 \
-  --buildspec-override file://infrastructure/aws/codebuild-migrations.buildspec.yml \
-  --environment-variables-override \
-    name=RUN_MIGRATIONS,value=true,type=PLAINTEXT \
-    name=RUN_SEED,value=true,type=PLAINTEXT
 ```
 
 ### 4. Backfill Latest Individual Role
@@ -308,34 +289,28 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo "Pulling Docker image..."
-      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
-      - docker pull $IMAGE_URI
+      - echo "Logging in to ECR..."
+      - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$(echo "$IMAGE_URI" | cut -d/ -f1)"
 
   build:
     commands:
+      - echo "Pulling image $IMAGE_URI"
+      - docker pull "$IMAGE_URI"
       - |
         if [ "$RUN_MIGRATIONS" = "true" ]; then
           echo "Running database migrations..."
           docker run --rm \
             -e DATABASE_URL=$DATABASE_URL \
-            $IMAGE_URI \
-            bun /usr/src/app/backend/drizzle/migrate.ts
+            "$IMAGE_URI" \
+            bun /usr/src/app/backend/src/db/migrate.ts
         fi
-      - |
-        if [ "$RUN_SEED" = "true" ]; then
-          echo "Running database seed..."
-          docker run --rm \
-            -e DATABASE_URL=$DATABASE_URL \
-            $IMAGE_URI \
-            bun /usr/src/app/backend/drizzle/seed.ts
-        fi
+      # RUN_SEED is present in the buildspec but should remain false in production.
 ```
 
 ### Cleanup Buildspec
 **File:** `infrastructure/aws/cleanup-users-buildspec.yml`
 
-See file for full implementation - installs Python deps and runs cleanup script.
+See file for full implementation - pulls the backend image and runs `backend/src/db/cleanup-users.ts` inside the container.
 
 ---
 
@@ -372,10 +347,7 @@ is not authorized to perform: secretsmanager:GetSecretValue
 ```
 
 **Solution:**
-Update IAM policy to include the secret ARN:
-```bash
-python3 update-codebuild-iam.py
-```
+Update IAM policy to include the secret ARN (console or IaC).
 
 ### Issue: Can't connect to RDS
 
@@ -420,19 +392,6 @@ aws logs tail /aws/codebuild/daadaar-migrations \
   --since 30m \
   --region us-east-1
 ```
-
----
-
-## Scripts
-
-### update-codebuild-iam.py
-Updates IAM role policy to include Secrets Manager permissions.
-
-### run-cleanup-codebuild.py
-Starts CodeBuild job to clean up test users and monitors progress.
-
-### cleanup-users.py
-Local script to clean up users (requires VPC access or bastion).
 
 ---
 

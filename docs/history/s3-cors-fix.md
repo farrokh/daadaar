@@ -61,6 +61,6 @@ After applying the CORS configuration, test video upload:
 
 ## Related Files
 - `/infrastructure/aws/s3-cors-config.json` - CORS configuration file
-- `/docs/CDN_CONFIGURATION.md` - CDN and S3 configuration documentation
+- `/docs/operations/cdn-configuration.md` - CDN and S3 configuration documentation
 - `/backend/src/controllers/media.ts` - Media upload controller
 - `/frontend/components/reports/media-uploader.tsx` - Frontend upload component

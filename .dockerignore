@@ -1,6 +1,6 @@
 .env
 .env.*
-backend/.env
+backend/.env*
 frontend/.env
 **/node_modules
 dist

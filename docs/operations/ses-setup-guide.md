@@ -1,7 +1,7 @@
 # Amazon SES Setup - Step by Step
 
-**Status:** 🔄 In Progress  
-**Purpose:** Fix SMTP timeout issue by switching from Brevo to Amazon SES
+**Status:** ✅ Complete  
+**Purpose:** Operational reference for Amazon SES SMTP in production
 
 ---
 
@@ -18,9 +18,9 @@
 
 ---
 
-## 📋 Next Steps (You Need to Do)
+## 📋 Verification (Completed)
 
-### Step 1: Add DNS Records to Cloudflare ⏳
+### Step 1: DNS Records (Completed)
 
 **Go to:** https://dash.cloudflare.com → daadaar.com → DNS
 
@@ -55,31 +55,14 @@ Record 3:
 
 ### Step 2: Wait for Verification (5-10 minutes)
 
-After adding the DNS records, wait 5-10 minutes, then check:
-
-```bash
-python3 check-ses-verification.py
-```
-
-**Expected output when ready:**
-```
-✅ Domain is VERIFIED and ready to send emails!
-```
+After adding the DNS records, wait 5-10 minutes, then verify in the SES console:
+- SES → Verified identities → `daadaar.com` should be **Verified**
 
 ---
 
-### Step 3: Update App Runner
+### Step 3: Update App Runner (if credentials rotate)
 
-Once verified, run:
-
-```bash
-python3 update-apprunner-ses.py
-```
-
-This will:
-- Switch SMTP from Brevo to Amazon SES
-- Deploy new configuration
-- Fix the timeout issue
+Use `.aws/update-app-runner.py` to update SMTP env vars when credentials change.
 
 ---
 
@@ -153,10 +136,7 @@ After deployment completes (3-5 minutes):
 
 | Script | Purpose |
 |--------|---------|
-| `show-ses-dns-records.py` | Display DNS records to add |
-| `check-ses-verification.py` | Check if domain is verified |
-| `generate-ses-smtp-credentials.py` | Show SMTP credentials |
-| `update-apprunner-ses.py` | Deploy SES to App Runner |
+| `.aws/update-app-runner.py` | Update App Runner env vars (SMTP, Slack, core config) |
 
 ---
 
@@ -188,6 +168,6 @@ fght6ammm3f4eiufbnztcevhx564o3eb.dkim.amazonses.com
 
 ---
 
-**Current Status:** ⏳ **Waiting for you to add DNS records to Cloudflare**
+**Current Status:** ✅ **Verified and active**
 
-**Next Action:** Add the 3 CNAME records shown above to Cloudflare DNS
+**Next Action:** Only revisit if SMTP credentials rotate or SES identity changes.

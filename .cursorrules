@@ -11,6 +11,10 @@ You are an expert AI developer working on the Daadaar Platform. You must follow 
 - **Schema Location**: Always edit `database/schema.ts`.
 - **Migration Policy**: Following schema changes, follow the `database-migration` workflow.
 - **NEVER** use `push` in a production environment; only use `generate` followed by `migrate`.
+- **Production Seeding**: Never run seed scripts in production.
+## 2b. Production Build Hygiene
+- **No .env in images**: Never bake `backend/.env*` into Docker images; keep them out of build context and remove after copy if needed.
+- **No static AWS keys**: Do not set `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` in production; use the App Runner instance role.
 
 ## 3. Backend Routes & Controllers
 - **Middleware Order**: Use `authMiddleware` first to populate `req.currentUser`, then `csrfProtection` for state-changing routes (POST, PUT, DELETE, PATCH).
@@ -63,3 +67,15 @@ You are an expert AI developer working on the Daadaar Platform. You must follow 
 - **Branch Strategy**: Use descriptive branch names (e.g., `fix/translation`, `feat/new-modal`).
 - **PR Management**: When creating a PR, wait for successful merge or follow the user's explicit merge instructions.
 - **Branch Deletion**: **NEVER** delete a branch (local or remote) before ensuring it has been fully merged into the base branch. Always `git pull origin main` (or the base branch) into the local workspace after a merge to verify consistency before cleaning up branches.
+
+## 12. Documentation Structure
+- **Central Folder**: Keep all project docs under `docs/` (root-only exceptions: `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `LICENSE`).
+- **Index**: Maintain `docs/README.md` as the canonical doc index.
+- **Suggested Structure**:
+  - `docs/architecture/` - System design, infrastructure, security.
+  - `docs/guides/` - Contributing, deployment, operational runbooks.
+  - `docs/operations/` - CodeBuild, SES, S3/CDN, infra fixes.
+  - `docs/features/` - Feature-specific docs.
+  - `docs/testing/` - Test plans/manual QA.
+  - `docs/history/` - Session summaries, reviews, resolved issues, audits.
+- **Outdated Docs**: Move to `docs/history/` (or `docs/archive/`) and note status in `docs/README.md`.

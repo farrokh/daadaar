@@ -76,7 +76,7 @@
 ### Created
 1. `/frontend/app/[locale]/signup/page.tsx` - Main signup page
 2. `/frontend/app/[locale]/register/page.tsx` - Redirect page
-3. `/docs/SIGNUP_IMPLEMENTATION.md` - Detailed documentation
+3. `/docs/history/signup-implementation.md` - Detailed documentation
 
 ### Modified
 1. `/frontend/messages/en.json` - Added signup translations
@@ -176,7 +176,7 @@
 
 ## 📚 Documentation
 
-- **Detailed Guide**: See `/docs/SIGNUP_IMPLEMENTATION.md`
+- **Detailed Guide**: See `/docs/history/signup-implementation.md`
 - **API Reference**: See `/backend/src/controllers/auth.ts`
 - **Design System**: See existing `/app/[locale]/login/page.tsx`
 
