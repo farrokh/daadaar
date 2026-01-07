@@ -1,6 +1,6 @@
 'use client';
 
-import { getS3PublicUrl } from '@/lib/utils';
+import { cn, getS3PublicUrl } from '@/lib/utils';
 import { Building2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { memo } from 'react';
@@ -14,9 +14,15 @@ function OrganizationNode({ data }: NodeProps<OrganizationNodeData>) {
     locale === 'en' ? data.descriptionEn || data.description : data.description;
 
   const imageUrl = data.url || (data.s3Key ? getS3PublicUrl(data.s3Key) : null);
+  const isDetailView = data.isDetailView;
 
   return (
-    <div className="group relative min-w-[240px] max-w-[320px]">
+    <div
+      className={cn(
+        'group relative',
+        isDetailView ? 'min-w-[280px] max-w-[360px]' : 'min-w-[240px] max-w-[320px]'
+      )}
+    >
       {/* Glow Effect */}
       <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent-secondary rounded-xl opacity-20 group-hover:opacity-40 blur transition duration-500" />
 
@@ -28,25 +34,47 @@ function OrganizationNode({ data }: NodeProps<OrganizationNodeData>) {
         {/* Target handle (left side - for incoming edges from parent) */}
         <Handle type="target" position={Position.Left} className="!w-3 !h-3 !opacity-0" />
 
-        <div className="flex items-start gap-4">
-          <div className="relative w-10 h-10 rounded-lg shrink-0 overflow-hidden bg-primary/10 flex items-center justify-center">
-            {imageUrl ? (
-              <img src={imageUrl} alt={displayName} className="w-full h-full object-cover" />
-            ) : (
-              <Building2 className="w-5 h-5 text-primary" />
-            )}
-          </div>
-          <div>
-            <div className="font-bold text-base text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80">
-              {displayName}
+        {isDetailView ? (
+          <div className="space-y-4">
+            <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-primary/10 flex items-center justify-center">
+              {imageUrl ? (
+                <img src={imageUrl} alt={displayName} className="w-full h-full object-cover" />
+              ) : (
+                <Building2 className="w-10 h-10 text-primary" />
+              )}
             </div>
-            {displayDescription && (
-              <div className="text-xs text-foreground/50 mt-1.5 line-clamp-2 leading-relaxed">
-                {displayDescription}
+            <div className="space-y-2">
+              <div className="font-bold text-lg text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80">
+                {displayName}
               </div>
-            )}
+              {displayDescription && (
+                <div className="text-sm text-foreground/60 leading-relaxed max-h-32 overflow-y-auto pr-2">
+                  {displayDescription}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-start gap-4">
+            <div className="relative w-10 h-10 rounded-lg shrink-0 overflow-hidden bg-primary/10 flex items-center justify-center">
+              {imageUrl ? (
+                <img src={imageUrl} alt={displayName} className="w-full h-full object-cover" />
+              ) : (
+                <Building2 className="w-5 h-5 text-primary" />
+              )}
+            </div>
+            <div>
+              <div className="font-bold text-base text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80">
+                {displayName}
+              </div>
+              {displayDescription && (
+                <div className="text-xs text-foreground/50 mt-1.5 line-clamp-2 leading-relaxed">
+                  {displayDescription}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
