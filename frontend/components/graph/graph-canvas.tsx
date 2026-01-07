@@ -352,11 +352,13 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         return {
           ...edge,
           type: 'occupies_former',
+          animated: true,
           style: {
             strokeWidth: 1.5,
             stroke: '#94a3b8',
-            strokeDasharray: '5,5', // Dashed line for former members
-            opacity: 0.6, // Slightly faded
+            strokeDasharray: '10,5,2,5', // Dash-dot pattern for former members
+            opacity: 0.5, // More faded
+            animation: 'dashdraw 3s linear infinite', // Slower animation (3s instead of default)
           },
         };
       }
