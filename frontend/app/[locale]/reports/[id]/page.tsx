@@ -149,7 +149,7 @@ export default function ReportDetailPage() {
         {/* Sidebar (Meta) */}
         <div className="md:col-span-4 space-y-10">
           {/* Actions */}
-          <div className="p-6 bg-foreground/[0.02] border border-foreground/[0.05] rounded-xl">
+          <div>
             <VotingButtons
               reportId={report.id}
               initialUpvoteCount={report.upvoteCount}
@@ -157,50 +157,42 @@ export default function ReportDetailPage() {
               isAnonymous={isAnonymous}
             />
           </div>
-
           {/* Details List */}
           <div className="space-y-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-foreground/40 text-sm font-medium uppercase tracking-wider">
-                <Calendar className="w-4 h-4" />
-                {t('incident_date')}
+            {/* Author */}
+            <div className="flex items-center gap-3 group">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-foreground/10 text-foreground/70 group-hover:ring-foreground/20 transition-all">
+                {report.user?.displayName?.[0] || 'A'}
               </div>
-              <p className="text-lg font-light pl-6">{displayDate}</p>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium leading-none text-foreground/90">
+                  {report.user?.displayName || t('anonymous_reporter')}
+                </span>
+                {report.user && (
+                  <span className="text-xs text-foreground/40 mt-1">@{report.user.username}</span>
+                )}
+              </div>
             </div>
 
+            <div className="h-px bg-foreground/5 w-full" />
+
+            {/* Date */}
+            <div className="flex items-center gap-3 text-foreground/60">
+              <Calendar className="w-4 h-4 shrink-0" />
+              <span className="text-sm">{displayDate}</span>
+            </div>
+
+            {/* Location */}
             {report.incidentLocation && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 text-foreground/40 text-sm font-medium uppercase tracking-wider">
-                  <MapPin className="w-4 h-4" />
-                  {t('incident_location')}
-                </div>
-                <p className="text-lg font-light pl-6">
+              <div className="flex items-center gap-3 text-foreground/60">
+                <MapPin className="w-4 h-4 shrink-0" />
+                <span className="text-sm">
                   {isRtl
                     ? report.incidentLocation
                     : report.incidentLocationEn || report.incidentLocation}
-                </p>
+                </span>
               </div>
             )}
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-foreground/40 text-sm font-medium uppercase tracking-wider">
-                <User className="w-4 h-4" />
-                {t('reported_by')}
-              </div>
-              <div className="pl-6 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center text-xs font-bold">
-                  {report.user?.displayName?.[0] || 'A'}
-                </div>
-                <div>
-                  <p className="text-sm font-medium">
-                    {report.user?.displayName || t('anonymous_reporter')}
-                  </p>
-                  {report.user && (
-                    <p className="text-xs text-foreground/40">@{report.user.username}</p>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Linked entities */}
@@ -212,21 +204,18 @@ export default function ReportDetailPage() {
               </div>
               <div className="space-y-4">
                 {report.reportLinks.map(link => (
-                  <div
-                    key={link.id}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-foreground/[0.02] border border-foreground/[0.05]"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center text-xs text-foreground/60 shrink-0">
+                  <div key={link.id} className="flex items-center gap-3 py-1 group">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-foreground/10 text-foreground/60 transition-all group-hover:ring-foreground/20 shrink-0">
                       {link.individual?.fullName?.[0] || 'P'}
                     </div>
                     <div>
-                      <p className="text-sm font-medium">
+                      <p className="text-sm font-medium text-foreground/90 leading-none">
                         {isRtl
                           ? link.individual?.fullName
                           : link.individual?.fullNameEn || link.individual?.fullName}
                       </p>
                       {link.role && (
-                        <p className="text-xs text-foreground/50">
+                        <p className="text-xs text-foreground/40 mt-1">
                           {isRtl ? link.role.title : link.role.titleEn || link.role.title}
                         </p>
                       )}

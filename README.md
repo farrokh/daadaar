@@ -121,8 +121,8 @@ We welcome contributions! This is a community-driven open-source project.
 
 1. Read our [Contributing Guide](CONTRIBUTING.md)
 2. Use the area-specific guides:
-   - [Frontend Contributors](docs/CONTRIBUTING_FRONTEND.md)
-   - [Backend Contributors](docs/CONTRIBUTING_BACKEND.md)
+   - [Frontend Contributors](docs/guides/contributing-frontend.md)
+   - [Backend Contributors](docs/guides/contributing-backend.md)
 3. Check out [good first issues](https://github.com/farrokh/daadaar/labels/good%20first%20issue)
 4. Join the discussion in [GitHub Discussions](https://github.com/farrokh/daadaar/discussions)
 
@@ -153,11 +153,12 @@ For security concerns, please see our [Security Policy](SECURITY.md) or contact 
 
 ## 📖 Documentation
 
+- [Documentation Index](docs/README.md) - Canonical docs map
 - [Architecture Summary](ARCHITECTURE_SUMMARY.md) - Technical architecture
 - [Contributing Guide](CONTRIBUTING.md) - How to contribute
-- [Frontend Contributors](docs/CONTRIBUTING_FRONTEND.md) - Frontend-specific workflow
-- [Backend Contributors](docs/CONTRIBUTING_BACKEND.md) - Backend-specific workflow
-- [API Documentation](docs/api.md) - API reference (coming soon)
+- [Frontend Contributors](docs/guides/contributing-frontend.md) - Frontend-specific workflow
+- [Backend Contributors](docs/guides/contributing-backend.md) - Backend-specific workflow
+- API reference (coming soon)
 
 ## 📜 License
 

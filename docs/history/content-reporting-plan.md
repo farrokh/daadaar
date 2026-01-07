@@ -56,4 +56,4 @@ The Content Reporting System allows users (both registered and anonymous) to rep
 - [ ] Email Notifications
 
 ## 5. Testing
-See `docs/CONTENT_REPORTING_TESTING.md` for manual testing steps.
+See `docs/testing/content-reporting.md` for manual testing steps.

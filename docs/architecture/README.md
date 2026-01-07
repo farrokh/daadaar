@@ -27,7 +27,7 @@ Next.js 16 (App Router), React Flow visualization, i18n strategy (Persian-first)
 ### ⚙️ [Backend & API](backend.md)
 Express.js runtime, unified authentication middleware, type-safe API contracts, and background job processing.
 
-### 🔧 [Admin Panel](../ADMIN_PANEL.md)
+### 🔧 [Admin Panel](../features/admin-panel.md)
 Comprehensive platform management interface for administrators, including user management, content moderation, and knowledge graph administration.
 
 

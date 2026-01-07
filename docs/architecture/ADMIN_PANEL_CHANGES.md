@@ -49,7 +49,7 @@ The following admin API routes were deleted:
 
 ### Removed Documentation
 
-- `docs/ADMIN_PANEL.md` - Comprehensive admin panel documentation
+- `docs/features/admin-panel.md` - Comprehensive admin panel documentation
 - Architecture documentation sections describing admin panels
 
 ## What Remains

@@ -187,7 +187,7 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 **Files**:
 - `backend/src/controllers/content-reports.ts`
 - `frontend/components/ui/report-content-button.tsx`
-- `docs/CONTENT_REPORTING_PLAN.md`
+- `docs/history/content-reporting-plan.md`
 
 **Features**:
 - ✅ Universal reporting for reports, organizations, individuals, and users
@@ -204,7 +204,7 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 - `backend/src/controllers/individuals.ts`
 - `frontend/messages/en.json`
 - `frontend/messages/fa.json`
-- `docs/END_DATE_IMPLEMENTATION.md`
+- `docs/history/end-date-implementation.md`
 
 **Features**:
 - ✅ Optional end date field for individual-organization relationships
@@ -225,7 +225,7 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 - `backend/src/controllers/media.ts`
 - `frontend/components/ui/image-uploader.tsx`
 - `frontend/components/reports/media-uploader.tsx`
-- `docs/IMAGE_UPLOAD_FORMAT.md`
+- `docs/features/image-upload-format.md`
 
 **Features**:
 - ✅ All images converted to AVIF format (individuals, organizations, reports)
@@ -270,7 +270,7 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 **Files**:
 - `frontend/app/[locale]/signup/page.tsx`
 - `frontend/app/[locale]/register/page.tsx` (redirect)
-- `docs/SIGNUP_IMPLEMENTATION.md`
+- `docs/history/signup-implementation.md`
 
 **Features**:
 - ✅ Dedicated signup page with premium glassmorphism design
@@ -337,7 +337,7 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 336: 
 337: ### 16. CDN Configuration Documentation ✅
 
-**File**: `docs/CDN_CONFIGURATION.md`
+**File**: `docs/operations/cdn-configuration.md`
 
 **Contents**:
 - ✅ Step-by-step Cloudflare CDN setup
@@ -400,7 +400,7 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
    - Add corresponding Persian translations to `frontend/messages/fa.json`
 
 5. **Implement CDN (when ready for production)**:
-   - Follow steps in `docs/CDN_CONFIGURATION.md`
+   - Follow steps in `docs/operations/cdn-configuration.md`
    - Set environment variables:
      ```bash
      USE_CDN=true
@@ -481,5 +481,5 @@ const response: ApiResponse<CreateReportResponse> = await fetch(...).then(r => r
 
 - Code Review Document: (in conversation)
 - Architecture Summary: `ARCHITECTURE_SUMMARY.md`
-- CDN Configuration: `docs/CDN_CONFIGURATION.md`
+- CDN Configuration: `docs/operations/cdn-configuration.md`
 - Shared Types: `shared/api-types.ts`

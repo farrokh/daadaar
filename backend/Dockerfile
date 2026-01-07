@@ -11,6 +11,9 @@ COPY backend ./backend
 COPY shared ./shared
 COPY database ./database
 
+# Ensure dev env files never get baked into the image
+RUN rm -f /usr/src/app/backend/.env /usr/src/app/backend/.env.local /usr/src/app/backend/.env.*
+
 # Create workspace package.json
 RUN echo '{"name":"daadaar-backend-docker","workspaces":["backend","shared","database"]}' > package.json
 

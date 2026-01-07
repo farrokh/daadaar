@@ -96,8 +96,8 @@ bun run type-check
 ## Area-Specific Guides
 
 Use these guides when working on a specific part of the stack:
-- [Frontend Contributors](docs/CONTRIBUTING_FRONTEND.md)
-- [Backend Contributors](docs/CONTRIBUTING_BACKEND.md)
+- [Frontend Contributors](docs/guides/contributing-frontend.md)
+- [Backend Contributors](docs/guides/contributing-backend.md)
 
 ## Project Structure
 

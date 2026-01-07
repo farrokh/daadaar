@@ -120,28 +120,32 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
       )}
 
       {/* Voting Buttons */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 max-w-fit p-1 rounded-full border border-foreground/10 bg-foreground/[0.02]">
         {/* Upvote Button */}
         <button
           type="button"
           onClick={handleUpvote}
           disabled={isLoading}
           className={`
-            flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200
+            group flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300
             ${
               currentVote === 'upvote'
-                ? 'bg-green-500/20 text-green-400 border-2 border-green-500/40 shadow-lg shadow-green-500/20'
-                : 'bg-foreground/5 text-foreground/70 hover:bg-green-500/10 hover:text-green-400 hover:border-green-500/30 border-2 border-transparent'
+                ? 'bg-green-500/10 text-green-600'
+                : 'text-foreground/50 hover:bg-foreground/5 hover:text-foreground'
             }
             ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           `}
+          title={t('upvote')}
         >
-          <ThumbsUp className="w-5 h-5" />
-          <div className="flex flex-col items-start">
-            <span className="text-xs font-medium opacity-70">{t('upvote')}</span>
-            <span className="text-lg font-bold">{upvoteCount}</span>
-          </div>
+          <ThumbsUp
+            className={`w-4 h-4 transition-transform duration-300 ${
+              currentVote === 'upvote' ? 'scale-110 fill-current' : 'group-hover:scale-110'
+            }`}
+          />
+          <span className="text-sm font-medium tabular-nums">{upvoteCount}</span>
         </button>
+
+        <div className="w-px h-4 bg-foreground/10" />
 
         {/* Downvote Button */}
         <button
@@ -149,20 +153,22 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
           onClick={handleDownvote}
           disabled={isLoading}
           className={`
-            flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200
+            group flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300
             ${
               currentVote === 'downvote'
-                ? 'bg-red-500/20 text-red-400 border-2 border-red-500/40 shadow-lg shadow-red-500/20'
-                : 'bg-foreground/5 text-foreground/70 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 border-2 border-transparent'
+                ? 'bg-red-500/10 text-red-600'
+                : 'text-foreground/50 hover:bg-foreground/5 hover:text-foreground'
             }
             ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           `}
+          title={t('downvote')}
         >
-          <ThumbsDown className="w-5 h-5" />
-          <div className="flex flex-col items-start">
-            <span className="text-xs font-medium opacity-70">{t('downvote')}</span>
-            <span className="text-lg font-bold">{downvoteCount}</span>
-          </div>
+          <span className="text-sm font-medium tabular-nums">{downvoteCount}</span>
+          <ThumbsDown
+            className={`w-4 h-4 transition-transform duration-300 ${
+              currentVote === 'downvote' ? 'scale-110 fill-current' : 'group-hover:scale-110'
+            }`}
+          />
         </button>
       </div>
 

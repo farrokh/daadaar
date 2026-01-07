@@ -7,7 +7,7 @@ description: Comprehensive guide to deploying Daadaar to AWS Production
 This workflow steps you through deploying the **Daadaar** platform to AWS.
 **Reference Docs**:
 - `docs/architecture/infrastructure.md` (Architecture Overview)
-- `docs/CDN_CONFIGURATION.md` (Media/CDN Setup)
+- `docs/operations/cdn-configuration.md` (Media/CDN Setup)
 
 **Note on Compute**: The architecture docs recommend **AWS ECS (Fargate)**. For this initial walkthrough, we use **AWS App Runner** as it handles the same container workloads with significantly less configuration overhead.
 
@@ -37,7 +37,7 @@ This workflow steps you through deploying the **Daadaar** platform to AWS.
 3.  **S3 Media Bucket**:
     *   Create bucket: `daadaar-media-v1-<account-id>` (current prod: `daadaar-media-v1-317430950654`).
     *   Region: `us-east-1`.
-    *   **Permissions**: Configure Bucket Policy to allow Cloudflare IPs (see `docs/CDN_CONFIGURATION.md`).
+    *   **Permissions**: Configure Bucket Policy to allow Cloudflare IPs (see `docs/operations/cdn-configuration.md`).
 
 ---
 
@@ -101,7 +101,7 @@ docker push <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/daadaar-backend:lat
 ## Step 4: Domain & CDN Configuration
 
 ### 4.1 DNS (Namecheap + Cloudflare)
-Per `CDN_CONFIGURATION.md`, it is highly recommended to proxy media traffic through Cloudflare.
+Per `docs/operations/cdn-configuration.md`, it is highly recommended to proxy media traffic through Cloudflare.
 
 1.  **Point Namecheap to Cloudflare**: Change Nameservers in Namecheap to Cloudflare's.
 2.  **Cloudflare DNS Records**:
@@ -112,7 +112,7 @@ Per `CDN_CONFIGURATION.md`, it is highly recommended to proxy media traffic thro
 
 ### 4.2 Cloudflare Rules
 *   **Media**: Set Page Rule for `media.daadaar.com/*` to "Cache Everything".
-*   See `docs/CDN_CONFIGURATION.md` for exact configurations.
+*   See `docs/operations/cdn-configuration.md` for exact configurations.
 
 ---
 
@@ -143,10 +143,7 @@ Use the CodeBuild runner so migrations execute inside the VPC:
 
 ### Email Verification Toggle
 - `EMAIL_VERIFICATION_ENABLED=false` allows logins without verification.
-4. Optional seed:
-   ```bash
-   aws codebuild start-build \
-     --project-name daadaar-migrations \
-     --region us-east-1 \
-     --environment-variables-override name=RUN_SEED,value=true,type=PLAINTEXT
-   ```
+
+### Production seeding prohibition
+- Automatic/seeding scripts must not run in production (risking data overwrite or security issues).
+- **Seeding is not allowed in production.**

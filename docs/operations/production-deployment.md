@@ -4,7 +4,7 @@ This guide details the process for deploying database changes and managing the p
 
 ## Overview
 
-We use AWS CodeBuild to run database migrations and seeds in production. This is necessary because:
+We use AWS CodeBuild to run database migrations in production. **Seeding is not allowed in production.** This is necessary because:
 1. **VPC Access**: The production RDS instance is in a private subnet, so we need a compute environment (CodeBuild) inside the VPC to access it.
 2. **Security**: We avoid exposing the database to the public internet or managing SSH tunnels.
 3. **Automation**: It integrates with our CI/CD pipeline.
@@ -32,24 +32,30 @@ The project must be configured with:
     - `DATABASE_URL`: Retrieved from Secrets Manager (`daadaar/prod/database-url`)
     - `IMAGE_URI`: The ECR URI for the backend image (e.g., `317430950654.dkr.ecr.us-east-1.amazonaws.com/daadaar-backend:latest`)
     - `RUN_MIGRATIONS`: `true`/`false`
-    - `RUN_SEED`: `true`/`false`
+    - `RUN_SEED`: **must remain `false` in production**
 
 ### Build Specification
 The project uses `infrastructure/aws/codebuild-migrations.buildspec.yml`. This file:
 1. Logs into ECR
 2. Pulls the backend Docker image
-3. executing `bun src/db/migrate.ts` or `bun src/db/seed-organizations.ts` *inside* the container, passing the `DATABASE_URL`.
+3. executing `bun src/db/migrate.ts` *inside* the container, passing the `DATABASE_URL`.
 
 ## 2. Deploying Changes
 
 ### Step 1: Build & Push Docker Image
-Since CodeBuild runs the Docker container, the image must contain the latest code (migrations/seeds) and be compatible with the CodeBuild architecture (x86_64/AMD64).
+Since CodeBuild runs the Docker container, the image must contain the latest code (migrations) and be compatible with the CodeBuild architecture (x86_64/AMD64).
 
 **Important**: If building from an Apple Silicon (M1/M2/M3) mac, you **MUST** specify the platform:
 
 ```bash
 docker buildx build --platform linux/amd64 -f backend/Dockerfile -t 317430950654.dkr.ecr.us-east-1.amazonaws.com/daadaar-backend:latest --push .
 ```
+
+### Production Environment Safety
+To avoid accidental dev configuration in production:
+- Do not bake `backend/.env*` files into the Docker image. Ensure `.dockerignore` excludes them and remove after copy in `backend/Dockerfile` if needed.
+- Do not set static `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` in App Runner. Production uses the App Runner instance role for S3 access.
+- Double-check `AWS_S3_BUCKET`, `AWS_REGION`, `FRONTEND_URL`, and `API_URL` are set via App Runner config (not local `.env` files).
 
 ### Step 2: Trigger CodeBuild
 
@@ -61,14 +67,6 @@ aws codebuild start-build \
   --project-name daadaar-migrations \
   --region us-east-1 \
   --environment-variables-override name=RUN_MIGRATIONS,value=true,type=PLAINTEXT name=RUN_SEED,value=false,type=PLAINTEXT
-```
-
-#### To Run Seeds (e.g., Organizations):
-```bash
-aws codebuild start-build \
-  --project-name daadaar-migrations \
-  --region us-east-1 \
-  --environment-variables-override name=RUN_SEED,value=true,type=PLAINTEXT name=RUN_MIGRATIONS,value=false,type=PLAINTEXT
 ```
 
 ## 3. Common Issues & Solutions
