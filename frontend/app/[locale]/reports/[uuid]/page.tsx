@@ -25,9 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const report = await getReport(uuid);
 
   if (!report) {
-    return {
-      title: 'Report Not Found',
-    };
+    notFound();
   }
 
   const isRtl = locale === 'fa';

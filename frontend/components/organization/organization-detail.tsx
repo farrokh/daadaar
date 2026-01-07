@@ -37,7 +37,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
           <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={() => router.push('/')}
+              onClick={() => router.push(`/${locale}`)}
               className="text-sm font-medium uppercase text-foreground/50 hover:text-foreground transition-colors tracking-[0.2em]"
             >
               {commonT('home')}
@@ -115,7 +115,9 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
               <Button
                 size="lg"
                 onClick={() =>
-                  router.push(`/?view=people&organizationUuid=${organization.shareableUuid}`)
+                  router.push(
+                    `/${locale}/?view=people&organizationUuid=${organization.shareableUuid}`
+                  )
                 }
                 className="rounded-full px-8"
               >
@@ -133,7 +135,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {organization.members.map(member => (
                   <Link
-                    href={`/person/${member.shareableUuid}`}
+                    href={`/${locale}/person/${member.shareableUuid}`}
                     key={member.id}
                     className="block group"
                   >

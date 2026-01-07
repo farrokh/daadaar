@@ -35,7 +35,7 @@ export default function PersonDetail({ person }: PersonDetailProps) {
           <div className="flex items-center gap-4">
             <button
               type="button"
-              onClick={() => router.push('/')}
+              onClick={() => router.push(`/${locale}`)}
               className="text-sm font-medium uppercase text-foreground/50 hover:text-foreground transition-colors tracking-[0.2em]"
             >
               {commonT('home')}
@@ -105,7 +105,7 @@ export default function PersonDetail({ person }: PersonDetailProps) {
               <div className="space-y-4">
                 {person.reports.map(report => (
                   <Link
-                    href={`/reports/${report.shareableUuid}`}
+                    href={`/${locale}/reports/${report.shareableUuid}`}
                     key={report.id}
                     className="block group"
                   >
