@@ -202,12 +202,14 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   useEffect(() => {
     // Skip URL sync while still loading initial data to prevent overwriting URL params
-    if (loading) return;
+    if (loading) {
+      return;
+    }
 
     // Mark that initial load is complete
     if (!hasInitialLoadCompleted.current) {
       hasInitialLoadCompleted.current = true;
-      return; // Don't sync URL on the first completion of loading
+      return;
     }
 
     const params = new URLSearchParams(searchParams.toString());

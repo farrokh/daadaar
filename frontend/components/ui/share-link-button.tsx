@@ -13,6 +13,7 @@ interface ShareLinkButtonProps {
   variant?: 'icon' | 'text';
   label?: string;
   copiedLabel?: string;
+  errorLabel?: string;
   toastText?: string;
   showToast?: boolean;
   buttonVariant?: ButtonVariant;
@@ -26,6 +27,7 @@ export function ShareLinkButton({
   variant = 'text',
   label,
   copiedLabel,
+  errorLabel,
   toastText,
   showToast = false,
   buttonVariant = 'ghost',
@@ -69,7 +71,7 @@ export function ShareLinkButton({
           <Share2 className={cn('w-4 h-4', iconClassName)} />
         )}
         <span className="text-sm font-medium">
-          {error ? 'Error' : copied ? (copiedLabel ?? label) : label}
+          {error ? (errorLabel ?? 'Error') : copied ? (copiedLabel ?? label) : label}
         </span>
       </div>
     );
@@ -81,7 +83,7 @@ export function ShareLinkButton({
         variant={buttonVariant}
         size={buttonSize ?? (variant === 'icon' ? 'icon' : 'sm')}
         onClick={handleShare}
-        aria-label={ariaLabel ?? label}
+        aria-label={ariaLabel ?? label ?? 'Share'}
         className={className}
       >
         {content}

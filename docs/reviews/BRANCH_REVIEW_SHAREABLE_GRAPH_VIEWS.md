@@ -17,7 +17,7 @@ This branch implements URL-based state management for the knowledge graph, allow
 - ✅ Locale-aware sharing (maintains /en or /fa)
 
 ### URL Examples
-```
+```text
 /?view=organizations
 /?view=people&organizationId=123
 /?view=reports&individualId=456
@@ -38,7 +38,7 @@ This branch implements URL-based state management for the knowledge graph, allow
 ### 2. URL Params Not Loading Content
 **Problem:** URLs like `?view=reports&individualId=3` redirected to organizations view  
 **Root Causes:**
-1. `searchParams` not awaited in Next.js 14 server component
+1. `searchParams` not awaited in Next.js 16 server component
 2. URL sync effect running before data loaded
 
 **Solutions:**
@@ -195,7 +195,7 @@ Potential improvements for future iterations:
 
 ## 📝 Commit Message Suggestion
 
-```
+```text
 feat: implement shareable graph views with URL state management
 
 - Add URL-based state persistence for graph views

@@ -57,7 +57,7 @@ function getInitialView(searchParams: HomePageProps['searchParams']): ViewContex
 ```
 
 **Key Points:**
-- Server component must be `async` and `await searchParams` (Next.js 14+ requirement)
+- Server component must be `async` and `await searchParams` (Next.js 15+ requirement)
 - Validates and parses numeric IDs with type safety
 - Falls back to organizations view if parameters are invalid
 
