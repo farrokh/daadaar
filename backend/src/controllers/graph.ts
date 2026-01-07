@@ -203,6 +203,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
     const individuals = await db
       .select({
         id: schema.individuals.id,
+        shareableUuid: schema.individuals.shareableUuid,
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
         biography: schema.individuals.biography,
@@ -220,6 +221,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
         label: individual.fullName,
         data: {
           id: individual.id,
+          shareableUuid: individual.shareableUuid,
           name: individual.fullName,
           nameEn: individual.fullNameEn,
           biography: individual.biography,

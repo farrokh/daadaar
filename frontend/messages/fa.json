@@ -161,7 +161,13 @@
     "create_new_role": "+ ایجاد نقش جدید",
     "creating_new_role": "ایجاد نقش جدید",
     "profile_image": "تصویر پروفایل",
-    "profile_image_helper": "بارگذاری تصویر پروفایل (اختیاری، حداکثر ۵ مگابایت)"
+    "profile_image_helper": "بارگذاری تصویر پروفایل (اختیاری، حداکثر ۵ مگابایت)",
+    "view_on_graph": "مشاهده در گراف",
+    "graph_description": "مشاهده ارتباطات و نقش‌های مرتبط با این فرد در گراف تعاملی.",
+    "explore_graph": "کاوش گراف",
+    "person_id": "شناسه فرد",
+    "no_biography": "بیوگرافی موجود نیست.",
+    "unknown_role": "نقش نامشخص"
   },
   "role": {
     "title": "عنوان نقش",

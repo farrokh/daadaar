@@ -15,6 +15,7 @@ export interface OrganizationNodeData {
 
 export interface PersonNodeData {
   id: number;
+  shareableUuid?: string;
   name: string;
   nameEn?: string | null;
   biography?: string | null;
