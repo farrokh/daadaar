@@ -25,6 +25,11 @@ The platform manages complex relational data and high-volume media assets with a
 
 *Note: All entities (Reports, Organizations, Individuals, Roles) support attribution to either a `userId` or a `sessionId`.*
 
+### Identity Strategy
+We use a **Hybrid ID Approach**:
+- **Integer IDs (Serial)**: Used internally for foreign keys, joins, and high-performance indexing.
+- **UUIDs (v4)**: Added as `shareable_uuid` to public-facing entities. Used for external URLs and API endpoints to prevent enumeration attacks and secure data access.
+
 ---
 
 ## 🛠️ Performance & Scalability

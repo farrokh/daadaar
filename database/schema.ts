@@ -59,6 +59,7 @@ export const organizations = pgTable(
   'organizations',
   {
     id: serial('id').primaryKey(),
+    shareableUuid: uuid('shareable_uuid').defaultRandom().unique().notNull(),
     name: varchar('name', { length: 255 }).notNull(),
     nameEn: varchar('name_en', { length: 255 }), // English translation
     description: text('description'),
@@ -74,6 +75,7 @@ export const organizations = pgTable(
     index('organizations_name_idx').on(table.name),
     index('organizations_parent_idx').on(table.parentId),
     index('organizations_created_by_idx').on(table.createdByUserId),
+    index('organizations_shareable_uuid_idx').on(table.shareableUuid),
   ]
 );
 
@@ -139,6 +141,7 @@ export const individuals = pgTable(
   'individuals',
   {
     id: serial('id').primaryKey(),
+    shareableUuid: uuid('shareable_uuid').defaultRandom().unique().notNull(),
     fullName: varchar('full_name', { length: 255 }).notNull(),
     fullNameEn: varchar('full_name_en', { length: 255 }), // English translation
     biography: text('biography'),
@@ -155,6 +158,7 @@ export const individuals = pgTable(
   table => [
     index('individuals_name_idx').on(table.fullName),
     index('individuals_name_en_idx').on(table.fullNameEn),
+    index('individuals_shareable_uuid_idx').on(table.shareableUuid),
   ]
 );
 
@@ -196,6 +200,7 @@ export const users = pgTable(
   'users',
   {
     id: serial('id').primaryKey(),
+    shareableUuid: uuid('shareable_uuid').defaultRandom().unique().notNull(),
     email: varchar('email', { length: 255 }).unique().notNull(),
     username: varchar('username', { length: 50 }).unique().notNull(),
     displayName: varchar('display_name', { length: 100 }),
@@ -219,6 +224,7 @@ export const users = pgTable(
     index('users_oauth_idx').on(table.oauthProvider, table.oauthId),
     index('users_role_idx').on(table.role),
     index('users_banned_idx').on(table.isBanned),
+    index('users_shareable_uuid_idx').on(table.shareableUuid),
   ]
 );
 
@@ -255,6 +261,7 @@ export const reports = pgTable(
   'reports',
   {
     id: serial('id').primaryKey(),
+    shareableUuid: uuid('shareable_uuid').defaultRandom().unique().notNull(),
     userId: integer('user_id').references(() => users.id, { onDelete: 'set null' }), // null for anonymous
     sessionId: uuid('session_id'), // for anonymous submissions
     title: varchar('title', { length: 500 }).notNull(),
@@ -281,6 +288,7 @@ export const reports = pgTable(
     index('reports_incident_date_idx').on(table.incidentDate),
     index('reports_submitted_by_user_id_idx').on(table.userId),
     index('reports_submitted_by_session_id_idx').on(table.sessionId),
+    index('reports_shareable_uuid_idx').on(table.shareableUuid),
   ]
 );
 

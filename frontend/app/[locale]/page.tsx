@@ -1,5 +1,6 @@
 import type { ViewContext } from '@/components/graph/config';
 import GraphCanvas from '@/components/graph/graph-canvas';
+import { fetchApi } from '@/lib/api';
 
 type HomePageProps = {
   searchParams?: Record<string, string | string[] | undefined>;
@@ -18,10 +19,47 @@ function parseNumberParam(value?: string | string[]): number | undefined {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-function getInitialView(searchParams: HomePageProps['searchParams']): ViewContext {
+// Check if a string is a valid UUID
+function isUuid(value: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(value);
+}
+
+async function resolveOrganizationUuid(uuid: string): Promise<number | undefined> {
+  try {
+    const response = await fetchApi<{ id: number }>(`/share/org/${uuid}`);
+    return response.success && response.data ? response.data.id : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function resolveIndividualUuid(uuid: string): Promise<number | undefined> {
+  try {
+    const response = await fetchApi<{ id: number }>(`/share/individual/${uuid}`);
+    return response.success && response.data ? response.data.id : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+async function getInitialView(searchParams: HomePageProps['searchParams']): Promise<ViewContext> {
   const view = getParamValue(searchParams?.view);
 
   if (view === 'people') {
+    // Try UUID first, fall back to numeric ID
+    const organizationUuid = getParamValue(searchParams?.organizationUuid);
+    if (organizationUuid && isUuid(organizationUuid)) {
+      const organizationId = await resolveOrganizationUuid(organizationUuid);
+      if (organizationId) {
+        return {
+          mode: 'people',
+          organizationId,
+        };
+      }
+    }
+
+    // Backward compatibility: support numeric organizationId
     const organizationId = parseNumberParam(searchParams?.organizationId);
     if (organizationId) {
       return {
@@ -32,6 +70,19 @@ function getInitialView(searchParams: HomePageProps['searchParams']): ViewContex
   }
 
   if (view === 'reports') {
+    // Try UUID first, fall back to numeric ID
+    const individualUuid = getParamValue(searchParams?.individualUuid);
+    if (individualUuid && isUuid(individualUuid)) {
+      const individualId = await resolveIndividualUuid(individualUuid);
+      if (individualId) {
+        return {
+          mode: 'reports',
+          individualId,
+        };
+      }
+    }
+
+    // Backward compatibility: support numeric individualId
     const individualId = parseNumberParam(searchParams?.individualId);
     if (individualId) {
       return {
@@ -46,7 +97,7 @@ function getInitialView(searchParams: HomePageProps['searchParams']): ViewContex
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const resolvedParams = await searchParams;
-  const initialView = getInitialView(resolvedParams);
+  const initialView = await getInitialView(resolvedParams);
 
   return (
     <main className="absolute inset-0 w-full h-full overflow-hidden">

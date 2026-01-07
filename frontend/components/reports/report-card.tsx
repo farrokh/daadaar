@@ -143,7 +143,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
 
         {/* View Details Click Overlay */}
         <Link
-          href={`/${locale}/reports/${report.id}`}
+          href={`/${locale}/reports/${report.shareableUuid}`}
           className="absolute inset-0 z-10 focus:outline-none focus:ring-2 focus:ring-accent-primary/50 rounded-3xl"
         >
           <span className="sr-only">{t('report_details')}</span>

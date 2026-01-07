@@ -36,6 +36,7 @@ export type OAuthProvider = 'google' | 'github' | 'twitter';
 
 export interface User {
   id: number;
+  shareableUuid: string;
   email: string;
   username: string;
   displayName: string | null;
@@ -102,6 +103,7 @@ export type CurrentUser = AuthUser | AnonymousUser;
 
 export interface Organization {
   id: number;
+  shareableUuid: string;
   name: string;
   nameEn: string | null;
   description: string | null;
@@ -142,6 +144,7 @@ export interface Role {
 
 export interface Individual {
   id: number;
+  shareableUuid: string;
   fullName: string;
   fullNameEn: string | null;
   biography: string | null;
@@ -174,6 +177,7 @@ export interface RoleOccupancy {
 
 export interface Report {
   id: number;
+  shareableUuid: string;
   userId: number | null;
   sessionId: string | null;
   title: string;

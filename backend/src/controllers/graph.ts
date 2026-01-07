@@ -106,6 +106,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
     const [organization] = await db
       .select({
         id: schema.organizations.id,
+        shareableUuid: schema.organizations.shareableUuid,
         name: schema.organizations.name,
         nameEn: schema.organizations.nameEn,
         description: schema.organizations.description,
@@ -289,6 +290,7 @@ export async function getIndividualReports(req: Request, res: Response) {
     const [individual] = await db
       .select({
         id: schema.individuals.id,
+        shareableUuid: schema.individuals.shareableUuid,
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
         biography: schema.individuals.biography,
@@ -358,6 +360,7 @@ export async function getIndividualReports(req: Request, res: Response) {
     const reports = await db
       .select({
         id: schema.reports.id,
+        shareableUuid: schema.reports.shareableUuid,
         title: schema.reports.title,
         titleEn: schema.reports.titleEn,
         content: schema.reports.content,
@@ -383,6 +386,7 @@ export async function getIndividualReports(req: Request, res: Response) {
       label: report.title,
       data: {
         id: report.id,
+        shareableUuid: report.shareableUuid,
         title: report.title,
         titleEn: report.titleEn,
         content: report.content,

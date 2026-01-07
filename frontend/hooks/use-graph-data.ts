@@ -19,6 +19,7 @@ export interface OrganizationPathItem {
 interface OrganizationPeopleResponse {
   organization: {
     id: number;
+    shareableUuid: string;
     name: string;
     nameEn?: string | null;
     description?: string | null;
@@ -35,6 +36,7 @@ interface OrganizationPeopleResponse {
 interface IndividualReportsResponse {
   individual: {
     id: number;
+    shareableUuid: string;
     fullName: string;
     fullNameEn?: string | null;
     biography?: string | null;
@@ -148,6 +150,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
         setViewContext({
           mode: 'people',
           organizationId: organization.id,
+          organizationUuid: organization.shareableUuid,
           organizationName: displayName,
         });
       } else {
@@ -201,6 +204,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
         setViewContext({
           mode: 'reports',
           individualId: individual.id,
+          individualUuid: individual.shareableUuid,
           individualName: displayName,
         });
 

@@ -30,7 +30,9 @@ export type ViewMode = 'organizations' | 'people' | 'reports';
 export type ViewContext = {
   mode: ViewMode;
   organizationId?: number;
+  organizationUuid?: string;
   organizationName?: string;
   individualId?: number;
+  individualUuid?: string;
   individualName?: string;
 };

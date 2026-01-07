@@ -152,6 +152,7 @@ export async function listOrganizations(req: Request, res: Response) {
     const query = db
       .select({
         id: schema.organizations.id,
+        shareableUuid: schema.organizations.shareableUuid,
         name: schema.organizations.name,
         nameEn: schema.organizations.nameEn,
         description: schema.organizations.description,
