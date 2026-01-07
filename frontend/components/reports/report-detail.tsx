@@ -7,15 +7,7 @@ import { ShareLinkButton } from '@/components/ui/share-link-button';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getS3PublicUrl } from '@/lib/utils';
 import type { Media, ReportWithDetails } from '@/shared/types';
-import {
-  Calendar,
-  FileText,
-  Link as LinkIcon,
-  MapPin,
-  Music,
-  Play,
-  Shield,
-} from 'lucide-react';
+import { Calendar, FileText, Link as LinkIcon, MapPin, Music, Play, Shield } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import React, { useEffect, useRef, useState } from 'react';
 

@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isRtl = locale === 'fa';
   const title = isRtl ? report.title : report.titleEn || report.title;
   const content = isRtl ? report.content : report.contentEn || report.content;
-  const description = content ? content.slice(0, 160) + '...' : `View this report on Daadaar.`;
+  const description = content ? `${content.slice(0, 160)}...` : 'View this report on Daadaar.';
 
   // Find first image for OG tag
   const firstImage = report.media?.find(m => m.mediaType === 'image');
@@ -41,21 +41,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? firstImage.url || getS3PublicUrl(firstImage.s3Key, firstImage.s3Bucket)
     : undefined;
 
+  const images = [];
+  if (imageUrl) {
+    images.push({ url: imageUrl });
+  }
+  images.push({ url: '/android-chrome-512x512.png', width: 512, height: 512, alt: title });
+
   return {
     title: title,
     description: description,
     openGraph: {
       title: title,
       description: description,
-      images: imageUrl ? [{ url: imageUrl }] : [],
+      images: images,
       type: 'article',
       publishedTime: report.incidentDate || report.createdAt,
+      siteName: 'Daadaar',
+      locale: locale,
     },
     twitter: {
       card: 'summary_large_image',
       title: title,
       description: description,
-      images: imageUrl ? [imageUrl] : [],
+      images: images.map(img => img.url),
     },
   };
 }

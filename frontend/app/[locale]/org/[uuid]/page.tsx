@@ -35,20 +35,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? organization.description
     : organization.descriptionEn || organization.description;
 
+  const images = [];
+  if (organization.logoUrl) {
+    images.push({ url: organization.logoUrl });
+  }
+  images.push({ url: '/android-chrome-512x512.png', width: 512, height: 512, alt: name });
+
   return {
     title: name,
     description: description || `View the profile of ${name} on Daadaar.`,
     openGraph: {
       title: name,
       description: description || `View the profile of ${name} on Daadaar.`,
-      images: organization.logoUrl ? [{ url: organization.logoUrl }] : [],
+      images: images,
       type: 'website',
+      siteName: 'Daadaar',
+      locale: locale,
     },
     twitter: {
       card: 'summary_large_image',
       title: name,
       description: description || `View the profile of ${name} on Daadaar.`,
-      images: organization.logoUrl ? [organization.logoUrl] : [],
+      images: images.map(img => img.url),
     },
   };
 }

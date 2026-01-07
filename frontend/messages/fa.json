@@ -126,7 +126,9 @@
     "about": "درباره",
     "no_description": "توضیحاتی موجود نیست.",
     "added_on": "اضافه شده در",
-    "org_id": "شناسه سازمان"
+    "org_id": "شناسه سازمان",
+    "members": "اعضا",
+    "no_members": "عضوی یافت نشد."
   },
   "person": {
     "add_title": "افزودن فرد جدید",
@@ -167,7 +169,9 @@
     "explore_graph": "کاوش گراف",
     "person_id": "شناسه فرد",
     "no_biography": "بیوگرافی موجود نیست.",
-    "unknown_role": "نقش نامشخص"
+    "unknown_role": "نقش نامشخص",
+    "associated_reports": "گزارش‌های مرتبط",
+    "no_reports": "گزارشی برای این فرد ثبت نشده است."
   },
   "role": {
     "title": "عنوان نقش",

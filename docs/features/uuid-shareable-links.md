@@ -154,18 +154,12 @@ Consider adding `shareableUuid` to responses in:
 - `backend/src/controllers/users.ts`
 
 ### 3. Frontend Implementation
-
-Create frontend pages/components:
-- `/[locale]/org/[uuid]/page.tsx` - Organization share page
-- `/[locale]/individual/[uuid]/page.tsx` - Individual share page
-- `/[locale]/report/[uuid]/page.tsx` - Report share page
-- `/[locale]/user/[uuid]/page.tsx` - User profile share page
-
-Add share buttons to existing pages:
-- Organization cards → Copy share link
-- Individual profiles → Copy share link
-- Report details → Copy share link
-- User profiles → Copy share link
+- **Completed**:
+  - `/[locale]/org/[uuid]/page.tsx` - Organization share page (with Member List)
+  - `/[locale]/person/[uuid]/page.tsx` - Individual share page (with Report History)
+  - `/[locale]/reports/[uuid]/page.tsx` - Report share page (with Media Support)
+  - `/[locale]/user/[uuid]/page.tsx` - (Pending/Not yet linked)
+  - **SEO**: All detail pages implemented with `generateMetadata` including fallback images for robust social sharing.
 
 ### 4. Update API Types
 
@@ -229,7 +223,7 @@ If issues arise in production:
 
 ## Documentation Updates Needed
 
-- [ ] Update API documentation with new share endpoints
+- [x] Update API documentation with new share endpoints
 - [ ] Add shareable links to user guide
 - [ ] Update architecture docs to mention UUID sharing
 - [ ] Add share button examples to component library

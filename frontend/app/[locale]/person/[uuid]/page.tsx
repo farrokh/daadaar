@@ -31,10 +31,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const isRtl = locale === 'fa';
   const name = isRtl ? person.fullName : person.fullNameEn || person.fullName;
-  const biography = isRtl
-    ? person.biography
-    : person.biographyEn || person.biography;
-  const description = biography ? biography.slice(0, 160) + '...' : `View the profile of ${name} on Daadaar.`;
+  const biography = isRtl ? person.biography : person.biographyEn || person.biography;
+  const description = biography
+    ? `${biography.slice(0, 160)}...`
+    : `View the profile of ${name} on Daadaar.`;
+
+  const images = [];
+  if (person.profileImageUrl) {
+    images.push({ url: person.profileImageUrl });
+  }
+  // Fallback image
+  images.push({ url: '/android-chrome-512x512.png', width: 512, height: 512, alt: name });
 
   return {
     title: name,
@@ -42,14 +49,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: name,
       description: description,
-      images: person.profileImageUrl ? [{ url: person.profileImageUrl }] : [],
+      images: images,
       type: 'profile',
+      siteName: 'Daadaar',
+      locale: locale,
     },
     twitter: {
       card: 'summary_large_image',
       title: name,
       description: description,
-      images: person.profileImageUrl ? [person.profileImageUrl] : [],
+      images: images.map(img => img.url),
     },
   };
 }

@@ -3,8 +3,9 @@
 import { Button } from '@/components/ui/button';
 import { ShareLinkButton } from '@/components/ui/share-link-button';
 import type { Organization } from '@/shared/types';
-import { Building2, Calendar, ChevronRight, Network } from 'lucide-react';
+import { Building2, Calendar, ChevronRight, Network, User } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 interface OrganizationDetailProps {
@@ -121,6 +122,50 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
                 {t('explore_graph')} <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
+          </section>
+
+          {/* Members */}
+          <section className="pt-8 border-t border-foreground/10">
+            <h2 className="text-sm font-bold uppercase text-foreground/40 tracking-widest mb-4">
+              {t('members')}
+            </h2>
+            {organization.members && organization.members.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {organization.members.map(member => (
+                  <Link
+                    href={`/person/${member.shareableUuid}`}
+                    key={member.id}
+                    className="block group"
+                  >
+                    <div className="flex items-center gap-4 p-4 rounded-xl bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 transition-colors group-hover:border-foreground/20">
+                      <div className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center shrink-0 overflow-hidden">
+                        {member.profileImageUrl ? (
+                          <img
+                            src={member.profileImageUrl}
+                            alt={member.fullName}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="w-6 h-6 text-foreground/40" />
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="font-bold group-hover:text-primary transition-colors line-clamp-1">
+                          {isRtl ? member.fullName : member.fullNameEn || member.fullName}
+                        </h3>
+                        {(member.roleTitle || member.roleTitleEn) && (
+                          <p className="text-xs text-foreground/60 line-clamp-1">
+                            {isRtl ? member.roleTitle : member.roleTitleEn || member.roleTitle}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="text-foreground/60">{t('no_members')}</p>
+            )}
           </section>
         </div>
 

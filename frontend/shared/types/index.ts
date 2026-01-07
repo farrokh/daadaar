@@ -113,6 +113,12 @@ export interface Organization {
   createdByUserId: number | null;
   createdAt: string;
   updatedAt: string;
+  members?: OrganizationMember[];
+}
+
+export interface OrganizationMember extends Individual {
+  roleTitle?: string;
+  roleTitleEn?: string | null;
 }
 
 export interface OrganizationHierarchy {
@@ -158,6 +164,7 @@ export interface Individual {
   currentRole?: string | null;
   currentOrganization?: string | null;
   currentOrganizationId?: number | null;
+  reports?: Report[];
 }
 
 export interface RoleOccupancy {
