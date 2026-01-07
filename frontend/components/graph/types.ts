@@ -2,6 +2,7 @@
 
 export interface OrganizationNodeData {
   id: number;
+  shareableUuid?: string;
   name: string;
   nameEn?: string | null;
   description?: string | null;

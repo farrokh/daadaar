@@ -17,6 +17,7 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
     const organizations = await db
       .select({
         id: schema.organizations.id,
+        shareableUuid: schema.organizations.shareableUuid,
         name: schema.organizations.name,
         nameEn: schema.organizations.nameEn,
         description: schema.organizations.description,
@@ -42,6 +43,7 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
         label: org.name,
         data: {
           id: org.id,
+          shareableUuid: org.shareableUuid,
           name: org.name,
           nameEn: org.nameEn,
           description: org.description,

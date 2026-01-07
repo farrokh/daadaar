@@ -4,10 +4,15 @@ import { cn } from '@/lib/utils';
 import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 
+import { ExternalLink } from 'lucide-react';
+import Link from 'next/link';
+
 export interface BaseNodeCardProps {
   displayName: string;
   displayDescription?: string | null;
   imageUrl?: string | null;
+  shareUrl?: string;
+  shareUrlLabel?: string;
   isDetailView?: boolean;
   fallbackIcon: React.ReactNode;
   iconBgClassName: string;
@@ -18,6 +23,8 @@ function BaseNodeCard({
   displayName,
   displayDescription,
   imageUrl,
+  shareUrl,
+  shareUrlLabel,
   isDetailView,
   fallbackIcon,
   iconBgClassName,
@@ -73,6 +80,18 @@ function BaseNodeCard({
                 >
                   {displayDescription}
                 </section>
+              )}
+              {shareUrl && (
+                <div className="pt-2">
+                  <Link
+                    href={shareUrl}
+                    onClick={e => e.stopPropagation()}
+                    className="flex items-center gap-2 text-xs font-medium text-foreground/50 hover:text-foreground transition-colors p-2 rounded-md hover:bg-foreground/5 w-fit"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    {shareUrlLabel || 'View Profile'}
+                  </Link>
+                </div>
               )}
             </div>
           </div>
