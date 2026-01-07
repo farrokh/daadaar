@@ -14,6 +14,8 @@ The Person Detail Page provides a dedicated, shareable, and verifying presence f
 - **Name**: Full localized name (Farsi/English).
 - **Biography**: Detailed biography section.
 - **Metadata**: "Added on" date.
+- **Error Handling**: Strict 404 (Not Found) if profile is missing.
+- **Localization**: URL routing preserves the user's selected language (e.g., `/fa/person/...`).
 
 ### 2. Report History
 - **Associated Reports**: Displays a chronological list of verified reports linked to this individual.

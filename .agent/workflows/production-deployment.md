@@ -147,3 +147,34 @@ Use the CodeBuild runner so migrations execute inside the VPC:
 ### Production seeding prohibition
 - Automatic/seeding scripts must not run in production (risking data overwrite or security issues).
 - **Seeding is not allowed in production.**
+
+---
+
+## Updating Production
+
+### Backend Update Workflow
+Since `AutoDeploymentsEnabled` is set to `false` (recommended for stability), updating the backend requires:
+
+1.  **Build & Push Docker Image**:
+    ```bash
+    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com
+    docker build --platform linux/amd64 -t daadaar-backend -f backend/Dockerfile .
+    docker tag daadaar-backend:latest <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/daadaar-backend:latest
+    docker push <AWS_ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/daadaar-backend:latest
+    ```
+
+2.  **Trigger Deployment**:
+    ```bash
+    aws apprunner start-deployment --service-arn <SERVICE_ARN>
+    ```
+
+### Database Migration Update
+Migrations run via CodeBuild using the **latest Docker image from ECR**.
+**CRITICAL**: You MUST push the updated Docker image (Step 1 above) *before* running the migration build, as CodeBuild pulls `daadaar-backend:latest` to execute the migration script.
+
+```bash
+aws codebuild start-build \
+  --project-name daadaar-migrations \
+  --region us-east-1 \
+  --environment-variables-override name=RUN_MIGRATIONS,value=true,type=PLAINTEXT
+```
