@@ -14,6 +14,7 @@ export const nodeTypes: NodeTypes = {
 export const edgeTypes: EdgeTypes = {
   hierarchy: SmoothStepEdge,
   occupies: SmoothStepEdge,
+  occupies_former: SmoothStepEdge, // For former members (ended role)
   linked_to: SmoothStepEdge,
 };
 
