@@ -159,7 +159,9 @@ export async function listOrganizations(req: Request, res: Response) {
         descriptionEn: schema.organizations.descriptionEn,
         logoUrl: schema.organizations.logoUrl,
         parentId: schema.organizations.parentId,
+        createdByUserId: schema.organizations.createdByUserId,
         createdAt: schema.organizations.createdAt,
+        updatedAt: schema.organizations.updatedAt,
       })
       .from(schema.organizations);
 

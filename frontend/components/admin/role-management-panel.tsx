@@ -200,6 +200,7 @@ export function RoleManagementPanel() {
               <Select
                 options={organizationOptions}
                 value={form.organizationId}
+                label={t('roles_org_label')}
                 onChange={value => setForm(prev => ({ ...prev, organizationId: value }))}
                 placeholder={t('roles_org_label')}
                 className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
@@ -207,6 +208,7 @@ export function RoleManagementPanel() {
               <Input
                 required
                 value={form.title}
+                label={t('roles_title_label')}
                 placeholder={t('roles_title_label')}
                 onChange={e => setForm(prev => ({ ...prev, title: e.target.value }))}
                 className="bg-background/50 border-foreground/10 focus:border-foreground/20"
@@ -214,6 +216,7 @@ export function RoleManagementPanel() {
             </div>
             <Textarea
               value={form.description}
+              label={t('roles_description_label')}
               placeholder={t('roles_description_label')}
               onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
               className="bg-background/50 border-foreground/10 focus:border-foreground/20 min-h-[80px]"
