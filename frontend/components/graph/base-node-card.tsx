@@ -65,14 +65,14 @@ function BaseNodeCard({
                 {displayName}
               </div>
               {displayDescription && (
-                <div
-                  className="text-sm text-foreground/60 leading-relaxed max-h-32 overflow-y-auto pr-2"
+                <section
+                  className="text-sm text-foreground/60 leading-relaxed max-h-32 overflow-y-auto pr-2 outline-none focus-visible:ring-1 ring-primary/50 rounded-sm"
+                  // biome-ignore lint/a11y/noNoninteractiveTabindex: Scrollable region needs keyboard access
                   tabIndex={0}
-                  role="region"
                   aria-label="Description"
                 >
                   {displayDescription}
-                </div>
+                </section>
               )}
             </div>
           </div>

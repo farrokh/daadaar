@@ -4,7 +4,7 @@ import { cn, getS3PublicUrl } from '@/lib/utils';
 import { User } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { memo } from 'react';
-import { type NodeProps } from 'reactflow';
+import type { NodeProps } from 'reactflow';
 import BaseNodeCard from './base-node-card';
 import type { PersonNodeData } from './types';
 

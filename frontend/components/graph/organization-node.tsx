@@ -1,10 +1,10 @@
 'use client';
 
-import { cn, getS3PublicUrl } from '@/lib/utils';
+import { getS3PublicUrl } from '@/lib/utils';
 import { Building2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import { memo } from 'react';
-import { type NodeProps } from 'reactflow';
+import type { NodeProps } from 'reactflow';
 import BaseNodeCard from './base-node-card';
 import type { OrganizationNodeData } from './types';
 
