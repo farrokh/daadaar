@@ -35,18 +35,26 @@ export function ShareLinkButton({
   ariaLabel,
 }: ShareLinkButtonProps) {
   const [copied, setCopied] = useState(false);
+  const [error, setError] = useState(false);
   const [toastVisible, setToastVisible] = useState(false);
 
   const handleShare = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
+      setError(false);
       setToastVisible(true);
 
       window.setTimeout(() => setCopied(false), 2000);
       window.setTimeout(() => setToastVisible(false), 2000);
-    } catch (error) {
-      console.error('Failed to copy link:', error);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+      setError(true);
+      setToastVisible(true);
+      window.setTimeout(() => {
+        setError(false);
+        setToastVisible(false);
+      }, 2000);
     }
   };
 
@@ -60,7 +68,9 @@ export function ShareLinkButton({
         ) : (
           <Share2 className={cn('w-4 h-4', iconClassName)} />
         )}
-        <span className="text-sm font-medium">{copied ? (copiedLabel ?? label) : label}</span>
+        <span className="text-sm font-medium">
+          {error ? 'Error' : copied ? (copiedLabel ?? label) : label}
+        </span>
       </div>
     );
 
@@ -79,8 +89,12 @@ export function ShareLinkButton({
 
       {showToast && toastVisible && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-2 fade-in">
-          <div className="px-4 py-2 rounded-full bg-foreground text-background shadow-lg text-sm font-medium">
-            {toastText ?? copiedLabel ?? label}
+          <div className={`px-4 py-2 rounded-full shadow-lg text-sm font-medium ${
+            error 
+              ? 'bg-destructive text-destructive-foreground' 
+              : 'bg-foreground text-background'
+          }`}>
+            {error ? 'Failed to copy link' : (toastText ?? copiedLabel ?? label)}
           </div>
         </div>
       )}

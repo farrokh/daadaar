@@ -1,8 +1,8 @@
 'use client';
 
-import { useRouter } from '@/i18n/routing';
+import { usePathname, useRouter } from '@/i18n/routing';
 import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, {
   Background,
   applyEdgeChanges,
@@ -31,7 +31,7 @@ import { useToolContext } from '@/components/providers/tool-provider';
 import { Button } from '@/components/ui/button';
 import { ReportContentButton } from '@/components/ui/report-content-button';
 import { Building2, FileText, Map as MapIcon, Share2, User } from 'lucide-react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ContextMenu } from './context-menu';
 
 // Custom MiniMap Node (Dot)
@@ -54,6 +54,8 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const [showMiniMap, setShowMiniMap] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [showCopyToast, setShowCopyToast] = useState(false);
+  const [copyError, setCopyError] = useState(false);
+  const hasInitialLoadCompleted = useRef(false);
 
   const locale = useLocale();
   const t = useTranslations('graph');
@@ -129,10 +131,17 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const handleShare = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
+      setCopyError(false);
       setShowCopyToast(true);
       window.setTimeout(() => setShowCopyToast(false), 2000);
     } catch (error) {
       console.error('Failed to copy link:', error);
+      setCopyError(true);
+      setShowCopyToast(true);
+      window.setTimeout(() => {
+        setShowCopyToast(false);
+        setCopyError(false);
+      }, 2000);
     }
   }, []);
 
@@ -185,6 +194,15 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   ]);
 
   useEffect(() => {
+    // Skip URL sync while still loading initial data to prevent overwriting URL params
+    if (loading) return;
+    
+    // Mark that initial load is complete
+    if (!hasInitialLoadCompleted.current) {
+      hasInitialLoadCompleted.current = true;
+      return; // Don't sync URL on the first completion of loading
+    }
+
     const params = new URLSearchParams(searchParams.toString());
 
     params.set('view', viewContext.mode);
@@ -207,7 +225,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
     const nextUrl = nextSearch ? `${pathname}?${nextSearch}` : pathname;
     router.replace(nextUrl);
-  }, [pathname, router, searchParams, viewContext]);
+  }, [pathname, router, searchParams, viewContext, loading]);
 
   // Load initial data
   // biome-ignore lint/correctness/useExhaustiveDependencies: This effect should only run once on mount
@@ -369,8 +387,12 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
       {showCopyToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-2 fade-in">
-          <div className="px-4 py-2 rounded-full bg-foreground text-background shadow-lg text-sm font-medium">
-            {commonT('link_copied')}
+          <div className={`px-4 py-2 rounded-full shadow-lg text-sm font-medium ${
+            copyError 
+              ? 'bg-destructive text-destructive-foreground' 
+              : 'bg-foreground text-background'
+          }`}>
+            {copyError ? commonT('error_generic') : commonT('link_copied')}
           </div>
         </div>
       )}

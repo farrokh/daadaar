@@ -44,8 +44,9 @@ function getInitialView(searchParams: HomePageProps['searchParams']): ViewContex
   return { mode: 'organizations' };
 }
 
-export default function HomePage({ searchParams }: HomePageProps) {
-  const initialView = getInitialView(searchParams);
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const resolvedParams = await searchParams;
+  const initialView = getInitialView(resolvedParams);
 
   return (
     <main className="absolute inset-0 w-full h-full overflow-hidden">
