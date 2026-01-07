@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { deleteUser, listUsers, updateUser } from '../../controllers/users';
+import { deleteIndividual, listIndividuals, updateIndividual } from '../../controllers/individuals';
 import { csrfProtection } from '../../lib/csrf-protection';
 import { adminMiddleware, authMiddleware } from '../../middleware/auth';
 
@@ -10,18 +10,18 @@ router.use(authMiddleware);
 router.use(adminMiddleware);
 
 /**
- * GET /api/admin/users
+ * GET /api/admin/individuals
  */
-router.get('/', listUsers);
+router.get('/', listIndividuals);
 
 /**
- * PATCH /api/admin/users/:id
+ * PATCH /api/admin/individuals/:id
  */
-router.patch('/:id', csrfProtection, updateUser);
+router.patch('/:id', csrfProtection, updateIndividual);
 
 /**
- * DELETE /api/admin/users/:id
+ * DELETE /api/admin/individuals/:id
  */
-router.delete('/:id', csrfProtection, deleteUser);
+router.delete('/:id', csrfProtection, deleteIndividual);
 
 export default router;

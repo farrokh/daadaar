@@ -42,6 +42,10 @@ export interface User {
   profileImageUrl: string | null;
   role: UserRole;
   isBanned: boolean;
+  isVerified: boolean;
+  bannedAt?: string | null;
+  bannedUntil?: string | null;
+  banReason?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -87,6 +91,7 @@ export interface AuthUser {
 export interface AnonymousUser {
   type: 'anonymous';
   sessionId: string;
+  isBanned?: boolean;
 }
 
 export type CurrentUser = AuthUser | AnonymousUser;
@@ -146,6 +151,10 @@ export interface Individual {
   createdByUserId: number | null;
   createdAt: string;
   updatedAt: string;
+  // Optional info included in some listings
+  currentRole?: string | null;
+  currentOrganization?: string | null;
+  currentOrganizationId?: number | null;
 }
 
 export interface RoleOccupancy {

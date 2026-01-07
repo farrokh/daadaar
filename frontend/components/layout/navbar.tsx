@@ -18,7 +18,10 @@ export function Navbar() {
   const pathname = usePathname();
   const registeredUser = currentUser?.type === 'registered' ? currentUser : null;
 
-  const isActive = (path: string) => pathname === path || pathname?.endsWith(path);
+  const isActive = (path: string) => {
+    if (path === '/') return pathname === '/';
+    return pathname === path || pathname?.startsWith(path);
+  };
   const showGlass = !tools;
   const glassClasses =
     'liquid-glass bg-white/5 backdrop-blur-lg rounded-full px-6 h-16 transition-all duration-500 ease-out border border-white/10';
@@ -46,39 +49,24 @@ export function Navbar() {
 
         {/* Nav Links */}
         <nav className="flex items-center gap-6">
-          <Link
-            href="/"
-            className={cn(
-              'text-sm font-medium tracking-wide transition-all duration-300 hover:scale-105',
-              isActive('/')
-                ? 'text-foreground font-semibold'
-                : 'text-foreground/60 hover:text-foreground'
-            )}
-          >
-            {t('graph')}
-          </Link>
-          <Link
-            href="/reports"
-            className={cn(
-              'text-sm font-medium tracking-wide transition-all duration-300 hover:scale-105',
-              isActive('/reports')
-                ? 'text-foreground font-semibold'
-                : 'text-foreground/60 hover:text-foreground'
-            )}
-          >
-            {t('reports')}
-          </Link>
-          <Link
-            href="/about"
-            className={cn(
-              'text-sm font-medium tracking-wide transition-all duration-300 hover:scale-105',
-              isActive('/about')
-                ? 'text-foreground font-semibold'
-                : 'text-foreground/60 hover:text-foreground'
-            )}
-          >
-            {t('about')}
-          </Link>
+          {[
+            { href: '/', label: t('graph') },
+            { href: '/reports', label: t('reports') },
+            { href: '/about', label: t('about') },
+          ].map(link => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                'text-sm font-medium tracking-wide transition-all duration-300 hover:scale-105',
+                isActive(link.href)
+                  ? 'text-foreground font-semibold'
+                  : 'text-foreground/60 hover:text-foreground'
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
       </div>
 
@@ -91,11 +79,16 @@ export function Navbar() {
         {isAuthenticated ? (
           <div className="flex items-center gap-2">
             {(registeredUser?.role === 'admin' || registeredUser?.role === 'moderator') && (
-              <Link href="/admin/content-reports">
+              <Link href="/admin">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-accent-primary hover:text-accent-primary/80 font-semibold"
+                  className={cn(
+                    'font-semibold transition-all duration-300',
+                    isActive('/admin')
+                      ? 'text-accent-primary'
+                      : 'text-foreground/60 hover:text-accent-primary'
+                  )}
                 >
                   {t('admin')}
                 </Button>
@@ -105,7 +98,12 @@ export function Navbar() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-foreground/60 hover:text-foreground"
+                className={cn(
+                  'transition-all duration-300',
+                  isActive('/profile')
+                    ? 'text-foreground font-semibold'
+                    : 'text-foreground/60 hover:text-foreground'
+                )}
               >
                 {registeredUser?.displayName || registeredUser?.username || t('profile')}
               </Button>

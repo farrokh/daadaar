@@ -1,6 +1,6 @@
-import { and, count, desc, eq, ilike, or } from 'drizzle-orm';
+import { type SQL, and, count, desc, eq, ilike, or } from 'drizzle-orm';
 import type { Request, Response } from 'express';
-import { db, schema } from '../../db';
+import { db, schema } from '../db';
 
 const sanitizeRole = (role?: string) => {
   if (role === 'user' || role === 'moderator' || role === 'admin') {
@@ -8,6 +8,8 @@ const sanitizeRole = (role?: string) => {
   }
   return null;
 };
+
+const MAX_LIMIT = 100; // Maximum items per page to prevent huge queries
 
 /**
  * GET /api/admin/users
@@ -19,17 +21,19 @@ export async function listUsers(req: Request, res: Response) {
     const role = sanitizeRole(req.query.role as string | undefined);
     const isBanned =
       typeof req.query.isBanned === 'string' ? req.query.isBanned === 'true' : undefined;
-    const page = Number.parseInt(req.query.page as string, 10) || 1;
-    const limit = Number.parseInt(req.query.limit as string, 10) || 20;
+
+    // Parse and validate pagination parameters
+    const page = Math.max(1, Number.parseInt(req.query.page as string, 10) || 1);
+    const parsedLimit = Number.parseInt(req.query.limit as string, 10) || 20;
+    const limit = Math.min(Math.max(1, parsedLimit), MAX_LIMIT); // Clamp between 1 and MAX_LIMIT
     const offset = (page - 1) * limit;
 
-    const filters = [] as ReturnType<typeof eq>[];
+    const filters: (SQL | undefined)[] = [];
 
     if (search) {
       const pattern = `%${search}%`;
-      // biome-ignore lint/suspicious/noExplicitAny: drizzle or conditions type is complex
       filters.push(
-        (or as any)(
+        or(
           ilike(schema.users.username, pattern),
           ilike(schema.users.email, pattern),
           ilike(schema.users.displayName, pattern)
@@ -57,6 +61,7 @@ export async function listUsers(req: Request, res: Response) {
         profileImageUrl: true,
         role: true,
         isBanned: true,
+        isVerified: true,
         bannedAt: true,
         bannedUntil: true,
         banReason: true,
@@ -68,10 +73,7 @@ export async function listUsers(req: Request, res: Response) {
       offset,
     });
 
-    const [totalCount] = await db
-      .select({ count: count() })
-      .from(schema.users)
-      .where(where);
+    const [totalCount] = await db.select({ count: count() }).from(schema.users).where(where);
 
     res.json({
       success: true,
@@ -97,6 +99,7 @@ export async function listUsers(req: Request, res: Response) {
 interface UpdateUserBody {
   role?: 'user' | 'moderator' | 'admin';
   isBanned?: boolean;
+  isVerified?: boolean;
   banReason?: string | null;
   bannedUntil?: string | null;
   displayName?: string | null;
@@ -134,7 +137,18 @@ export async function updateUser(req: Request, res: Response) {
       if (body.isBanned) {
         updates.isBanned = true;
         updates.bannedAt = new Date();
-        updates.bannedUntil = body.bannedUntil ? new Date(body.bannedUntil) : null;
+        if (body.bannedUntil) {
+          const parsedDate = new Date(body.bannedUntil);
+          if (Number.isNaN(parsedDate.getTime())) {
+            return res.status(400).json({
+              success: false,
+              error: { code: 'VALIDATION_ERROR', message: 'Invalid bannedUntil date' },
+            });
+          }
+          updates.bannedUntil = parsedDate;
+        } else {
+          updates.bannedUntil = null;
+        }
         updates.banReason = body.banReason?.trim() || 'Banned via admin panel';
       } else {
         updates.isBanned = false;
@@ -142,6 +156,10 @@ export async function updateUser(req: Request, res: Response) {
         updates.bannedUntil = null;
         updates.banReason = null;
       }
+    }
+
+    if (typeof body.isVerified === 'boolean') {
+      updates.isVerified = body.isVerified;
     }
 
     if (body.displayName !== undefined) {
@@ -170,6 +188,7 @@ export async function updateUser(req: Request, res: Response) {
         profileImageUrl: schema.users.profileImageUrl,
         role: schema.users.role,
         isBanned: schema.users.isBanned,
+        isVerified: schema.users.isVerified,
         bannedAt: schema.users.bannedAt,
         bannedUntil: schema.users.bannedUntil,
         banReason: schema.users.banReason,
@@ -190,6 +209,42 @@ export async function updateUser(req: Request, res: Response) {
     res.status(500).json({
       success: false,
       error: { code: 'INTERNAL_ERROR', message: 'Failed to update user' },
+    });
+  }
+}
+
+/**
+ * DELETE /api/admin/users/:id
+ * Delete a user
+ */
+export async function deleteUser(req: Request, res: Response) {
+  try {
+    const userId = Number.parseInt(req.params.id, 10);
+    if (Number.isNaN(userId)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_ID', message: 'Invalid user ID' },
+      });
+    }
+
+    const [deletedUser] = await db
+      .delete(schema.users)
+      .where(eq(schema.users.id, userId))
+      .returning({ id: schema.users.id });
+
+    if (!deletedUser) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'User not found' },
+      });
+    }
+
+    res.json({ success: true, data: { id: userId } });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to delete user' },
     });
   }
 }

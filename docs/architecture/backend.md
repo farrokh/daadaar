@@ -57,7 +57,116 @@ We use a shared library (`shared/api-types.ts`) to synchronize types between the
 - `/api/graph`: Retrieves graph nodes and edges with recursive PostgreSQL CTEs.
 - `/api/reports`: CRUD for user reports with PoW validation.
 - `/api/auth`: Multi-mode authentication management.
-- `/api/admin`: Moderation, banning, and role management.
+- `/api/admin/*`: Comprehensive admin panel for platform management (see Admin Panel section below).
+
+### Admin Panel API
+
+The admin panel provides comprehensive management capabilities for platform administrators. All admin endpoints require authentication and admin role verification via middleware.
+
+#### User Management (`/api/admin/users`)
+Manage platform users with role assignment, ban/unban, and verification controls.
+
+**Endpoints:**
+- `GET /api/admin/users` - List all users with pagination and filtering
+  - Query params: `page`, `limit`, `q` (search), `role`, `isBanned`
+  - Returns: Paginated list of users with full details
+- `PATCH /api/admin/users/:id` - Update user role, ban status, or verification
+  - Body: `{ role?, isBanned?, isVerified?, banReason?, bannedUntil?, displayName? }`
+  - Protected: CSRF token required
+- `DELETE /api/admin/users/:id` - Delete a user account
+  - Protected: CSRF token required
+
+**Features:**
+- Search by username, email, or display name
+- Filter by role (user, moderator, admin)
+- Filter by ban status (active, banned)
+- Bulk operations support via pagination
+
+#### Individual Management (`/api/admin/individuals`)
+Manage individuals (people) in the knowledge graph with role assignments.
+
+**Endpoints:**
+- `GET /api/admin/individuals` - List all individuals with pagination
+  - Query params: `page`, `limit`, `q` (search)
+  - Returns: Individuals with current organization and role info
+- `PATCH /api/admin/individuals/:id` - Update individual details
+  - Body: `{ fullName?, biography?, organizationId?, roleId?, startDate? }`
+  - Protected: CSRF token required
+  - Auto-creates default "Member" role if organization provided without role
+- `DELETE /api/admin/individuals/:id` - Delete an individual
+  - Protected: CSRF token required
+  - Cascade deletes role occupancies
+
+**Features:**
+- Full-text search on names
+- Displays current organization and role
+- Automatic role assignment when adding to organization
+- Biography and profile management
+
+#### Organization Management (`/api/admin/organizations`)
+Manage organizations with hierarchy support.
+
+**Endpoints:**
+- `GET /api/admin/organizations` - List all organizations with pagination
+  - Query params: `page`, `limit`, `q` (search)
+  - Returns: Organizations with parent/child relationships
+- `PATCH /api/admin/organizations/:id` - Update organization details
+  - Body: `{ name?, description?, logoUrl?, parentId? }`
+  - Protected: CSRF token required
+- `DELETE /api/admin/organizations/:id` - Delete an organization
+  - Protected: CSRF token required
+  - Cascade deletes roles and hierarchy relationships
+
+**Features:**
+- Hierarchical organization support (parent-child relationships)
+- Full-text search on organization names
+- Logo URL management
+- Bilingual support (name/nameEn, description/descriptionEn)
+
+#### Role Management (`/api/admin/roles`)
+Manage roles within organizations.
+
+**Endpoints:**
+- `GET /api/admin/roles` - List all roles with filtering
+  - Query params: `page`, `limit`, `q` (search), `organizationId`
+  - Returns: Roles with organization context
+- `PATCH /api/admin/roles/:id` - Update role details
+  - Body: `{ title?, description?, titleEn?, descriptionEn? }`
+  - Protected: CSRF token required
+- `DELETE /api/admin/roles/:id` - Delete a role
+  - Protected: CSRF token required
+  - Cascade deletes role occupancies
+
+**Features:**
+- Filter by organization
+- Full-text search on role titles
+- Bilingual support
+- Organization-scoped role management
+
+#### Content Report Moderation (`/api/admin/content-reports`)
+Moderate user-submitted content reports for abuse, spam, and policy violations.
+
+**Endpoints:**
+- `GET /api/admin/content-reports` - List all content reports
+  - Query params: `page`, `limit`, `status`, `contentType`, `reason`
+  - Returns: Reports with reporter/reviewer details and content metadata
+- `GET /api/admin/content-reports/:id` - Get detailed report view
+  - Returns: Full report with all relationships
+- `PATCH /api/admin/content-reports/:id/status` - Update report status
+  - Body: `{ status, adminNotes? }`
+  - Status values: `pending`, `reviewing`, `resolved`, `dismissed`
+  - Protected: CSRF token required
+  - Auto-sets reviewer and timestamp
+- `GET /api/admin/content-reports/stats` - Get moderation statistics
+  - Returns: Counts by status and content type
+
+**Features:**
+- Filter by status (pending, reviewing, resolved, dismissed)
+- Filter by content type (report, organization, individual, user, media)
+- Filter by reason (spam, misinformation, harassment, inappropriate, duplicate, other)
+- Displays content details inline (organization names, user info, etc.)
+- Admin notes for internal tracking
+- Automatic reviewer assignment and timestamps
 
 ### Anonymous Contribution Flow
 1. User lands on site (Anonymous session created).

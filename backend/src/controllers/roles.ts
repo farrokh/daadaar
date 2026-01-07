@@ -1,7 +1,7 @@
 // Roles controller
 // Handles CRUD operations for roles within organizations
 
-import { eq } from 'drizzle-orm';
+import { and, count, eq, ilike } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 
@@ -12,6 +12,8 @@ interface CreateRoleBody {
   description?: string | null;
   descriptionEn?: string | null;
 }
+
+const MAX_LIMIT = 100; // Maximum items per page to prevent huge queries
 
 /**
  * POST /api/roles
@@ -116,15 +118,22 @@ export async function createRole(req: Request, res: Response) {
 
 /**
  * GET /api/roles
- * List all roles (optionally filtered by organization)
+ * List all roles (optionally filtered by organization, supports pagination and search)
  */
 export async function listRoles(req: Request, res: Response) {
   try {
     const organizationId = req.query.organizationId
       ? Number.parseInt(req.query.organizationId as string, 10)
       : undefined;
+    const search = (req.query.q as string) || '';
 
-    let query = db
+    // Parse and validate pagination parameters
+    const page = Math.max(1, Number.parseInt(req.query.page as string, 10) || 1);
+    const parsedLimit = Number.parseInt(req.query.limit as string, 10) || 100;
+    const limit = Math.min(Math.max(1, parsedLimit), MAX_LIMIT); // Clamp between 1 and MAX_LIMIT
+    const offset = (page - 1) * limit;
+
+    const query = db
       .select({
         id: schema.roles.id,
         organizationId: schema.roles.organizationId,
@@ -136,11 +145,40 @@ export async function listRoles(req: Request, res: Response) {
       })
       .from(schema.roles);
 
+    const filters = [];
     if (organizationId && !Number.isNaN(organizationId)) {
-      query = query.where(eq(schema.roles.organizationId, organizationId)) as typeof query;
+      filters.push(eq(schema.roles.organizationId, organizationId));
+    }
+    if (search) {
+      filters.push(ilike(schema.roles.title, `%${search}%`));
     }
 
-    const roles = await query.orderBy(schema.roles.title);
+    if (filters.length > 0) {
+      query.where(and(...filters));
+    }
+
+    const roles = await query.orderBy(schema.roles.title).limit(limit).offset(offset);
+
+    // If page is provided, return paginated structure
+    if (req.query.page) {
+      const [totalCount] = await db
+        .select({ count: count() })
+        .from(schema.roles)
+        .where(filters.length > 0 ? and(...filters) : undefined);
+
+      return res.json({
+        success: true,
+        data: {
+          roles,
+          pagination: {
+            total: totalCount.count,
+            page,
+            limit,
+            totalPages: Math.ceil(totalCount.count / limit),
+          },
+        },
+      });
+    }
 
     res.json({
       success: true,

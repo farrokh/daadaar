@@ -1,7 +1,7 @@
 // Individuals controller
 // Handles CRUD operations for individuals (people)
 
-import { and, eq, or } from 'drizzle-orm';
+import { and, count, desc, eq, ilike, or } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
@@ -23,6 +23,7 @@ interface CreateIndividualBody {
 
 const DEFAULT_MEMBER_ROLE_TITLE = 'Member';
 const DEFAULT_MEMBER_ROLE_DESCRIPTION = 'Default role for organization members';
+const MAX_LIMIT = 100; // Maximum items per page to prevent huge queries
 
 const getOrCreateDefaultRoleId = async ({
   organizationId,
@@ -229,11 +230,19 @@ export async function createIndividual(req: Request, res: Response) {
 
 /**
  * GET /api/individuals
- * List all individuals
+ * List all individuals (supports pagination and search)
  */
-export async function listIndividuals(_req: Request, res: Response) {
+export async function listIndividuals(req: Request, res: Response) {
   try {
-    const individuals = await db
+    const search = (req.query.q as string) || '';
+
+    // Parse and validate pagination parameters
+    const page = Math.max(1, Number.parseInt(req.query.page as string, 10) || 1);
+    const parsedLimit = Number.parseInt(req.query.limit as string, 10) || 100;
+    const limit = Math.min(Math.max(1, parsedLimit), MAX_LIMIT); // Clamp between 1 and MAX_LIMIT
+    const offset = (page - 1) * limit;
+
+    const query = db
       .select({
         id: schema.individuals.id,
         fullName: schema.individuals.fullName,
@@ -244,24 +253,69 @@ export async function listIndividuals(_req: Request, res: Response) {
         dateOfBirth: schema.individuals.dateOfBirth,
         createdAt: schema.individuals.createdAt,
       })
-      .from(schema.individuals)
-      .orderBy(schema.individuals.fullName);
+      .from(schema.individuals);
 
-    // Generate presigned URLs for profile images
-    const individualsWithUrls = await Promise.all(
-      individuals.map(async ind => ({
-        ...ind,
-        profileImageUrl: ind.profileImageUrl
-          ? ind.profileImageUrl.startsWith('http')
-            ? ind.profileImageUrl
-            : await generatePresignedGetUrl(ind.profileImageUrl)
-          : null,
-      }))
+    if (search) {
+      query.where(ilike(schema.individuals.fullName, `%${search}%`));
+    }
+
+    const individuals = await query
+      .orderBy(schema.individuals.fullName)
+      .limit(limit)
+      .offset(offset);
+
+    // Populate extra info for each individual (role, organization, presigned URL)
+    const individualsWithInfo = await Promise.all(
+      individuals.map(async ind => {
+        // Get current role and organization
+        const [roleInfo] = await db
+          .select({
+            roleTitle: schema.roles.title,
+            orgName: schema.organizations.name,
+            orgId: schema.organizations.id,
+          })
+          .from(schema.roleOccupancy)
+          .innerJoin(schema.roles, eq(schema.roleOccupancy.roleId, schema.roles.id))
+          .innerJoin(schema.organizations, eq(schema.roles.organizationId, schema.organizations.id))
+          .where(eq(schema.roleOccupancy.individualId, ind.id))
+          .orderBy(desc(schema.roleOccupancy.startDate))
+          .limit(1);
+
+        return {
+          ...ind,
+          currentRole: roleInfo?.roleTitle || null,
+          currentOrganization: roleInfo?.orgName || null,
+          currentOrganizationId: roleInfo?.orgId || null,
+          profileImageUrl: ind.profileImageUrl
+            ? ind.profileImageUrl.startsWith('http')
+              ? ind.profileImageUrl
+              : await generatePresignedGetUrl(ind.profileImageUrl)
+            : null,
+        };
+      })
     );
+
+    // If page is provided, return paginated structure
+    if (req.query.page) {
+      const [totalCount] = await db.select({ count: count() }).from(schema.individuals);
+
+      return res.json({
+        success: true,
+        data: {
+          individuals: individualsWithInfo,
+          pagination: {
+            total: totalCount.count,
+            page,
+            limit,
+            totalPages: Math.ceil(totalCount.count / limit),
+          },
+        },
+      });
+    }
 
     res.json({
       success: true,
-      data: individualsWithUrls,
+      data: individualsWithInfo,
     });
   } catch (error) {
     console.error('Error listing individuals:', error);
@@ -271,6 +325,41 @@ export async function listIndividuals(_req: Request, res: Response) {
         code: 'INTERNAL_ERROR',
         message: 'Failed to list individuals',
       },
+    });
+  }
+}
+
+/**
+ * DELETE /api/individuals/:id
+ */
+export async function deleteIndividual(req: Request, res: Response) {
+  try {
+    const individualId = Number.parseInt(req.params.id, 10);
+    if (Number.isNaN(individualId)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_ID', message: 'Invalid individual ID' },
+      });
+    }
+
+    const [deletedInd] = await db
+      .delete(schema.individuals)
+      .where(eq(schema.individuals.id, individualId))
+      .returning({ id: schema.individuals.id });
+
+    if (!deletedInd) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Individual not found' },
+      });
+    }
+
+    res.json({ success: true, data: { id: individualId } });
+  } catch (error) {
+    console.error('Error deleting individual:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to delete individual' },
     });
   }
 }

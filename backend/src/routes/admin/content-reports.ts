@@ -4,7 +4,7 @@ import {
   getContentReportStats,
   listContentReports,
   updateContentReportStatus,
-} from '../../controllers/admin/content-reports';
+} from '../../controllers/content-reports';
 import { csrfProtection } from '../../lib/csrf-protection';
 import { authMiddleware, moderatorMiddleware } from '../../middleware/auth';
 

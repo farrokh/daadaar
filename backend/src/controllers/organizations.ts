@@ -1,7 +1,7 @@
 // Organizations controller
 // Handles CRUD operations for organizations
 
-import { eq } from 'drizzle-orm';
+import { count, eq, ilike } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
@@ -15,6 +15,8 @@ interface CreateOrganizationBody {
   logoUrl?: string | null;
   parentId?: number | null;
 }
+
+const MAX_LIMIT = 100; // Maximum items per page to prevent huge queries
 
 /**
  * POST /api/organizations
@@ -135,11 +137,19 @@ export async function createOrganization(req: Request, res: Response) {
 
 /**
  * GET /api/organizations
- * List all organizations
+ * List all organizations (supports pagination and search)
  */
-export async function listOrganizations(_req: Request, res: Response) {
+export async function listOrganizations(req: Request, res: Response) {
   try {
-    const organizations = await db
+    const search = (req.query.q as string) || '';
+
+    // Parse and validate pagination parameters
+    const page = Math.max(1, Number.parseInt(req.query.page as string, 10) || 1);
+    const parsedLimit = Number.parseInt(req.query.limit as string, 10) || 100;
+    const limit = Math.min(Math.max(1, parsedLimit), MAX_LIMIT); // Clamp between 1 and MAX_LIMIT
+    const offset = (page - 1) * limit;
+
+    const query = db
       .select({
         id: schema.organizations.id,
         name: schema.organizations.name,
@@ -150,8 +160,16 @@ export async function listOrganizations(_req: Request, res: Response) {
         parentId: schema.organizations.parentId,
         createdAt: schema.organizations.createdAt,
       })
-      .from(schema.organizations)
-      .orderBy(schema.organizations.name);
+      .from(schema.organizations);
+
+    if (search) {
+      query.where(ilike(schema.organizations.name, `%${search}%`));
+    }
+
+    const organizations = await query
+      .orderBy(schema.organizations.name)
+      .limit(limit)
+      .offset(offset);
 
     // Generate presigned URLs for logos
     const organizationsWithUrls = await Promise.all(
@@ -165,6 +183,24 @@ export async function listOrganizations(_req: Request, res: Response) {
       }))
     );
 
+    // If page is provided, return paginated structure
+    if (req.query.page) {
+      const [totalCount] = await db.select({ count: count() }).from(schema.organizations);
+
+      return res.json({
+        success: true,
+        data: {
+          organizations: organizationsWithUrls,
+          pagination: {
+            total: totalCount.count,
+            page,
+            limit,
+            totalPages: Math.ceil(totalCount.count / limit),
+          },
+        },
+      });
+    }
+
     res.json({
       success: true,
       data: organizationsWithUrls,
@@ -177,6 +213,41 @@ export async function listOrganizations(_req: Request, res: Response) {
         code: 'INTERNAL_ERROR',
         message: 'Failed to list organizations',
       },
+    });
+  }
+}
+
+/**
+ * DELETE /api/organizations/:id
+ */
+export async function deleteOrganization(req: Request, res: Response) {
+  try {
+    const organizationId = Number.parseInt(req.params.id, 10);
+    if (Number.isNaN(organizationId)) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_ID', message: 'Invalid organization ID' },
+      });
+    }
+
+    const [deletedOrg] = await db
+      .delete(schema.organizations)
+      .where(eq(schema.organizations.id, organizationId))
+      .returning({ id: schema.organizations.id });
+
+    if (!deletedOrg) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Organization not found' },
+      });
+    }
+
+    res.json({ success: true, data: { id: organizationId } });
+  } catch (error) {
+    console.error('Error deleting organization:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'INTERNAL_ERROR', message: 'Failed to delete organization' },
     });
   }
 }

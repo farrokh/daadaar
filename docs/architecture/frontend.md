@@ -62,6 +62,143 @@ Our design system prioritizes a "Premium, State-of-the-art" feel.
    - Secure media uploader with AVIF processing.
 5. **Voting Interface**: Optimistic UI for instant feedback.
 6. **Legal & Compliance**: Dedicated pages for Terms of Service and Privacy Policy.
+7. **Admin Dashboard** (`/admin`): Comprehensive platform management interface (admin-only).
+
+---
+
+## 🔧 Admin Dashboard
+
+The admin dashboard provides a centralized interface for platform management, accessible only to users with admin role.
+
+### Components
+
+#### 1. **User Management Panel** (`UserManagementPanel`)
+Manage all platform users with comprehensive controls.
+
+**Features:**
+- **Search**: Real-time search by username, email, or display name
+- **Filtering**: 
+  - Role filter (user, moderator, admin)
+  - Status filter (active, banned)
+- **Actions**:
+  - Change user role (inline dropdown)
+  - Ban/unban users with reason tracking
+  - Verify/unverify email addresses
+  - Delete user accounts
+- **Display**: 
+  - User badges (verified, banned status)
+  - Ban reason tooltips
+  - Creation date
+  - Hover-reveal action buttons
+- **Pagination**: Client-side pagination with page controls
+
+#### 2. **Individual Management Panel** (`IndividualManagementPanel`)
+Manage individuals (people) in the knowledge graph.
+
+**Features:**
+- **Create/Edit Form**:
+  - Full name and biography
+  - Organization assignment (dropdown)
+  - Role assignment (filtered by selected organization)
+  - Start date for role occupancy
+  - Collapsible form with smooth animations
+- **Search**: Real-time search by name
+- **Display**:
+  - Current organization and role
+  - Biography preview (truncated)
+  - Creation date
+- **Actions**:
+  - Edit individual details
+  - Delete individuals
+  - Auto-scroll to form on edit
+- **Smart Features**:
+  - Auto-creates "Member" role if organization selected without specific role
+  - Role dropdown dynamically filters based on organization
+
+#### 3. **Organization Management Panel** (`OrganizationManagementPanel`)
+Manage organizations with hierarchy support.
+
+**Features:**
+- **Create/Edit Form**:
+  - Organization name and description
+  - Parent organization selection (hierarchy)
+  - Prevents circular references (can't select self as parent)
+- **Search**: Real-time search by organization name
+- **Display**:
+  - Parent organization name
+  - Description preview
+  - Creation date
+- **Actions**:
+  - Edit organization details
+  - Delete organizations
+  - Manage hierarchical relationships
+- **Hierarchy Support**:
+  - Parent-child organization relationships
+  - Visual hierarchy indicators
+
+#### 4. **Role Management Panel** (`RoleManagementPanel`)
+Manage roles within organizations.
+
+**Features:**
+- **Create/Edit Form**:
+  - Role title and description
+  - Organization assignment (required)
+  - Bilingual support (title/titleEn, description/descriptionEn)
+- **Filtering**:
+  - Filter by organization
+  - Search by role title
+- **Display**:
+  - Organization name for each role
+  - Description preview
+  - Member count (individuals with this role)
+  - Creation date
+- **Actions**:
+  - Edit role details
+  - Delete roles
+  - View role occupancies
+
+#### 5. **Content Reports List** (`ContentReportsList`)
+Moderate user-submitted content reports.
+
+**Features:**
+- **Filtering**:
+  - Status (pending, reviewing, resolved, dismissed)
+  - Content type (report, organization, individual, user, media)
+  - Reason (spam, misinformation, harassment, etc.)
+- **Display**:
+  - Reporter information
+  - Content details (inline preview)
+  - Report reason and description
+  - Status badges with color coding
+  - Admin notes
+  - Reviewer information
+- **Actions**:
+  - Update report status
+  - Add admin notes
+  - View full content details
+- **Statistics Dashboard**:
+  - Reports by status (pending, reviewing, resolved, dismissed)
+  - Reports by content type
+  - Quick overview cards
+
+### Design Patterns
+
+**Consistent UI Elements:**
+- Glass-effect cards with subtle borders
+- Hover-reveal action buttons for cleaner interface
+- Color-coded status badges (green=active, red=banned/dismissed, blue=verified)
+- Smooth animations for form show/hide
+- Responsive tables with horizontal scroll on mobile
+- Debounced search inputs (300ms) to reduce API calls
+- Loading states with skeleton screens
+- Error handling with user-friendly messages
+
+**Accessibility:**
+- Semantic HTML with proper ARIA labels
+- Keyboard navigation support
+- Focus management for modals and forms
+- Screen reader friendly status indicators
+- High contrast mode support
 
 ---
 
