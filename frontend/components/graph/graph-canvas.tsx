@@ -2,11 +2,12 @@
 
 import { usePathname, useRouter } from '@/i18n/routing';
 import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactFlow, {
   Background,
   applyEdgeChanges,
   applyNodeChanges,
+
   MiniMap,
   type Node,
   type OnEdgesChange,
@@ -15,7 +16,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 
 import { useGraphData } from '@/hooks/use-graph-data';
-import { type ViewContext, defaultEdgeOptions, nodeTypes } from './config';
+import { type ViewContext, defaultEdgeOptions, edgeTypes, nodeTypes } from './config';
 import { GraphControls } from './graph-controls';
 import { GraphDock } from './graph-dock';
 import { GraphMarkers } from './graph-markers';
@@ -56,8 +57,14 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const hasInitialLoadCompleted = useRef(false);
-
+  
   const locale = useLocale();
+
+  // Memoize config objects to satisfy React Flow warning (references must be stable)
+  const memoizedNodeTypes = useMemo(() => nodeTypes, []);
+  const memoizedEdgeTypes = useMemo(() => edgeTypes, []);
+  const memoizedEdgeOptions = useMemo(() => defaultEdgeOptions, []);
+
   const t = useTranslations('graph');
   const commonT = useTranslations('common');
   const tOrg = useTranslations('organization');
@@ -345,8 +352,10 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
-        nodeTypes={nodeTypes}
-        defaultEdgeOptions={defaultEdgeOptions}
+
+        nodeTypes={memoizedNodeTypes}
+        edgeTypes={memoizedEdgeTypes}
+        defaultEdgeOptions={memoizedEdgeOptions}
         fitView
         attributionPosition="bottom-left"
         className="bg-background"
