@@ -62,7 +62,9 @@ export async function getOrganizationPath(organizationId: number): Promise<Organ
   }
 
   if (depth >= maxDepth) {
-    console.error(`Maximum depth reached when traversing organization hierarchy for ID ${organizationId}`);
+    console.error(
+      `Maximum depth reached when traversing organization hierarchy for ID ${organizationId}`
+    );
   }
 
   return path;

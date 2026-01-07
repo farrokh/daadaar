@@ -7,7 +7,6 @@ import ReactFlow, {
   Background,
   applyEdgeChanges,
   applyNodeChanges,
-
   MiniMap,
   type Node,
   type OnEdgesChange,
@@ -57,7 +56,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const hasInitialLoadCompleted = useRef(false);
-  
+
   const locale = useLocale();
 
   // Memoize config objects to satisfy React Flow warning (references must be stable)
@@ -204,7 +203,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   useEffect(() => {
     // Skip URL sync while still loading initial data to prevent overwriting URL params
     if (loading) return;
-    
+
     // Mark that initial load is complete
     if (!hasInitialLoadCompleted.current) {
       hasInitialLoadCompleted.current = true;
@@ -352,7 +351,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
-
         nodeTypes={memoizedNodeTypes}
         edgeTypes={memoizedEdgeTypes}
         defaultEdgeOptions={memoizedEdgeOptions}
@@ -397,11 +395,13 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
       {showCopyToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-2 fade-in">
-          <div className={`px-4 py-2 rounded-full shadow-lg text-sm font-medium ${
-            copyError 
-              ? 'bg-destructive text-destructive-foreground' 
-              : 'bg-foreground text-background'
-          }`}>
+          <div
+            className={`px-4 py-2 rounded-full shadow-lg text-sm font-medium ${
+              copyError
+                ? 'bg-destructive text-destructive-foreground'
+                : 'bg-foreground text-background'
+            }`}
+          >
             {copyError ? commonT('error_generic') : commonT('link_copied')}
           </div>
         </div>
@@ -464,11 +464,13 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
             <>
               {(() => {
                 // Filter out the current organization from the path as it matches the current view title
-                const path = organizationPath.filter(item => item.id !== viewContext.organizationId);
-                
+                const path = organizationPath.filter(
+                  item => item.id !== viewContext.organizationId
+                );
+
                 if (path.length === 0) return null;
 
-                const displayPath: Array<typeof path[0] | 'ellipsis'> = [];
+                const displayPath: Array<(typeof path)[0] | 'ellipsis'> = [];
 
                 // If more than 4 items, show first 2, ellipsis, and last 1
                 if (path.length > 4) {
@@ -478,7 +480,10 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
                 }
 
                 return displayPath.map((item, index) => (
-                  <span key={item === 'ellipsis' ? `ellipsis-${index}` : `org-${item.id}`} className="flex items-center gap-2">
+                  <span
+                    key={item === 'ellipsis' ? `ellipsis-${index}` : `org-${item.id}`}
+                    className="flex items-center gap-2"
+                  >
                     <span className="text-foreground/40">/</span>
                     {item === 'ellipsis' ? (
                       <span className="text-foreground/60">...</span>
@@ -494,7 +499,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
                   </span>
                 ));
               })()}
-              
+
               <span className="text-foreground/40">/</span>
               <span className="text-foreground font-medium">{viewContext.organizationName}</span>
               {viewContext.organizationId && (
@@ -512,7 +517,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
             <>
               {(() => {
                 const path = organizationPath;
-                const displayPath: Array<typeof path[0] | 'ellipsis'> = [];
+                const displayPath: Array<(typeof path)[0] | 'ellipsis'> = [];
 
                 // If more than 4 items, show first 2, ellipsis, and last 1
                 if (path.length > 4) {
@@ -522,7 +527,10 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
                 }
 
                 return displayPath.map((item, index) => (
-                  <span key={item === 'ellipsis' ? `ellipsis-${index}` : `org-${item.id}`} className="flex items-center gap-2">
+                  <span
+                    key={item === 'ellipsis' ? `ellipsis-${index}` : `org-${item.id}`}
+                    className="flex items-center gap-2"
+                  >
                     <span className="text-foreground/40">/</span>
                     {item === 'ellipsis' ? (
                       <span className="text-foreground/60">...</span>
@@ -538,7 +546,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
                   </span>
                 ));
               })()}
-              
+
               {viewContext.individualName && (
                 <>
                   <span className="text-foreground/40">/</span>

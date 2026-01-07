@@ -89,11 +89,11 @@ export function ShareLinkButton({
 
       {showToast && toastVisible && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-2 fade-in">
-          <div className={`px-4 py-2 rounded-full shadow-lg text-sm font-medium ${
-            error 
-              ? 'bg-destructive text-destructive-foreground' 
-              : 'bg-foreground text-background'
-          }`}>
+          <div
+            className={`px-4 py-2 rounded-full shadow-lg text-sm font-medium ${
+              error ? 'bg-destructive text-destructive-foreground' : 'bg-foreground text-background'
+            }`}
+          >
             {error ? 'Failed to copy link' : (toastText ?? copiedLabel ?? label)}
           </div>
         </div>
