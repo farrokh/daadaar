@@ -394,7 +394,11 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       )}
 
       {showCopyToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-2 fade-in">
+        <div
+          className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-2 fade-in"
+          role="status"
+          aria-live="polite"
+        >
           <div
             className={`px-4 py-2 rounded-full shadow-lg text-sm font-medium ${
               copyError

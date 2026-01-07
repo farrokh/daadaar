@@ -1,7 +1,7 @@
 // Helper functions for organization hierarchy
 // Provides utilities to work with organizational hierarchies
 
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { db, schema } from '../db';
 
 export interface OrganizationPathItem {
@@ -85,7 +85,7 @@ export async function getIndividualOrganizationPath(
     })
     .from(schema.roleOccupancy)
     .where(eq(schema.roleOccupancy.individualId, individualId))
-    .orderBy(schema.roleOccupancy.startDate)
+    .orderBy(desc(schema.roleOccupancy.startDate))
     .limit(1);
 
   if (!roleOccupancy) {
