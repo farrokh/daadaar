@@ -165,7 +165,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved }: MediaUploader
               // Important: Content-Type must strictly match what was used to generate the presigned URL
               xhr.setRequestHeader('Content-Type', file.type);
 
-              xhr.upload.onprogress = (event) => {
+              xhr.upload.onprogress = event => {
                 if (event.lengthComputable) {
                   const percentComplete = (event.loaded / event.total) * 100;
                   setMediaFiles(prev =>
@@ -191,7 +191,7 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved }: MediaUploader
 
               xhr.send(file);
             });
-          } catch (error) {
+          } catch (_error) {
             // S3 upload failed - cleanup the database record
             try {
               await fetchApi(`/media/${mediaId}`, {
