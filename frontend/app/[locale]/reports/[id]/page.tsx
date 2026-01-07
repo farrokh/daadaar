@@ -158,7 +158,6 @@ export default function ReportDetailPage() {
             />
           </div>
 
-
           {/* Details List */}
           <div className="space-y-6">
             {/* Author */}
@@ -206,10 +205,7 @@ export default function ReportDetailPage() {
               </div>
               <div className="space-y-4">
                 {report.reportLinks.map(link => (
-                  <div
-                    key={link.id}
-                    className="flex items-center gap-3 py-1 group"
-                  >
+                  <div key={link.id} className="flex items-center gap-3 py-1 group">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-foreground/10 text-foreground/60 transition-all group-hover:ring-foreground/20 shrink-0">
                       {link.individual?.fullName?.[0] || 'P'}
                     </div>

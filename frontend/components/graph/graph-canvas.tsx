@@ -247,11 +247,11 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   }, [pathname, router, searchParams, viewContext, loading]);
 
   // Load initial data
-  // biome-ignore lint/correctness/useExhaustiveDependencies: This effect should only run once on mount
   // Track if we have done the initial data fetch
   const hasPerformedInitialFetch = useRef(false);
 
   // Load initial data and sync with external URL changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: We only want this to run when external props change
   useEffect(() => {
     // Determine target view from initialView (props)
     const targetMode = initialView?.mode || 'organizations';
@@ -265,9 +265,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
     // Check if internal state already matches target
     const isMatched =
-      targetMode === currentMode &&
-      targetOrgId === currentOrgId &&
-      targetIndId === currentIndId;
+      targetMode === currentMode && targetOrgId === currentOrgId && targetIndId === currentIndId;
 
     // If matches, normally we skip. BUT on first load, we must fetch because data is empty!
     if (isMatched && hasPerformedInitialFetch.current) return;
@@ -289,12 +287,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     // We intentionally omit fetchers and viewContext from dependencies.
     // We only want this to run when the *external* props (initialView) change.
     // If viewContext changes (internal navigation), we do NOT want this to run/revert.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    initialView?.mode,
-    initialView?.organizationId,
-    initialView?.individualId,
-  ]);
+  }, [initialView?.mode, initialView?.organizationId, initialView?.individualId]);
 
   if (loading) {
     return (
@@ -439,9 +432,8 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       )}
 
       {showCopyToast && (
-        <div
+        <output
           className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-2 fade-in"
-          role="status"
           aria-live="polite"
         >
           <div
@@ -453,7 +445,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           >
             {copyError ? commonT('error_generic') : commonT('link_copied')}
           </div>
-        </div>
+        </output>
       )}
 
       {/* Add Organization Modal */}
@@ -497,7 +489,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       {/* Navigation breadcrumb */}
       <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg border border-foreground/10 z-10">
         <div className="flex items-center gap-2 text-sm">
-
           {/* Organization path for people view */}
           {viewContext.mode === 'people' && organizationPath.length > 0 && (
             <>
@@ -513,7 +504,12 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
                 // If more than 3 items, show first 1, ellipsis, and last 2
                 if (path.length > 3) {
-                  displayPath.push(path[0], 'ellipsis', path[path.length - 2], path[path.length - 1]);
+                  displayPath.push(
+                    path[0],
+                    'ellipsis',
+                    path[path.length - 2],
+                    path[path.length - 1]
+                  );
                 } else {
                   displayPath.push(...path);
                 }
@@ -539,9 +535,8 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
                 ));
               })()}
 
-              {organizationPath.filter(item => item.id !== viewContext.organizationId).length > 0 && (
-                <span className="text-foreground/40">/</span>
-              )}
+              {organizationPath.filter(item => item.id !== viewContext.organizationId).length >
+                0 && <span className="text-foreground/40">/</span>}
               <span className="text-foreground font-medium">{viewContext.organizationName}</span>
               {viewContext.organizationId && (
                 <ReportContentButton
@@ -562,7 +557,12 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
                 // If more than 3 items, show first 1, ellipsis, and last 2
                 if (path.length > 3) {
-                  displayPath.push(path[0], 'ellipsis', path[path.length - 2], path[path.length - 1]);
+                  displayPath.push(
+                    path[0],
+                    'ellipsis',
+                    path[path.length - 2],
+                    path[path.length - 1]
+                  );
                 } else {
                   displayPath.push(...path);
                 }
@@ -607,7 +607,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       </div>
 
       {/* Help tooltip */}
-       {/* Help tooltip */}
+      {/* Help tooltip */}
       <div
         className={`fixed top-6 right-44 z-40 bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-lg liquid-glass rounded-full transition-all duration-500 ease-in-out cursor-default select-none overflow-hidden flex items-center h-9 ${
           isHelpCollapsed ? 'w-9 justify-center' : 'max-w-[400px]'
@@ -629,7 +629,9 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
               isHelpCollapsed ? 'max-w-0 opacity-0' : 'max-w-[300px] opacity-100'
             }`}
           >
-            <span className="text-xs font-medium text-foreground/80 mr-2">{t('click_to_drill_down')}</span>
+            <span className="text-xs font-medium text-foreground/80 mr-2">
+              {t('click_to_drill_down')}
+            </span>
             <span className="w-px h-3 bg-foreground/10 mr-2" />
             <span className="text-xs font-medium text-foreground/80">
               {t('scroll_to_zoom')} • {t('drag_to_pan')}
