@@ -158,15 +158,40 @@ export function MediaUploader({ onMediaUploaded, onMediaRemoved }: MediaUploader
           s3Key = presignedResponse.data.s3Key;
 
           // 2. Upload file to S3 using presigned URL
-          const s3Response = await fetch(uploadUrl, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': file.type,
-            },
-            body: file,
-          });
+          try {
+            await new Promise<void>((resolve, reject) => {
+              const xhr = new XMLHttpRequest();
+              xhr.open('PUT', uploadUrl);
+              // Important: Content-Type must strictly match what was used to generate the presigned URL
+              xhr.setRequestHeader('Content-Type', file.type);
 
-          if (!s3Response.ok) {
+              xhr.upload.onprogress = event => {
+                if (event.lengthComputable) {
+                  const percentComplete = (event.loaded / event.total) * 100;
+                  setMediaFiles(prev =>
+                    prev.map(m => {
+                      if (m.id === tempId) {
+                        return { ...m, progress: percentComplete };
+                      }
+                      return m;
+                    })
+                  );
+                }
+              };
+
+              xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                  resolve();
+                } else {
+                  reject(new Error(`Upload failed with status ${xhr.status}`));
+                }
+              };
+
+              xhr.onerror = () => reject(new Error('Network error during upload'));
+
+              xhr.send(file);
+            });
+          } catch (_error) {
             // S3 upload failed - cleanup the database record
             try {
               await fetchApi(`/media/${mediaId}`, {
