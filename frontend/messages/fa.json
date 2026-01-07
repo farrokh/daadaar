@@ -34,7 +34,10 @@
     "anonymous": "ناشناس",
     "none": "هیچ",
     "open": "باز کردن",
-    "download": "دانلود"
+    "download": "دانلود",
+    "share": "اشتراک‌گذاری",
+    "copied": "کپی شد!",
+    "link_copied": "پیوند در کلیپ‌بورد کپی شد"
   },
   "navigation": {
     "home": "خانه",

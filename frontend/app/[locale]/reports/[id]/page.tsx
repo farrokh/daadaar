@@ -3,6 +3,7 @@
 import { VotingButtons } from '@/components/reports/voting-buttons';
 import { Button } from '@/components/ui/button';
 import { ReportContentButton } from '@/components/ui/report-content-button';
+import { ShareLinkButton } from '@/components/ui/share-link-button';
 import { fetchApi } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getS3PublicUrl } from '@/lib/utils';
@@ -127,6 +128,11 @@ export default function ReportDetailPage() {
                 {t('verification_score')}: {report.aiVerification?.confidenceScore ?? 0}%
               </span>
             </div>
+            <ShareLinkButton
+              label={commonT('share')}
+              copiedLabel={commonT('copied')}
+              className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/70 transition-colors bg-transparent border-none"
+            />
             <ReportContentButton contentType="report" contentId={report.id} />
           </div>
         </div>

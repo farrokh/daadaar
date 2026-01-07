@@ -1,8 +1,8 @@
 'use client';
 
-import { useRouter } from '@/i18n/routing';
+import { usePathname, useRouter } from '@/i18n/routing';
 import { useLocale, useTranslations } from 'next-intl';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactFlow, {
   Background,
   applyEdgeChanges,
@@ -15,7 +15,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 
 import { useGraphData } from '@/hooks/use-graph-data';
-import { type ViewContext, defaultEdgeOptions, nodeTypes } from './config';
+import { type ViewContext, defaultEdgeOptions, edgeTypes, nodeTypes } from './config';
 import { GraphControls } from './graph-controls';
 import { GraphDock } from './graph-dock';
 import { GraphMarkers } from './graph-markers';
@@ -30,7 +30,8 @@ import type { OrganizationNodeData, PersonNodeData, ReportNodeData } from './typ
 import { useToolContext } from '@/components/providers/tool-provider';
 import { Button } from '@/components/ui/button';
 import { ReportContentButton } from '@/components/ui/report-content-button';
-import { Building2, FileText, Map as MapIcon, User } from 'lucide-react';
+import { Building2, FileText, Map as MapIcon, Share2, User } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { ContextMenu } from './context-menu';
 
 // Custom MiniMap Node (Dot)
@@ -45,14 +46,26 @@ interface GraphCanvasProps {
 
 export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isAddOrgModalOpen, setIsAddOrgModalOpen] = useState(false);
   const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState(false);
   const [isSubmitReportModalOpen, setIsSubmitReportModalOpen] = useState(false);
   const [showMiniMap, setShowMiniMap] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+  const [showCopyToast, setShowCopyToast] = useState(false);
+  const [copyError, setCopyError] = useState(false);
+  const hasInitialLoadCompleted = useRef(false);
 
   const locale = useLocale();
+
+  // Memoize config objects to satisfy React Flow warning (references must be stable)
+  const memoizedNodeTypes = useMemo(() => nodeTypes, []);
+  const memoizedEdgeTypes = useMemo(() => edgeTypes, []);
+  const memoizedEdgeOptions = useMemo(() => defaultEdgeOptions, []);
+
   const t = useTranslations('graph');
+  const commonT = useTranslations('common');
   const tOrg = useTranslations('organization');
   const tPerson = useTranslations('person');
 
@@ -62,6 +75,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     loading,
     error,
     viewContext,
+    organizationPath,
     dateRange,
     timeRangeLimit,
     setNodes,
@@ -121,6 +135,23 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     setContextMenu({ x: event.clientX, y: event.clientY });
   }, []);
 
+  const handleShare = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopyError(false);
+      setShowCopyToast(true);
+      window.setTimeout(() => setShowCopyToast(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      setCopyError(true);
+      setShowCopyToast(true);
+      window.setTimeout(() => {
+        setShowCopyToast(false);
+        setCopyError(false);
+      }, 2000);
+    }
+  }, []);
+
   const onPaneClick = useCallback(() => {
     if (contextMenu) setContextMenu(null);
   }, [contextMenu]);
@@ -168,6 +199,42 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     setTools,
     showMiniMap,
   ]);
+
+  useEffect(() => {
+    // Skip URL sync while still loading initial data to prevent overwriting URL params
+    if (loading) {
+      return;
+    }
+
+    // Mark that initial load is complete
+    if (!hasInitialLoadCompleted.current) {
+      hasInitialLoadCompleted.current = true;
+      return;
+    }
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    params.set('view', viewContext.mode);
+
+    if (viewContext.mode === 'people' && viewContext.organizationId) {
+      params.set('organizationId', String(viewContext.organizationId));
+      params.delete('individualId');
+    } else if (viewContext.mode === 'reports' && viewContext.individualId) {
+      params.set('individualId', String(viewContext.individualId));
+      params.delete('organizationId');
+    } else {
+      params.delete('organizationId');
+      params.delete('individualId');
+    }
+
+    const nextSearch = params.toString();
+    const currentSearch = searchParams.toString();
+
+    if (nextSearch === currentSearch) return;
+
+    const nextUrl = nextSearch ? `${pathname}?${nextSearch}` : pathname;
+    router.replace(nextUrl);
+  }, [pathname, router, searchParams, viewContext, loading]);
 
   // Load initial data
   // biome-ignore lint/correctness/useExhaustiveDependencies: This effect should only run once on mount
@@ -270,6 +337,11 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           },
         ]
       : []),
+    {
+      label: commonT('share'),
+      icon: Share2,
+      onClick: handleShare,
+    },
   ];
 
   return (
@@ -281,8 +353,9 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         onEdgesChange={onEdgesChange}
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
-        nodeTypes={nodeTypes}
-        defaultEdgeOptions={defaultEdgeOptions}
+        nodeTypes={memoizedNodeTypes}
+        edgeTypes={memoizedEdgeTypes}
+        defaultEdgeOptions={memoizedEdgeOptions}
         fitView
         attributionPosition="bottom-left"
         className="bg-background"
@@ -320,6 +393,24 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           items={contextMenuItems}
           onClose={() => setContextMenu(null)}
         />
+      )}
+
+      {showCopyToast && (
+        <div
+          className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-2 fade-in"
+          role="status"
+          aria-live="polite"
+        >
+          <div
+            className={`px-4 py-2 rounded-full shadow-lg text-sm font-medium ${
+              copyError
+                ? 'bg-destructive text-destructive-foreground'
+                : 'bg-foreground text-background'
+            }`}
+          >
+            {copyError ? commonT('error_generic') : commonT('link_copied')}
+          </div>
+        </div>
       )}
 
       {/* Add Organization Modal */}
@@ -374,8 +465,47 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           >
             {t('organizations')}
           </button>
-          {viewContext.mode === 'people' && viewContext.organizationName && (
+          {/* Organization path for people view */}
+          {viewContext.mode === 'people' && organizationPath.length > 0 && (
             <>
+              {(() => {
+                // Filter out the current organization from the path as it matches the current view title
+                const path = organizationPath.filter(
+                  item => item.id !== viewContext.organizationId
+                );
+
+                if (path.length === 0) return null;
+
+                const displayPath: Array<(typeof path)[0] | 'ellipsis'> = [];
+
+                // If more than 4 items, show first 2, ellipsis, and last 1
+                if (path.length > 4) {
+                  displayPath.push(path[0], path[1], 'ellipsis', path[path.length - 1]);
+                } else {
+                  displayPath.push(...path);
+                }
+
+                return displayPath.map((item, index) => (
+                  <span
+                    key={item === 'ellipsis' ? `ellipsis-${index}` : `org-${item.id}`}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="text-foreground/40">/</span>
+                    {item === 'ellipsis' ? (
+                      <span className="text-foreground/60">...</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => fetchOrganizationPeople(item.id, item.name)}
+                        className="text-accent-primary hover:underline"
+                      >
+                        {locale === 'en' ? item.nameEn || item.name : item.name}
+                      </button>
+                    )}
+                  </span>
+                ));
+              })()}
+
               <span className="text-foreground/40">/</span>
               <span className="text-foreground font-medium">{viewContext.organizationName}</span>
               {viewContext.organizationId && (
@@ -387,16 +517,54 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
               )}
             </>
           )}
-          {viewContext.mode === 'reports' && viewContext.individualName && (
+
+          {/* Organization path for reports view */}
+          {viewContext.mode === 'reports' && organizationPath.length > 0 && (
             <>
-              <span className="text-foreground/40">/</span>
-              <span className="text-foreground font-medium">{viewContext.individualName}</span>
-              {viewContext.individualId && (
-                <ReportContentButton
-                  contentType="individual"
-                  contentId={viewContext.individualId}
-                  className="ml-1"
-                />
+              {(() => {
+                const path = organizationPath;
+                const displayPath: Array<(typeof path)[0] | 'ellipsis'> = [];
+
+                // If more than 4 items, show first 2, ellipsis, and last 1
+                if (path.length > 4) {
+                  displayPath.push(path[0], path[1], 'ellipsis', path[path.length - 1]);
+                } else {
+                  displayPath.push(...path);
+                }
+
+                return displayPath.map((item, index) => (
+                  <span
+                    key={item === 'ellipsis' ? `ellipsis-${index}` : `org-${item.id}`}
+                    className="flex items-center gap-2"
+                  >
+                    <span className="text-foreground/40">/</span>
+                    {item === 'ellipsis' ? (
+                      <span className="text-foreground/60">...</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => fetchOrganizationPeople(item.id, item.name)}
+                        className="text-accent-primary hover:underline"
+                      >
+                        {locale === 'en' ? item.nameEn || item.name : item.name}
+                      </button>
+                    )}
+                  </span>
+                ));
+              })()}
+
+              {viewContext.individualName && (
+                <>
+                  <span className="text-foreground/40">/</span>
+                  <span className="text-foreground font-medium">{viewContext.individualName}</span>
+                  {viewContext.individualId && (
+                    <ReportContentButton
+                      contentType="individual"
+                      contentId={viewContext.individualId}
+                      className="ml-1"
+                    />
+                  )}
+                </>
               )}
             </>
           )}

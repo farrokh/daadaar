@@ -36,7 +36,10 @@
     "previous": "Previous",
     "next": "Next",
     "open": "Open",
-    "download": "Download"
+    "download": "Download",
+    "share": "Share",
+    "copied": "Copied!",
+    "link_copied": "Link copied to clipboard"
   },
   "navigation": {
     "home": "Home",

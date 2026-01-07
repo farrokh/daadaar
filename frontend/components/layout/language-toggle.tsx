@@ -3,11 +3,16 @@
 import { usePathname, useRouter } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
 import { useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 
 export function LanguageToggle() {
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
+  const searchParams = useSearchParams();
+
+  const search = searchParams.toString();
+  const query = search ? `?${search}` : '';
 
   return (
     <div className="fixed top-6 right-6 z-50 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -20,7 +25,7 @@ export function LanguageToggle() {
       >
         <button
           type="button"
-          onClick={() => router.replace(pathname, { locale: 'en' })}
+          onClick={() => router.replace(`${pathname}${query}`, { locale: 'en' })}
           className={cn(
             'relative px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-300',
             locale === 'en'
@@ -32,7 +37,7 @@ export function LanguageToggle() {
         </button>
         <button
           type="button"
-          onClick={() => router.replace(pathname, { locale: 'fa' })}
+          onClick={() => router.replace(`${pathname}${query}`, { locale: 'fa' })}
           className={cn(
             'relative px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-300 font-[family-name:var(--font-vazirmatn)]',
             locale === 'fa'
