@@ -174,7 +174,7 @@ export default function PersonDetail({ person }: PersonDetailProps) {
                               year: 'numeric',
                               month: 'long',
                             })
-                          : 'Present'}
+                          : t('present')}
                       </time>
                     </div>
                   </div>

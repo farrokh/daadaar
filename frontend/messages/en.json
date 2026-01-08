@@ -185,7 +185,8 @@
     "associated_reports": "Associated Reports",
     "no_reports": "No reports associated with this individual.",
     "career_history": "Career History",
-    "no_history": "No career history available."
+    "no_history": "No career history available.",
+    "present": "Present"
   },
   "role": {
     "title": "Role Title",

@@ -149,29 +149,41 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                 {t('linked_individuals')}
               </div>
               <div className="space-y-4">
-                {report.reportLinks.map(link => (
-                  <Link
-                    key={link.id}
-                    href={`/${locale}/person/${link.individual?.shareableUuid}`}
-                    className="flex items-center gap-3 py-2 px-3 -mx-3 rounded-lg group hover:bg-foreground/5 transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-foreground/10 text-foreground/60 transition-all group-hover:ring-foreground/20 group-hover:bg-background shrink-0">
-                      {link.individual?.fullName?.[0] || 'P'}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground/90 leading-none group-hover:text-primary transition-colors">
-                        {isRtl
-                          ? link.individual?.fullName
-                          : link.individual?.fullNameEn || link.individual?.fullName}
-                      </p>
-                      {link.role && (
-                        <p className="text-xs text-foreground/40 mt-1 group-hover:text-foreground/60 transition-colors">
-                          {isRtl ? link.role.title : link.role.titleEn || link.role.title}
+                {report.reportLinks.map(link => {
+                  const shareableUuid = link.individual?.shareableUuid;
+                  const hasIndividual = !!shareableUuid;
+                  const Wrapper = hasIndividual ? Link : 'div';
+                  const wrapperProps = hasIndividual
+                    ? {
+                        href: `/${locale}/person/${shareableUuid}`,
+                        className:
+                          'flex items-center gap-3 py-2 px-3 -mx-3 rounded-lg group hover:bg-foreground/5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                      }
+                    : {
+                        className: 'flex items-center gap-3 py-2 px-3 -mx-3 rounded-lg group',
+                      };
+
+                  return (
+                    // @ts-ignore - dynamic component type issue
+                    <Wrapper key={link.id} {...wrapperProps}>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-foreground/10 text-foreground/60 transition-all group-hover:ring-foreground/20 group-hover:bg-background shrink-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+                        {link.individual?.fullName?.[0] || 'P'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground/90 leading-none group-hover:text-primary transition-colors">
+                          {isRtl
+                            ? link.individual?.fullName
+                            : link.individual?.fullNameEn || link.individual?.fullName}
                         </p>
-                      )}
-                    </div>
-                  </Link>
-                ))}
+                        {link.role && (
+                          <p className="text-xs text-foreground/40 mt-1 group-hover:text-foreground/60 transition-colors">
+                            {isRtl ? link.role.title : link.role.titleEn || link.role.title}
+                          </p>
+                        )}
+                      </div>
+                    </Wrapper>
+                  );
+                })}
               </div>
             </div>
           )}
