@@ -48,3 +48,9 @@ The Graph API visualization endpoints power the interactive canvas.
 - **Public**: Public assets are served via Cloudflare CDN (`media.daadaar.com`).
 
 ---
+
+## Error Handling
+
+- **Validation Errors (400)**: Specific validation failures (like hierarchy cycles) return standard 400 responses with `code: 'VALIDATION_ERROR'` and a descriptive message.
+- **Internal Errors (500)**: Uncaught exceptions are logged and return a generic 500 status.
+
