@@ -148,7 +148,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
         setNodes(positionedNodes);
         setEdges(peopleEdges);
         setOrganizationPath(response.data.organizationPath || []); // Store organization path
-        
+
         // Update time range limits based on role occupancy dates
         const occupancyYears = peopleEdges
           .filter(edge => edge.data?.startDate)
@@ -172,7 +172,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
           setTimeRangeLimit([min, max]);
           setDateRange([min, max]);
         }
-        
+
         setViewContext({
           mode: 'people',
           organizationId: organization.id,

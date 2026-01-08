@@ -336,36 +336,38 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     return true;
   });
 
-  const visibleEdges = edges.filter(edge => {
-    // Always show edges, but we'll modify their type based on whether they're current or former
-    const sourceVisible = visibleNodes.some(n => n.id === edge.source);
-    const targetVisible = visibleNodes.some(n => n.id === edge.target);
-    return sourceVisible && targetVisible;
-  }).map(edge => {
-    // Check if this is a former occupancy (ended in the past)
-    if (edge.type === 'occupies' && edge.data?.endDate) {
-      const endDate = new Date(edge.data.endDate);
-      const now = new Date();
-      
-      // If the role ended in the past, mark it as a former occupancy
-      if (endDate < now) {
-        return {
-          ...edge,
-          type: 'occupies_former',
-          animated: true,
-          style: {
-            strokeWidth: 1.5,
-            stroke: '#94a3b8',
-            strokeDasharray: '10,5,2,5', // Dash-dot pattern for former members
-            opacity: 0.5, // More faded
-            animation: 'dashdraw 3s linear infinite', // Slower animation (3s instead of default)
-          },
-        };
+  const visibleEdges = edges
+    .filter(edge => {
+      // Always show edges, but we'll modify their type based on whether they're current or former
+      const sourceVisible = visibleNodes.some(n => n.id === edge.source);
+      const targetVisible = visibleNodes.some(n => n.id === edge.target);
+      return sourceVisible && targetVisible;
+    })
+    .map(edge => {
+      // Check if this is a former occupancy (ended in the past)
+      if (edge.type === 'occupies' && edge.data?.endDate) {
+        const endDate = new Date(edge.data.endDate);
+        const now = new Date();
+
+        // If the role ended in the past, mark it as a former occupancy
+        if (endDate < now) {
+          return {
+            ...edge,
+            type: 'occupies_former',
+            animated: true,
+            style: {
+              strokeWidth: 1.5,
+              stroke: '#94a3b8',
+              strokeDasharray: '10,5,2,5', // Dash-dot pattern for former members
+              opacity: 0.5, // More faded
+              animation: 'dashdraw 3s linear infinite', // Slower animation (3s instead of default)
+            },
+          };
+        }
       }
-    }
-    
-    return edge;
-  });
+
+      return edge;
+    });
 
   // Calculate context menu items based on view mode
   const contextMenuItems = [

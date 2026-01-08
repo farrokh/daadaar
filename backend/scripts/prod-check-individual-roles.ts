@@ -62,7 +62,9 @@ async function checkAllIndividuals() {
         console.log(`\n  Role Occupancy ID: ${ro.id}`);
         console.log(`  ├─ Role: ${ro.roleTitle} (${ro.roleTitleEn || 'no EN'})`);
         console.log(`  ├─ Role ID: ${ro.roleId}`);
-        console.log(`  ├─ Organization: ${ro.organizationName} (${ro.organizationNameEn || 'no EN'})`);
+        console.log(
+          `  ├─ Organization: ${ro.organizationName} (${ro.organizationNameEn || 'no EN'})`
+        );
         console.log(`  ├─ Organization ID: ${ro.organizationId}`);
         console.log(`  ├─ Start Date: ${ro.startDate}`);
         console.log(`  └─ End Date: ${ro.endDate || 'ongoing (null)'}`);
@@ -71,7 +73,7 @@ async function checkAllIndividuals() {
   }
 
   // Also check all organizations
-  console.log('\n\n' + '='.repeat(80));
+  console.log(`\n\n${'='.repeat(80)}`);
   console.log('ALL ORGANIZATIONS');
   console.log('='.repeat(80));
   const organizations = await db
@@ -88,7 +90,7 @@ async function checkAllIndividuals() {
   }
 
   // Check all roles
-  console.log('\n\n' + '='.repeat(80));
+  console.log(`\n\n${'='.repeat(80)}`);
   console.log('ALL ROLES');
   console.log('='.repeat(80));
   const roles = await db
@@ -104,10 +106,12 @@ async function checkAllIndividuals() {
     .orderBy(schema.roles.id);
 
   for (const role of roles) {
-    console.log(`${role.id}: ${role.title} (${role.titleEn || 'no EN'}) - Org: ${role.organizationName} (ID: ${role.organizationId})`);
+    console.log(
+      `${role.id}: ${role.title} (${role.titleEn || 'no EN'}) - Org: ${role.organizationName} (ID: ${role.organizationId})`
+    );
   }
 
-  console.log('\n' + '='.repeat(80));
+  console.log(`\n${'='.repeat(80)}`);
   console.log('✅ DIAGNOSTIC COMPLETE');
   console.log('='.repeat(80));
   process.exit(0);
