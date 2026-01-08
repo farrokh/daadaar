@@ -1,8 +1,17 @@
+'use client';
+
+import { FileText } from 'lucide-react';
 import { AlertCircle, Monitor, Smartphone } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 
 export function MobileNotReady() {
   const t = useTranslations('mobile');
+  const [acknowledged, setAcknowledged] = useState(false);
+
+  if (acknowledged) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/98 backdrop-blur-md p-6 text-center lg:hidden">
@@ -29,7 +38,7 @@ export function MobileNotReady() {
           </p>
         </div>
 
-        <div className="pt-8 border-t border-border/50 w-full px-8">
+        <div className="pt-8 border-t border-border/50 w-full px-8 space-y-4">
           <div className="rounded-lg bg-secondary/50 p-3">
             <p className="text-sm text-secondary-foreground font-medium flex items-center justify-center gap-2">
               <span className="relative flex h-2 w-2">
@@ -39,6 +48,14 @@ export function MobileNotReady() {
               {t('coming_soon')}
             </p>
           </div>
+
+          <button
+            type="button"
+            onClick={() => setAcknowledged(true)}
+            className="w-full py-3 px-4 rounded-xl bg-foreground/5 text-foreground/70 hover:text-foreground hover:bg-foreground/10 text-sm font-medium transition-colors border border-foreground/10"
+          >
+            {t('proceed_anyway')}
+          </button>
         </div>
       </div>
     </div>

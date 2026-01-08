@@ -165,6 +165,18 @@ export interface Individual {
   currentOrganization?: string | null;
   currentOrganizationId?: number | null;
   reports?: Report[];
+  history?: Array<{
+    id: number;
+    roleId: number;
+    startDate: string;
+    endDate: string | null;
+    roleTitle: string;
+    roleTitleEn: string | null;
+    organizationId: number;
+    organizationName: string;
+    organizationNameEn: string | null;
+    organizationUuid: string;
+  }>;
 }
 
 export interface RoleOccupancy {

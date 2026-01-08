@@ -139,7 +139,52 @@ export default function PersonDetail({ person }: PersonDetailProps) {
         </div>
 
         {/* Sidebar Info */}
-        <div className="space-y-8">{/* Placeholder for future specific details */}</div>
+        <div className="md:col-span-1 space-y-8">
+          <section className="space-y-4">
+            <h2 className="text-sm font-bold uppercase text-foreground/40 tracking-widest">
+              {t('career_history')}
+            </h2>
+            {person.history && person.history.length > 0 ? (
+              <div className="relative border-s border-foreground/10 ms-4">
+                {person.history.map(record => (
+                  <div key={record.id} className="mb-8 ms-8">
+                    <span className="absolute flex items-center justify-center w-8 h-8 rounded-full -start-4 ring-4 ring-background bg-foreground/5 text-foreground/50">
+                      <User className="w-4 h-4" />
+                    </span>
+                    <div className="p-4 rounded-xl bg-foreground/5 border border-foreground/10">
+                      <h3 className="flex items-center text-lg font-semibold text-foreground">
+                        {isRtl ? record.roleTitle : record.roleTitleEn || record.roleTitle}
+                      </h3>
+                      <Link
+                        href={`/${locale}/org/${record.organizationUuid}`}
+                        className="block mb-2 text-sm font-normal leading-none text-foreground/70 hover:text-foreground hover:underline transition-colors"
+                      >
+                        {isRtl
+                          ? record.organizationName
+                          : record.organizationNameEn || record.organizationName}
+                      </Link>
+                      <time className="block mb-2 text-xs font-normal leading-none text-foreground/40">
+                        {new Date(record.startDate).toLocaleDateString(locale, {
+                          year: 'numeric',
+                          month: 'long',
+                        })}
+                        {' - '}
+                        {record.endDate
+                          ? new Date(record.endDate).toLocaleDateString(locale, {
+                              year: 'numeric',
+                              month: 'long',
+                            })
+                          : t('present')}
+                      </time>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-foreground/60 text-sm">{t('no_history')}</p>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );

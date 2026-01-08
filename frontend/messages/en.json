@@ -46,7 +46,8 @@
   "mobile": {
     "not_ready_title": "Desktop Experience Recommended",
     "not_ready_message": "Daadaar is currently optimized for desktop computers. For the best experience, please switch to a larger screen.",
-    "coming_soon": "Mobile version is currently under development."
+    "coming_soon": "Mobile version is currently under development.",
+    "proceed_anyway": "I understand, proceed anyway"
   },
   "navigation": {
     "home": "Home",
@@ -182,7 +183,10 @@
     "no_biography": "No biography available.",
     "unknown_role": "Unknown Role",
     "associated_reports": "Associated Reports",
-    "no_reports": "No reports associated with this individual."
+    "no_reports": "No reports associated with this individual.",
+    "career_history": "Career History",
+    "no_history": "No career history available.",
+    "present": "Present"
   },
   "role": {
     "title": "Role Title",
