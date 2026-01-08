@@ -117,20 +117,20 @@ DELETE /api/admin/organizations/:id   # Delete organization
 **Capabilities:**
 - Create new organizations
 - Establish parent-child relationships (hierarchy)
-- Update organization details (name, description, logo)
+- Update organization details (name, description) and upload logos
 - Delete organizations (cascade deletes roles and hierarchy)
 - Bilingual support (Farsi and English)
 
 **Hierarchy Features:**
 - Parent organization selection
-- Prevents circular references (can't select self as parent)
+- Prevents transitive circular references (checks entire hierarchy chain)
 - Visual hierarchy indicators in list view
 - Cascade delete of child relationships
 
 **UI Features:**
 - Parent organization dropdown (excludes self when editing)
 - Description textarea
-- Logo URL input
+- S3-integrated Image Uploader for logos
 - Search by organization name
 
 ---
