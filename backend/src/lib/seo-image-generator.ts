@@ -1,5 +1,8 @@
 import sharp from 'sharp';
-import { uploadS3Object } from './s3-client';
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import { uploadS3Object, getS3PublicUrl } from './s3-client';
 
 /**
  * Generate SEO-optimized Open Graph images for entities
@@ -10,9 +13,24 @@ const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
 const SEO_FOLDER_PREFIX = 'seo';
 
+const LOGO_PATH = path.join(process.cwd(), '../frontend/public/logo_navbar_en.svg');
+
+/**
+ * Helper to fetch an image as a buffer
+ */
+async function fetchImageBuffer(urlOrKey: string): Promise<Buffer | null> {
+  try {
+    const url = urlOrKey.startsWith('http') ? urlOrKey : getS3PublicUrl(urlOrKey);
+    const response = await axios.get(url, { responseType: 'arraybuffer', timeout: 5000 });
+    return Buffer.from(response.data);
+  } catch (error) {
+    console.error('Failed to fetch image buffer:', error);
+    return null;
+  }
+}
+
 /**
  * Get the public S3 URL for an SEO image
- * These URLs are permanent and publicly accessible
  */
 export function getSeoImageUrl(entityType: 'org' | 'individual' | 'report', uuid: string): string {
   const bucket = process.env.AWS_S3_BUCKET || 'daadaar-media-v1-317430950654';
@@ -27,57 +45,134 @@ export function getSeoImageUrl(entityType: 'org' | 'individual' | 'report', uuid
 }
 
 /**
+ * Generate a minimal, professional SEO image
+ */
+async function generateMinimalSeoImage(
+  key: string,
+  name: string,
+  options: {
+    entityType: 'org' | 'individual' | 'report';
+    subtext?: string;
+    imageUrl?: string | null;
+    isCircle?: boolean;
+  }
+): Promise<string> {
+  const margin = 60;
+  const imageSize = 300;
+  const nameFontSize = 72;
+  const subtextFontSize = 32;
+
+  // 1. Prepare Logo
+  let logoBuffer: Buffer;
+  try {
+    logoBuffer = fs.readFileSync(LOGO_PATH);
+  } catch (e) {
+    console.error('Failed to read logo svg:', e);
+    // Fallback or empty buffer
+    logoBuffer = Buffer.from('<svg></svg>');
+  }
+
+  // 2. Prepare Profile/Entity Image
+  let entityImageBuffer: Buffer | null = null;
+  if (options.imageUrl) {
+    const rawBuffer = await fetchImageBuffer(options.imageUrl);
+    if (rawBuffer) {
+      const sharpEntity = sharp(rawBuffer).resize(imageSize, imageSize, {
+        fit: 'cover',
+      });
+
+      if (options.isCircle) {
+        const circleShape = Buffer.from(
+          `<svg><circle cx="${imageSize/2}" cy="${imageSize/2}" r="${imageSize/2}" /></svg>`
+        );
+        entityImageBuffer = await sharpEntity
+          .composite([{ input: circleShape, blend: 'dest-in' }])
+          .toBuffer();
+      } else {
+        entityImageBuffer = await sharpEntity.toBuffer();
+      }
+    }
+  }
+
+  // 3. Create SVG template
+  // Name at top right, same margin from top and right
+  const truncatedName = truncateText(name, 40);
+  const svg = `
+    <svg width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}" viewBox="0 0 ${OG_IMAGE_WIDTH} ${OG_IMAGE_HEIGHT}">
+      <rect width="100%" height="100%" fill="#FFFFFF"/>
+      
+      <!-- Name at top right -->
+      <text
+        x="${OG_IMAGE_WIDTH - margin}"
+        y="${margin + nameFontSize}"
+        text-anchor="end"
+        font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', sans-serif"
+        font-size="${nameFontSize}"
+        font-weight="700"
+        fill="#0b1d44"
+      >${escapeXml(truncatedName)}</text>
+      
+      ${options.subtext ? `
+      <text
+        x="${OG_IMAGE_WIDTH - margin}"
+        y="${margin + nameFontSize + subtextFontSize + 10}"
+        text-anchor="end"
+        font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', sans-serif"
+        font-size="${subtextFontSize}"
+        font-weight="400"
+        fill="#86868B"
+      >${escapeXml(options.subtext)}</text>
+      ` : ''}
+    </svg>
+  `;
+
+  // 4. Composite
+  let finalSharp = sharp(Buffer.from(svg));
+  const composites = [];
+
+  // Add entity image if available
+  if (entityImageBuffer) {
+    composites.push({
+      input: entityImageBuffer,
+      top: margin,
+      left: margin,
+    });
+  }
+
+  // Add Daadaar logo at bottom left
+  const resizedLogo = await sharp(logoBuffer)
+    .resize({ height: 80 })
+    .toBuffer();
+  
+  composites.push({
+    input: resizedLogo,
+    top: OG_IMAGE_HEIGHT - 80 - margin,
+    left: margin,
+  });
+
+  if (composites.length > 0) {
+    finalSharp = finalSharp.composite(composites);
+  }
+
+  const buffer = await finalSharp.jpeg({ quality: 90 }).toBuffer();
+  await uploadS3Object(key, buffer, 'image/jpeg');
+  return getSeoImageUrl(options.entityType, key.split('/').pop()?.replace('.jpg', '') || '');
+}
+
+/**
  * Generate and upload an SEO image for an organization
  */
 export async function generateOrgSeoImage(
   uuid: string,
   name: string,
-  _logoUrl?: string | null
+  logoUrl?: string | null
 ): Promise<string> {
-  try {
-    const key = `${SEO_FOLDER_PREFIX}/org/${uuid}.jpg`;
-
-    // Create a simple branded OG image
-    // If logoUrl exists, we could fetch and composite it
-    // For now, create a text-based image
-    const svg = `
-      <svg width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}">
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#grad)"/>
-        <text
-          x="50%"
-          y="45%"
-          text-anchor="middle"
-          font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', Arial, sans-serif"
-          font-size="64"
-          font-weight="bold"
-          fill="white"
-        >${escapeXml(name)}</text>
-        <text
-          x="50%"
-          y="60%"
-          text-anchor="middle"
-          font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', Arial, sans-serif"
-          font-size="32"
-          fill="rgba(255,255,255,0.8)"
-        >Daadaar</text>
-      </svg>
-    `;
-
-    const buffer = await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toBuffer();
-
-    await uploadS3Object(key, buffer, 'image/jpeg');
-
-    return getSeoImageUrl('org', uuid);
-  } catch (error) {
-    console.error('Failed to generate SEO image for organization:', error);
-    throw error;
-  }
+  return generateMinimalSeoImage(`${SEO_FOLDER_PREFIX}/org/${uuid}.jpg`, name, {
+    entityType: 'org',
+    subtext: 'Organization',
+    imageUrl: logoUrl,
+    isCircle: false
+  });
 }
 
 /**
@@ -86,49 +181,14 @@ export async function generateOrgSeoImage(
 export async function generateIndividualSeoImage(
   uuid: string,
   name: string,
-  _profileImageUrl?: string | null
+  profileImageUrl?: string | null
 ): Promise<string> {
-  try {
-    const key = `${SEO_FOLDER_PREFIX}/individual/${uuid}.jpg`;
-
-    const svg = `
-      <svg width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}">
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#4facfe;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#grad)"/>
-        <text
-          x="50%"
-          y="45%"
-          text-anchor="middle"
-          font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', Arial, sans-serif"
-          font-size="64"
-          font-weight="bold"
-          fill="white"
-        >${escapeXml(name)}</text>
-        <text
-          x="50%"
-          y="60%"
-          text-anchor="middle"
-          font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', Arial, sans-serif"
-          font-size="32"
-          fill="rgba(255,255,255,0.8)"
-        >Daadaar</text>
-      </svg>
-    `;
-
-    const buffer = await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toBuffer();
-
-    await uploadS3Object(key, buffer, 'image/jpeg');
-
-    return getSeoImageUrl('individual', uuid);
-  } catch (error) {
-    console.error('Failed to generate SEO image for individual:', error);
-    throw error;
-  }
+  return generateMinimalSeoImage(`${SEO_FOLDER_PREFIX}/individual/${uuid}.jpg`, name, {
+    entityType: 'individual',
+    subtext: 'Public Servant Profile',
+    imageUrl: profileImageUrl,
+    isCircle: true
+  });
 }
 
 /**
@@ -137,49 +197,14 @@ export async function generateIndividualSeoImage(
 export async function generateReportSeoImage(
   uuid: string,
   title: string,
-  _imageUrl?: string | null
+  imageUrl?: string | null
 ): Promise<string> {
-  try {
-    const key = `${SEO_FOLDER_PREFIX}/report/${uuid}.jpg`;
-
-    const svg = `
-      <svg width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}">
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#fa709a;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#fee140;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#grad)"/>
-        <text
-          x="50%"
-          y="45%"
-          text-anchor="middle"
-          font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', Arial, sans-serif"
-          font-size="56"
-          font-weight="bold"
-          fill="white"
-        >${escapeXml(truncateText(title, 50))}</text>
-        <text
-          x="50%"
-          y="60%"
-          text-anchor="middle"
-          font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', Arial, sans-serif"
-          font-size="32"
-          fill="rgba(255,255,255,0.8)"
-        >Daadaar Report</text>
-      </svg>
-    `;
-
-    const buffer = await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toBuffer();
-
-    await uploadS3Object(key, buffer, 'image/jpeg');
-
-    return getSeoImageUrl('report', uuid);
-  } catch (error) {
-    console.error('Failed to generate SEO image for report:', error);
-    throw error;
-  }
+  return generateMinimalSeoImage(`${SEO_FOLDER_PREFIX}/report/${uuid}.jpg`, title, {
+    entityType: 'report',
+    subtext: 'Official Report',
+    imageUrl: imageUrl,
+    isCircle: false
+  });
 }
 
 /**
@@ -199,5 +224,5 @@ function escapeXml(text: string): string {
  */
 function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
-  return `${text.substring(0, maxLength - 3)}...`;
+  return text.substring(0, maxLength).trim() + '...';
 }
