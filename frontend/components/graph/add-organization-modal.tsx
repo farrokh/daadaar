@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
-import { Select, type SelectOption } from '@/components/ui/select';
+import { SearchableSelect, type SelectOption } from '@/components/ui/searchable-select';
 import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Organization {
   id: number;
@@ -31,6 +31,16 @@ interface CreateOrganizationResponse {
   parentId: number | null;
 }
 
+interface OrganizationListResponse {
+  organizations: Organization[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganizationModalProps) {
   const [name, setName] = useState('');
   const [nameEn, setNameEn] = useState('');
@@ -47,24 +57,34 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
   const t = useTranslations('organization');
   const tCommon = useTranslations('common');
 
-  // Fetch organizations for parent dropdown
-  useEffect(() => {
-    if (isOpen) {
-      fetchOrganizations();
-    }
-  }, [isOpen]);
-
-  const fetchOrganizations = async () => {
+  const fetchOrganizations = useCallback(async (search: string) => {
     setFetchingOrgs(true);
-    const response = await fetchApi<{ nodes: Array<{ data: Organization }> }>(
-      '/graph/organizations'
+    const query = new URLSearchParams({
+      page: '1',
+      limit: '20',
+      q: search,
+    });
+
+    const response = await fetchApi<OrganizationListResponse>(
+      `/admin/organizations?${query.toString()}`
     );
 
     if (response.success && response.data) {
-      setOrganizations(response.data.nodes.map(node => node.data));
+      if ('organizations' in response.data) {
+        setOrganizations(response.data.organizations);
+      } else if (Array.isArray(response.data)) {
+        setOrganizations(response.data);
+      }
     }
     setFetchingOrgs(false);
-  };
+  }, []);
+
+  // Fetch organizations for parent dropdown
+  useEffect(() => {
+    if (isOpen) {
+      fetchOrganizations('');
+    }
+  }, [isOpen, fetchOrganizations]);
 
   const resetForm = () => {
     setName('');
@@ -134,10 +154,14 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
     }
   };
 
-  const parentOptions: SelectOption[] = organizations.map(org => ({
-    value: org.id,
-    label: org.nameEn ? `${org.name} (${org.nameEn})` : org.name,
-  }));
+  const parentOptions: SelectOption[] = useMemo(
+    () =>
+      organizations.map(org => ({
+        value: org.id,
+        label: org.nameEn ? `${org.name} (${org.nameEn})` : org.name,
+      })),
+    [organizations]
+  );
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title={t('add_title')} size="lg">
@@ -198,15 +222,20 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
           helperText={t('logo_helper')}
         />
 
-        <Select
-          label={t('parent')}
-          placeholder={fetchingOrgs ? t('loading_organizations') : t('parent_placeholder')}
-          options={parentOptions}
-          value={parentId}
-          onChange={value => setParentId(value)}
-          disabled={loading || fetchingOrgs}
-          helperText={t('parent_helper')}
-        />
+        <div className="relative z-20">
+          <SearchableSelect
+            label={t('parent')}
+            placeholder={t('parent_placeholder')}
+            options={parentOptions}
+            value={parentId}
+            onChange={value => setParentId(value)}
+            onSearch={fetchOrganizations}
+            loading={fetchingOrgs}
+            disabled={loading}
+            helperText={t('parent_helper')}
+            emptyMessage={t('no_organizations_found')}
+          />
+        </div>
 
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-foreground/10">
           <Button type="button" variant="ghost" onClick={handleClose} disabled={loading}>

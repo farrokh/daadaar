@@ -138,7 +138,8 @@
     "added_on": "Added on",
     "org_id": "ORG ID",
     "members": "Members",
-    "no_members": "No members found."
+    "no_members": "No members found.",
+    "no_organizations_found": "No organizations found"
   },
   "person": {
     "add_title": "Add New Person",

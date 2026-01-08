@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { ImageUploader } from '@/components/ui/image-uploader';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
-import { Select, type SelectOption } from '@/components/ui/select';
+import { SearchableSelect, type SelectOption } from '@/components/ui/searchable-select';
 import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Role {
   id: number;
@@ -40,10 +40,14 @@ interface CreateRoleResponse {
   organizationId: number;
 }
 
-interface RolesResponse {
-  id: number;
-  title: string;
-  titleEn: string | null;
+interface RoleListResponse {
+  roles: Role[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 export function AddPersonModal({
@@ -79,22 +83,33 @@ export function AddPersonModal({
   const [newRoleDescription, setNewRoleDescription] = useState('');
   const [newRoleDescriptionEn, setNewRoleDescriptionEn] = useState('');
 
+  const fetchRoles = useCallback(async (search: string) => {
+    setFetchingRoles(true);
+    const query = new URLSearchParams({
+      organizationId: String(organizationId),
+      page: '1',
+      limit: '20',
+      q: search,
+    });
+
+    const response = await fetchApi<RoleListResponse>(`/admin/roles?${query.toString()}`);
+
+    if (response.success && response.data) {
+      if ('roles' in response.data) {
+        setRoles(response.data.roles);
+      } else if (Array.isArray(response.data)) {
+        setRoles(response.data);
+      }
+    }
+    setFetchingRoles(false);
+  }, [organizationId]);
+
   // Fetch roles for the organization
   useEffect(() => {
     if (isOpen && organizationId) {
-      fetchRoles();
+      fetchRoles('');
     }
-  }, [isOpen, organizationId]);
-
-  const fetchRoles = async () => {
-    setFetchingRoles(true);
-    const response = await fetchApi<RolesResponse[]>(`/organizations/${organizationId}/roles`);
-
-    if (response.success && response.data) {
-      setRoles(response.data);
-    }
-    setFetchingRoles(false);
-  };
+  }, [isOpen, organizationId, fetchRoles]);
 
   const resetForm = () => {
     setFullName('');
@@ -216,10 +231,14 @@ export function AddPersonModal({
     }
   };
 
-  const roleOptions: SelectOption[] = roles.map(role => ({
-    value: role.id,
-    label: role.titleEn ? `${role.title} (${role.titleEn})` : role.title,
-  }));
+  const roleOptions: SelectOption[] = useMemo(
+    () =>
+      roles.map(role => ({
+        value: role.id,
+        label: role.titleEn ? `${role.title} (${role.titleEn})` : role.title,
+      })),
+    [roles]
+  );
 
   const handleToggleNewRole = () => {
     setIsCreatingNewRole(!isCreatingNewRole);
@@ -409,17 +428,22 @@ export function AddPersonModal({
           ) : (
             /* Existing Role Selection */
             <div className="space-y-4">
-              <Select
-                label={t('role')}
-                placeholder={fetchingRoles ? t('loading_roles') : t('role_placeholder')}
-                options={roleOptions}
-                value={roleId}
-                onChange={value => setRoleId(value)}
-                disabled={loading || fetchingRoles}
-                helperText={
-                  roles.length === 0 && !fetchingRoles ? t('no_roles_helper') : t('role_helper')
-                }
-              />
+              <div className="relative z-20">
+                <SearchableSelect
+                  label={t('role')}
+                  placeholder={fetchingRoles ? t('loading_roles') : t('role_placeholder')}
+                  options={roleOptions}
+                  value={roleId}
+                  onChange={value => setRoleId(value)}
+                  onSearch={fetchRoles}
+                  loading={fetchingRoles}
+                  disabled={loading}
+                  helperText={
+                    roles.length === 0 && !fetchingRoles ? t('no_roles_helper') : t('role_helper')
+                  }
+                  emptyMessage={t('no_roles_helper')}
+                />
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input

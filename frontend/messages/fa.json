@@ -136,7 +136,8 @@
     "added_on": "اضافه شده در",
     "org_id": "شناسه سازمان",
     "members": "اعضا",
-    "no_members": "عضوی یافت نشد."
+    "no_members": "عضوی یافت نشد.",
+    "no_organizations_found": "سازمانی یافت نشد"
   },
   "person": {
     "add_title": "افزودن فرد جدید",
