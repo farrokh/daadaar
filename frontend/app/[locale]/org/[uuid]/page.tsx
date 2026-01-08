@@ -1,5 +1,6 @@
 import OrganizationDetail from '@/components/organization/organization-detail';
 import { fetchApi } from '@/lib/api';
+import { getSeoImageUrl } from '@/lib/seo-utils';
 import type { Organization } from '@/shared/types';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -33,11 +34,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? organization.description
     : organization.descriptionEn || organization.description;
 
-  const images = [];
-  if (organization.logoUrl) {
-    images.push({ url: organization.logoUrl });
-  }
-  images.push({ url: '/android-chrome-512x512.png', width: 512, height: 512, alt: name });
+  // Use dedicated SEO image for social media sharing
+  const seoImageUrl = getSeoImageUrl('org', uuid);
+
+  const images = [
+    { url: seoImageUrl, width: 1200, height: 630, alt: name },
+  ];
 
   return {
     title: name,
