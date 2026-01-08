@@ -117,37 +117,32 @@ export function IndividualManagementPanel() {
     [updateOrganizationOptions]
   );
 
-  const fetchRoles = useCallback(
-    async (searchQuery = '', orgId?: string) => {
-      try {
-        setFetchingRoles(true);
-        const query = new URLSearchParams({
-          page: '1',
-          limit: '20',
-          q: searchQuery,
-        });
-        if (orgId) {
-          query.append('organizationId', orgId);
-        } else if (form.organizationId) {
-          query.append('organizationId', form.organizationId);
-        }
-
-        const response = await fetchApi<RoleListResponse>(`/admin/roles?${query.toString()}`);
-        if (response.success && response.data) {
-          if ('roles' in response.data) {
-            // Update roles list for the SearchableSelect
-            // Note: form.roleId is cleared when organizationId changes in a separate useEffect
-            setRoles(response.data.roles);
-          }
-        }
-      } catch (err) {
-        console.error('Failed to fetch roles:', err);
-      } finally {
-        setFetchingRoles(false);
+  const fetchRoles = useCallback(async (orgId: string, searchQuery = '') => {
+    try {
+      setFetchingRoles(true);
+      const query = new URLSearchParams({
+        page: '1',
+        limit: '20',
+        q: searchQuery,
+      });
+      if (orgId) {
+        query.append('organizationId', orgId);
       }
-    },
-    [form.organizationId]
-  );
+
+      const response = await fetchApi<RoleListResponse>(`/admin/roles?${query.toString()}`);
+      if (response.success && response.data) {
+        if ('roles' in response.data) {
+          // Update roles list for the SearchableSelect
+          // Note: form.roleId is cleared when organizationId changes in a separate useEffect
+          setRoles(response.data.roles);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch roles:', err);
+    } finally {
+      setFetchingRoles(false);
+    }
+  }, []);
 
   const fetchIndividuals = useCallback(async () => {
     try {
@@ -178,8 +173,7 @@ export function IndividualManagementPanel() {
   useEffect(() => {
     // Initial fetch of options (first 20)
     fetchOrganizations();
-    fetchRoles();
-  }, [fetchOrganizations, fetchRoles]); // Only on mount/deps change
+  }, [fetchOrganizations]); // Only on mount/deps change
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -191,9 +185,9 @@ export function IndividualManagementPanel() {
   // When organization changes, refetch roles
   useEffect(() => {
     if (form.organizationId) {
-      fetchRoles('', form.organizationId);
+      fetchRoles(form.organizationId, '');
     } else {
-      fetchRoles('');
+      fetchRoles('', '');
     }
   }, [form.organizationId, fetchRoles]);
 
@@ -537,7 +531,7 @@ export function IndividualManagementPanel() {
                   value={form.roleId}
                   label={t('individuals_role_label')}
                   onChange={value => setForm(prev => ({ ...prev, roleId: value }))}
-                  onSearch={q => fetchRoles(q, form.organizationId)}
+                  onSearch={q => fetchRoles(form.organizationId, q)}
                   loading={fetchingRoles}
                   placeholder={t('individuals_role_label')}
                   disabled={!form.organizationId}

@@ -8,6 +8,13 @@ import { generatePresignedGetUrl } from '../lib/s3-client';
 import { generateOrgSeoImage } from '../lib/seo-image-generator';
 import { notifyNewOrganization } from '../lib/slack';
 
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
+
 interface CreateOrganizationBody {
   name: string;
   nameEn?: string | null;
@@ -429,7 +436,9 @@ export async function updateOrganization(req: Request, res: Response) {
           let depth = 0;
           while (current && depth < 20) {
             if (current === organizationId)
-              throw new Error('Transitive cycle detected: cannot set descendant as parent');
+              throw new ValidationError(
+                'Transitive cycle detected: cannot set descendant as parent'
+              );
             const [rel] = await tx
               .select({ parentId: schema.organizationHierarchy.parentId })
               .from(schema.organizationHierarchy)
@@ -485,6 +494,15 @@ export async function updateOrganization(req: Request, res: Response) {
       data: updatedOrg,
     });
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: error.message,
+        },
+      });
+    }
     console.error('Error updating organization:', error);
     res.status(500).json({
       success: false,
