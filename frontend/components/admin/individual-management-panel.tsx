@@ -133,7 +133,7 @@ export function IndividualManagementPanel() {
       const data = response.data;
       if (response.success && data && 'roles' in data) {
         // Update roles list for the SearchableSelect
-        // Note: form.roleId is cleared when organizationId changes in a separate useEffect
+        // Note: form.roleId is cleared in the SearchableSelect onChange handler
         setRoles(prev => {
           const map = new Map(prev.map(role => [role.id, role]));
           for (const role of data.roles) {
@@ -191,8 +191,6 @@ export function IndividualManagementPanel() {
   useEffect(() => {
     if (form.organizationId) {
       fetchRoles(form.organizationId, '');
-    } else {
-      fetchRoles('', '');
     }
   }, [form.organizationId, fetchRoles]);
 
