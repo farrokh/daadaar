@@ -154,14 +154,21 @@ const SearchableSelect = React.memo(
               </span>
               <div className="flex items-center gap-1">
                 {value && !disabled && (
-                  <button
-                    type="button"
+                  <span
+                    role="button"
+                    tabIndex={0}
                     onClick={handleClear}
-                    className="p-0.5 rounded-full hover:bg-foreground/10 text-foreground/40 hover:text-foreground transition-colors mr-1"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleClear(e as any);
+                      }
+                    }}
+                    className="p-0.5 rounded-full hover:bg-foreground/10 text-foreground/40 hover:text-foreground transition-colors mr-1 cursor-pointer"
                     aria-label="Clear selection"
                   >
                     <X className="w-3 h-3" />
-                  </button>
+                  </span>
                 )}
                 <ChevronDown
                   className={`w-4 h-4 opacity-70 transition-transform duration-300 ease-in-out ${

@@ -6,11 +6,22 @@ import { useTranslations } from 'next-intl';
 import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { ImageUploader } from '@/components/ui/image-uploader';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { SearchableSelect, type SelectOption } from '@/components/ui/searchable-select';
 import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
 import type { Organization } from '@/shared/types';
+
+interface OrganizationListResponse {
+  organizations: Organization[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
 
 export function OrganizationManagementPanel() {
   const t = useTranslations('admin');
@@ -20,6 +31,11 @@ export function OrganizationManagementPanel() {
     organizations: Organization[];
     pagination: { total: number; page: number; limit: number; totalPages: number };
   } | null>(null);
+
+  // Separate state for dropdown options
+  const [parentOrgs, setParentOrgs] = useState<Organization[]>([]);
+  const [fetchingParentOrgs, setFetchingParentOrgs] = useState(false);
+
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -36,18 +52,35 @@ export function OrganizationManagementPanel() {
 
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const organizations = orgsData?.organizations || [];
-
-  const parentOptions = useMemo(
-    () =>
-      organizations
-        .filter(org => org.id !== editingId)
-        .map(org => ({
-          value: org.id,
-          label: org.name,
-        })),
-    [organizations, editingId]
-  );
+  // Function to fetch organizations for the dropdown
+  const fetchParentOrgs = useCallback(async (searchQuery: string = '') => {
+    setFetchingParentOrgs(true);
+    try {
+      const query = new URLSearchParams({
+        page: '1',
+        limit: '20',
+        q: searchQuery,
+      });
+      const response = await fetchApi<OrganizationListResponse>(
+        `/admin/organizations?${query.toString()}`
+      );
+      if (response.success && response.data) {
+        if ('organizations' in response.data) {
+          setParentOrgs(prev => {
+            const map = new Map(prev.map(o => [o.id, o]));
+            response.data.organizations.forEach(o => map.set(o.id, o));
+            return Array.from(map.values());
+          });
+        } else if (Array.isArray(response.data)) {
+          setParentOrgs(response.data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch parent orgs', err);
+    } finally {
+      setFetchingParentOrgs(false);
+    }
+  }, []);
 
   const fetchOrganizations = useCallback(async () => {
     setLoading(true);
@@ -72,6 +105,11 @@ export function OrganizationManagementPanel() {
     }, 300);
     return () => clearTimeout(timer);
   }, [fetchOrganizations]);
+
+  // Initial fetch for dropdown
+  useEffect(() => {
+    fetchParentOrgs();
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -109,8 +147,38 @@ export function OrganizationManagementPanel() {
     }
   };
 
-  const handleEdit = (org: Organization) => {
+  const handleEdit = async (org: Organization) => {
     setEditingId(org.id);
+
+    // Ensure parent is in options
+    if (org.parentId) {
+      // Check if we have it, if not, maybe fetch it?
+      // For now reliance on pre-fetched list + search is okay, but ideal to have the parent name.
+      // We can find the parent details from the main list if available (likely is if parent is in same list? No)
+      // Similar strategy: if we don't have it, we might display ID.
+      // Improvement: fetch specific org?
+      // Let's see if we can get it.
+      const parent =
+        orgsData?.organizations.find(o => o.id === org.parentId) ||
+        parentOrgs.find(o => o.id === org.parentId);
+
+      if (!parent) {
+        // Maybe fetch it individually to ensure label exists
+        try {
+          const res = await fetchApi<Organization>(`/admin/organizations/${org.parentId}`);
+          if (res.success && res.data) {
+            const orgData = res.data;
+            setParentOrgs(prev => {
+              if (!prev.find(o => o.id === orgData.id)) {
+                return [...prev, orgData];
+              }
+              return prev;
+            });
+          }
+        } catch (e) {}
+      }
+    }
+
     setForm({
       name: org.name,
       nameEn: org.nameEn || '',
@@ -134,6 +202,15 @@ export function OrganizationManagementPanel() {
       fetchOrganizations();
     }
   };
+
+  const parentOptions = useMemo(
+    () =>
+      parentOrgs.map(org => ({
+        value: String(org.id),
+        label: org.name,
+      })),
+    [parentOrgs]
+  );
 
   return (
     <div className="space-y-6">
@@ -218,21 +295,25 @@ export function OrganizationManagementPanel() {
               onChange={e => setForm(prev => ({ ...prev, descriptionEn: e.target.value }))}
               className="bg-background/50 border-foreground/10 focus:border-foreground/20 min-h-[100px]"
             />
-            <div className="grid md:grid-cols-2 gap-4">
-              <Input
-                value={form.logoUrl}
-                label={t('organizations_logo_label')}
-                placeholder={t('organizations_logo_label')}
-                onChange={e => setForm(prev => ({ ...prev, logoUrl: e.target.value }))}
-                className="bg-background/50 border-foreground/10 focus:border-foreground/20"
-              />
-              <Select
-                options={parentOptions.map(opt => ({ value: String(opt.value), label: opt.label }))}
+            
+            <ImageUploader
+              label={t('organizations_logo_label')}
+              currentImageUrl={form.logoUrl}
+              onImageUploaded={(url) => setForm(prev => ({ ...prev, logoUrl: url }))}
+              helperText="Upload organization logo (optional, max 5MB)"
+            />
+
+            <div className="relative z-20">
+              <SearchableSelect
+                options={parentOptions.filter(opt => opt.value !== String(editingId))}
                 value={form.parentId}
                 label={t('organizations_parent_label')}
                 onChange={value => setForm(prev => ({ ...prev, parentId: value }))}
+                onSearch={fetchParentOrgs}
+                loading={fetchingParentOrgs}
                 placeholder={t('organizations_parent_label')}
                 className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
+                emptyMessage={t('no_organizations_found')}
               />
             </div>
             <div className="flex justify-end gap-3">
@@ -277,8 +358,10 @@ export function OrganizationManagementPanel() {
                   </td>
                   <td className="px-6 py-3 text-foreground/70">
                     {org.parentId ? (
-                      organizations.find(o => o.id === org.parentId)?.name ||
-                      t('organizations_parent_label')
+                      orgsData.organizations.find(o => o.id === org.parentId)?.name ||
+                      // Fallback to searching in parentOrgs or showing ID if not available
+                      parentOrgs.find(o => o.id === org.parentId)?.name ||
+                      org.parentId // We might want to fetch parent name if not available
                     ) : (
                       <span className="opacity-30">—</span>
                     )}

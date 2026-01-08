@@ -358,6 +358,7 @@
     "individuals_empty": "هیچ فردی ثبت نشده است.",
     "refresh": "به‌روزرسانی",
     "no_reports_found": "گزارشی مطابق با معیارهای جستجو یافت نشد.",
+    "no_organizations_found": "سازمانی یافت نشد",
     "pagination_page": "صفحه {current} از {total}"
   },
   "auth": {

@@ -359,6 +359,7 @@
     "individuals_empty": "No individuals recorded yet.",
     "refresh": "Refresh",
     "no_reports_found": "No content reports found matching the criteria.",
+    "no_organizations_found": "No organizations found",
     "pagination_page": "Page {current} of {total}"
   },
   "auth": {

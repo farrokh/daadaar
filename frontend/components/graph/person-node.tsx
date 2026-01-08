@@ -30,6 +30,7 @@ function PersonNode({ data }: NodeProps<PersonNodeData>) {
       fallbackIcon={<User className="w-full h-full text-secondary" />}
       iconBgClassName="bg-secondary/10"
       glowGradientClassName="from-secondary to-pink-500"
+      onEdit={data.onEdit}
     />
   );
 }

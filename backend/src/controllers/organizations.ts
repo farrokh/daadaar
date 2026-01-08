@@ -386,6 +386,59 @@ export async function updateOrganization(req: Request, res: Response) {
       updateData.logoUrl = body.logoUrl || null;
     }
 
+    // Handle parentId update
+    if (body.parentId !== undefined) {
+      // Validate parent organization if provided
+      if (body.parentId !== null) {
+        // Prevent self-reference
+        if (body.parentId === organizationId) {
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Organization cannot be its own parent',
+            },
+          });
+        }
+
+        const [parentOrg] = await db
+          .select({ id: schema.organizations.id })
+          .from(schema.organizations)
+          .where(eq(schema.organizations.id, body.parentId));
+
+        if (!parentOrg) {
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Parent organization not found',
+            },
+          });
+        }
+      }
+
+      updateData.parentId = body.parentId;
+
+      // Update hierarchy relationships
+      // First, delete existing hierarchy relationships where this org is a child
+      await db
+        .delete(schema.organizationHierarchy)
+        .where(eq(schema.organizationHierarchy.childId, organizationId));
+
+      // Then, create new hierarchy relationship if parent is specified
+      if (body.parentId !== null) {
+        const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
+        const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
+
+        await db.insert(schema.organizationHierarchy).values({
+          parentId: body.parentId,
+          childId: organizationId,
+          createdByUserId: userId,
+          sessionId,
+        });
+      }
+    }
+
     // Update the organization
     const [updatedOrg] = await db
       .update(schema.organizations)

@@ -7,10 +7,30 @@ import { type FormEvent, useCallback, useEffect, useMemo, useState } from 'react
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { SearchableSelect, type SelectOption } from '@/components/ui/searchable-select';
 import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
 import type { Individual, Organization, Role } from '@/shared/types';
+
+interface OrganizationListResponse {
+  organizations: Organization[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+interface RoleListResponse {
+  roles: Role[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
 
 export function IndividualManagementPanel() {
   const t = useTranslations('admin');
@@ -20,9 +40,15 @@ export function IndividualManagementPanel() {
     individuals: Individual[];
     pagination: { total: number; page: number; limit: number; totalPages: number };
   } | null>(null);
+
+  // These will store the options for the dropdowns
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const [fetchingOrgs, setFetchingOrgs] = useState(false);
+  const [fetchingRoles, setFetchingRoles] = useState(false);
+
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [page, setPage] = useState(1);
@@ -48,48 +74,100 @@ export function IndividualManagementPanel() {
 
   const individuals = indsData?.individuals || [];
 
-  const organizationOptions = useMemo(
-    () =>
-      organizations.map(org => ({
-        value: String(org.id),
-        label: org.name,
-      })),
-    [organizations]
-  );
+  const updateOrganizationOptions = (newOrgs: Organization[]) => {
+    setOrganizations(prev => {
+      // Merge new orgs with existing ones, avoiding duplicates, to keep selected ones available
+      const map = new Map(prev.map(o => [o.id, o]));
+      newOrgs.forEach(o => map.set(o.id, o));
+      return Array.from(map.values());
+    });
+  };
 
-  const filteredRoles = useMemo(() => {
-    if (!form.organizationId) return roles;
-    return roles.filter(role => String(role.organizationId) === form.organizationId);
-  }, [form.organizationId, roles]);
+  const updateRoleOptions = (newRoles: Role[]) => {
+    setRoles(prev => {
+      const map = new Map(prev.map(r => [r.id, r]));
+      newRoles.forEach(r => map.set(r.id, r));
+      return Array.from(map.values());
+    });
+  };
 
-  const fetchOrganizations = useCallback(async () => {
+  const fetchOrganizations = useCallback(async (searchQuery: string = '') => {
     try {
+      setFetchingOrgs(true);
       setError(null);
-      const response = await fetchApi<Organization[]>('/organizations');
+      const query = new URLSearchParams({
+        page: '1',
+        limit: '20',
+        q: searchQuery,
+      });
+
+      const response = await fetchApi<OrganizationListResponse>(
+        `/admin/organizations?${query.toString()}`
+      );
       if (response.success && response.data) {
-        setOrganizations(response.data);
+        if ('organizations' in response.data) {
+          updateOrganizationOptions(response.data.organizations);
+        } else if (Array.isArray(response.data)) {
+          updateOrganizationOptions(response.data);
+        }
       } else if (response.error) {
-        setError(response.error.message);
+        console.error(response.error.message);
       }
     } catch (err) {
       console.error('Failed to fetch organizations:', err);
-      setError('Failed to load organizations');
+    } finally {
+      setFetchingOrgs(false);
     }
   }, []);
 
-  const fetchRoles = useCallback(async () => {
-    try {
-      const response = await fetchApi<Role[]>('/roles');
-      if (response.success && response.data) {
-        setRoles(response.data);
-      } else if (response.error) {
-        setError(response.error.message);
+  const fetchRoles = useCallback(
+    async (searchQuery: string = '', orgId?: string) => {
+      try {
+        setFetchingRoles(true);
+        const query = new URLSearchParams({
+          page: '1',
+          limit: '20',
+          q: searchQuery,
+        });
+        if (orgId) {
+          query.append('organizationId', orgId);
+        } else if (form.organizationId) {
+          query.append('organizationId', form.organizationId);
+        }
+
+        const response = await fetchApi<RoleListResponse>(`/admin/roles?${query.toString()}`);
+        if (response.success && response.data) {
+          if ('roles' in response.data) {
+            // If we are filtering by org, we should probably replace the roles list or be careful?
+            // Actually replacing is better for the dropdown to show relevant results.
+            // But we want to keep the SELECTED role if it exists.
+            // Since we use `updateRoleOptions` which merges, it should be fine?
+            // Wait, if I change org, I want only roles for that org in the list.
+            // So I should probably RESET roles if org changes, but fetchRoles handles the fetching.
+            // If I merge, I might show roles from other orgs?
+
+            // Strategy: For the dropdown options, we only want the ones matching the query/filter.
+            // BUT we want to keep the currently selected one if it's not in the new list.
+            // SearchableSelect takes `options`. I'll pass the `roles` state which I should manage carefully.
+
+            // If `orgId` param changed, we likely want to clear old roles from state, EXCEPT the currently selected one?
+            // Actually, if orgId changes, the selected roleId becomes invalid anyway (mostly).
+            // So if org changes, we clear `form.roleId`.
+
+            // So: `setRoles` to the new list.
+            setRoles(response.data.roles);
+          } else if (Array.isArray(response.data)) {
+            setRoles(response.data);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch roles:', err);
+      } finally {
+        setFetchingRoles(false);
       }
-    } catch (err) {
-      console.error('Failed to fetch roles:', err);
-      setError('Failed to load roles');
-    }
-  }, []);
+    },
+    [form.organizationId]
+  );
 
   const fetchIndividuals = useCallback(async () => {
     try {
@@ -118,9 +196,10 @@ export function IndividualManagementPanel() {
   }, [page, search]);
 
   useEffect(() => {
+    // Initial fetch of options (first 20)
     fetchOrganizations();
     fetchRoles();
-  }, [fetchOrganizations, fetchRoles]);
+  }, []); // Only on mount
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -128,6 +207,15 @@ export function IndividualManagementPanel() {
     }, 300);
     return () => clearTimeout(timer);
   }, [fetchIndividuals]);
+
+  // When organization changes, refetch roles
+  useEffect(() => {
+    if (form.organizationId) {
+      fetchRoles('', form.organizationId);
+    } else {
+      fetchRoles('');
+    }
+  }, [form.organizationId, fetchRoles]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -190,7 +278,33 @@ export function IndividualManagementPanel() {
   const handleEdit = async (person: Individual) => {
     setEditingId(person.id);
 
-    // Pre-populate basic fields
+    // Ensure the current organization and role are in the options so they display correctly
+    if (person.currentOrganizationId) {
+      // We need to make sure we have this org in options.
+      // If it's not loaded, we might need to fetch it or cheat by adding it if we have the name.
+      // We have `person.currentOrganization` (name).
+      setOrganizations(prev => {
+        if (!prev.find(o => o.id === person.currentOrganizationId)) {
+          return [
+            ...prev,
+            {
+              id: person.currentOrganizationId!,
+              name: person.currentOrganization!,
+              nameEn: null,
+              description: null,
+              descriptionEn: null,
+              parentId: null,
+              logoUrl: null,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              shareableUuid: '',
+            } as Organization,
+          ];
+        }
+        return prev;
+      });
+    }
+
     const baseForm = {
       fullName: person.fullName,
       fullNameEn: person.fullNameEn || '',
@@ -216,8 +330,28 @@ export function IndividualManagementPanel() {
         >(`/individuals/${person.id}/roles`);
 
         if (response.success && response.data && response.data.length > 0) {
-          // Get the most recent role (first one, since backend orders by startDate desc)
           const currentRole = response.data[0];
+
+          // Also fetch the specific role to add to options using /api/roles/:id if needed,
+          // or rely on `fetchRoles` filtering by org to likely find it.
+          // BUT `fetchRoles` is async and might happen after pagination.
+          // Better: If we have the role ID, we should try to fetch it specifically or rely on the fact that filtering by org typically returns a small enough list?
+          // If the org has > 20 roles, and this one is 21st, it won't show.
+          // Ideally we fetch the single role to add to options.
+
+          if (currentRole.roleId) {
+            const roleRes = await fetchApi<Role>(`/admin/roles/${currentRole.roleId}`);
+            if (roleRes.success && roleRes.data) {
+              const roleData = roleRes.data;
+              setRoles(prev => {
+                if (!prev.find(r => r.id === roleData.id)) {
+                  return [...prev, roleData];
+                }
+                return prev;
+              });
+            }
+          }
+
           setForm(prev => ({
             ...prev,
             roleId: String(currentRole.roleId),
@@ -242,6 +376,24 @@ export function IndividualManagementPanel() {
       fetchIndividuals();
     }
   };
+
+  const organizationOptions = useMemo(
+    () =>
+      organizations.map(org => ({
+        value: String(org.id),
+        label: org.name,
+      })),
+    [organizations]
+  );
+
+  const roleOptions = useMemo(
+    () =>
+      roles.map(role => ({
+        value: String(role.id),
+        label: role.title,
+      })),
+    [roles]
+  );
 
   return (
     <div className="space-y-6">
@@ -381,25 +533,39 @@ export function IndividualManagementPanel() {
               />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
-              <Select
-                options={organizationOptions}
-                value={form.organizationId}
-                label={t('individuals_org_label')}
-                onChange={value =>
-                  setForm(prev => ({ ...prev, organizationId: value, roleId: '' }))
-                }
-                placeholder={t('individuals_org_label')}
-                className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
-              />
-              <Select
-                options={filteredRoles.map(role => ({ value: String(role.id), label: role.title }))}
-                value={form.roleId}
-                label={t('individuals_role_label')}
-                onChange={value => setForm(prev => ({ ...prev, roleId: value }))}
-                placeholder={t('individuals_role_label')}
-                disabled={!form.organizationId || filteredRoles.length === 0}
-                className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
-              />
+              <div className="relative z-20">
+                <SearchableSelect
+                  options={organizationOptions}
+                  value={form.organizationId}
+                  label={t('individuals_org_label')}
+                  onChange={value =>
+                    setForm(prev => ({ ...prev, organizationId: value, roleId: '' }))
+                  }
+                  onSearch={fetchOrganizations}
+                  loading={fetchingOrgs}
+                  placeholder={t('individuals_org_label')}
+                  className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
+                  emptyMessage={t('individuals_empty')}
+                />
+              </div>
+              <div className="relative z-10">
+                <SearchableSelect
+                  options={roleOptions}
+                  value={form.roleId}
+                  label={t('individuals_role_label')}
+                  onChange={value => setForm(prev => ({ ...prev, roleId: value }))}
+                  onSearch={q => fetchRoles(q, form.organizationId)}
+                  loading={fetchingRoles}
+                  placeholder={t('individuals_role_label')}
+                  disabled={!form.organizationId} // Disable until org selected? Or allow fetch all? User said Searchable Combo Box. If I clear org, I should be able to search roles? But role depends on org usually.
+                  // Current logic: disabled={!form.organizationId || filteredRoles.length === 0}
+                  // Let's keep it disabled if no org, to enforce hierarchy? Or allow free search?
+                  // Providing `!form.organizationId` matches existing behavior.
+                  // But `filteredRoles.length === 0` is bad if we fetch async.
+                  className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
+                  emptyMessage={t('no_roles_helper') || 'No roles found'}
+                />
+              </div>
             </div>
             <div className="flex justify-end gap-3">
               <Button
@@ -427,6 +593,7 @@ export function IndividualManagementPanel() {
         </div>
       )}
 
+      {/* Table view below - mostly unchanged but make sure to close <div> properly */}
       {loading && !indsData ? (
         <div className="p-12 text-center text-foreground/40 italic">{commonT('loading')}</div>
       ) : (

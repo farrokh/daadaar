@@ -30,6 +30,7 @@ function OrganizationNode({ data }: NodeProps<OrganizationNodeData>) {
       fallbackIcon={<Building2 className="w-full h-full text-primary" />}
       iconBgClassName="bg-primary/10"
       glowGradientClassName="from-primary to-accent-secondary"
+      onEdit={data.onEdit}
     />
   );
 }
