@@ -356,11 +356,8 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
             type: 'occupies_former',
             animated: true,
             style: {
-              strokeWidth: 1.5,
-              stroke: '#94a3b8',
-              strokeDasharray: '10,5,2,5', // Dash-dot pattern for former members
-              opacity: 0.5, // More faded
-              animation: 'dashdraw 3s linear infinite', // Slower animation (3s instead of default)
+              strokeWidth: .7,
+              opacity: 0.3, // More faded
             },
           };
         }
