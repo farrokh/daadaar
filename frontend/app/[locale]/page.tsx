@@ -1,8 +1,8 @@
 import type { ViewContext } from '@/components/graph/config';
 import GraphCanvas from '@/components/graph/graph-canvas';
 import { fetchApi } from '@/lib/api';
-import type { Metadata } from 'next';
 import type { Individual, Organization } from '@/shared/types';
+import type { Metadata } from 'next';
 
 type HomePageProps = {
   params: { locale: string };
@@ -101,18 +101,18 @@ async function getInitialView(searchParams: HomePageProps['searchParams']): Prom
 export async function generateMetadata({ params, searchParams }: HomePageProps): Promise<Metadata> {
   const resolvedParams = await searchParams;
   const { locale } = params;
-  
+
   // Base URL for og:url
   const baseUrl = 'https://www.daadaar.com';
   const urlParams = new URLSearchParams();
-  
+
   if (resolvedParams) {
     Object.entries(resolvedParams).forEach(([key, value]) => {
       if (typeof value === 'string') urlParams.append(key, value);
       else if (Array.isArray(value)) value.forEach(v => urlParams.append(key, v));
     });
   }
-  
+
   const canonicalUrl = `${baseUrl}/${locale}?${urlParams.toString()}`;
 
   // Check for Individual (view=reports)
@@ -124,7 +124,8 @@ export async function generateMetadata({ params, searchParams }: HomePageProps):
       if (response.success && response.data) {
         const individual = response.data;
         const displayName = individual.fullNameEn || individual.fullName;
-        const description = individual.biographyEn || individual.biography || 'Public Servant Profile';
+        const description =
+          individual.biographyEn || individual.biography || 'Public Servant Profile';
         const seoImageUrl = `https://daadaar-media-v1-317430950654.s3.amazonaws.com/seo/individual/${individualUuid}.jpg`;
 
         return {
@@ -198,7 +199,7 @@ export async function generateMetadata({ params, searchParams }: HomePageProps):
   return {
     openGraph: {
       url: canonicalUrl,
-    }
+    },
   };
 }
 
