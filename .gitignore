@@ -69,6 +69,18 @@ update-codebuild-iam.py
 run-cleanup-codebuild.py
 monitor-deployment.sh
 .aws/
+
+# Infrastructure automation scripts with sensitive data
+infrastructure/aws/*_elasticache.py
+infrastructure/aws/*_apprunner_redis.py
+infrastructure/aws/update-codebuild-diagnostic.sh
+
+# Temporary files with potential sensitive data
+/tmp/apprunner-config.json
+*-config-dump.json
+*-credentials.json
+*-secrets.json
+
 # Also ignore backup/temp files
 *.py.patch
 *.yml.bak

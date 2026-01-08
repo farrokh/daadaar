@@ -1,0 +1,6 @@
+# Ignore any files with actual credentials or sensitive data
+*-credentials.json
+*-secrets.json
+*-config-dump.json
+*.pem
+*.key

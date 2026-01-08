@@ -1,5 +1,6 @@
 import PersonDetail from '@/components/person/person-detail';
 import { fetchApi } from '@/lib/api';
+import { getSeoImageUrl } from '@/lib/seo-utils';
 import type { Individual } from '@/shared/types';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -36,12 +37,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? `${biography.slice(0, 160)}...`
     : `View the profile of ${name} on Daadaar.`;
 
-  const images = [];
-  if (person.profileImageUrl) {
-    images.push({ url: person.profileImageUrl });
-  }
-  // Fallback image
-  images.push({ url: '/android-chrome-512x512.png', width: 512, height: 512, alt: name });
+  // Use dedicated SEO image for social media sharing
+  const seoImageUrl = getSeoImageUrl('individual', uuid);
+
+  const images = [{ url: seoImageUrl, width: 1200, height: 630, alt: name }];
 
   return {
     title: name,

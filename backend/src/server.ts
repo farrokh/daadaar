@@ -22,6 +22,7 @@ import organizationsRoutes from './routes/organizations';
 import powRoutes from './routes/pow';
 import reportsRoutes from './routes/reports';
 import rolesRoutes from './routes/roles';
+import seoImagesRoutes from './routes/seo-images';
 import shareRoutes from './routes/share';
 import votesRoutes from './routes/votes';
 
@@ -71,6 +72,7 @@ app.use('/api/reports', reportsRoutes);
 app.use('/api/votes', votesRoutes);
 app.use('/api/content-reports', contentReportsRoutes);
 app.use('/api/share', shareRoutes);
+app.use('/api/seo', seoImagesRoutes);
 app.use('/api/admin/content-reports', adminContentReportsRoutes);
 app.use('/api/admin/users', adminUsersRoutes);
 app.use('/api/admin/organizations', adminOrganizationsRoutes);

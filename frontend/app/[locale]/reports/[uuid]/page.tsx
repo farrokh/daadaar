@@ -1,6 +1,6 @@
 import ReportDetail from '@/components/reports/report-detail';
 import { fetchApi } from '@/lib/api';
-import { getS3PublicUrl } from '@/lib/utils';
+import { getSeoImageUrl } from '@/lib/seo-utils';
 import type { ReportWithDetails } from '@/shared/types';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -33,17 +33,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const content = isRtl ? report.content : report.contentEn || report.content;
   const description = content ? `${content.slice(0, 160)}...` : 'View this report on Daadaar.';
 
-  // Find first image for OG tag
-  const firstImage = report.media?.find(m => m.mediaType === 'image');
-  const imageUrl = firstImage
-    ? firstImage.url || getS3PublicUrl(firstImage.s3Key, firstImage.s3Bucket)
-    : undefined;
+  // Use dedicated SEO image for social media sharing
+  const seoImageUrl = getSeoImageUrl('report', uuid);
 
-  const images = [];
-  if (imageUrl) {
-    images.push({ url: imageUrl });
-  }
-  images.push({ url: '/android-chrome-512x512.png', width: 512, height: 512, alt: title });
+  const images = [{ url: seoImageUrl, width: 1200, height: 630, alt: title }];
 
   return {
     title: title,
