@@ -5,8 +5,8 @@ import { and, count, desc, eq, ilike, or } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
-import { notifyNewIndividual } from '../lib/slack';
 import { generateIndividualSeoImage } from '../lib/seo-image-generator';
+import { notifyNewIndividual } from '../lib/slack';
 
 interface CreateIndividualBody {
   fullName: string;
@@ -603,20 +603,20 @@ export async function updateIndividual(req: Request, res: Response) {
       );
     }
 
-    res.json({
-      success: true,
-      data: updatedIndividual,
-    });
-
+    // Regenerate SEO image
     if (updatedIndividual) {
-      // Regenerate SEO image
-      generateIndividualSeoImage(
+      await generateIndividualSeoImage(
         updatedIndividual.shareableUuid,
         updatedIndividual.fullNameEn || updatedIndividual.fullName,
         updatedIndividual.profileImageUrl,
         updatedIndividual.biographyEn || updatedIndividual.biography
       ).catch(err => console.error('SEO image generation error:', err));
     }
+
+    res.json({
+      success: true,
+      data: updatedIndividual,
+    });
   } catch (error) {
     console.error('Error updating individual:', error);
     res.status(500).json({

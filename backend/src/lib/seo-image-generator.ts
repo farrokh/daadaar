@@ -1,8 +1,8 @@
-import sharp from 'sharp';
+import fs from 'node:fs';
+import path from 'node:path';
 import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
-import { uploadS3Object, getS3ObjectBuffer } from './s3-client';
+import sharp from 'sharp';
+import { getS3ObjectBuffer, uploadS3Object } from './s3-client';
 
 /**
  * Generate SEO-optimized Open Graph images for entities
@@ -27,7 +27,7 @@ const FALLBACK_LOGO_SVG = `
 async function fetchImageBuffer(urlOrKey: string): Promise<Buffer | null> {
   try {
     let key = urlOrKey;
-    
+
     // If it's a full URL, try to extract the S3 key
     if (urlOrKey.startsWith('http')) {
       const bucket = process.env.AWS_S3_BUCKET || 'daadaar-media-v1-317430950654';
@@ -47,17 +47,17 @@ async function fetchImageBuffer(urlOrKey: string): Promise<Buffer | null> {
       if (buffer) return buffer;
       console.warn(`Failed to get buffer from S3 for key: ${key}`);
     }
-    
+
     // Fallback to axios if it's still a remote URL (and not in our S3)
     if (urlOrKey.startsWith('http')) {
-      const response = await axios.get(urlOrKey, { 
-        responseType: 'arraybuffer', 
+      const response = await axios.get(urlOrKey, {
+        responseType: 'arraybuffer',
         timeout: 8000,
-        headers: { 'User-Agent': 'Daadaar-SEO-Generator/1.0' }
+        headers: { 'User-Agent': 'Daadaar-SEO-Generator/1.0' },
       });
       return Buffer.from(response.data);
     }
-    
+
     return null;
   } catch (error) {
     console.error('Failed to fetch image buffer:', error);
@@ -123,7 +123,7 @@ async function generateMinimalSeoImage(
 
       if (options.isCircle) {
         const circleShape = Buffer.from(
-          `<svg><circle cx="${imageSize/2}" cy="${imageSize/2}" r="${imageSize/2}" /></svg>`
+          `<svg><circle cx="${imageSize / 2}" cy="${imageSize / 2}" r="${imageSize / 2}" /></svg>`
         );
         entityImageBuffer = await sharpEntity
           .composite([{ input: circleShape, blend: 'dest-in' }])
@@ -171,10 +171,8 @@ async function generateMinimalSeoImage(
 
   // Add Daadaar logo at bottom left
   try {
-    const resizedLogo = await sharp(logoBuffer)
-      .resize({ height: 80 })
-      .toBuffer();
-    
+    const resizedLogo = await sharp(logoBuffer).resize({ height: 80 }).toBuffer();
+
     composites.push({
       input: resizedLogo,
       top: OG_IMAGE_HEIGHT - 80 - margin,
@@ -205,7 +203,7 @@ export async function generateOrgSeoImage(
     entityType: 'org',
     subtext: 'Organization',
     imageUrl: logoUrl,
-    isCircle: false
+    isCircle: false,
   });
 }
 
@@ -219,7 +217,7 @@ export async function generateIndividualSeoImage(
   biography?: string | null
 ): Promise<string> {
   let subtext = 'Public Servant Profile';
-  
+
   if (biography && biography.trim().length > 0) {
     // Truncate bio to ~150 chars for display
     subtext = truncateText(biography, 150);
@@ -229,7 +227,7 @@ export async function generateIndividualSeoImage(
     entityType: 'individual',
     subtext: subtext,
     imageUrl: profileImageUrl,
-    isCircle: true
+    isCircle: true,
   });
 }
 
@@ -245,7 +243,7 @@ export async function generateReportSeoImage(
     entityType: 'report',
     subtext: 'Official Report',
     imageUrl: imageUrl,
-    isCircle: false
+    isCircle: false,
   });
 }
 
@@ -266,17 +264,18 @@ function escapeXml(text: string): string {
  */
 function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
-  
+
   // Cut to length
   let truncated = text.substring(0, maxLength);
-  
+
   // Find last space
   const lastSpace = truncated.lastIndexOf(' ');
-  if (lastSpace > maxLength * 0.7) { // Only cut at space if it's not too far back
+  if (lastSpace > maxLength * 0.7) {
+    // Only cut at space if it's not too far back
     truncated = truncated.substring(0, lastSpace);
   }
-  
-  return truncated.trim() + '...';
+
+  return `${truncated.trim()}...`;
 }
 
 /**
@@ -288,10 +287,10 @@ function renderMultiLineText(text: string, x: number, y: number, fontSize: numbe
   let currentLine = words[0];
 
   for (let i = 1; i < words.length; i++) {
-    // Rough estimation of line length (assuming ~15 chars per word avg for simple logic, 
+    // Rough estimation of line length (assuming ~15 chars per word avg for simple logic,
     // or just char count. Since we don't have font metrics, we estimate ~35 chars per line for this font size)
     if (currentLine.length + words[i].length < 45) {
-      currentLine += ' ' + words[i];
+      currentLine += ` ${words[i]}`;
     } else {
       lines.push(currentLine);
       currentLine = words[i];
@@ -301,16 +300,20 @@ function renderMultiLineText(text: string, x: number, y: number, fontSize: numbe
 
   // Take max 3 lines to avoid overflow
   const displayLines = lines.slice(0, 3);
-  
-  return displayLines.map((line, index) => `
+
+  return displayLines
+    .map(
+      (line, index) => `
     <text
       x="${x}"
-      y="${y + (index * (fontSize * 1.4))}"
+      y="${y + index * (fontSize * 1.4)}"
       text-anchor="end"
       font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', sans-serif"
       font-size="${fontSize}"
       font-weight="400"
       fill="#86868B"
     >${escapeXml(line)}</text>
-  `).join('');
+  `
+    )
+    .join('');
 }

@@ -5,8 +5,8 @@ import type { Individual, Organization } from '@/shared/types';
 import type { Metadata } from 'next';
 
 type HomePageProps = {
-  params: { locale: string };
-  searchParams?: Record<string, string | string[] | undefined>;
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 function getParamValue(value?: string | string[]): string | undefined {
@@ -46,7 +46,9 @@ async function resolveIndividualUuid(uuid: string): Promise<number | undefined> 
   }
 }
 
-async function getInitialView(searchParams: HomePageProps['searchParams']): Promise<ViewContext> {
+async function getInitialView(
+  searchParams: Awaited<HomePageProps['searchParams']>
+): Promise<ViewContext> {
   const view = getParamValue(searchParams?.view);
 
   if (view === 'people') {
@@ -100,17 +102,22 @@ async function getInitialView(searchParams: HomePageProps['searchParams']): Prom
 
 export async function generateMetadata({ params, searchParams }: HomePageProps): Promise<Metadata> {
   const resolvedParams = await searchParams;
-  const { locale } = params;
+  const { locale } = await params;
 
   // Base URL for og:url
   const baseUrl = 'https://www.daadaar.com';
   const urlParams = new URLSearchParams();
 
   if (resolvedParams) {
-    Object.entries(resolvedParams).forEach(([key, value]) => {
-      if (typeof value === 'string') urlParams.append(key, value);
-      else if (Array.isArray(value)) value.forEach(v => urlParams.append(key, v));
-    });
+    for (const [key, value] of Object.entries(resolvedParams)) {
+      if (typeof value === 'string') {
+        urlParams.append(key, value);
+      } else if (Array.isArray(value)) {
+        for (const v of value) {
+          urlParams.append(key, v);
+        }
+      }
+    }
   }
 
   const canonicalUrl = `${baseUrl}/${locale}?${urlParams.toString()}`;
@@ -203,7 +210,7 @@ export async function generateMetadata({ params, searchParams }: HomePageProps):
   };
 }
 
-export default async function HomePage({ params, searchParams }: HomePageProps) {
+export default async function HomePage({ searchParams }: HomePageProps) {
   const resolvedParams = await searchParams;
   const initialView = await getInitialView(resolvedParams);
 

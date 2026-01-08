@@ -4,8 +4,8 @@ import { db, schema } from '../db';
 import { validatePowSolution } from '../lib/pow-validator';
 import { checkReportSubmissionLimit } from '../lib/rate-limiter';
 import { generatePresignedGetUrl } from '../lib/s3-client';
-import { notifyNewReport } from '../lib/slack';
 import { generateReportSeoImage } from '../lib/seo-image-generator';
+import { notifyNewReport } from '../lib/slack';
 
 /**
  * Escape special characters in a string for use in SQL LIKE patterns.
@@ -208,27 +208,13 @@ export async function createReport(req: Request, res: Response) {
         title: completeReport.title,
         author: completeReport.user?.displayName || completeReport.user?.username || 'Anonymous',
       }).catch(err => console.error('Slack notification error:', err));
-      
-      // Generate SEO image (uuid is missing in schema, assuming id is not used for SEO image directly or mapping is needed)
-      // Actually Reports DO have shareableUuid in schema usually, but let's check. 
-      // Checking reports usage in seo-image-generator: it uses uuid.
-      // Let's check report schema in other file if needed, but usually it has uuid.
-      // Wait, report schema in createReport doesn't show uuid returned or inserted explicit.
-      // It likely has a default uuid.
-      
-      if (completeReport && completeReport.shareableUuid) {
-           generateReportSeoImage(
-            completeReport.shareableUuid,
-            completeReport.titleEn || completeReport.title,
-            // Use first image if available
-            completeReport.media && completeReport.media.length > 0 && completeReport.media[0].mediaType === 'image'
-              ? completeReport.media[0].s3Key // We need full URL or key. generateReportSeoImage handles both?
-              // seo-image-generator fetchImageBuffer handles keys or URLs.
-              // media items have s3Key. We can pass s3Key directly if generator handles it?
-              // Looking at generator: if (urlOrKey.startsWith('http')) ... else getS3ObjectBuffer(key)
-              // So passing s3Key is perfect!
-              : null
-          ).catch(err => console.error('SEO image generation error:', err));
+
+      if (completeReport?.shareableUuid) {
+        generateReportSeoImage(
+          completeReport.shareableUuid,
+          completeReport.titleEn || completeReport.title,
+          completeReport.media?.[0]?.mediaType === 'image' ? completeReport.media[0].s3Key : null
+        ).catch(err => console.error('SEO image generation error:', err));
       }
     }
 
