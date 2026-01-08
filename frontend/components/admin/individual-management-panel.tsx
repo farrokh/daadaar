@@ -130,12 +130,17 @@ export function IndividualManagementPanel() {
       }
 
       const response = await fetchApi<RoleListResponse>(`/admin/roles?${query.toString()}`);
-      if (response.success && response.data) {
-        if ('roles' in response.data) {
-          // Update roles list for the SearchableSelect
-          // Note: form.roleId is cleared when organizationId changes in a separate useEffect
-          setRoles(response.data.roles);
-        }
+      const data = response.data;
+      if (response.success && data && 'roles' in data) {
+        // Update roles list for the SearchableSelect
+        // Note: form.roleId is cleared when organizationId changes in a separate useEffect
+        setRoles(prev => {
+          const map = new Map(prev.map(role => [role.id, role]));
+          for (const role of data.roles) {
+            map.set(role.id, role);
+          }
+          return Array.from(map.values());
+        });
       }
     } catch (err) {
       console.error('Failed to fetch roles:', err);
@@ -522,7 +527,7 @@ export function IndividualManagementPanel() {
                   loading={fetchingOrgs}
                   placeholder={t('individuals_org_label')}
                   className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
-                  emptyMessage={t('individuals_empty')}
+                  emptyMessage={t('no_organizations_found')}
                 />
               </div>
               <div className="relative z-10">
@@ -536,7 +541,7 @@ export function IndividualManagementPanel() {
                   placeholder={t('individuals_role_label')}
                   disabled={!form.organizationId}
                   className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
-                  emptyMessage={t('no_roles_helper') || 'No roles found'}
+                  emptyMessage={t('no_roles_helper')}
                 />
               </div>
             </div>

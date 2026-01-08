@@ -344,6 +344,7 @@
     "roles_table_org": "Organization",
     "roles_table_created": "Created",
     "roles_empty": "No roles found for the selected organization.",
+    "no_roles_helper": "No roles exist yet - create one above!",
     "individuals_create_title": "Add Individual",
     "individuals_name_label": "Full name",
     "individuals_bio_label": "Biography (optional)",

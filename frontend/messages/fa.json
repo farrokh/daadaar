@@ -343,6 +343,7 @@
     "roles_table_org": "سازمان",
     "roles_table_created": "ایجاد",
     "roles_empty": "هیچ نقشی برای این فیلتر یافت نشد.",
+    "no_roles_helper": "هنوز نقشی وجود ندارد - از بالا ایجاد کنید!",
     "individuals_create_title": "افزودن فرد",
     "individuals_name_label": "نام کامل",
     "individuals_bio_label": "بیوگرافی (اختیاری)",
