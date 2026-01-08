@@ -83,6 +83,8 @@ export async function generateIndividualImage(req: Request, res: Response) {
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
         profileImageUrl: schema.individuals.profileImageUrl,
+        biography: schema.individuals.biography,
+        biographyEn: schema.individuals.biographyEn,
       })
       .from(schema.individuals)
       .where(eq(schema.individuals.shareableUuid, uuid));
@@ -103,7 +105,8 @@ export async function generateIndividualImage(req: Request, res: Response) {
     const imageUrl = await generateIndividualSeoImage(
       uuid,
       displayName,
-      individual.profileImageUrl
+      individual.profileImageUrl,
+      individual.biographyEn || individual.biography
     );
 
     res.json({
@@ -254,6 +257,8 @@ export async function batchGenerateImages(req: Request, res: Response) {
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
         profileImageUrl: schema.individuals.profileImageUrl,
+        biography: schema.individuals.biography,
+        biographyEn: schema.individuals.biographyEn,
       })
       .from(schema.individuals);
 
@@ -262,7 +267,8 @@ export async function batchGenerateImages(req: Request, res: Response) {
         await generateIndividualSeoImage(
           individual.shareableUuid,
           individual.fullNameEn || individual.fullName,
-          individual.profileImageUrl
+          individual.profileImageUrl,
+          individual.biographyEn || individual.biography
         );
         results.individuals.success++;
       } catch (error) {

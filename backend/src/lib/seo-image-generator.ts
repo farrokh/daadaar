@@ -152,17 +152,7 @@ async function generateMinimalSeoImage(
         fill="#0b1d44"
       >${escapeXml(truncatedName)}</text>
       
-      ${options.subtext ? `
-      <text
-        x="${OG_IMAGE_WIDTH - margin}"
-        y="${margin + nameFontSize + subtextFontSize + 10}"
-        text-anchor="end"
-        font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', sans-serif"
-        font-size="${subtextFontSize}"
-        font-weight="400"
-        fill="#86868B"
-      >${escapeXml(options.subtext)}</text>
-      ` : ''}
+      ${options.subtext ? renderMultiLineText(options.subtext, OG_IMAGE_WIDTH - margin, margin + nameFontSize + subtextFontSize + 20, subtextFontSize) : ''}
     </svg>
   `;
 
@@ -225,11 +215,19 @@ export async function generateOrgSeoImage(
 export async function generateIndividualSeoImage(
   uuid: string,
   name: string,
-  profileImageUrl?: string | null
+  profileImageUrl?: string | null,
+  biography?: string | null
 ): Promise<string> {
+  let subtext = 'Public Servant Profile';
+  
+  if (biography && biography.trim().length > 0) {
+    // Truncate bio to ~150 chars for display
+    subtext = truncateText(biography, 150);
+  }
+
   return generateMinimalSeoImage(`${SEO_FOLDER_PREFIX}/individual/${uuid}.jpg`, name, {
     entityType: 'individual',
-    subtext: 'Public Servant Profile',
+    subtext: subtext,
     imageUrl: profileImageUrl,
     isCircle: true
   });
@@ -279,4 +277,40 @@ function truncateText(text: string, maxLength: number): string {
   }
   
   return truncated.trim() + '...';
+}
+
+/**
+ * Render multi-line text for SVG
+ */
+function renderMultiLineText(text: string, x: number, y: number, fontSize: number): string {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = words[0];
+
+  for (let i = 1; i < words.length; i++) {
+    // Rough estimation of line length (assuming ~15 chars per word avg for simple logic, 
+    // or just char count. Since we don't have font metrics, we estimate ~35 chars per line for this font size)
+    if (currentLine.length + words[i].length < 45) {
+      currentLine += ' ' + words[i];
+    } else {
+      lines.push(currentLine);
+      currentLine = words[i];
+    }
+  }
+  lines.push(currentLine);
+
+  // Take max 3 lines to avoid overflow
+  const displayLines = lines.slice(0, 3);
+  
+  return displayLines.map((line, index) => `
+    <text
+      x="${x}"
+      y="${y + (index * (fontSize * 1.4))}"
+      text-anchor="end"
+      font-family="'Noto Sans Arabic', 'Noto Sans', 'DejaVu Sans', sans-serif"
+      font-size="${fontSize}"
+      font-weight="400"
+      fill="#86868B"
+    >${escapeXml(line)}</text>
+  `).join('');
 }
