@@ -2,7 +2,7 @@ import sharp from 'sharp';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
-import { uploadS3Object, getS3PublicUrl } from './s3-client';
+import { uploadS3Object, getS3ObjectBuffer } from './s3-client';
 
 /**
  * Generate SEO-optimized Open Graph images for entities
@@ -13,15 +13,20 @@ const OG_IMAGE_WIDTH = 1200;
 const OG_IMAGE_HEIGHT = 630;
 const SEO_FOLDER_PREFIX = 'seo';
 
-const LOGO_PATH = path.join(process.cwd(), '../frontend/public/logo_navbar_en.svg');
+const LOGO_PATH = path.join(__dirname, '../assets/logo.svg');
 
 /**
  * Helper to fetch an image as a buffer
  */
 async function fetchImageBuffer(urlOrKey: string): Promise<Buffer | null> {
   try {
-    const url = urlOrKey.startsWith('http') ? urlOrKey : getS3PublicUrl(urlOrKey);
-    const response = await axios.get(url, { responseType: 'arraybuffer', timeout: 5000 });
+    // If it looks like an S3 key (no http), use S3 client
+    if (!urlOrKey.startsWith('http')) {
+      return await getS3ObjectBuffer(urlOrKey);
+    }
+    
+    // Otherwise use axios for remote images
+    const response = await axios.get(urlOrKey, { responseType: 'arraybuffer', timeout: 5000 });
     return Buffer.from(response.data);
   } catch (error) {
     console.error('Failed to fetch image buffer:', error);
@@ -65,11 +70,15 @@ async function generateMinimalSeoImage(
   // 1. Prepare Logo
   let logoBuffer: Buffer;
   try {
-    logoBuffer = fs.readFileSync(LOGO_PATH);
+    if (fs.existsSync(LOGO_PATH)) {
+      logoBuffer = fs.readFileSync(LOGO_PATH);
+    } else {
+      console.warn('Logo path not found:', LOGO_PATH);
+      logoBuffer = Buffer.from('<svg width="1" height="1"></svg>');
+    }
   } catch (e) {
     console.error('Failed to read logo svg:', e);
-    // Fallback or empty buffer
-    logoBuffer = Buffer.from('<svg></svg>');
+    logoBuffer = Buffer.from('<svg width="1" height="1"></svg>');
   }
 
   // 2. Prepare Profile/Entity Image
@@ -220,9 +229,19 @@ function escapeXml(text: string): string {
 }
 
 /**
- * Helper function to truncate text
+ * Helper function to truncate text at word boundary
  */
 function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength).trim() + '...';
+  
+  // Cut to length
+  let truncated = text.substring(0, maxLength);
+  
+  // Find last space
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace > maxLength * 0.7) { // Only cut at space if it's not too far back
+    truncated = truncated.substring(0, lastSpace);
+  }
+  
+  return truncated.trim() + '...';
 }

@@ -106,6 +106,34 @@ export async function uploadS3Object(
 }
 
 /**
+ * Get an object from S3 as a buffer
+ * @param key - S3 object key
+ * @returns Object content as buffer
+ */
+export async function getS3ObjectBuffer(key: string): Promise<Buffer | null> {
+  if (!USE_S3) {
+    console.warn('AWS credentials not configured, skipping S3 download');
+    return null;
+  }
+
+  try {
+    const command = new GetObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    });
+
+    const response = await s3Client.send(command);
+    if (!response.Body) return null;
+
+    const bytes = await response.Body.transformToByteArray();
+    return Buffer.from(bytes);
+  } catch (error) {
+    console.error(`Failed to download S3 object ${key}:`, error);
+    return null;
+  }
+}
+
+/**
  * Delete a file from S3
  * @param key - S3 object key (file path)
  */
