@@ -3,12 +3,12 @@
  * Generates and caches Open Graph images for social media sharing
  */
 
-import type { Request, Response } from 'express';
 import { eq } from 'drizzle-orm';
+import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import {
-  generateOrgSeoImage,
   generateIndividualSeoImage,
+  generateOrgSeoImage,
   generateReportSeoImage,
   getSeoImageUrl,
 } from '../lib/seo-image-generator';
@@ -167,11 +167,7 @@ export async function generateReportImage(req: Request, res: Response) {
       .limit(1);
 
     // Generate and upload SEO image
-    const imageUrl = await generateReportSeoImage(
-      uuid,
-      displayTitle,
-      firstImage?.s3Key || null
-    );
+    const imageUrl = await generateReportSeoImage(uuid, displayTitle, firstImage?.s3Key || null);
 
     res.json({
       success: true,
@@ -287,11 +283,7 @@ export async function batchGenerateImages(req: Request, res: Response) {
 
     for (const report of reports) {
       try {
-        await generateReportSeoImage(
-          report.shareableUuid,
-          report.titleEn || report.title,
-          null
-        );
+        await generateReportSeoImage(report.shareableUuid, report.titleEn || report.title, null);
         results.reports.success++;
       } catch (error) {
         console.error(`Failed to generate SEO image for report ${report.shareableUuid}:`, error);

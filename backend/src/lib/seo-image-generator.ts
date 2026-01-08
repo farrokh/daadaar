@@ -1,5 +1,5 @@
-import { uploadS3Object } from './s3-client';
 import sharp from 'sharp';
+import { uploadS3Object } from './s3-client';
 
 /**
  * Generate SEO-optimized Open Graph images for entities
@@ -18,11 +18,11 @@ export function getSeoImageUrl(entityType: 'org' | 'individual' | 'report', uuid
   const bucket = process.env.AWS_S3_BUCKET || 'daadaar-media-v1-317430950654';
   const region = process.env.AWS_REGION || 'us-east-1';
   const key = `${SEO_FOLDER_PREFIX}/${entityType}/${uuid}.jpg`;
-  
+
   if (region === 'us-east-1') {
     return `https://${bucket}.s3.amazonaws.com/${key}`;
   }
-  
+
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`;
 }
 
@@ -32,11 +32,11 @@ export function getSeoImageUrl(entityType: 'org' | 'individual' | 'report', uuid
 export async function generateOrgSeoImage(
   uuid: string,
   name: string,
-  logoUrl?: string | null
+  _logoUrl?: string | null
 ): Promise<string> {
   try {
     const key = `${SEO_FOLDER_PREFIX}/org/${uuid}.jpg`;
-    
+
     // Create a simple branded OG image
     // If logoUrl exists, we could fetch and composite it
     // For now, create a text-based image
@@ -68,13 +68,11 @@ export async function generateOrgSeoImage(
         >Daadaar</text>
       </svg>
     `;
-    
-    const buffer = await sharp(Buffer.from(svg))
-      .jpeg({ quality: 85 })
-      .toBuffer();
-    
+
+    const buffer = await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toBuffer();
+
     await uploadS3Object(key, buffer, 'image/jpeg');
-    
+
     return getSeoImageUrl('org', uuid);
   } catch (error) {
     console.error('Failed to generate SEO image for organization:', error);
@@ -88,11 +86,11 @@ export async function generateOrgSeoImage(
 export async function generateIndividualSeoImage(
   uuid: string,
   name: string,
-  profileImageUrl?: string | null
+  _profileImageUrl?: string | null
 ): Promise<string> {
   try {
     const key = `${SEO_FOLDER_PREFIX}/individual/${uuid}.jpg`;
-    
+
     const svg = `
       <svg width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}">
         <defs>
@@ -121,13 +119,11 @@ export async function generateIndividualSeoImage(
         >Daadaar</text>
       </svg>
     `;
-    
-    const buffer = await sharp(Buffer.from(svg))
-      .jpeg({ quality: 85 })
-      .toBuffer();
-    
+
+    const buffer = await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toBuffer();
+
     await uploadS3Object(key, buffer, 'image/jpeg');
-    
+
     return getSeoImageUrl('individual', uuid);
   } catch (error) {
     console.error('Failed to generate SEO image for individual:', error);
@@ -141,11 +137,11 @@ export async function generateIndividualSeoImage(
 export async function generateReportSeoImage(
   uuid: string,
   title: string,
-  imageUrl?: string | null
+  _imageUrl?: string | null
 ): Promise<string> {
   try {
     const key = `${SEO_FOLDER_PREFIX}/report/${uuid}.jpg`;
-    
+
     const svg = `
       <svg width="${OG_IMAGE_WIDTH}" height="${OG_IMAGE_HEIGHT}">
         <defs>
@@ -174,13 +170,11 @@ export async function generateReportSeoImage(
         >Daadaar Report</text>
       </svg>
     `;
-    
-    const buffer = await sharp(Buffer.from(svg))
-      .jpeg({ quality: 85 })
-      .toBuffer();
-    
+
+    const buffer = await sharp(Buffer.from(svg)).jpeg({ quality: 85 }).toBuffer();
+
     await uploadS3Object(key, buffer, 'image/jpeg');
-    
+
     return getSeoImageUrl('report', uuid);
   } catch (error) {
     console.error('Failed to generate SEO image for report:', error);
@@ -205,5 +199,5 @@ function escapeXml(text: string): string {
  */
 function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
-  return text.substring(0, maxLength - 3) + '...';
+  return `${text.substring(0, maxLength - 3)}...`;
 }

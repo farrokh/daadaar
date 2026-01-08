@@ -9,10 +9,7 @@
  * @param uuid - Entity shareableUuid
  * @returns Public S3 URL for the SEO image
  */
-export function getSeoImageUrl(
-  entityType: 'org' | 'individual' | 'report',
-  uuid: string
-): string {
+export function getSeoImageUrl(entityType: 'org' | 'individual' | 'report', uuid: string): string {
   const bucket = process.env.NEXT_PUBLIC_AWS_S3_BUCKET || 'daadaar-media-v1-317430950654';
   const region = process.env.NEXT_PUBLIC_AWS_REGION || 'us-east-1';
   const key = `seo/${entityType}/${uuid}.jpg`;

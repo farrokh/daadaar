@@ -12,11 +12,7 @@ const router: Router = express.Router();
 router.get('/image-url/:entityType/:uuid', seoController.getSeoImage);
 
 // Generate SEO images (requires authentication)
-router.post(
-  '/generate-org-image/:uuid',
-  optionalAuthMiddleware,
-  seoController.generateOrgImage
-);
+router.post('/generate-org-image/:uuid', optionalAuthMiddleware, seoController.generateOrgImage);
 
 router.post(
   '/generate-individual-image/:uuid',

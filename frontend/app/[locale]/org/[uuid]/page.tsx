@@ -37,9 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Use dedicated SEO image for social media sharing
   const seoImageUrl = getSeoImageUrl('org', uuid);
 
-  const images = [
-    { url: seoImageUrl, width: 1200, height: 630, alt: name },
-  ];
+  const images = [{ url: seoImageUrl, width: 1200, height: 630, alt: name }];
 
   return {
     title: name,
