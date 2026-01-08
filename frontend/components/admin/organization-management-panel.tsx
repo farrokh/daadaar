@@ -53,7 +53,7 @@ export function OrganizationManagementPanel() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   // Function to fetch organizations for the dropdown
-  const fetchParentOrgs = useCallback(async (searchQuery: string = '') => {
+  const fetchParentOrgs = useCallback(async (searchQuery = '') => {
     setFetchingParentOrgs(true);
     try {
       const query = new URLSearchParams({
@@ -65,14 +65,17 @@ export function OrganizationManagementPanel() {
         `/admin/organizations?${query.toString()}`
       );
       if (response.success && response.data) {
-        if ('organizations' in response.data) {
+        const data = response.data;
+        if ('organizations' in data) {
           setParentOrgs(prev => {
             const map = new Map(prev.map(o => [o.id, o]));
-            response.data.organizations.forEach(o => map.set(o.id, o));
+            for (const o of data.organizations) {
+              map.set(o.id, o);
+            }
             return Array.from(map.values());
           });
-        } else if (Array.isArray(response.data)) {
-          setParentOrgs(response.data);
+        } else if (Array.isArray(data)) {
+          setParentOrgs(data);
         }
       }
     } catch (err) {
@@ -109,7 +112,7 @@ export function OrganizationManagementPanel() {
   // Initial fetch for dropdown
   useEffect(() => {
     fetchParentOrgs();
-  }, []);
+  }, [fetchParentOrgs]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -175,7 +178,7 @@ export function OrganizationManagementPanel() {
               return prev;
             });
           }
-        } catch (e) {}
+        } catch (_e) {}
       }
     }
 
@@ -295,11 +298,11 @@ export function OrganizationManagementPanel() {
               onChange={e => setForm(prev => ({ ...prev, descriptionEn: e.target.value }))}
               className="bg-background/50 border-foreground/10 focus:border-foreground/20 min-h-[100px]"
             />
-            
+
             <ImageUploader
               label={t('organizations_logo_label')}
               currentImageUrl={form.logoUrl}
-              onImageUploaded={(url) => setForm(prev => ({ ...prev, logoUrl: url }))}
+              onImageUploaded={url => setForm(prev => ({ ...prev, logoUrl: url }))}
               helperText="Upload organization logo (optional, max 5MB)"
             />
 

@@ -1,4 +1,3 @@
-
 import dotenv from 'dotenv';
 
 console.log('Loading environment variables...');

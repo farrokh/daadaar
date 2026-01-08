@@ -53,7 +53,7 @@ function BaseNodeCard({
         {onEdit && (
           <button
             type="button"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               onEdit();
             }}

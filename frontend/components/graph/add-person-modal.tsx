@@ -83,26 +83,29 @@ export function AddPersonModal({
   const [newRoleDescription, setNewRoleDescription] = useState('');
   const [newRoleDescriptionEn, setNewRoleDescriptionEn] = useState('');
 
-  const fetchRoles = useCallback(async (search: string) => {
-    setFetchingRoles(true);
-    const query = new URLSearchParams({
-      organizationId: String(organizationId),
-      page: '1',
-      limit: '20',
-      q: search,
-    });
+  const fetchRoles = useCallback(
+    async (search: string) => {
+      setFetchingRoles(true);
+      const query = new URLSearchParams({
+        organizationId: String(organizationId),
+        page: '1',
+        limit: '20',
+        q: search,
+      });
 
-    const response = await fetchApi<RoleListResponse>(`/admin/roles?${query.toString()}`);
+      const response = await fetchApi<RoleListResponse>(`/admin/roles?${query.toString()}`);
 
-    if (response.success && response.data) {
-      if ('roles' in response.data) {
-        setRoles(response.data.roles);
-      } else if (Array.isArray(response.data)) {
-        setRoles(response.data);
+      if (response.success && response.data) {
+        if ('roles' in response.data) {
+          setRoles(response.data.roles);
+        } else if (Array.isArray(response.data)) {
+          setRoles(response.data);
+        }
       }
-    }
-    setFetchingRoles(false);
-  }, [organizationId]);
+      setFetchingRoles(false);
+    },
+    [organizationId]
+  );
 
   // Fetch roles for the organization
   useEffect(() => {

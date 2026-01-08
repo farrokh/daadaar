@@ -74,54 +74,51 @@ export function IndividualManagementPanel() {
 
   const individuals = indsData?.individuals || [];
 
-  const updateOrganizationOptions = (newOrgs: Organization[]) => {
+  const updateOrganizationOptions = useCallback((newOrgs: Organization[]) => {
     setOrganizations(prev => {
       // Merge new orgs with existing ones, avoiding duplicates, to keep selected ones available
       const map = new Map(prev.map(o => [o.id, o]));
-      newOrgs.forEach(o => map.set(o.id, o));
-      return Array.from(map.values());
-    });
-  };
-
-  const updateRoleOptions = (newRoles: Role[]) => {
-    setRoles(prev => {
-      const map = new Map(prev.map(r => [r.id, r]));
-      newRoles.forEach(r => map.set(r.id, r));
-      return Array.from(map.values());
-    });
-  };
-
-  const fetchOrganizations = useCallback(async (searchQuery: string = '') => {
-    try {
-      setFetchingOrgs(true);
-      setError(null);
-      const query = new URLSearchParams({
-        page: '1',
-        limit: '20',
-        q: searchQuery,
-      });
-
-      const response = await fetchApi<OrganizationListResponse>(
-        `/admin/organizations?${query.toString()}`
-      );
-      if (response.success && response.data) {
-        if ('organizations' in response.data) {
-          updateOrganizationOptions(response.data.organizations);
-        } else if (Array.isArray(response.data)) {
-          updateOrganizationOptions(response.data);
-        }
-      } else if (response.error) {
-        console.error(response.error.message);
+      for (const o of newOrgs) {
+        map.set(o.id, o);
       }
-    } catch (err) {
-      console.error('Failed to fetch organizations:', err);
-    } finally {
-      setFetchingOrgs(false);
-    }
+      return Array.from(map.values());
+    });
   }, []);
 
+  const fetchOrganizations = useCallback(
+    async (searchQuery = '') => {
+      try {
+        setFetchingOrgs(true);
+        setError(null);
+        const query = new URLSearchParams({
+          page: '1',
+          limit: '20',
+          q: searchQuery,
+        });
+
+        const response = await fetchApi<OrganizationListResponse>(
+          `/admin/organizations?${query.toString()}`
+        );
+        if (response.success && response.data) {
+          if ('organizations' in response.data) {
+            updateOrganizationOptions(response.data.organizations);
+          } else if (Array.isArray(response.data)) {
+            updateOrganizationOptions(response.data);
+          }
+        } else if (response.error) {
+          console.error(response.error.message);
+        }
+      } catch (err) {
+        console.error('Failed to fetch organizations:', err);
+      } finally {
+        setFetchingOrgs(false);
+      }
+    },
+    [updateOrganizationOptions]
+  );
+
   const fetchRoles = useCallback(
-    async (searchQuery: string = '', orgId?: string) => {
+    async (searchQuery = '', orgId?: string) => {
       try {
         setFetchingRoles(true);
         const query = new URLSearchParams({
@@ -140,14 +137,7 @@ export function IndividualManagementPanel() {
           if ('roles' in response.data) {
             // If we are filtering by org, we should probably replace the roles list or be careful?
             // Actually replacing is better for the dropdown to show relevant results.
-            // But we want to keep the SELECTED role if it exists.
-            // Since we use `updateRoleOptions` which merges, it should be fine?
-            // Wait, if I change org, I want only roles for that org in the list.
-            // So I should probably RESET roles if org changes, but fetchRoles handles the fetching.
-            // If I merge, I might show roles from other orgs?
-
-            // Strategy: For the dropdown options, we only want the ones matching the query/filter.
-            // BUT we want to keep the currently selected one if it's not in the new list.
+            // But we want to keep the SELECTED role if it's not in the new list.
             // SearchableSelect takes `options`. I'll pass the `roles` state which I should manage carefully.
 
             // If `orgId` param changed, we likely want to clear old roles from state, EXCEPT the currently selected one?
@@ -199,7 +189,7 @@ export function IndividualManagementPanel() {
     // Initial fetch of options (first 20)
     fetchOrganizations();
     fetchRoles();
-  }, []); // Only on mount
+  }, [fetchOrganizations, fetchRoles]); // Only on mount/deps change
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -279,17 +269,20 @@ export function IndividualManagementPanel() {
     setEditingId(person.id);
 
     // Ensure the current organization and role are in the options so they display correctly
-    if (person.currentOrganizationId) {
+    if (person.currentOrganizationId && person.currentOrganization) {
       // We need to make sure we have this org in options.
       // If it's not loaded, we might need to fetch it or cheat by adding it if we have the name.
       // We have `person.currentOrganization` (name).
+      const orgId = person.currentOrganizationId;
+      const orgName = person.currentOrganization;
+
       setOrganizations(prev => {
-        if (!prev.find(o => o.id === person.currentOrganizationId)) {
+        if (!prev.find(o => o.id === orgId)) {
           return [
             ...prev,
             {
-              id: person.currentOrganizationId!,
-              name: person.currentOrganization!,
+              id: orgId,
+              name: orgName,
               nameEn: null,
               description: null,
               descriptionEn: null,

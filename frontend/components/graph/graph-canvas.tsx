@@ -61,7 +61,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const hasInitialLoadCompleted = useRef(false);
 
   const locale = useLocale();
-  
+
   // Check if user is admin
   const isAdmin = currentUser?.type === 'registered' && currentUser.role === 'admin';
 

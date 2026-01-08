@@ -2,7 +2,7 @@
 
 import { getCurrentUser, logout as logoutApi } from '@/lib/auth';
 import type { CurrentUser } from '@/shared/types';
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 interface AuthContextType {
   currentUser: CurrentUser | null;
@@ -16,7 +16,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);

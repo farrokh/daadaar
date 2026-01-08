@@ -95,7 +95,7 @@ const SearchableSelect = React.memo(
       );
 
       const handleClear = useCallback(
-        (e: React.MouseEvent) => {
+        (e: React.KeyboardEvent | React.MouseEvent) => {
           e.stopPropagation();
           onChange?.('');
         },
@@ -148,20 +148,19 @@ const SearchableSelect = React.memo(
                   !selectedOption && !value ? 'text-foreground/40' : 'text-foreground truncate'
                 }
               >
-                {selectedOption
-                  ? selectedOption.label
-                  : value || placeholder || 'Select an option'}
+                {selectedOption ? selectedOption.label : value || placeholder || 'Select an option'}
               </span>
               <div className="flex items-center gap-1">
                 {value && !disabled && (
+                  // biome-ignore lint/a11y/useSemanticElements: Intentionally using span to avoid nested buttons
                   <span
                     role="button"
                     tabIndex={0}
                     onClick={handleClear}
-                    onKeyDown={(e) => {
+                    onKeyDown={e => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        handleClear(e as any);
+                        handleClear(e);
                       }
                     }}
                     className="p-0.5 rounded-full hover:bg-foreground/10 text-foreground/40 hover:text-foreground transition-colors mr-1 cursor-pointer"
@@ -257,7 +256,10 @@ const SearchableSelect = React.memo(
             </p>
           )}
           {helperText && !error && (
-            <p id={`${selectId}-helper`} className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+            <p
+              id={`${selectId}-helper`}
+              className="mt-1.5 text-sm text-gray-500 dark:text-gray-400"
+            >
               {helperText}
             </p>
           )}
