@@ -414,9 +414,32 @@ export async function getIndividual(req: Request, res: Response) {
       individual.profileImageUrl = await generatePresignedGetUrl(individual.profileImageUrl);
     }
 
+    // Get role occupancies/history for this individual
+    const history = await db
+      .select({
+        id: schema.roleOccupancy.id,
+        roleId: schema.roleOccupancy.roleId,
+        startDate: schema.roleOccupancy.startDate,
+        endDate: schema.roleOccupancy.endDate,
+        roleTitle: schema.roles.title,
+        roleTitleEn: schema.roles.titleEn,
+        organizationId: schema.organizations.id,
+        organizationName: schema.organizations.name,
+        organizationNameEn: schema.organizations.nameEn,
+        organizationUuid: schema.organizations.shareableUuid,
+      })
+      .from(schema.roleOccupancy)
+      .innerJoin(schema.roles, eq(schema.roleOccupancy.roleId, schema.roles.id))
+      .innerJoin(schema.organizations, eq(schema.roles.organizationId, schema.organizations.id))
+      .where(eq(schema.roleOccupancy.individualId, individualId))
+      .orderBy(desc(schema.roleOccupancy.startDate));
+
     res.json({
       success: true,
-      data: individual,
+      data: {
+        ...individual,
+        history,
+      },
     });
   } catch (error) {
     console.error('Error getting individual:', error);
@@ -663,15 +686,23 @@ export async function getIndividualRoles(req: Request, res: Response) {
       });
     }
 
-    // Get role occupancies for this individual
+    // Get role occupancies for this individual with organization and role details
     const roleOccupancies = await db
       .select({
         id: schema.roleOccupancy.id,
         roleId: schema.roleOccupancy.roleId,
         startDate: schema.roleOccupancy.startDate,
         endDate: schema.roleOccupancy.endDate,
+        roleTitle: schema.roles.title,
+        roleTitleEn: schema.roles.titleEn,
+        organizationId: schema.organizations.id,
+        organizationName: schema.organizations.name,
+        organizationNameEn: schema.organizations.nameEn,
+        organizationUuid: schema.organizations.shareableUuid,
       })
       .from(schema.roleOccupancy)
+      .innerJoin(schema.roles, eq(schema.roleOccupancy.roleId, schema.roles.id))
+      .innerJoin(schema.organizations, eq(schema.roles.organizationId, schema.organizations.id))
       .where(eq(schema.roleOccupancy.individualId, individualId))
       .orderBy(desc(schema.roleOccupancy.startDate));
 

@@ -9,6 +9,7 @@ import { formatDate, getS3PublicUrl } from '@/lib/utils';
 import type { Media, ReportWithDetails } from '@/shared/types';
 import { Calendar, FileText, Link as LinkIcon, MapPin, Music, Play, Shield } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
 import React, { useEffect, useRef, useState } from 'react';
 
 interface ReportDetailProps {
@@ -149,23 +150,27 @@ export default function ReportDetail({ report }: ReportDetailProps) {
               </div>
               <div className="space-y-4">
                 {report.reportLinks.map(link => (
-                  <div key={link.id} className="flex items-center gap-3 py-1 group">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-foreground/10 text-foreground/60 transition-all group-hover:ring-foreground/20 shrink-0">
+                  <Link
+                    key={link.id}
+                    href={`/${locale}/person/${link.individual?.shareableUuid}`}
+                    className="flex items-center gap-3 py-2 px-3 -mx-3 rounded-lg group hover:bg-foreground/5 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-1 ring-foreground/10 text-foreground/60 transition-all group-hover:ring-foreground/20 group-hover:bg-background shrink-0">
                       {link.individual?.fullName?.[0] || 'P'}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground/90 leading-none">
+                      <p className="text-sm font-medium text-foreground/90 leading-none group-hover:text-primary transition-colors">
                         {isRtl
                           ? link.individual?.fullName
                           : link.individual?.fullNameEn || link.individual?.fullName}
                       </p>
                       {link.role && (
-                        <p className="text-xs text-foreground/40 mt-1">
+                        <p className="text-xs text-foreground/40 mt-1 group-hover:text-foreground/60 transition-colors">
                           {isRtl ? link.role.title : link.role.titleEn || link.role.title}
                         </p>
                       )}
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>
