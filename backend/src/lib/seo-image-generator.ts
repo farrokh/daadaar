@@ -15,19 +15,50 @@ const SEO_FOLDER_PREFIX = 'seo';
 
 const LOGO_PATH = path.join(__dirname, '../assets/logo.svg');
 
+const FALLBACK_LOGO_SVG = `
+<svg width="252" height="54" viewBox="0 0 252 54" xmlns="http://www.w3.org/2000/svg">
+  <text x="0" y="40" font-family="sans-serif" font-size="40" font-weight="bold" fill="#0b1d44">daadaar</text>
+</svg>
+`;
+
 /**
  * Helper to fetch an image as a buffer
  */
 async function fetchImageBuffer(urlOrKey: string): Promise<Buffer | null> {
   try {
-    // If it looks like an S3 key (no http), use S3 client
-    if (!urlOrKey.startsWith('http')) {
-      return await getS3ObjectBuffer(urlOrKey);
+    let key = urlOrKey;
+    
+    // If it's a full URL, try to extract the S3 key
+    if (urlOrKey.startsWith('http')) {
+      const bucket = process.env.AWS_S3_BUCKET || 'daadaar-media-v1-317430950654';
+      if (urlOrKey.includes(bucket)) {
+        // Extract key: everything between bucket.s3...com/ and the "?" or end of string
+        const match = urlOrKey.match(new RegExp(`${bucket}\\.s3\\.[^/]+/([^?#]+)`));
+        if (match) {
+          key = decodeURIComponent(match[1]);
+          console.log(`Extracted S3 key from URL: ${key}`);
+        }
+      }
+    }
+
+    // If it doesn't look like an HTTP URL now, fetch from S3
+    if (!key.startsWith('http')) {
+      const buffer = await getS3ObjectBuffer(key);
+      if (buffer) return buffer;
+      console.warn(`Failed to get buffer from S3 for key: ${key}`);
     }
     
-    // Otherwise use axios for remote images
-    const response = await axios.get(urlOrKey, { responseType: 'arraybuffer', timeout: 5000 });
-    return Buffer.from(response.data);
+    // Fallback to axios if it's still a remote URL (and not in our S3)
+    if (urlOrKey.startsWith('http')) {
+      const response = await axios.get(urlOrKey, { 
+        responseType: 'arraybuffer', 
+        timeout: 8000,
+        headers: { 'User-Agent': 'Daadaar-SEO-Generator/1.0' }
+      });
+      return Buffer.from(response.data);
+    }
+    
+    return null;
   } catch (error) {
     console.error('Failed to fetch image buffer:', error);
     return null;
@@ -74,11 +105,11 @@ async function generateMinimalSeoImage(
       logoBuffer = fs.readFileSync(LOGO_PATH);
     } else {
       console.warn('Logo path not found:', LOGO_PATH);
-      logoBuffer = Buffer.from('<svg width="1" height="1"></svg>');
+      logoBuffer = Buffer.from(FALLBACK_LOGO_SVG);
     }
   } catch (e) {
     console.error('Failed to read logo svg:', e);
-    logoBuffer = Buffer.from('<svg width="1" height="1"></svg>');
+    logoBuffer = Buffer.from(FALLBACK_LOGO_SVG);
   }
 
   // 2. Prepare Profile/Entity Image
@@ -149,15 +180,19 @@ async function generateMinimalSeoImage(
   }
 
   // Add Daadaar logo at bottom left
-  const resizedLogo = await sharp(logoBuffer)
-    .resize({ height: 80 })
-    .toBuffer();
-  
-  composites.push({
-    input: resizedLogo,
-    top: OG_IMAGE_HEIGHT - 80 - margin,
-    left: margin,
-  });
+  try {
+    const resizedLogo = await sharp(logoBuffer)
+      .resize({ height: 80 })
+      .toBuffer();
+    
+    composites.push({
+      input: resizedLogo,
+      top: OG_IMAGE_HEIGHT - 80 - margin,
+      left: margin,
+    });
+  } catch (e) {
+    console.error('Failed to composite logo:', e);
+  }
 
   if (composites.length > 0) {
     finalSharp = finalSharp.composite(composites);
