@@ -1,6 +1,14 @@
 FROM oven/bun:1 AS base
 WORKDIR /usr/src/app
 
+# Install fonts for SEO image generation (supports Persian/Arabic)
+RUN apt-get update && apt-get install -y \
+    fonts-noto-core \
+    fonts-noto-ui-core \
+    fonts-noto-arabic \
+    fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy package.json files first
 COPY backend/package.json ./backend/
 COPY shared/package.json ./shared/
