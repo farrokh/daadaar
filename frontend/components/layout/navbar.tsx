@@ -7,7 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Link, usePathname } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/utils';
-import { BookOpen, FileText, Info, LayoutGrid, LogIn, LogOut, User, UserPlus, X } from 'lucide-react';
+import {
+  BookOpen,
+  FileText,
+  Info,
+  LayoutGrid,
+  LogIn,
+  LogOut,
+  User,
+  UserPlus,
+  X,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
