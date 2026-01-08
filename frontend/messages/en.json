@@ -327,6 +327,7 @@
     "organizations_name_label": "Organization name",
     "organizations_description_label": "Description (optional)",
     "organizations_logo_label": "Logo URL (optional)",
+    "organizations_logo_helper": "Upload organization logo (optional, max 5MB)",
     "organizations_parent_label": "Parent organization (optional)",
     "organizations_submit": "Save organization",
     "organizations_table_name": "Organization",

@@ -65,15 +65,11 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
       q: search,
     });
 
-    const response = await fetchApi<OrganizationListResponse>(
-      `/admin/organizations?${query.toString()}`
-    );
+    const response = await fetchApi<OrganizationListResponse>(`/organizations?${query.toString()}`);
 
     if (response.success && response.data) {
       if ('organizations' in response.data) {
         setOrganizations(response.data.organizations);
-      } else if (Array.isArray(response.data)) {
-        setOrganizations(response.data);
       }
     }
     setFetchingOrgs(false);

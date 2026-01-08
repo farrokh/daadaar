@@ -14,8 +14,8 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import { useAuth } from '@/components/auth/auth-provider';
 import { useGraphData } from '@/hooks/use-graph-data';
+import { useAuth } from '@/lib/auth';
 import { type ViewContext, defaultEdgeOptions, edgeTypes, nodeTypes } from './config';
 import { GraphControls } from './graph-controls';
 import { GraphDock } from './graph-dock';

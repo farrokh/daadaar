@@ -74,8 +74,6 @@ export function OrganizationManagementPanel() {
             }
             return Array.from(map.values());
           });
-        } else if (Array.isArray(data)) {
-          setParentOrgs(data);
         }
       }
     } catch (err) {
@@ -178,7 +176,9 @@ export function OrganizationManagementPanel() {
               return prev;
             });
           }
-        } catch (_e) {}
+        } catch (e) {
+          console.error('Failed to fetch parent organization details:', e);
+        }
       }
     }
 
@@ -303,7 +303,7 @@ export function OrganizationManagementPanel() {
               label={t('organizations_logo_label')}
               currentImageUrl={form.logoUrl}
               onImageUploaded={url => setForm(prev => ({ ...prev, logoUrl: url }))}
-              helperText="Upload organization logo (optional, max 5MB)"
+              helperText={t('organizations_logo_helper')}
             />
 
             <div className="relative z-20">

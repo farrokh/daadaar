@@ -326,6 +326,7 @@
     "organizations_name_label": "نام سازمان",
     "organizations_description_label": "توضیحات (اختیاری)",
     "organizations_logo_label": "آدرس لوگو (اختیاری)",
+    "organizations_logo_helper": "بارگذاری لوگو (اختیاری، حداکثر ۵ مگابایت)",
     "organizations_parent_label": "سازمان مادر (اختیاری)",
     "organizations_submit": "ذخیره سازمان",
     "organizations_table_name": "سازمان",

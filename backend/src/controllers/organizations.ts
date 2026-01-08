@@ -417,34 +417,49 @@ export async function updateOrganization(req: Request, res: Response) {
         }
       }
 
-      updateData.parentId = body.parentId;
-
-      // Update hierarchy relationships
-      // First, delete existing hierarchy relationships where this org is a child
-      await db
-        .delete(schema.organizationHierarchy)
-        .where(eq(schema.organizationHierarchy.childId, organizationId));
-
-      // Then, create new hierarchy relationship if parent is specified
-      if (body.parentId !== null) {
-        const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
-        const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
-
-        await db.insert(schema.organizationHierarchy).values({
-          parentId: body.parentId,
-          childId: organizationId,
-          createdByUserId: userId,
-          sessionId,
-        });
-      }
     }
 
-    // Update the organization
-    const [updatedOrg] = await db
-      .update(schema.organizations)
-      .set(updateData)
-      .where(eq(schema.organizations.id, organizationId))
-      .returning();
+    // Transactional update
+    const [updatedOrg] = await db.transaction(async tx => {
+      if (body.parentId !== undefined) {
+        updateData.parentId = body.parentId;
+
+        if (body.parentId) {
+           // Cycle Check
+           let current = body.parentId;
+           let depth = 0;
+           while(current && depth < 20) {
+              if (current === organizationId) throw new Error("Transitive cycle detected: cannot set descendant as parent");
+              const [rel] = await tx.select({ parentId: schema.organizationHierarchy.parentId }).from(schema.organizationHierarchy).where(eq(schema.organizationHierarchy.childId, current));
+              if (!rel) break;
+              current = rel.parentId;
+              depth++;
+           }
+        }
+
+        await tx
+          .delete(schema.organizationHierarchy)
+          .where(eq(schema.organizationHierarchy.childId, organizationId));
+
+        if (body.parentId !== null) {
+          const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
+          const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
+
+          await tx.insert(schema.organizationHierarchy).values({
+            parentId: body.parentId,
+            childId: organizationId,
+            createdByUserId: userId,
+            sessionId,
+          });
+        }
+      }
+
+      return await tx
+        .update(schema.organizations)
+        .set(updateData)
+        .where(eq(schema.organizations.id, organizationId))
+        .returning();
+    });
 
     // Regenerate SEO image
     if (updatedOrg) {

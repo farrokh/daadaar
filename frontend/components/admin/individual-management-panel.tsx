@@ -135,19 +135,9 @@ export function IndividualManagementPanel() {
         const response = await fetchApi<RoleListResponse>(`/admin/roles?${query.toString()}`);
         if (response.success && response.data) {
           if ('roles' in response.data) {
-            // If we are filtering by org, we should probably replace the roles list or be careful?
-            // Actually replacing is better for the dropdown to show relevant results.
-            // But we want to keep the SELECTED role if it's not in the new list.
-            // SearchableSelect takes `options`. I'll pass the `roles` state which I should manage carefully.
-
-            // If `orgId` param changed, we likely want to clear old roles from state, EXCEPT the currently selected one?
-            // Actually, if orgId changes, the selected roleId becomes invalid anyway (mostly).
-            // So if org changes, we clear `form.roleId`.
-
-            // So: `setRoles` to the new list.
+            // Update roles list for the SearchableSelect
+            // Note: form.roleId is cleared when organizationId changes in a separate useEffect
             setRoles(response.data.roles);
-          } else if (Array.isArray(response.data)) {
-            setRoles(response.data);
           }
         }
       } catch (err) {
@@ -550,11 +540,7 @@ export function IndividualManagementPanel() {
                   onSearch={q => fetchRoles(q, form.organizationId)}
                   loading={fetchingRoles}
                   placeholder={t('individuals_role_label')}
-                  disabled={!form.organizationId} // Disable until org selected? Or allow fetch all? User said Searchable Combo Box. If I clear org, I should be able to search roles? But role depends on org usually.
-                  // Current logic: disabled={!form.organizationId || filteredRoles.length === 0}
-                  // Let's keep it disabled if no org, to enforce hierarchy? Or allow free search?
-                  // Providing `!form.organizationId` matches existing behavior.
-                  // But `filteredRoles.length === 0` is bad if we fetch async.
+                  disabled={!form.organizationId}
                   className="w-full bg-background/50 border-foreground/10 focus:border-foreground/20"
                   emptyMessage={t('no_roles_helper') || 'No roles found'}
                 />

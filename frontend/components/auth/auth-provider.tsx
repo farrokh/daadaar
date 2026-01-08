@@ -2,7 +2,7 @@
 
 import { getCurrentUser, logout as logoutApi } from '@/lib/auth';
 import type { CurrentUser } from '@/shared/types';
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { type ReactNode, createContext, useCallback, useEffect, useState } from 'react';
 
 interface AuthContextType {
   currentUser: CurrentUser | null;
@@ -57,12 +57,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 }

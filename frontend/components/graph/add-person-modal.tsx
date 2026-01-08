@@ -98,8 +98,6 @@ export function AddPersonModal({
       if (response.success && response.data) {
         if ('roles' in response.data) {
           setRoles(response.data.roles);
-        } else if (Array.isArray(response.data)) {
-          setRoles(response.data);
         }
       }
       setFetchingRoles(false);
