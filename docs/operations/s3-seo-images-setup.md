@@ -98,7 +98,7 @@ curl -I https://daadaar-media-v1-<AWS_ACCOUNT_ID>.s3.us-east-1.amazonaws.com/use
 
 ## Folder Structure
 
-```
+```tree
 daadaar-media-v1-317430950654/
 ├── seo/                          # Public folder (read-only)
 │   ├── org/

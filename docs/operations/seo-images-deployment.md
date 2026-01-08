@@ -13,7 +13,7 @@
 
 ### Step 1: Merge the Pull Request
 
-1. **Open the PR**: https://github.com/farrokh/daadaar/pull/new/feat/seo-images
+1. **Open PR #47**: https://github.com/farrokh/daadaar/pull/47
 
 2. **Create Pull Request** with this info:
    - **Title**: `feat: Add SEO images for social media sharing`
@@ -53,7 +53,9 @@
 Run the automated deployment script:
 
 ```bash
-cd /Users/farrokhrostamikia/projects/daadaar
+# Set your project root first
+# export PROJECT_ROOT=/path/to/daadaar
+cd $PROJECT_ROOT
 ./scripts/deploy-seo-images.sh
 ```
 
@@ -283,7 +285,7 @@ For **1,000 entities** with **1,000 shares/month**:
 
 ## Next Steps Checklist
 
-- [ ] Merge PR: https://github.com/farrokh/daadaar/pull/new/feat/seo-images
+- [ ] Merge [PR #47](https://github.com/farrokh/daadaar/pull/47)
 - [ ] Pull main branch locally
 - [ ] Run deployment script: `./scripts/deploy-seo-images.sh`
 - [ ] Get admin token from browser cookies

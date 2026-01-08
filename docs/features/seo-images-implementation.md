@@ -47,7 +47,8 @@ You **must** configure S3 to make the `seo/` folder publicly accessible:
 
 1. **Apply S3 Bucket Policy**:
    ```bash
-   cd /Users/farrokhrostamikia/projects/daadaar
+   cd /path/to/your/project
+   # Or use your project root directory
    
    # Create policy file
    cat > /tmp/seo-bucket-policy.json << 'EOF'
@@ -108,7 +109,7 @@ curl -X POST https://api.daadaar.com/api/seo/generate-report-image/{uuid}
 ### URL Pattern
 
 SEO images follow this predictable pattern:
-```
+```text
 https://daadaar-media-v1-317430950654.s3.us-east-1.amazonaws.com/seo/{entityType}/{uuid}.jpg
 ```
 
