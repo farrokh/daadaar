@@ -10,6 +10,9 @@ echo "========================================"
 echo ""
 
 API_URL="https://api.daadaar.com/api/seo"
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+BUCKET_NAME="daadaar-media-v1-${AWS_ACCOUNT_ID}"
+REGION=${REGION:-"us-east-1"}
 
 # Check if we have an admin token
 if [ -z "$ADMIN_TOKEN" ]; then
@@ -72,9 +75,9 @@ if [ "$HTTP_CODE" = "200" ]; then
   echo ""
   
   echo "🔍 Verify images in S3:"
-  echo "  aws s3 ls s3://daadaar-media-v1-317430950654/seo/org/"
-  echo "  aws s3 ls s3://daadaar-media-v1-317430950654/seo/individual/"
-  echo "  aws s3 ls s3://daadaar-media-v1-317430950654/seo/report/"
+  echo "  aws s3 ls s3://${BUCKET_NAME}/seo/org/"
+  echo "  aws s3 ls s3://${BUCKET_NAME}/seo/individual/"
+  echo "  aws s3 ls s3://${BUCKET_NAME}/seo/report/"
   echo ""
   
 elif [ "$HTTP_CODE" = "401" ]; then
@@ -98,7 +101,7 @@ fi
 
 echo "🧪 Test your SEO images:"
 echo "1. Get a shareable UUID from your database"
-echo "2. Construct URL: https://daadaar-media-v1-317430950654.s3.us-east-1.amazonaws.com/seo/org/{uuid}.jpg"
+echo "2. Construct URL: https://${BUCKET_NAME}.s3.${REGION}.amazonaws.com/seo/org/{uuid}.jpg"
 echo "3. Open in browser to verify"
 echo ""
 echo "📱 Test social media sharing:"

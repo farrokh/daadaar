@@ -10,10 +10,16 @@ echo "=============================================="
 echo ""
 
 # Configuration
-AWS_ACCOUNT_ID="317430950654"
-AWS_REGION="us-east-1"
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+AWS_REGION=${AWS_REGION:-"us-east-1"}
 ECR_REPO="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/daadaar-backend"
-SERVICE_ARN="arn:aws:apprunner:us-east-1:317430950654:service/daadaar-backend-service/24ad2d8ead7e47dfa18db82af1db52f8"
+SERVICE_NAME="daadaar-backend"
+SERVICE_ARN=$(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='${SERVICE_NAME}'].ServiceArn" --output text)
+
+if [ -z "$SERVICE_ARN" ]; then
+  echo "❌ Error: Could not find App Runner service with name '${SERVICE_NAME}'"
+  exit 1
+fi
 
 echo "📦 Step 1: Build Docker Image"
 echo "------------------------------"

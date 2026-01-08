@@ -18,7 +18,7 @@ Create a dedicated `seo/` folder in the S3 bucket with public read access for pe
 
 ### Step 1: Update S3 Bucket Policy
 
-Add the following policy to your S3 bucket (`daadaar-media-v1-317430950654`) to make only the `seo/` folder publicly readable:
+Add the following policy to your S3 bucket (`daadaar-media-v1-<AWS_ACCOUNT_ID>`) to make only the `seo/` folder publicly readable:
 
 ```json
 {
@@ -29,7 +29,7 @@ Add the following policy to your S3 bucket (`daadaar-media-v1-317430950654`) to 
       "Effect": "Allow",
       "Principal": "*",
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::daadaar-media-v1-317430950654/seo/*"
+      "Resource": "arn:aws:s3:::daadaar-media-v1-<AWS_ACCOUNT_ID>/seo/*"
     }
   ]
 }
@@ -56,7 +56,7 @@ EOF
 
 # Apply the policy
 aws s3api put-bucket-policy \
-  --bucket daadaar-media-v1-317430950654 \
+  --bucket daadaar-media-v1-<AWS_ACCOUNT_ID> \
   --policy file:///tmp/seo-bucket-policy.json
 ```
 
@@ -71,7 +71,7 @@ aws s3api get-public-access-block \
 
 # If needed, update to allow policy-based public access
 aws s3api put-public-access-block \
-  --bucket daadaar-media-v1-317430950654 \
+  --bucket daadaar-media-v1-<AWS_ACCOUNT_ID> \
   --public-access-block-configuration \
   "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=false,RestrictPublicBuckets=false"
 ```
@@ -86,14 +86,14 @@ aws s3api put-public-access-block \
 ```bash
 # Upload a test image
 aws s3 cp /path/to/test-image.jpg \
-  s3://daadaar-media-v1-317430950654/seo/test/test-image.jpg \
+  s3://daadaar-media-v1-<AWS_ACCOUNT_ID>/seo/test/test-image.jpg \
   --content-type image/jpeg
 
 # Test public access (should return 200)
-curl -I https://daadaar-media-v1-317430950654.s3.us-east-1.amazonaws.com/seo/test/test-image.jpg
+curl -I https://daadaar-media-v1-<AWS_ACCOUNT_ID>.s3.us-east-1.amazonaws.com/seo/test/test-image.jpg
 
 # Test private path (should return 403)
-curl -I https://daadaar-media-v1-317430950654.s3.us-east-1.amazonaws.com/users/123/private.jpg
+curl -I https://daadaar-media-v1-<AWS_ACCOUNT_ID>.s3.us-east-1.amazonaws.com/users/123/private.jpg
 ```
 
 ## Folder Structure
@@ -145,7 +145,7 @@ Set up CloudWatch alerts for unusual access patterns:
 ```bash
 # Enable S3 access logging
 aws s3api put-bucket-logging \
-  --bucket daadaar-media-v1-317430950654 \
+  --bucket daadaar-media-v1-<AWS_ACCOUNT_ID> \
   --bucket-logging-status \
   '{"LoggingEnabled": {"TargetBucket": "daadaar-logs", "TargetPrefix": "s3-access/"}}'
 ```
@@ -167,7 +167,7 @@ aws s3api delete-bucket-policy \
 
 # Re-enable full block public access
 aws s3api put-public-access-block \
-  --bucket daadaar-media-v1-317430950654 \
+  --bucket daadaar-media-v1-<AWS_ACCOUNT_ID> \
   --public-access-block-configuration \
   "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
 ```

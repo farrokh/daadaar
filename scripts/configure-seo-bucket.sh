@@ -5,8 +5,9 @@
 
 set -e
 
-BUCKET_NAME="daadaar-media-v1-317430950654"
-REGION="us-east-1"
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+BUCKET_NAME="daadaar-media-v1-${AWS_ACCOUNT_ID}"
+REGION=${REGION:-"us-east-1"}
 
 echo "🔧 Configuring S3 bucket for SEO images..."
 echo "Bucket: ${BUCKET_NAME}"
@@ -24,7 +25,7 @@ cat > /tmp/seo-bucket-policy.json << 'EOF'
       "Effect": "Allow",
       "Principal": "*",
       "Action": "s3:GetObject",
-      "Resource": "arn:aws:s3:::daadaar-media-v1-317430950654/seo/*"
+      "Resource": "arn:aws:s3:::${BUCKET_NAME}/seo/*"
     }
   ]
 }

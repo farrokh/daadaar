@@ -44,7 +44,7 @@ https://bucket.s3.amazonaws.com/seo/{entityType}/{uuid}.jpg
 ## S3 Folder Structure
 
 ```
-daadaar-media-v1-317430950654/
+daadaar-media-v1-<AWS_ACCOUNT_ID>/
 ├── seo/                          # ✅ Public (read-only)
 │   ├── org/
 │   │   ├── {uuid-1}.jpg
@@ -115,22 +115,6 @@ curl -X POST https://api.daadaar.com/api/seo/generate-report-image/{uuid}
 
 ### Step 3: Verify Setup
 
-1. **Check S3**: Verify images exist in S3:
-   ```bash
-   aws s3 ls s3://daadaar-media-v1-317430950654/seo/org/
-   aws s3 ls s3://daadaar-media-v1-317430950654/seo/individual/
-   aws s3 ls s3://daadaar-media-v1-317430950654/seo/report/
-   ```
-
-2. **Test Public Access**: 
-   ```bash
-   curl -I https://daadaar-media-v1-317430950654.s3.us-east-1.amazonaws.com/seo/org/{uuid}.jpg
-   ```
-   Should return `200 OK`
-
-3. **Test Social Media Preview**:
-   - Use [Twitter Card Validator](https://cards-dev.twitter.com/validator)
-   - Use [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)
    - Use [LinkedIn Post Inspector](https://www.linkedin.com/post-inspector/)
 
 ## API Endpoints
@@ -249,7 +233,7 @@ Estimated AWS costs for SEO images:
 
 2. **Verify bucket policy is applied**:
    ```bash
-   aws s3api get-bucket-policy --bucket daadaar-media-v1-317430950654
+   aws s3api get-bucket-policy --bucket daadaar-media-v1-<AWS_ACCOUNT_ID>
    ```
 
 3. **Clear social media cache**:
@@ -261,7 +245,7 @@ Estimated AWS costs for SEO images:
 
 1. Check Block Public Access settings:
    ```bash
-   aws s3api get-public-access-block --bucket daadaar-media-v1-317430950654
+   aws s3api get-public-access-block --bucket daadaar-media-v1-<AWS_ACCOUNT_ID>
    ```
 
 2. Ensure `BlockPublicPolicy` and `RestrictPublicBuckets` are `false`
