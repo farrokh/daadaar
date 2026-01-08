@@ -6,6 +6,7 @@ import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
 import { notifyNewOrganization } from '../lib/slack';
+import { generateOrgSeoImage } from '../lib/seo-image-generator';
 
 interface CreateOrganizationBody {
   name: string;
@@ -112,6 +113,13 @@ export async function createOrganization(req: Request, res: Response) {
         id: newOrg.id,
         name: newOrg.name,
       }).catch(err => console.error('Slack notification error:', err));
+
+      // Generate SEO image
+      generateOrgSeoImage(
+        newOrg.shareableUuid,
+        newOrg.nameEn || newOrg.name,
+        newOrg.logoUrl
+      ).catch(err => console.error('SEO image generation error:', err));
     }
 
     // Generate presigned URL for logo
@@ -396,6 +404,15 @@ export async function updateOrganization(req: Request, res: Response) {
       success: true,
       data: updatedOrg,
     });
+
+    if (updatedOrg) {
+      // Regenerate SEO image
+      generateOrgSeoImage(
+        updatedOrg.shareableUuid,
+        updatedOrg.nameEn || updatedOrg.name,
+        updatedOrg.logoUrl
+      ).catch(err => console.error('SEO image generation error:', err));
+    }
   } catch (error) {
     console.error('Error updating organization:', error);
     res.status(500).json({

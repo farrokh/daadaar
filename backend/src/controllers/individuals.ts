@@ -6,6 +6,7 @@ import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
 import { notifyNewIndividual } from '../lib/slack';
+import { generateIndividualSeoImage } from '../lib/seo-image-generator';
 
 interface CreateIndividualBody {
   fullName: string;
@@ -205,6 +206,14 @@ export async function createIndividual(req: Request, res: Response) {
         id: newIndividual.id,
         fullName: newIndividual.fullName,
       }).catch(err => console.error('Slack notification error:', err));
+
+      // Generate SEO image
+      generateIndividualSeoImage(
+        newIndividual.shareableUuid,
+        newIndividual.fullNameEn || newIndividual.fullName,
+        newIndividual.profileImageUrl,
+        newIndividual.biographyEn || newIndividual.biography
+      ).catch(err => console.error('SEO image generation error:', err));
     }
 
     // Generate presigned URL for profile image
@@ -598,6 +607,16 @@ export async function updateIndividual(req: Request, res: Response) {
       success: true,
       data: updatedIndividual,
     });
+
+    if (updatedIndividual) {
+      // Regenerate SEO image
+      generateIndividualSeoImage(
+        updatedIndividual.shareableUuid,
+        updatedIndividual.fullNameEn || updatedIndividual.fullName,
+        updatedIndividual.profileImageUrl,
+        updatedIndividual.biographyEn || updatedIndividual.biography
+      ).catch(err => console.error('SEO image generation error:', err));
+    }
   } catch (error) {
     console.error('Error updating individual:', error);
     res.status(500).json({
