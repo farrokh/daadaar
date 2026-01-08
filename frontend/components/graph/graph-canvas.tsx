@@ -336,21 +336,35 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     return true;
   });
 
-  const visibleEdges = edges.filter(edge => {
-    if (edge.data?.startDate) {
-      const startYear = new Date(edge.data.startDate).getFullYear();
-      const endYear = edge.data.endDate
-        ? new Date(edge.data.endDate).getFullYear()
-        : new Date().getFullYear();
+  const visibleEdges = edges
+    .filter(edge => {
+      // Always show edges, but we'll modify their type based on whether they're current or former
+      const sourceVisible = visibleNodes.some(n => n.id === edge.source);
+      const targetVisible = visibleNodes.some(n => n.id === edge.target);
+      return sourceVisible && targetVisible;
+    })
+    .map(edge => {
+      // Check if this is a former occupancy (ended in the past)
+      if (edge.type === 'occupies' && edge.data?.endDate) {
+        const endDate = new Date(edge.data.endDate);
+        const now = new Date();
 
-      const hasOverlap = Math.max(startYear, dateRange[0]) <= Math.min(endYear, dateRange[1]);
-      if (!hasOverlap) return false;
-    }
+        // If the role ended in the past, mark it as a former occupancy
+        if (endDate < now) {
+          return {
+            ...edge,
+            type: 'occupies_former',
+            animated: true,
+            style: {
+              strokeWidth: 0.7,
+              opacity: 0.3, // More faded
+            },
+          };
+        }
+      }
 
-    const sourceVisible = visibleNodes.some(n => n.id === edge.source);
-    const targetVisible = visibleNodes.some(n => n.id === edge.target);
-    return sourceVisible && targetVisible;
-  });
+      return edge;
+    });
 
   // Calculate context menu items based on view mode
   const contextMenuItems = [

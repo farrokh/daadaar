@@ -148,6 +148,31 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
         setNodes(positionedNodes);
         setEdges(peopleEdges);
         setOrganizationPath(response.data.organizationPath || []); // Store organization path
+
+        // Update time range limits based on role occupancy dates
+        const occupancyYears = peopleEdges
+          .filter(edge => edge.data?.startDate)
+          .flatMap(edge => {
+            const years: number[] = [];
+            if (edge.data.startDate) {
+              years.push(new Date(edge.data.startDate).getFullYear());
+            }
+            if (edge.data.endDate) {
+              years.push(new Date(edge.data.endDate).getFullYear());
+            } else {
+              // If no end date, include current year
+              years.push(new Date().getFullYear());
+            }
+            return years;
+          });
+
+        if (occupancyYears.length > 0) {
+          const min = Math.min(...occupancyYears);
+          const max = Math.max(...occupancyYears);
+          setTimeRangeLimit([min, max]);
+          setDateRange([min, max]);
+        }
+
         setViewContext({
           mode: 'people',
           organizationId: organization.id,
