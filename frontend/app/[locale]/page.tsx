@@ -1,9 +1,12 @@
 import type { ViewContext } from '@/components/graph/config';
 import GraphCanvas from '@/components/graph/graph-canvas';
 import { fetchApi } from '@/lib/api';
+import type { Individual, Organization } from '@/shared/types';
+import type { Metadata } from 'next';
 
 type HomePageProps = {
-  searchParams?: Record<string, string | string[] | undefined>;
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 function getParamValue(value?: string | string[]): string | undefined {
@@ -43,7 +46,9 @@ async function resolveIndividualUuid(uuid: string): Promise<number | undefined> 
   }
 }
 
-async function getInitialView(searchParams: HomePageProps['searchParams']): Promise<ViewContext> {
+async function getInitialView(
+  searchParams: Awaited<HomePageProps['searchParams']>
+): Promise<ViewContext> {
   const view = getParamValue(searchParams?.view);
 
   if (view === 'people') {
@@ -93,6 +98,116 @@ async function getInitialView(searchParams: HomePageProps['searchParams']): Prom
   }
 
   return { mode: 'organizations' };
+}
+
+export async function generateMetadata({ params, searchParams }: HomePageProps): Promise<Metadata> {
+  const resolvedParams = await searchParams;
+  const { locale } = await params;
+
+  // Base URL for og:url
+  const baseUrl = 'https://www.daadaar.com';
+  const urlParams = new URLSearchParams();
+
+  if (resolvedParams) {
+    for (const [key, value] of Object.entries(resolvedParams)) {
+      if (typeof value === 'string') {
+        urlParams.append(key, value);
+      } else if (Array.isArray(value)) {
+        for (const v of value) {
+          urlParams.append(key, v);
+        }
+      }
+    }
+  }
+
+  const canonicalUrl = `${baseUrl}/${locale}?${urlParams.toString()}`;
+
+  // Check for Individual (view=reports)
+  const individualUuid = getParamValue(resolvedParams?.individualUuid);
+  if (individualUuid && isUuid(individualUuid)) {
+    const individualId = await resolveIndividualUuid(individualUuid);
+    if (individualId) {
+      const response = await fetchApi<Individual>(`/individuals/${individualId}`);
+      if (response.success && response.data) {
+        const individual = response.data;
+        const displayName = individual.fullNameEn || individual.fullName;
+        const description =
+          individual.biographyEn || individual.biography || 'Public Servant Profile';
+        const seoImageUrl = `https://daadaar-media-v1-317430950654.s3.amazonaws.com/seo/individual/${individualUuid}.jpg`;
+
+        return {
+          title: `Daadaar - ${displayName}`,
+          description: description,
+          openGraph: {
+            title: `Daadaar - ${displayName}`,
+            description: description,
+            url: canonicalUrl,
+            images: [
+              {
+                url: seoImageUrl,
+                width: 1200,
+                height: 630,
+                alt: displayName,
+              },
+            ],
+            type: 'profile',
+          },
+          twitter: {
+            card: 'summary_large_image',
+            title: `Daadaar - ${displayName}`,
+            description: description,
+            images: [seoImageUrl],
+          },
+        };
+      }
+    }
+  }
+
+  // Check for Organization (view=people)
+  const organizationUuid = getParamValue(resolvedParams?.organizationUuid);
+  if (organizationUuid && isUuid(organizationUuid)) {
+    const organizationId = await resolveOrganizationUuid(organizationUuid);
+    if (organizationId) {
+      const response = await fetchApi<Organization>(`/organizations/${organizationId}`);
+      if (response.success && response.data) {
+        const org = response.data;
+        const displayName = org.nameEn || org.name;
+        const description = org.descriptionEn || org.description || 'Organization Profile';
+        const seoImageUrl = `https://daadaar-media-v1-317430950654.s3.amazonaws.com/seo/org/${organizationUuid}.jpg`;
+
+        return {
+          title: `Daadaar - ${displayName}`,
+          description: description,
+          openGraph: {
+            title: `Daadaar - ${displayName}`,
+            description: description,
+            url: canonicalUrl,
+            images: [
+              {
+                url: seoImageUrl,
+                width: 1200,
+                height: 630,
+                alt: displayName,
+              },
+            ],
+            type: 'website',
+          },
+          twitter: {
+            card: 'summary_large_image',
+            title: `Daadaar - ${displayName}`,
+            description: description,
+            images: [seoImageUrl],
+          },
+        };
+      }
+    }
+  }
+
+  return {
+    openGraph: {
+      url: canonicalUrl,
+    },
+  };
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {

@@ -5,6 +5,7 @@ import { count, eq, ilike } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
+import { generateOrgSeoImage } from '../lib/seo-image-generator';
 import { notifyNewOrganization } from '../lib/slack';
 
 interface CreateOrganizationBody {
@@ -112,6 +113,11 @@ export async function createOrganization(req: Request, res: Response) {
         id: newOrg.id,
         name: newOrg.name,
       }).catch(err => console.error('Slack notification error:', err));
+
+      // Generate SEO image
+      generateOrgSeoImage(newOrg.shareableUuid, newOrg.nameEn || newOrg.name, newOrg.logoUrl).catch(
+        err => console.error('SEO image generation error:', err)
+      );
     }
 
     // Generate presigned URL for logo
@@ -331,7 +337,7 @@ export async function updateOrganization(req: Request, res: Response) {
 
     // Check if organization exists
     const [existingOrg] = await db
-      .select({ id: schema.organizations.id })
+      .select({ id: schema.organizations.id, logoUrl: schema.organizations.logoUrl })
       .from(schema.organizations)
       .where(eq(schema.organizations.id, organizationId));
 
@@ -386,6 +392,16 @@ export async function updateOrganization(req: Request, res: Response) {
       .set(updateData)
       .where(eq(schema.organizations.id, organizationId))
       .returning();
+
+    // Regenerate SEO image
+    if (updatedOrg) {
+      await generateOrgSeoImage(
+        updatedOrg.shareableUuid,
+        updatedOrg.nameEn || updatedOrg.name,
+        // Pass the original non-presigned URL from the database/updateData
+        updateData.logoUrl !== undefined ? updateData.logoUrl : existingOrg.logoUrl
+      ).catch(err => console.error('SEO image generation error:', err));
+    }
 
     // Generate presigned URL for logo
     if (updatedOrg.logoUrl && !updatedOrg.logoUrl.startsWith('http')) {

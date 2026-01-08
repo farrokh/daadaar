@@ -5,6 +5,7 @@ import { and, count, desc, eq, ilike, or } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
+import { generateIndividualSeoImage } from '../lib/seo-image-generator';
 import { notifyNewIndividual } from '../lib/slack';
 
 interface CreateIndividualBody {
@@ -205,6 +206,14 @@ export async function createIndividual(req: Request, res: Response) {
         id: newIndividual.id,
         fullName: newIndividual.fullName,
       }).catch(err => console.error('Slack notification error:', err));
+
+      // Generate SEO image
+      generateIndividualSeoImage(
+        newIndividual.shareableUuid,
+        newIndividual.fullNameEn || newIndividual.fullName,
+        newIndividual.profileImageUrl,
+        newIndividual.biographyEn || newIndividual.biography
+      ).catch(err => console.error('SEO image generation error:', err));
     }
 
     // Generate presigned URL for profile image
@@ -592,6 +601,16 @@ export async function updateIndividual(req: Request, res: Response) {
       updatedIndividual.profileImageUrl = await generatePresignedGetUrl(
         updatedIndividual.profileImageUrl
       );
+    }
+
+    // Regenerate SEO image
+    if (updatedIndividual) {
+      await generateIndividualSeoImage(
+        updatedIndividual.shareableUuid,
+        updatedIndividual.fullNameEn || updatedIndividual.fullName,
+        updatedIndividual.profileImageUrl,
+        updatedIndividual.biographyEn || updatedIndividual.biography
+      ).catch(err => console.error('SEO image generation error:', err));
     }
 
     res.json({

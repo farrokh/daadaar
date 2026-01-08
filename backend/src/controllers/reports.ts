@@ -4,6 +4,7 @@ import { db, schema } from '../db';
 import { validatePowSolution } from '../lib/pow-validator';
 import { checkReportSubmissionLimit } from '../lib/rate-limiter';
 import { generatePresignedGetUrl } from '../lib/s3-client';
+import { generateReportSeoImage } from '../lib/seo-image-generator';
 import { notifyNewReport } from '../lib/slack';
 
 /**
@@ -207,6 +208,14 @@ export async function createReport(req: Request, res: Response) {
         title: completeReport.title,
         author: completeReport.user?.displayName || completeReport.user?.username || 'Anonymous',
       }).catch(err => console.error('Slack notification error:', err));
+
+      if (completeReport?.shareableUuid) {
+        generateReportSeoImage(
+          completeReport.shareableUuid,
+          completeReport.titleEn || completeReport.title,
+          completeReport.media?.[0]?.mediaType === 'image' ? completeReport.media[0].s3Key : null
+        ).catch(err => console.error('SEO image generation error:', err));
+      }
     }
 
     return res.status(201).json({

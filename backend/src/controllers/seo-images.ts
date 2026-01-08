@@ -83,6 +83,8 @@ export async function generateIndividualImage(req: Request, res: Response) {
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
         profileImageUrl: schema.individuals.profileImageUrl,
+        biography: schema.individuals.biography,
+        biographyEn: schema.individuals.biographyEn,
       })
       .from(schema.individuals)
       .where(eq(schema.individuals.shareableUuid, uuid));
@@ -103,7 +105,8 @@ export async function generateIndividualImage(req: Request, res: Response) {
     const imageUrl = await generateIndividualSeoImage(
       uuid,
       displayName,
-      individual.profileImageUrl
+      individual.profileImageUrl,
+      individual.biographyEn || individual.biography
     );
 
     res.json({
@@ -233,12 +236,13 @@ export async function batchGenerateImages(req: Request, res: Response) {
         shareableUuid: schema.organizations.shareableUuid,
         name: schema.organizations.name,
         nameEn: schema.organizations.nameEn,
+        logoUrl: schema.organizations.logoUrl,
       })
       .from(schema.organizations);
 
     for (const org of orgs) {
       try {
-        await generateOrgSeoImage(org.shareableUuid, org.nameEn || org.name, null);
+        await generateOrgSeoImage(org.shareableUuid, org.nameEn || org.name, org.logoUrl);
         results.organizations.success++;
       } catch (error) {
         console.error(`Failed to generate SEO image for org ${org.shareableUuid}:`, error);
@@ -252,6 +256,9 @@ export async function batchGenerateImages(req: Request, res: Response) {
         shareableUuid: schema.individuals.shareableUuid,
         fullName: schema.individuals.fullName,
         fullNameEn: schema.individuals.fullNameEn,
+        profileImageUrl: schema.individuals.profileImageUrl,
+        biography: schema.individuals.biography,
+        biographyEn: schema.individuals.biographyEn,
       })
       .from(schema.individuals);
 
@@ -260,7 +267,8 @@ export async function batchGenerateImages(req: Request, res: Response) {
         await generateIndividualSeoImage(
           individual.shareableUuid,
           individual.fullNameEn || individual.fullName,
-          null
+          individual.profileImageUrl,
+          individual.biographyEn || individual.biography
         );
         results.individuals.success++;
       } catch (error) {
@@ -275,6 +283,7 @@ export async function batchGenerateImages(req: Request, res: Response) {
     // Generate for all reports
     const reports = await db
       .select({
+        id: schema.reports.id,
         shareableUuid: schema.reports.shareableUuid,
         title: schema.reports.title,
         titleEn: schema.reports.titleEn,
@@ -283,7 +292,20 @@ export async function batchGenerateImages(req: Request, res: Response) {
 
     for (const report of reports) {
       try {
-        await generateReportSeoImage(report.shareableUuid, report.titleEn || report.title, null);
+        // Find first image from report media
+        const [firstImage] = await db
+          .select({
+            s3Key: schema.media.s3Key,
+          })
+          .from(schema.media)
+          .where(eq(schema.media.reportId, report.id))
+          .limit(1);
+
+        await generateReportSeoImage(
+          report.shareableUuid,
+          report.titleEn || report.title,
+          firstImage?.s3Key || null
+        );
         results.reports.success++;
       } catch (error) {
         console.error(`Failed to generate SEO image for report ${report.shareableUuid}:`, error);

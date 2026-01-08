@@ -43,6 +43,11 @@
     "home": "Home",
     "view_profile": "View Profile"
   },
+  "mobile": {
+    "not_ready_title": "Desktop Experience Recommended",
+    "not_ready_message": "Daadaar is currently optimized for desktop computers. For the best experience, please switch to a larger screen.",
+    "coming_soon": "Mobile version is currently under development."
+  },
   "navigation": {
     "home": "Home",
     "reports": "Reports",
