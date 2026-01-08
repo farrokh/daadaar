@@ -356,7 +356,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
             type: 'occupies_former',
             animated: true,
             style: {
-              strokeWidth: .7,
+              strokeWidth: 0.7,
               opacity: 0.3, // More faded
             },
           };
