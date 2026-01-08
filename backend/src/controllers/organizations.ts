@@ -416,7 +416,6 @@ export async function updateOrganization(req: Request, res: Response) {
           });
         }
       }
-
     }
 
     // Transactional update
@@ -425,16 +424,20 @@ export async function updateOrganization(req: Request, res: Response) {
         updateData.parentId = body.parentId;
 
         if (body.parentId) {
-           // Cycle Check
-           let current = body.parentId;
-           let depth = 0;
-           while(current && depth < 20) {
-              if (current === organizationId) throw new Error("Transitive cycle detected: cannot set descendant as parent");
-              const [rel] = await tx.select({ parentId: schema.organizationHierarchy.parentId }).from(schema.organizationHierarchy).where(eq(schema.organizationHierarchy.childId, current));
-              if (!rel) break;
-              current = rel.parentId;
-              depth++;
-           }
+          // Cycle Check
+          let current = body.parentId;
+          let depth = 0;
+          while (current && depth < 20) {
+            if (current === organizationId)
+              throw new Error('Transitive cycle detected: cannot set descendant as parent');
+            const [rel] = await tx
+              .select({ parentId: schema.organizationHierarchy.parentId })
+              .from(schema.organizationHierarchy)
+              .where(eq(schema.organizationHierarchy.childId, current));
+            if (!rel) break;
+            current = rel.parentId;
+            depth++;
+          }
         }
 
         await tx
@@ -443,7 +446,8 @@ export async function updateOrganization(req: Request, res: Response) {
 
         if (body.parentId !== null) {
           const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
-          const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
+          const sessionId =
+            req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
 
           await tx.insert(schema.organizationHierarchy).values({
             parentId: body.parentId,
