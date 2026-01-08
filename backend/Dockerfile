@@ -3,10 +3,9 @@ WORKDIR /usr/src/app
 
 # Install fonts for SEO image generation (supports Persian/Arabic)
 RUN apt-get update && apt-get install -y \
-    fonts-noto-core \
-    fonts-noto-ui-core \
-    fonts-noto-arabic \
+    fonts-noto \
     fontconfig \
+    libfontconfig1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package.json files first
