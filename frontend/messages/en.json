@@ -53,7 +53,10 @@
     "signup": "Sign Up",
     "admin": "Admin",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "tutorial": "Tutorial",
+    "tutorial_hint": "New here? Tap this tutorial to see a quick Instagram walkthrough of how to use the system.",
+    "close": "Close"
   },
   "landing": {
     "hero_title": "Exposing Injustice, Anonymously",
