@@ -1,6 +1,8 @@
 import type { ViewContext } from '@/components/graph/config';
 import GraphCanvas from '@/components/graph/graph-canvas';
 import { fetchApi } from '@/lib/api';
+import type { Metadata } from 'next';
+import type { Individual } from '@/shared/types';
 
 type HomePageProps = {
   searchParams?: Record<string, string | string[] | undefined>;
@@ -93,6 +95,51 @@ async function getInitialView(searchParams: HomePageProps['searchParams']): Prom
   }
 
   return { mode: 'organizations' };
+}
+
+export async function generateMetadata({ searchParams }: HomePageProps): Promise<Metadata> {
+  const resolvedParams = await searchParams;
+  const individualUuid = getParamValue(resolvedParams?.individualUuid);
+
+  if (individualUuid && isUuid(individualUuid)) {
+    const individualId = await resolveIndividualUuid(individualUuid);
+    if (individualId) {
+      const response = await fetchApi<Individual>(`/individuals/${individualId}`);
+      if (response.success && response.data) {
+        const individual = response.data;
+        const displayName = individual.fullNameEn || individual.fullName;
+        const description = individual.biographyEn || individual.biography || 'Public Servant Profile';
+        // Note: Using the SEO image URL format
+        const seoImageUrl = `https://daadaar-media-v1-317430950654.s3.amazonaws.com/seo/individual/${individualUuid}.jpg`;
+
+        return {
+          title: `Daadaar - ${displayName}`,
+          description: description,
+          openGraph: {
+            title: `Daadaar - ${displayName}`,
+            description: description,
+            images: [
+              {
+                url: seoImageUrl,
+                width: 1200,
+                height: 630,
+                alt: displayName,
+              },
+            ],
+            type: 'profile',
+          },
+          twitter: {
+            card: 'summary_large_image',
+            title: `Daadaar - ${displayName}`,
+            description: description,
+            images: [seoImageUrl],
+          },
+        };
+      }
+    }
+  }
+
+  return {};
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
