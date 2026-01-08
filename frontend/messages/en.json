@@ -138,7 +138,8 @@
     "added_on": "Added on",
     "org_id": "ORG ID",
     "members": "Members",
-    "no_members": "No members found."
+    "no_members": "No members found.",
+    "no_organizations_found": "No organizations found"
   },
   "person": {
     "add_title": "Add New Person",
@@ -326,6 +327,7 @@
     "organizations_name_label": "Organization name",
     "organizations_description_label": "Description (optional)",
     "organizations_logo_label": "Logo URL (optional)",
+    "organizations_logo_helper": "Upload organization logo (optional, max 5MB)",
     "organizations_parent_label": "Parent organization (optional)",
     "organizations_submit": "Save organization",
     "organizations_table_name": "Organization",
@@ -342,6 +344,7 @@
     "roles_table_org": "Organization",
     "roles_table_created": "Created",
     "roles_empty": "No roles found for the selected organization.",
+    "no_roles_helper": "No roles exist yet - create one above!",
     "individuals_create_title": "Add Individual",
     "individuals_name_label": "Full name",
     "individuals_bio_label": "Biography (optional)",
@@ -358,6 +361,7 @@
     "individuals_empty": "No individuals recorded yet.",
     "refresh": "Refresh",
     "no_reports_found": "No content reports found matching the criteria.",
+    "no_organizations_found": "No organizations found",
     "pagination_page": "Page {current} of {total}"
   },
   "auth": {

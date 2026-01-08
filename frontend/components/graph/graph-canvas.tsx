@@ -15,6 +15,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 
 import { useGraphData } from '@/hooks/use-graph-data';
+import { useAuth } from '@/lib/auth';
 import { type ViewContext, defaultEdgeOptions, edgeTypes, nodeTypes } from './config';
 import { GraphControls } from './graph-controls';
 import { GraphDock } from './graph-dock';
@@ -48,6 +49,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { currentUser } = useAuth();
   const [isAddOrgModalOpen, setIsAddOrgModalOpen] = useState(false);
   const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState(false);
   const [isSubmitReportModalOpen, setIsSubmitReportModalOpen] = useState(false);
@@ -59,6 +61,9 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const hasInitialLoadCompleted = useRef(false);
 
   const locale = useLocale();
+
+  // Check if user is admin
+  const isAdmin = currentUser?.type === 'registered' && currentUser.role === 'admin';
 
   // Memoize config objects to satisfy React Flow warning (references must be stable)
   const memoizedNodeTypes = useMemo(() => nodeTypes, []);
@@ -325,16 +330,34 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     );
   }
 
-  // Filter nodes and edges based on date range
-  const visibleNodes = nodes.filter(node => {
-    if (node.type === 'report') {
-      const data = node.data as ReportNodeData;
-      if (!data.incidentDate) return true;
-      const year = new Date(data.incidentDate).getFullYear();
-      return year >= dateRange[0] && year <= dateRange[1];
-    }
-    return true;
-  });
+  // Filter nodes and edges based on date range and inject admin edit callbacks
+  const visibleNodes = nodes
+    .filter(node => {
+      if (node.type === 'report') {
+        const data = node.data as ReportNodeData;
+        if (!data.incidentDate) return true;
+        const year = new Date(data.incidentDate).getFullYear();
+        return year >= dateRange[0] && year <= dateRange[1];
+      }
+      return true;
+    })
+    .map(node => {
+      // Inject onEdit callback for admin users
+      if (isAdmin && (node.type === 'organization' || node.type === 'individual')) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            onEdit: () => {
+              // Navigate to admin panel with appropriate tab
+              const tab = node.type === 'organization' ? 'organizations' : 'individuals';
+              router.push(`/admin?tab=${tab}`);
+            },
+          },
+        };
+      }
+      return node;
+    });
 
   const visibleEdges = edges
     .filter(edge => {
@@ -415,6 +438,8 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         edgeTypes={memoizedEdgeTypes}
         defaultEdgeOptions={memoizedEdgeOptions}
         fitView
+        minZoom={0.1}
+        maxZoom={4}
         attributionPosition="bottom-left"
         className="bg-background"
       >

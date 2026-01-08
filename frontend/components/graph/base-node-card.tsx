@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
 
-import { ExternalLink } from 'lucide-react';
+import { Edit2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 export interface BaseNodeCardProps {
@@ -17,6 +17,7 @@ export interface BaseNodeCardProps {
   fallbackIcon: React.ReactNode;
   iconBgClassName: string;
   glowGradientClassName: string;
+  onEdit?: () => void;
 }
 
 function BaseNodeCard({
@@ -29,6 +30,7 @@ function BaseNodeCard({
   fallbackIcon,
   iconBgClassName,
   glowGradientClassName,
+  onEdit,
 }: BaseNodeCardProps) {
   return (
     <div
@@ -47,6 +49,22 @@ function BaseNodeCard({
 
       {/* Card Content */}
       <div className="relative px-5 py-4 bg-background/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-xl transition-transform">
+        {/* Edit Button - Only shown if onEdit is provided */}
+        {onEdit && (
+          <button
+            type="button"
+            onClick={e => {
+              e.stopPropagation();
+              onEdit();
+            }}
+            className="absolute top-2 right-2 p-1.5 rounded-md bg-background/80 border border-foreground/10 opacity-0 group-hover:opacity-100 hover:bg-foreground/5 hover:border-foreground/20 transition-all duration-200 z-10"
+            aria-label="Edit"
+            title="Edit"
+          >
+            <Edit2 className="w-3.5 h-3.5 text-foreground/60" />
+          </button>
+        )}
+
         {/* Source handle (right side - for outgoing edges) */}
         <Handle type="source" position={Position.Right} className="!w-3 !h-3 !opacity-0" />
 

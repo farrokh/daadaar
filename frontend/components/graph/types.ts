@@ -11,6 +11,7 @@ export interface OrganizationNodeData {
   url?: string | null; // Fully-qualified URL (pre-resolved)
   s3Key?: string | null; // Raw S3 key
   isDetailView?: boolean;
+  onEdit?: () => void;
 }
 
 export interface PersonNodeData {
@@ -24,6 +25,7 @@ export interface PersonNodeData {
   url?: string | null; // Fully-qualified URL (pre-resolved)
   s3Key?: string | null; // Raw S3 key
   isDetailView?: boolean;
+  onEdit?: () => void;
 }
 
 export interface ReportNodeData {

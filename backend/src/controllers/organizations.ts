@@ -8,6 +8,13 @@ import { generatePresignedGetUrl } from '../lib/s3-client';
 import { generateOrgSeoImage } from '../lib/seo-image-generator';
 import { notifyNewOrganization } from '../lib/slack';
 
+class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
+
 interface CreateOrganizationBody {
   name: string;
   nameEn?: string | null;
@@ -386,12 +393,86 @@ export async function updateOrganization(req: Request, res: Response) {
       updateData.logoUrl = body.logoUrl || null;
     }
 
-    // Update the organization
-    const [updatedOrg] = await db
-      .update(schema.organizations)
-      .set(updateData)
-      .where(eq(schema.organizations.id, organizationId))
-      .returning();
+    // Handle parentId update
+    if (body.parentId !== undefined) {
+      // Validate parent organization if provided
+      if (body.parentId !== null) {
+        // Prevent self-reference
+        if (body.parentId === organizationId) {
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Organization cannot be its own parent',
+            },
+          });
+        }
+
+        const [parentOrg] = await db
+          .select({ id: schema.organizations.id })
+          .from(schema.organizations)
+          .where(eq(schema.organizations.id, body.parentId));
+
+        if (!parentOrg) {
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Parent organization not found',
+            },
+          });
+        }
+      }
+    }
+
+    // Transactional update
+    const [updatedOrg] = await db.transaction(async tx => {
+      if (body.parentId !== undefined) {
+        updateData.parentId = body.parentId;
+
+        if (body.parentId) {
+          // Cycle Check
+          let current = body.parentId;
+          let depth = 0;
+          while (current && depth < 20) {
+            if (current === organizationId)
+              throw new ValidationError(
+                'Transitive cycle detected: cannot set descendant as parent'
+              );
+            const [rel] = await tx
+              .select({ parentId: schema.organizationHierarchy.parentId })
+              .from(schema.organizationHierarchy)
+              .where(eq(schema.organizationHierarchy.childId, current));
+            if (!rel) break;
+            current = rel.parentId;
+            depth++;
+          }
+        }
+
+        await tx
+          .delete(schema.organizationHierarchy)
+          .where(eq(schema.organizationHierarchy.childId, organizationId));
+
+        if (body.parentId !== null) {
+          const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
+          const sessionId =
+            req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
+
+          await tx.insert(schema.organizationHierarchy).values({
+            parentId: body.parentId,
+            childId: organizationId,
+            createdByUserId: userId,
+            sessionId,
+          });
+        }
+      }
+
+      return await tx
+        .update(schema.organizations)
+        .set(updateData)
+        .where(eq(schema.organizations.id, organizationId))
+        .returning();
+    });
 
     // Regenerate SEO image
     if (updatedOrg) {
@@ -413,6 +494,15 @@ export async function updateOrganization(req: Request, res: Response) {
       data: updatedOrg,
     });
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: error.message,
+        },
+      });
+    }
     console.error('Error updating organization:', error);
     res.status(500).json({
       success: false,

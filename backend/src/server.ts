@@ -1,6 +1,6 @@
+import './load-env'; // Must be first to ensure env vars are loaded before other imports
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import express, { type Express } from 'express';
 import passport from 'passport';
 import { checkDatabaseConnection, closeDatabaseConnection } from './db';
@@ -25,10 +25,6 @@ import rolesRoutes from './routes/roles';
 import seoImagesRoutes from './routes/seo-images';
 import shareRoutes from './routes/share';
 import votesRoutes from './routes/votes';
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config();
-}
 
 const app: Express = express();
 const PORT = process.env.PORT || 4000;

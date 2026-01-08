@@ -136,7 +136,8 @@
     "added_on": "اضافه شده در",
     "org_id": "شناسه سازمان",
     "members": "اعضا",
-    "no_members": "عضوی یافت نشد."
+    "no_members": "عضوی یافت نشد.",
+    "no_organizations_found": "سازمانی یافت نشد"
   },
   "person": {
     "add_title": "افزودن فرد جدید",
@@ -325,6 +326,7 @@
     "organizations_name_label": "نام سازمان",
     "organizations_description_label": "توضیحات (اختیاری)",
     "organizations_logo_label": "آدرس لوگو (اختیاری)",
+    "organizations_logo_helper": "بارگذاری لوگو (اختیاری، حداکثر ۵ مگابایت)",
     "organizations_parent_label": "سازمان مادر (اختیاری)",
     "organizations_submit": "ذخیره سازمان",
     "organizations_table_name": "سازمان",
@@ -341,6 +343,7 @@
     "roles_table_org": "سازمان",
     "roles_table_created": "ایجاد",
     "roles_empty": "هیچ نقشی برای این فیلتر یافت نشد.",
+    "no_roles_helper": "هنوز نقشی وجود ندارد - از بالا ایجاد کنید!",
     "individuals_create_title": "افزودن فرد",
     "individuals_name_label": "نام کامل",
     "individuals_bio_label": "بیوگرافی (اختیاری)",
@@ -357,6 +360,7 @@
     "individuals_empty": "هیچ فردی ثبت نشده است.",
     "refresh": "به‌روزرسانی",
     "no_reports_found": "گزارشی مطابق با معیارهای جستجو یافت نشد.",
+    "no_organizations_found": "سازمانی یافت نشد",
     "pagination_page": "صفحه {current} از {total}"
   },
   "auth": {
