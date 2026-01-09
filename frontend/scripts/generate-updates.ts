@@ -1,8 +1,8 @@
 
-import { exec } from "child_process";
-import fs from "fs";
-import path from "path";
-import { promisify } from "util";
+import { exec } from "node:child_process";
+import fs from "node:fs";
+import path from "node:path";
+import { promisify } from "node:util";
 import OpenAI from "openai";
 
 const execAsync = promisify(exec);
@@ -23,17 +23,23 @@ async function generateUpdates() {
     // Get git log
     // Format: hash | date | subject | author
     // Limit to last 500 commits
-    const { stdout } = await execAsync('git log --pretty=format:"%H|%ad|%s|%an" --date=short -n 500');
+    // Use line separator for commits, and null bytes for fields to handle pipe characters in messages
+    const { stdout } = await execAsync('git log --pretty=format:"%H%x00%ad%x00%s%x00%an" --date=short -n 500');
 
-    const updates = stdout.split("\n").filter(line => line.trim()).map(line => {
-      const parts = line.split("|");
-      return {
-        hash: parts[0],
-        date: parts[1],
-        message: parts.slice(2, parts.length - 1).join("|"), 
-        author: parts[parts.length - 1]
-      };
-    });
+    const updates = stdout
+      .split("\n")
+      .filter(line => line.trim())
+      .map(line => {
+        const parts = line.split("\0");
+        const [hash, date, message, author] = parts;
+        return {
+          hash,
+          date,
+          // Fallback if split fails, though highly unlikely with \0
+          message: message || "No message", 
+          author: author || "Unknown"
+        };
+      });
 
     // Group by date
     const grouped: Record<string, any[]> = {};
@@ -67,7 +73,7 @@ async function generateUpdates() {
     }
 
     // Process for public/technical
-    let processed = Object.keys(grouped)
+    const processed = Object.keys(grouped)
       .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
       .map(date => {
         const commits = grouped[date];
@@ -206,7 +212,7 @@ async function generateUpdates() {
     console.log(`Total days processed: ${processed.length}`);
 
   } catch (error) {
-    console.warn("Warning: Could not generate updates from git log.", error);
+    console.warn("Warning: Could not generate updates from git log. Using empty updates list.", error);
     
     // Check if we have an existing file we can preserve
     if (fs.existsSync(outputPath)) {

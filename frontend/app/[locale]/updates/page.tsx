@@ -55,7 +55,16 @@ export default async function UpdatesPage({ params }: { params: Promise<{ locale
             name: 'Daadaar Team',
           },
           articleBody:
-            u.public.map(c => c.message).join('. ') || 'Technical maintenance and improvements.',
+            u.public
+              .map(c =>
+                typeof c.message === 'string'
+                  ? c.message
+                  : c.message[locale as 'en' | 'fa'] ||
+                    (c.message as any).en ||
+                    Object.values(c.message)[0] ||
+                    ''
+              )
+              .join('. ') || 'Technical maintenance and improvements.',
         },
       })),
     },

@@ -11,16 +11,16 @@ We implemented a comprehensive system for the "Project Updates" page (`/updates`
 ### 1. Automated Data Pipeline
 *   **Script**: Created `scripts/generate-updates.ts`.
 *   **Logic**:
-    *   Extracts git history.
-    *   Filters "Public" updates based on conventional commit prefixes (`feat`, `fix`).
-    *   **AI Integration**: Added OpenAI (`gpt-4o-mini`) integration to translate public messages.
-    *   **Smart Caching**: Implemented a JSON-based local cache to store translations, ensuring we only pay/wait for *new* commits.
+  *   Extracts git history.
+  *   Filters "Public" updates based on conventional commit prefixes (`feat`, `fix`).
+  *   **AI Integration**: Added OpenAI (`gpt-4o-mini`) integration to translate public messages.
+  *   **Smart Caching**: Implemented a JSON-based local cache to store translations, ensuring we only pay/wait for *new* commits.
 
 ### 2. Frontend Improvements
 *   **Updates Page**: Refined `UpdatesFeed` component.
-    *   **Minimap**: Redesigned for better usability (larger hit targets, horizontal dash expansion on hover).
-    *   **Smooth Animations**: Removed jarring scale effects on exit, improved hover transitions.
-    *   **Localization Support**: Updated component to accept and render dual-language message objects (`{ en, fa }`).
+  *   **Minimap**: Redesigned for better usability (larger hit targets, horizontal dash expansion on hover).
+  *   **Smooth Animations**: Removed jarring scale effects on exit, improved hover transitions.
+  *   **Localization Support**: Updated component to accept and render dual-language message objects (`{ en, fa }`).
 *   **Performance**: Optimized animations with `framer-motion`.
 
 ### 3. Workflow & Documentation
