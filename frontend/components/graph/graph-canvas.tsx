@@ -114,9 +114,10 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     });
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reset expanded state when switching modes
   useEffect(() => {
     setPeopleExpandedOrgIds(new Set());
-  }, []);
+  }, [viewContext.mode]);
 
   // Handle node click
   const onNodeClick = useCallback(
