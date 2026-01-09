@@ -18,7 +18,8 @@ The Organization Detail Page provides a dedicated, shareable, and verifying pres
 ### 2. Context & Hierarchy
 - **Localization**: Fully locale-aware navigation (preserving language preference across links).
 - **Description**: Full localized description of the organization.
-- **Parent Organization**: Links to the parent entity if applicable (currently displays ID, future update will link via UUID).
+- **Parent Organization**: Clickable link to the parent organization's detail page (localized name).
+- **Sub-Organizations**: Section displaying a grid of child organizations with logos and descriptions.
 
 ### 3. Related Relations
 - **Member List**: Displays a list of individuals who are members of the organization, with their roles and profile images. Links directly to their Person Detail pages.
