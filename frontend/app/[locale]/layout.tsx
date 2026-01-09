@@ -10,6 +10,11 @@ import { notFound } from 'next/navigation';
 import { routing } from '../../i18n/routing';
 import '../globals.css';
 
+// Initialize PostHog analytics (client-side only)
+if (typeof window !== 'undefined') {
+  import('../../instrumentation');
+}
+
 export function generateStaticParams() {
   return routing.locales.map(locale => ({ locale }));
 }

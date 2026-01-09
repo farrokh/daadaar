@@ -225,17 +225,19 @@ export function AddPersonModal({
     setLoading(false);
 
     if (response.success && response.data) {
-      // Track person creation
-      posthog.capture('person_created', {
-        personId: response.data.id,
-        fullName: response.data.fullName,
-        fullNameEn: response.data.fullNameEn,
-        organizationId,
-        organizationName,
-        hasRole: !!finalRoleId,
-        createdNewRole: isCreatingNewRole,
-        hasProfileImage: !!profileImageUrl,
-      });
+      // Track person creation - only non-PII metadata
+      if (posthog && typeof posthog.capture === 'function') {
+        posthog.capture('person_created', {
+          // Only non-PII identifiers and flags
+          personId: response.data.id,
+          organizationId,
+          organizationName, // Organization name is not considered PII
+          hasRole: !!finalRoleId,
+          createdNewRole: isCreatingNewRole,
+          hasProfileImage: !!profileImageUrl,
+          // Removed: fullName, fullNameEn (PII)
+        });
+      }
       resetForm();
       onSuccess();
       onClose();

@@ -166,16 +166,22 @@ export function GraphSearchPanel() {
         failureCount += 1;
       }
 
-      // Track search performed
+      // Track search performed - anonymized to protect user privacy
       if (aggregated.length > 0) {
-        posthog.capture('search_performed', {
-          query: term,
-          resultsCount: aggregated.length,
-          reportResults: aggregated.filter(r => r.type === 'report').length,
-          individualResults: aggregated.filter(r => r.type === 'individual').length,
-          organizationResults: aggregated.filter(r => r.type === 'organization').length,
-          hadPartialFailure: failureCount > 0 && failureCount < 3,
-        });
+        try {
+          posthog.capture('search_performed', {
+            // Anonymized: send query length instead of actual query text
+            queryLength: term.length,
+            resultsCount: aggregated.length,
+            reportResults: aggregated.filter(r => r.type === 'report').length,
+            individualResults: aggregated.filter(r => r.type === 'individual').length,
+            organizationResults: aggregated.filter(r => r.type === 'organization').length,
+            hadPartialFailure: failureCount > 0 && failureCount < 3,
+          });
+        } catch (error) {
+          // Silently fail - analytics should never break search
+          console.warn('PostHog capture failed:', error);
+        }
       }
 
       return {
@@ -242,15 +248,22 @@ export function GraphSearchPanel() {
 
   const handleSelect = useCallback(
     (url: string, result?: SearchResult) => {
-      // Track search result selection
+      // Track search result selection - wrapped to prevent navigation failure
       if (result) {
-        posthog.capture('search_result_selected', {
-          query,
-          resultType: result.type,
-          resultTitle: result.title,
-          resultUrl: result.url,
-        });
+        try {
+          posthog.capture('search_result_selected', {
+            queryLength: query.length, // Anonymized query
+            resultType: result.type,
+            resultUrl: result.url,
+            // Removed: resultTitle (PII - contains names)
+          });
+        } catch (error) {
+          // Silently fail - analytics should never break navigation
+          console.warn('PostHog capture failed:', error);
+        }
       }
+
+      // Navigation always succeeds regardless of analytics
       router.push(url);
       setQuery('');
       setResults([]);
