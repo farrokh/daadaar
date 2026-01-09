@@ -479,6 +479,9 @@ export async function updateIndividual(req: Request, res: Response) {
 
     const body = req.body as Partial<CreateIndividualBody>;
 
+    const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
+    const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
+
     // Check if individual exists
     const [existingIndividual] = await db
       .select({ id: schema.individuals.id })
@@ -534,21 +537,32 @@ export async function updateIndividual(req: Request, res: Response) {
       updateData.dateOfBirth = body.dateOfBirth ? new Date(body.dateOfBirth) : null;
     }
 
-    if (body.organizationId) {
-      const [organization] = await db
-        .select({ id: schema.organizations.id })
-        .from(schema.organizations)
-        .where(eq(schema.organizations.id, body.organizationId))
-        .limit(1);
+    const shouldUpdateRoleOccupancy =
+      body.roleId !== undefined ||
+      body.organizationId !== undefined ||
+      body.startDate !== undefined ||
+      body.endDate !== undefined;
 
-      if (!organization) {
-        return res.status(400).json({
-          success: false,
-          error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Organization not found',
-          },
-        });
+    if (shouldUpdateRoleOccupancy) {
+      let organization: { id: number } | null = null;
+      if (body.organizationId) {
+        const [org] = await db
+          .select({ id: schema.organizations.id })
+          .from(schema.organizations)
+          .where(eq(schema.organizations.id, body.organizationId))
+          .limit(1);
+
+        if (!org) {
+          return res.status(400).json({
+            success: false,
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'Organization not found',
+            },
+          });
+        }
+
+        organization = org;
       }
 
       // Find the latest role occupancy for this individual
@@ -563,8 +577,18 @@ export async function updateIndividual(req: Request, res: Response) {
         // Update existing latest role occupancy
         const roleUpdateData: Partial<typeof schema.roleOccupancy.$inferInsert> = {};
 
-        if (body.roleId !== undefined) {
-          roleUpdateData.roleId = body.roleId || undefined;
+        let resolvedRoleId: number | null | undefined = body.roleId;
+
+        if (resolvedRoleId === null && organization) {
+          resolvedRoleId = await getOrCreateDefaultRoleId({
+            organizationId: organization.id,
+            userId,
+            sessionId,
+          });
+        }
+
+        if (resolvedRoleId !== undefined && resolvedRoleId !== null) {
+          roleUpdateData.roleId = resolvedRoleId;
         }
 
         if (body.startDate) {
@@ -594,16 +618,12 @@ export async function updateIndividual(req: Request, res: Response) {
             );
           }
         }
-      } else {
-        // Create new role occupancy if none exists
-        const userId = req.currentUser?.type === 'registered' ? req.currentUser.id : null;
-        const sessionId = req.currentUser?.type === 'anonymous' ? req.currentUser.sessionId : null;
-
+      } else if (organization || body.roleId) {
         let roleIdToUse = body.roleId;
 
-        if (!roleIdToUse) {
+        if (!roleIdToUse && organization) {
           roleIdToUse = await getOrCreateDefaultRoleId({
-            organizationId: body.organizationId,
+            organizationId: organization.id,
             userId,
             sessionId,
           });
