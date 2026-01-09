@@ -20,6 +20,8 @@ interface AddOrganizationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  defaultParentId?: number;
+  defaultParentName?: string;
 }
 
 interface CreateOrganizationResponse {
@@ -41,7 +43,13 @@ interface OrganizationListResponse {
   };
 }
 
-export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganizationModalProps) {
+export function AddOrganizationModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  defaultParentId,
+  defaultParentName,
+}: AddOrganizationModalProps) {
   const [name, setName] = useState('');
   const [nameEn, setNameEn] = useState('');
   const [description, setDescription] = useState('');
@@ -57,30 +65,63 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
   const t = useTranslations('organization');
   const tCommon = useTranslations('common');
 
-  const fetchOrganizations = useCallback(async (search: string) => {
-    setFetchingOrgs(true);
-    const query = new URLSearchParams({
-      page: '1',
-      limit: '20',
-      q: search,
-    });
+  const fetchOrganizations = useCallback(
+    async (search: string) => {
+      setFetchingOrgs(true);
+      const query = new URLSearchParams({
+        page: '1',
+        limit: '20',
+        q: search,
+      });
 
-    const response = await fetchApi<OrganizationListResponse>(`/organizations?${query.toString()}`);
+      const response = await fetchApi<OrganizationListResponse>(
+        `/organizations?${query.toString()}`
+      );
 
-    if (response.success && response.data) {
-      if ('organizations' in response.data) {
-        setOrganizations(response.data.organizations);
+      if (response.success && response.data) {
+        const data = response.data;
+        if ('organizations' in data) {
+          setOrganizations(_prev => {
+            // If we have a default parent, ensure we keep it in the list if it's not returned by the API
+            // This prevents the label from disappearing when searching
+            if (defaultParentId && defaultParentName) {
+              const hasDefault = data.organizations.some(o => o.id === defaultParentId);
+              if (!hasDefault) {
+                return [
+                  { id: defaultParentId, name: defaultParentName, nameEn: null },
+                  ...data.organizations,
+                ];
+              }
+            }
+            return data.organizations;
+          });
+        }
       }
-    }
-    setFetchingOrgs(false);
-  }, []);
+      setFetchingOrgs(false);
+    },
+    [defaultParentId, defaultParentName]
+  );
 
-  // Fetch organizations for parent dropdown
+  // Handle default parent initialization
   useEffect(() => {
     if (isOpen) {
+      if (defaultParentId) {
+        setParentId(defaultParentId.toString());
+        // We only add it to the list here if we haven't fetched yet,
+        // but fetchOrganizations will be called right after anyway.
+        // Let's just make sure it's in the initial state so it renders correctly immediately.
+        if (defaultParentName) {
+          setOrganizations(prev => {
+            if (!prev.some(o => o.id === defaultParentId)) {
+              return [{ id: defaultParentId, name: defaultParentName, nameEn: null }, ...prev];
+            }
+            return prev;
+          });
+        }
+      }
       fetchOrganizations('');
     }
-  }, [isOpen, fetchOrganizations]);
+  }, [isOpen, fetchOrganizations, defaultParentId, defaultParentName]);
 
   const resetForm = () => {
     setName('');

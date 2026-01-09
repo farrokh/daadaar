@@ -1,4 +1,4 @@
-import { type DefaultEdgeOptions, type EdgeTypes, type NodeTypes, SmoothStepEdge } from 'reactflow';
+import type { DefaultEdgeOptions, NodeTypes } from 'reactflow';
 import OrganizationNode from './organization-node';
 import PersonNode from './person-node';
 import ReportNode from './report-node';
@@ -10,20 +10,21 @@ export const nodeTypes: NodeTypes = {
   report: ReportNode,
 };
 
-// Define edge types to handle backend types and silence warnings
-export const edgeTypes: EdgeTypes = {
-  hierarchy: SmoothStepEdge,
-  occupies: SmoothStepEdge,
-  occupies_former: SmoothStepEdge, // For former members (ended role)
-  linked_to: SmoothStepEdge,
-};
+// Edge types use default bezier edges for better routing
+export const edgeTypes = {};
 
 // Default edge options with modern styling
 export const defaultEdgeOptions: DefaultEdgeOptions = {
-  type: 'smoothstep',
-  animated: true,
-  style: { strokeWidth: 1.5, stroke: '#94a3b8' },
+  type: 'default', // Bezier edges route better around nodes
+  animated: false, // Disable animation to reduce visual noise
+  style: {
+    strokeWidth: 1.2,
+    stroke: '#94a3b8',
+    opacity: 0.4, // More subtle edges
+  },
   markerEnd: 'edge-circle',
+  // Add z-index to ensure edges stay behind nodes
+  zIndex: -1,
 };
 
 export type ViewMode = 'organizations' | 'people' | 'reports';

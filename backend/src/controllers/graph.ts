@@ -1,10 +1,8 @@
-// Graph visualization controller
-// Handles fetching graph data for organizations, people, and reports
-
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { getIndividualOrganizationPath, getOrganizationPath } from '../lib/organization-hierarchy';
+import { getBatchRecursiveMemberCounts } from '../lib/organization-member-counts';
 import { generatePresignedGetUrl } from '../lib/s3-client';
 
 /**
@@ -35,6 +33,21 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
       })
       .from(schema.organizationHierarchy);
 
+    // Fetch recursive member counts for all organizations (with Redis caching)
+    const organizationIds = organizations.map(org => org.id);
+    const memberCountMap = await getBatchRecursiveMemberCounts(organizationIds);
+
+    // Fetch child counts for each organization
+    const childCounts = await db
+      .select({
+        parentId: schema.organizationHierarchy.parentId,
+        count: sql<number>`count(${schema.organizationHierarchy.childId})`,
+      })
+      .from(schema.organizationHierarchy)
+      .groupBy(schema.organizationHierarchy.parentId);
+
+    const childCountMap = new Map(childCounts.map(c => [c.parentId, Number(c.count)]));
+
     // Generate presigned URLs for logos
     const nodes = await Promise.all(
       organizations.map(async org => ({
@@ -55,6 +68,8 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
               ? org.logoUrl
               : await generatePresignedGetUrl(org.logoUrl)
             : null,
+          memberCount: memberCountMap.get(org.id) || 0, // Recursive count including sub-orgs
+          childCount: childCountMap.get(org.id) || 0,
         },
         position: { x: 0, y: 0 }, // Will be calculated on frontend
       }))
@@ -64,6 +79,8 @@ export async function getOrganizationsGraph(_req: Request, res: Response) {
       id: `edge-${hierarchy.parentId}-${hierarchy.childId}`,
       source: `org-${hierarchy.parentId}`,
       target: `org-${hierarchy.childId}`,
+      sourceHandle: 'right', // From right side of parent
+      targetHandle: 'left', // To left side of child
       type: 'hierarchy' as const,
     }));
 
@@ -142,16 +159,17 @@ export async function getOrganizationPeople(req: Request, res: Response) {
 
     // Generate presigned URL for organization logo
     const logoUrl = organization.logoUrl;
-    const orgWithPresignedLogo = {
-      ...organization,
-      logoUrl: logoUrl,
-      s3Key: logoUrl,
-      url: logoUrl
-        ? logoUrl.startsWith('http')
-          ? logoUrl
-          : await generatePresignedGetUrl(logoUrl)
-        : null,
-    };
+
+    // Count members directly in this organization (excluding sub-orgs)
+    const [memberCountResult] = await db
+      .select({
+        count: sql<number>`count(distinct ${schema.roleOccupancy.individualId})`,
+      })
+      .from(schema.roles)
+      .leftJoin(schema.roleOccupancy, eq(schema.roles.id, schema.roleOccupancy.roleId))
+      .where(eq(schema.roles.organizationId, organizationId));
+
+    const memberCount = Number(memberCountResult?.count || 0);
 
     // Get the organization path for breadcrumb
     // We fetch this early so it's available even if there are no people
@@ -162,59 +180,174 @@ export async function getOrganizationPeople(req: Request, res: Response) {
       console.error('Error getting organization path:', pathError);
     }
 
-    if (roleIds.length === 0) {
-      return res.json({
-        success: true,
-        data: {
-          organization: orgWithPresignedLogo,
-          organizationPath,
-          nodes: [],
-          edges: [],
-        },
-      });
-    }
-
-    // Fetch all individuals who have/had these roles
-    const roleOccupancies = await db
+    // Fetch child organizations (sub-organizations)
+    const childOrganizations = await db
       .select({
-        individualId: schema.roleOccupancy.individualId,
-        roleId: schema.roleOccupancy.roleId,
-        startDate: schema.roleOccupancy.startDate,
-        endDate: schema.roleOccupancy.endDate,
+        id: schema.organizations.id,
+        shareableUuid: schema.organizations.shareableUuid,
+        name: schema.organizations.name,
+        nameEn: schema.organizations.nameEn,
+        description: schema.organizations.description,
+        descriptionEn: schema.organizations.descriptionEn,
+        logoUrl: schema.organizations.logoUrl,
       })
-      .from(schema.roleOccupancy)
-      .where(inArray(schema.roleOccupancy.roleId, roleIds));
+      .from(schema.organizations)
+      .innerJoin(
+        schema.organizationHierarchy,
+        eq(schema.organizations.id, schema.organizationHierarchy.childId)
+      )
+      .where(eq(schema.organizationHierarchy.parentId, organizationId));
+
+    // Get member counts for child organizations
+    const childOrgIds = childOrganizations.map(org => org.id);
+
+    // Fetch grandchildren (sub-organizations of child organizations)
+    const grandChildOrganizations =
+      childOrgIds.length > 0
+        ? await db
+            .select({
+              parentId: schema.organizationHierarchy.parentId,
+              id: schema.organizations.id,
+              shareableUuid: schema.organizations.shareableUuid,
+              name: schema.organizations.name,
+              nameEn: schema.organizations.nameEn,
+              description: schema.organizations.description,
+              descriptionEn: schema.organizations.descriptionEn,
+              logoUrl: schema.organizations.logoUrl,
+            })
+            .from(schema.organizations)
+            .innerJoin(
+              schema.organizationHierarchy,
+              eq(schema.organizations.id, schema.organizationHierarchy.childId)
+            )
+            .where(inArray(schema.organizationHierarchy.parentId, childOrgIds))
+        : [];
+
+    const grandChildOrgIds = grandChildOrganizations.map(org => org.id);
+    const descendantOrgIds = [...childOrgIds, ...grandChildOrgIds];
+    const recursiveMemberCounts =
+      descendantOrgIds.length > 0
+        ? await getBatchRecursiveMemberCounts(descendantOrgIds)
+        : new Map<number, number>();
+
+    const orgWithPresignedLogo = {
+      ...organization,
+      logoUrl: logoUrl,
+      s3Key: logoUrl,
+      url: logoUrl
+        ? logoUrl.startsWith('http')
+          ? logoUrl
+          : await generatePresignedGetUrl(logoUrl)
+        : null,
+      memberCount,
+    };
+
+    // Get child counts for child organizations
+    const descendantChildCounts =
+      descendantOrgIds.length > 0
+        ? await db
+            .select({
+              parentId: schema.organizationHierarchy.parentId,
+              count: sql<number>`count(${schema.organizationHierarchy.childId})`,
+            })
+            .from(schema.organizationHierarchy)
+            .where(inArray(schema.organizationHierarchy.parentId, descendantOrgIds))
+            .groupBy(schema.organizationHierarchy.parentId)
+        : [];
+
+    const childCountMap = new Map(descendantChildCounts.map(c => [c.parentId, Number(c.count)]));
+
+    // Build organization nodes for children
+    const childOrgNodes = await Promise.all(
+      childOrganizations.map(async org => ({
+        id: `org-${org.id}`,
+        type: 'organization' as const,
+        label: org.name,
+        data: {
+          id: org.id,
+          shareableUuid: org.shareableUuid,
+          name: org.name,
+          nameEn: org.nameEn,
+          description: org.description,
+          descriptionEn: org.descriptionEn,
+          logoUrl: org.logoUrl,
+          s3Key: org.logoUrl,
+          url: org.logoUrl
+            ? org.logoUrl.startsWith('http')
+              ? org.logoUrl
+              : await generatePresignedGetUrl(org.logoUrl)
+            : null,
+          memberCount: recursiveMemberCounts.get(org.id) || 0,
+          childCount: childCountMap.get(org.id) || 0,
+          parentOrgId: organizationId,
+        },
+        position: { x: 0, y: 0 }, // Will be calculated on frontend
+      }))
+    );
+
+    // Fetch all individuals who have/had roles in this organization
+    const roleOccupancies =
+      roleIds.length > 0
+        ? await db
+            .select({
+              individualId: schema.roleOccupancy.individualId,
+              roleId: schema.roleOccupancy.roleId,
+              startDate: schema.roleOccupancy.startDate,
+              endDate: schema.roleOccupancy.endDate,
+            })
+            .from(schema.roleOccupancy)
+            .where(inArray(schema.roleOccupancy.roleId, roleIds))
+        : [];
 
     const individualIds = [...new Set(roleOccupancies.map(ro => ro.individualId))];
 
-    if (individualIds.length === 0) {
-      return res.json({
-        success: true,
+    // Fetch individual details when there are matching occupancies
+    const individuals =
+      individualIds.length > 0
+        ? await db
+            .select({
+              id: schema.individuals.id,
+              shareableUuid: schema.individuals.shareableUuid,
+              fullName: schema.individuals.fullName,
+              fullNameEn: schema.individuals.fullNameEn,
+              biography: schema.individuals.biography,
+              biographyEn: schema.individuals.biographyEn,
+              profileImageUrl: schema.individuals.profileImageUrl,
+            })
+            .from(schema.individuals)
+            .where(inArray(schema.individuals.id, individualIds))
+        : [];
+
+    // Build grandchild organization nodes (sub-organizations of child orgs)
+    const grandChildOrgNodes = await Promise.all(
+      grandChildOrganizations.map(async org => ({
+        id: `org-${org.id}`,
+        type: 'organization' as const,
+        label: org.name,
         data: {
-          organization: orgWithPresignedLogo,
-          organizationPath,
-          nodes: [],
-          edges: [],
+          id: org.id,
+          shareableUuid: org.shareableUuid,
+          name: org.name,
+          nameEn: org.nameEn,
+          description: org.description,
+          descriptionEn: org.descriptionEn,
+          logoUrl: org.logoUrl,
+          s3Key: org.logoUrl,
+          url: org.logoUrl
+            ? org.logoUrl.startsWith('http')
+              ? org.logoUrl
+              : await generatePresignedGetUrl(org.logoUrl)
+            : null,
+          memberCount: recursiveMemberCounts.get(org.id) || 0,
+          childCount: childCountMap.get(org.id) || 0,
+          parentOrgId: org.parentId,
         },
-      });
-    }
+        position: { x: 0, y: 0 }, // Will be calculated on frontend
+      }))
+    );
 
-    // Fetch individual details
-    const individuals = await db
-      .select({
-        id: schema.individuals.id,
-        shareableUuid: schema.individuals.shareableUuid,
-        fullName: schema.individuals.fullName,
-        fullNameEn: schema.individuals.fullNameEn,
-        biography: schema.individuals.biography,
-        biographyEn: schema.individuals.biographyEn,
-        profileImageUrl: schema.individuals.profileImageUrl,
-      })
-      .from(schema.individuals)
-      .where(inArray(schema.individuals.id, individualIds));
-
-    // Build nodes and edges
-    const nodes = await Promise.all(
+    // Build individual nodes
+    const individualNodes = await Promise.all(
       individuals.map(async individual => ({
         id: `individual-${individual.id}`,
         type: 'individual' as const,
@@ -238,11 +371,17 @@ export async function getOrganizationPeople(req: Request, res: Response) {
       }))
     );
 
+    // Combine all nodes (child orgs, grandchild orgs, individuals)
+    const nodes = [...childOrgNodes, ...grandChildOrgNodes, ...individualNodes];
+
     // Create edges from organization to people (via roles)
-    const edges = roleOccupancies.map(occupancy => ({
+    // Connect from RIGHT side of org to LEFT side of individual
+    const peopleEdges = roleOccupancies.map(occupancy => ({
       id: `edge-org-${organizationId}-individual-${occupancy.individualId}`,
       source: `org-${organizationId}`,
       target: `individual-${occupancy.individualId}`,
+      sourceHandle: 'right', // From right side of organization
+      targetHandle: 'left', // To left side of individual
       type: 'occupies' as const,
       data: {
         roleId: occupancy.roleId,
@@ -250,6 +389,32 @@ export async function getOrganizationPeople(req: Request, res: Response) {
         endDate: occupancy.endDate,
       },
     }));
+
+    // Create edges from organization to child organizations
+    // Connect from LEFT side of org to RIGHT side of child org
+    const childHierarchyEdges = childOrganizations.map(childOrg => ({
+      id: `edge-org-${organizationId}-org-${childOrg.id}`,
+      source: `org-${organizationId}`,
+      target: `org-${childOrg.id}`,
+      sourceHandle: 'left', // From left side of parent organization
+      targetHandle: 'right', // To right side of child organization
+      type: 'hierarchy' as const,
+    }));
+
+    // Create edges from child organizations to their sub-organizations
+    const grandChildHierarchyEdges = grandChildOrganizations.map(childOrg => ({
+      id: `edge-org-${childOrg.parentId}-org-${childOrg.id}`,
+      source: `org-${childOrg.parentId}`,
+      target: `org-${childOrg.id}`,
+      sourceHandle: 'left',
+      targetHandle: 'right',
+      type: 'hierarchy' as const,
+    }));
+
+    const hierarchyEdges = [...childHierarchyEdges, ...grandChildHierarchyEdges];
+
+    // Combine all edges
+    const edges = [...hierarchyEdges, ...peopleEdges];
 
     res.json({
       success: true,

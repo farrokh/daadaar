@@ -1,6 +1,7 @@
 import { fetchApi } from '@/lib/api';
 import { calculateGridLayout } from '@/lib/graph-layout';
-import { useCallback, useState } from 'react';
+import { calculateOrganizationPeopleLayout } from '@/lib/organization-people-layout';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Edge, Node } from 'reactflow';
 import type { ViewContext, ViewMode } from '../components/graph/config';
 import type { ReportNodeData } from '../components/graph/types';
@@ -27,6 +28,7 @@ interface OrganizationPeopleResponse {
     logoUrl?: string | null;
     url?: string | null;
     s3Key?: string | null;
+    memberCount?: number;
   };
   organizationPath: OrganizationPathItem[];
   nodes: Node[];
@@ -73,6 +75,74 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
     new Date().getFullYear(),
   ]);
 
+  const [expandedOrgIds, setExpandedOrgIds] = useState<Set<number>>(new Set());
+
+  // Store full graph data
+  const allNodesRef = useRef<Node[]>([]);
+  const allEdgesRef = useRef<Edge[]>([]);
+
+  // Toggle child organization expansion
+  const toggleChildOrgExpansion = useCallback((orgId: number) => {
+    setExpandedOrgIds(prev => {
+      const next = new Set(prev);
+      if (next.has(orgId)) {
+        next.delete(orgId);
+      } else {
+        next.add(orgId);
+      }
+      return next;
+    });
+  }, []);
+
+  // Compute visible graph based on expansion state
+  useEffect(() => {
+    if (viewContext.mode !== 'organizations' || allNodesRef.current.length === 0) return;
+
+    const visibleNodeIds = new Set<string>();
+    const visibleEdgeIds = new Set<string>();
+    const queue = allNodesRef.current
+      .filter(n => !allEdgesRef.current.some(e => e.target === n.id)) // Roots
+      .map(n => n.id);
+
+    // Always show roots
+    for (const id of queue) {
+      visibleNodeIds.add(id);
+    }
+
+    // Simple BFS traversal respecting expansion state
+    while (queue.length > 0) {
+      const parentNodeId = queue.shift();
+      if (!parentNodeId) continue;
+
+      // Extract numeric ID
+      const parentIdNum = Number.parseInt(parentNodeId.replace('org-', ''), 10);
+
+      // If this node is expanded, show its children
+      if (expandedOrgIds.has(parentIdNum)) {
+        const children = allEdgesRef.current.filter(
+          e => e.source === parentNodeId && e.type === 'hierarchy'
+        );
+
+        for (const edge of children) {
+          visibleEdgeIds.add(edge.id);
+          if (!visibleNodeIds.has(edge.target)) {
+            visibleNodeIds.add(edge.target);
+            queue.push(edge.target);
+          }
+        }
+      }
+    }
+
+    const filteredNodes = allNodesRef.current.filter(n => visibleNodeIds.has(n.id));
+    const filteredEdges = allEdgesRef.current.filter(e => visibleEdgeIds.has(e.id));
+
+    // Recalculate layout for visible subset
+    const positionedNodes = calculateGridLayout(filteredNodes, filteredEdges);
+
+    setNodes(positionedNodes);
+    setEdges(filteredEdges);
+  }, [expandedOrgIds, viewContext.mode]);
+
   // Fetch organizations graph
   const fetchOrganizations = useCallback(async () => {
     setLoading(true);
@@ -81,12 +151,22 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
     const response = await fetchApi<OrganizationsResponse>('/graph/organizations');
 
     if (response.success && response.data) {
-      const positionedNodes = calculateGridLayout(response.data.nodes, response.data.edges);
-      setNodes(positionedNodes);
-      setEdges(response.data.edges);
+      const { nodes: rawNodes, edges: rawEdges } = response.data;
+
+      allNodesRef.current = rawNodes;
+      allEdgesRef.current = rawEdges;
+
+      // Identify nodes to expand initially (Roots and Level 1)
+      // This will make Roots, Level 1, and Level 2 visible
+
+      const rootNodeIds = rawNodes
+        .filter(n => !rawEdges.some(e => e.target === n.id && e.type === 'hierarchy'))
+        .map(n => (n.data as { id: number }).id);
+
+      setExpandedOrgIds(new Set(rootNodeIds));
 
       // Update time range limits based on reports if any
-      const reportYears = response.data.nodes
+      const reportYears = rawNodes
         .filter(n => n.type === 'report')
         .map(n => (n.data as ReportNodeData).incidentDate)
         .filter((d): d is string => !!d)
@@ -136,12 +216,13 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
             url: organization.url,
             s3Key: organization.s3Key,
             isDetailView: true,
+            memberCount: organization.memberCount,
           },
           position: { x: 0, y: 0 },
         };
 
         const allNodes = [orgNode, ...peopleNodes];
-        const positionedNodes = calculateGridLayout(allNodes, peopleEdges);
+        const positionedNodes = calculateOrganizationPeopleLayout(allNodes, peopleEdges);
         const displayName =
           locale === 'en' ? organization.nameEn || organization.name : organization.name;
 
@@ -271,5 +352,7 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
     fetchOrganizations,
     fetchOrganizationPeople,
     fetchIndividualReports,
+    toggleChildOrgExpansion,
+    expandedOrgIds,
   };
 };

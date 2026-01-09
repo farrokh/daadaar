@@ -19,13 +19,20 @@ Follow these steps to create a Pull Request (PR) that adheres to the project's s
     *   Check off the relevant boxes (e.g., `[x]`) for "Type of Change" and "Area of Change".
     *   Ensure the "Checklist" is reviewed. If you have verified linting/tests in previous steps, mark those as checked.
 
-4.  **Push Changes**:
+4.  **Validate Code**:
+    *   Before pushing, ensure the code adheres to project standards by running linting and type checking:
+      ```bash
+      bun run lint && bun run type-check
+      ```
+    *   If any errors occur, fix them before proceeding.
+
+5.  **Push Changes**:
     *   Ensure the current branch is pushed to the remote:
       ```bash
       git push origin <current-branch-name>
       ```
 
-5.  **Create PR**:
+6.  **Create PR**:
     *   Use the GitHub CLI to create the PR with the generated title and body.
     *   Generate a semantic title (e.g., `feat: ...`, `fix: ...`).
       ```bash
@@ -33,5 +40,5 @@ Follow these steps to create a Pull Request (PR) that adheres to the project's s
       ```
     *   If the command fails because the branch isn't pushed, push it and retry.
 
-6.  **Verify**:
+7.  **Verify**:
     *   Output the URL of the created PR.

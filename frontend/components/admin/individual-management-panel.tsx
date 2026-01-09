@@ -74,16 +74,24 @@ export function IndividualManagementPanel() {
 
   const individuals = indsData?.individuals || [];
 
-  const updateOrganizationOptions = useCallback((newOrgs: Organization[]) => {
-    setOrganizations(prev => {
-      // Merge new orgs with existing ones, avoiding duplicates, to keep selected ones available
-      const map = new Map(prev.map(o => [o.id, o]));
-      for (const o of newOrgs) {
-        map.set(o.id, o);
-      }
-      return Array.from(map.values());
-    });
-  }, []);
+  const updateOrganizationOptions = useCallback(
+    (newOrgs: Organization[], includeIds: number[] = []) => {
+      setOrganizations(prev => {
+        const map = new Map<number, Organization>();
+        for (const id of includeIds) {
+          const existing = prev.find(org => org.id === id);
+          if (existing) {
+            map.set(id, existing);
+          }
+        }
+        for (const org of newOrgs) {
+          map.set(org.id, org);
+        }
+        return Array.from(map.values());
+      });
+    },
+    []
+  );
 
   const fetchOrganizations = useCallback(
     async (searchQuery = '') => {
@@ -101,9 +109,17 @@ export function IndividualManagementPanel() {
         );
         if (response.success && response.data) {
           if ('organizations' in response.data) {
-            updateOrganizationOptions(response.data.organizations);
+            const includeIds =
+              form.organizationId && !Number.isNaN(Number(form.organizationId))
+                ? [Number(form.organizationId)]
+                : [];
+            updateOrganizationOptions(response.data.organizations, includeIds);
           } else if (Array.isArray(response.data)) {
-            updateOrganizationOptions(response.data);
+            const includeIds =
+              form.organizationId && !Number.isNaN(Number(form.organizationId))
+                ? [Number(form.organizationId)]
+                : [];
+            updateOrganizationOptions(response.data, includeIds);
           }
         } else if (response.error) {
           console.error(response.error.message);
@@ -114,7 +130,7 @@ export function IndividualManagementPanel() {
         setFetchingOrgs(false);
       }
     },
-    [updateOrganizationOptions]
+    [updateOrganizationOptions, form.organizationId]
   );
 
   const fetchRoles = useCallback(async (orgId: string, searchQuery = '') => {

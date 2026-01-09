@@ -29,20 +29,11 @@ export const metadata: Metadata = {
     url: '/',
     siteName: 'Daadaar',
     type: 'website',
-    images: [
-      {
-        url: '/android-chrome-512x512.png',
-        width: 512,
-        height: 512,
-        alt: 'Daadaar logo',
-      },
-    ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'Daadaar Platform',
     description: 'Decentralized, anonymous platform for exposing Iranian government injustices',
-    images: ['/android-chrome-512x512.png'],
   },
   icons: {
     icon: [

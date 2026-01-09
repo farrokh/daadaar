@@ -31,6 +31,12 @@ function OrganizationNode({ data }: NodeProps<OrganizationNodeData>) {
       iconBgClassName="bg-primary/10"
       glowGradientClassName="from-primary to-accent-secondary"
       onEdit={data.onEdit}
+      memberCount={data.memberCount}
+      onExpand={data.onExpand}
+      childCount={data.childCount}
+      onToggleChildren={data.onToggleChildren}
+      isExpanded={data.isExpanded}
+      toggleOnLeft={data.toggleOnLeft}
     />
   );
 }

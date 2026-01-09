@@ -103,7 +103,11 @@
     "fit_view": "تنظیم اندازه",
     "search": "جستجو",
     "search_coming_soon": "قابلیت جستجو به زودی اضافه می‌شود...",
-    "add_item": "افزودن آیتم"
+    "add_item": "افزودن آیتم",
+    "sub_toggle_show": "زیر مجموعه",
+    "sub_toggle_hide": "ببند",
+    "sub_toggle_expand_label": "نمایش زیرسازمان‌ها",
+    "sub_toggle_collapse_label": "پنهان کردن زیرسازمان‌ها"
   },
   "organization": {
     "add_title": "افزودن سازمان جدید",
