@@ -24,7 +24,13 @@ const formatReportSubtitle = (
   formatter: Intl.DateTimeFormat
 ) => {
   const segments: string[] = [];
-  const location = report.incidentLocation || report.incidentLocationEn;
+  const currentLocale = formatter.resolvedOptions().locale;
+  const isEnglish = currentLocale.startsWith('en');
+
+  const location = isEnglish
+    ? report.incidentLocationEn || report.incidentLocation
+    : report.incidentLocation || report.incidentLocationEn;
+
   if (location) {
     segments.push(location);
   }
@@ -98,6 +104,8 @@ export function GraphSearchPanel() {
       let failureCount = 0;
 
       const [reportsRes, individualsRes, organizationsRes] = requests;
+      const currentLocale = formatter.resolvedOptions().locale;
+      const isEnglish = currentLocale.startsWith('en');
 
       if (
         reportsRes.status === 'fulfilled' &&
@@ -108,10 +116,9 @@ export function GraphSearchPanel() {
           ...reportsRes.value.data.reports.map(report => ({
             id: `${report.shareableUuid}-report`,
             type: 'report' as SearchResultType,
-            title:
-              locale === 'en'
-                ? report.titleEn || report.title || ''
-                : report.title || report.titleEn || '',
+            title: isEnglish
+              ? report.titleEn || report.title || ''
+              : report.title || report.titleEn || '',
             subtitle: formatReportSubtitle(report, formatter),
             url: `/reports/${report.shareableUuid}`,
           }))
@@ -128,10 +135,9 @@ export function GraphSearchPanel() {
           ...individuals.map(person => ({
             id: `${person.shareableUuid}-individual`,
             type: 'individual' as SearchResultType,
-            title:
-              locale === 'en'
-                ? person.fullNameEn || person.fullName || ''
-                : person.fullName || person.fullNameEn || '',
+            title: isEnglish
+              ? person.fullNameEn || person.fullName || ''
+              : person.fullName || person.fullNameEn || '',
             subtitle: formatIndividualSubtitle(person),
             url: `/person/${person.shareableUuid}`,
           }))
@@ -148,11 +154,10 @@ export function GraphSearchPanel() {
           ...organizations.map(org => ({
             id: `${org.shareableUuid}-organization`,
             type: 'organization' as SearchResultType,
-            title: locale === 'en' ? org.nameEn || org.name || '' : org.name || org.nameEn || '',
-            subtitle:
-              locale === 'en'
-                ? org.descriptionEn || org.description || undefined
-                : org.description || org.descriptionEn || undefined,
+            title: isEnglish ? org.nameEn || org.name || '' : org.name || org.nameEn || '',
+            subtitle: isEnglish
+              ? org.descriptionEn || org.description || undefined
+              : org.description || org.descriptionEn || undefined,
             url: `/org/${org.shareableUuid}`,
           }))
         );
@@ -166,7 +171,7 @@ export function GraphSearchPanel() {
         partialFailure: failureCount > 0 && failureCount < 3,
       };
     },
-    [formatter, locale]
+    [formatter]
   );
 
   useEffect(() => {
@@ -180,6 +185,8 @@ export function GraphSearchPanel() {
       setResults([]);
       setLoading(false);
       setError(null);
+      setPartialFailure(false);
+      setHighlightedIndex(-1);
       return;
     }
 
@@ -192,13 +199,23 @@ export function GraphSearchPanel() {
       runSearch(trimmed)
         .then(({ results: fetched, hadError, partialFailure: isPartial }) => {
           if (currentFetchId !== fetchIdRef.current) return;
-          setResults(fetched);
-          setError(hadError ? graphT('search_error') : null);
-          setPartialFailure(isPartial);
-          setHighlightedIndex(fetched.length > 0 ? 0 : -1);
+          if (hadError) {
+            setResults([]);
+            setPartialFailure(false);
+            setHighlightedIndex(-1);
+            setError(graphT('search_error'));
+          } else {
+            setResults(fetched);
+            setError(null);
+            setPartialFailure(isPartial);
+            setHighlightedIndex(fetched.length > 0 ? 0 : -1);
+          }
         })
         .catch(() => {
           if (currentFetchId !== fetchIdRef.current) return;
+          setResults([]);
+          setPartialFailure(false);
+          setHighlightedIndex(-1);
           setError(graphT('search_error'));
         })
         .finally(() => {
@@ -265,6 +282,7 @@ export function GraphSearchPanel() {
           id={inputId}
           type="text"
           value={query}
+          role="combobox"
           onChange={event => setQuery(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={graphT('search_placeholder')}
@@ -329,15 +347,13 @@ export function GraphSearchPanel() {
             )}
 
             {results.map((result, index) => (
-              <div
-                key={result.id}
-                id={getItemId(index)}
-                role="option"
-                aria-selected={index === highlightedIndex}
-                tabIndex={-1}
-              >
+              <div key={result.id}>
                 <button
+                  id={getItemId(index)}
                   type="button"
+                  role="option"
+                  aria-selected={index === highlightedIndex}
+                  tabIndex={-1}
                   onClick={() => handleSelect(result.url)}
                   className={`w-full px-4 py-3 text-left transition ${
                     index === highlightedIndex ? 'bg-foreground/10' : 'hover:bg-foreground/5'
