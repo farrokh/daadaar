@@ -12,7 +12,8 @@
     "format": "biome format --write .",
     "type-check": "tsc --noEmit",
     "test": "echo 'No tests configured yet' && exit 0",
-    "test:watch": "echo 'No tests configured yet' && exit 0"
+    "generate-updates": "bun scripts/generate-updates.ts",
+    "deploy:prod": "bun generate-updates && vercel deploy --prod --cwd ./ --yes"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -44,3 +44,16 @@ curl https://api.daadaar.com/health
 ```
 
 If `curl -I https://www.daadaar.com` includes a `server: Vercel` header, the deployment is live.
+
+## 7) Routine Deployment
+
+To deploy updates to production with automated changelog generation:
+
+```bash
+# Run from frontend directory
+bun run deploy:prod
+```
+
+This single command will:
+1.  Generate localized updates from git history (using your local API key).
+2.  Deploy the updated site to Vercel.
