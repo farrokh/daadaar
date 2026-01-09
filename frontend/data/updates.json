@@ -3,6 +3,12 @@
     "date": "2026-01-09",
     "technical": [
       {
+        "hash": "010d57589642382082adbfcababce17d046c733c",
+        "date": "2026-01-09",
+        "message": "chore: update changelog translations",
+        "author": "farrokh"
+      },
+      {
         "hash": "6fbd1ab1acfe4d8e7d960cb6ac735146e5b15af1",
         "date": "2026-01-09",
         "message": "Merge pull request #59 from farrokh/feat/automated-updates",
