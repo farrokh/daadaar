@@ -20,6 +20,10 @@ const s3Client = new S3Client({
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET || 'daadaar-media-v1-317430950654';
 
+// CDN Configuration
+const CDN_URL = process.env.CDN_URL || 'https://media.daadaar.com';
+const USE_CDN = process.env.USE_CDN === 'true';
+
 // Determine if we should use real S3 or mock
 // In production, we always assume S3 (using IAM roles if env vars are missing)
 // In development, we use S3 only if credentials are explicitly provided
@@ -57,16 +61,22 @@ export async function generatePresignedUploadUrl(
 
 /**
  * Generate a presigned URL for reading a file from S3
+ * Note: For CDN-enabled deployments, returns CDN URL for public access
  * @param key - S3 object key
  * @param bucket - S3 bucket name
  * @param expiresIn - URL expiration time in seconds (default: 1 hour)
- * @returns Presigned URL
+ * @returns Presigned URL or CDN URL
  */
 export async function generatePresignedGetUrl(
   key: string,
   bucket?: string,
   expiresIn = 3600
 ): Promise<string> {
+  // For CDN-enabled deployments, return CDN URL for public access
+  if (USE_CDN) {
+    return getS3PublicUrl(key);
+  }
+
   if (!USE_S3) {
     return `http://localhost:4000/api/media/mock/${key}`;
   }
@@ -224,14 +234,20 @@ export function validateMediaFile(
 }
 
 /**
- * Get public URL for an S3 object
+ * Get public URL for an S3 object (via CDN if enabled)
  * @param key - S3 object key
- * @returns Public URL
+ * @returns Public URL (CDN or S3 direct)
  */
 export function getS3PublicUrl(key: string): string {
   if (!USE_S3) {
     return `http://localhost:4000/api/media/mock/${key}`;
   }
 
+  // Use CDN URL if configured
+  if (USE_CDN) {
+    return `${CDN_URL}/${key}`;
+  }
+
+  // Fallback to direct S3 URL
   return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com/${key}`;
 }
