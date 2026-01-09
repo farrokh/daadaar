@@ -11,6 +11,7 @@
     "build": "bun run --filter frontend build && bun run --filter backend build",
     "build:frontend": "bun run --filter frontend build",
     "build:backend": "bun run --filter backend build",
+    "deploy:frontend": "bun run --filter frontend deploy:prod",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
