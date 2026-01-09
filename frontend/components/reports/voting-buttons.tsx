@@ -3,6 +3,7 @@
 import { useVoting } from '@/hooks/use-voting';
 import { Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import posthog from 'posthog-js';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -55,16 +56,36 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
   const handleUpvote = async () => {
     if (currentVote === 'upvote') {
       await unvote();
+      posthog.capture('vote_removed', {
+        reportId,
+        previousVote: 'upvote',
+        isAnonymous,
+      });
     } else {
       await vote('upvote');
+      posthog.capture('report_upvoted', {
+        reportId,
+        previousVote: currentVote,
+        isAnonymous,
+      });
     }
   };
 
   const handleDownvote = async () => {
     if (currentVote === 'downvote') {
       await unvote();
+      posthog.capture('vote_removed', {
+        reportId,
+        previousVote: 'downvote',
+        isAnonymous,
+      });
     } else {
       await vote('downvote');
+      posthog.capture('report_downvoted', {
+        reportId,
+        previousVote: currentVote,
+        isAnonymous,
+      });
     }
   };
 

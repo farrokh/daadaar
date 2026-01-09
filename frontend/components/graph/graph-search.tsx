@@ -5,6 +5,7 @@ import type { Individual, Organization, ReportWithDetails } from '@/shared/types
 import { Loader2, Search, X } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import posthog from 'posthog-js';
 import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type SearchResultType = 'report' | 'individual' | 'organization';
@@ -165,6 +166,18 @@ export function GraphSearchPanel() {
         failureCount += 1;
       }
 
+      // Track search performed
+      if (aggregated.length > 0) {
+        posthog.capture('search_performed', {
+          query: term,
+          resultsCount: aggregated.length,
+          reportResults: aggregated.filter(r => r.type === 'report').length,
+          individualResults: aggregated.filter(r => r.type === 'individual').length,
+          organizationResults: aggregated.filter(r => r.type === 'organization').length,
+          hadPartialFailure: failureCount > 0 && failureCount < 3,
+        });
+      }
+
       return {
         results: aggregated,
         hadError: failureCount === 3,
@@ -228,7 +241,16 @@ export function GraphSearchPanel() {
   }, [graphT, query, runSearch]);
 
   const handleSelect = useCallback(
-    (url: string) => {
+    (url: string, result?: SearchResult) => {
+      // Track search result selection
+      if (result) {
+        posthog.capture('search_result_selected', {
+          query,
+          resultType: result.type,
+          resultTitle: result.title,
+          resultUrl: result.url,
+        });
+      }
       router.push(url);
       setQuery('');
       setResults([]);
@@ -236,7 +258,7 @@ export function GraphSearchPanel() {
       setHighlightedIndex(-1);
       setPartialFailure(false);
     },
-    [router]
+    [router, query]
   );
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -252,7 +274,7 @@ export function GraphSearchPanel() {
       event.preventDefault();
       const selected = results[highlightedIndex] || results[0];
       if (selected) {
-        handleSelect(selected.url);
+        handleSelect(selected.url, selected);
       }
     } else if (event.key === 'Escape') {
       setResults([]);
@@ -354,7 +376,7 @@ export function GraphSearchPanel() {
                   role="option"
                   aria-selected={index === highlightedIndex}
                   tabIndex={-1}
-                  onClick={() => handleSelect(result.url)}
+                  onClick={() => handleSelect(result.url, result)}
                   className={`w-full px-4 py-3 text-left transition ${
                     index === highlightedIndex ? 'bg-foreground/10' : 'hover:bg-foreground/5'
                   }`}

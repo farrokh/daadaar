@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { register } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 
 import { useState } from 'react';
 
@@ -89,6 +90,18 @@ export default function SignupPage() {
       });
 
       if (result.success) {
+        // Identify user in PostHog
+        posthog.identify(formData.email, {
+          email: formData.email,
+          username: formData.username,
+          displayName: formData.displayName || undefined,
+        });
+        // Track successful signup
+        posthog.capture('user_signed_up', {
+          email: formData.email,
+          username: formData.username,
+          requiresEmailVerification: result.requiresEmailVerification ?? true,
+        });
         setRequiresEmailVerification(result.requiresEmailVerification ?? true);
         setSuccess(true);
       } else {
@@ -99,7 +112,8 @@ export default function SignupPage() {
           setError(result.error || t('signup_failed'));
         }
       }
-    } catch (_err) {
+    } catch (err) {
+      posthog.captureException(err);
       setError(t('signup_failed'));
     } finally {
       setLoading(false);

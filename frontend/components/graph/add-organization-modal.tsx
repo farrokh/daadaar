@@ -8,6 +8,7 @@ import { SearchableSelect, type SelectOption } from '@/components/ui/searchable-
 import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import posthog from 'posthog-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Organization {
@@ -182,7 +183,16 @@ export function AddOrganizationModal({
 
     setLoading(false);
 
-    if (response.success) {
+    if (response.success && response.data) {
+      // Track organization creation
+      posthog.capture('organization_created', {
+        organizationId: response.data.id,
+        name: response.data.name,
+        nameEn: response.data.nameEn,
+        parentId: response.data.parentId,
+        hasParent: !!response.data.parentId,
+        hasLogo: !!logoUrl,
+      });
       resetForm();
       onSuccess();
       onClose();

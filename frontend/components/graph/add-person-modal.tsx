@@ -8,6 +8,7 @@ import { SearchableSelect, type SelectOption } from '@/components/ui/searchable-
 import { Textarea } from '@/components/ui/textarea';
 import { fetchApi } from '@/lib/api';
 import { useTranslations } from 'next-intl';
+import posthog from 'posthog-js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface Role {
@@ -223,7 +224,18 @@ export function AddPersonModal({
 
     setLoading(false);
 
-    if (response.success) {
+    if (response.success && response.data) {
+      // Track person creation
+      posthog.capture('person_created', {
+        personId: response.data.id,
+        fullName: response.data.fullName,
+        fullNameEn: response.data.fullNameEn,
+        organizationId,
+        organizationName,
+        hasRole: !!finalRoleId,
+        createdNewRole: isCreatingNewRole,
+        hasProfileImage: !!profileImageUrl,
+      });
       resetForm();
       onSuccess();
       onClose();

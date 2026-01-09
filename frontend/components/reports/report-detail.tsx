@@ -10,7 +10,8 @@ import type { Media, ReportWithDetails } from '@/shared/types';
 import { Calendar, FileText, Link as LinkIcon, MapPin, Music, Play, Shield } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import React, { useEffect, useRef, useState } from 'react';
+import posthog from 'posthog-js';
+import React, { useRef, useState } from 'react';
 
 interface ReportDetailProps {
   report: ReportWithDetails;
@@ -24,22 +25,27 @@ export default function ReportDetail({ report }: ReportDetailProps) {
   const [selectedMedia, setSelectedMedia] = useState<(Media & { url?: string }) | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
-  // Lightbox Logic
-  useEffect(() => {
-    if (!selectedMedia) {
-      dialogRef.current?.close();
-      document.body.style.overflow = '';
-      return;
-    }
+  // Handler for selecting media
+  const handleSelectMedia = (media: Media & { url?: string }) => {
+    setSelectedMedia(media);
+    // Track media view
+    posthog.capture('media_viewed', {
+      reportId: report.id,
+      reportUuid: report.shareableUuid,
+      mediaId: media.id,
+      mediaType: media.mediaType,
+      originalFilename: media.originalFilename,
+    });
     dialogRef.current?.showModal();
     document.body.style.overflow = 'hidden';
-    const handleEscape = (e: KeyboardEvent) => e.key === 'Escape' && setSelectedMedia(null);
-    document.addEventListener('keydown', handleEscape);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = '';
-    };
-  }, [selectedMedia]);
+  };
+
+  // Handler for closing the lightbox
+  const handleCloseMedia = () => {
+    setSelectedMedia(null);
+    dialogRef.current?.close();
+    document.body.style.overflow = '';
+  };
 
   const isRtl = locale === 'fa';
   const title = isRtl ? report.title : report.titleEn || report.title;
@@ -210,7 +216,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                     <button
                       key={item.id}
                       type="button"
-                      onClick={() => setSelectedMedia(item)}
+                      onClick={() => handleSelectMedia(item)}
                       className="group relative aspect-square rounded-xl overflow-hidden bg-foreground/5 border border-foreground/10 transition-all hover:border-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20"
                     >
                       {item.mediaType === 'image' && (
@@ -251,8 +257,8 @@ export default function ReportDetail({ report }: ReportDetailProps) {
       <dialog
         ref={dialogRef}
         className="fixed inset-0 z-[100] w-full h-full bg-background/95 backdrop-blur-xl p-0 m-0 border-0"
-        onClick={() => setSelectedMedia(null)}
-        onKeyDown={e => e.key === 'Escape' && setSelectedMedia(null)}
+        onClick={handleCloseMedia}
+        onKeyDown={e => e.key === 'Escape' && handleCloseMedia()}
       >
         {selectedMedia && (
           <div
@@ -262,7 +268,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
           >
             <button
               type="button"
-              onClick={() => setSelectedMedia(null)}
+              onClick={handleCloseMedia}
               className="absolute top-6 right-6 p-2 rounded-full bg-foreground/10 hover:bg-foreground/20 text-foreground transition-colors"
             >
               <svg

@@ -1,6 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import posthog from 'posthog-js';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { fetchApi } from '../../lib/api';
@@ -95,6 +96,18 @@ export function SubmitReportModal({
       const { data: responseData } = response;
       if (!responseData) throw new Error('No data received');
 
+      // Track successful report submission
+      posthog.capture('report_submitted', {
+        reportId: responseData.id,
+        individualId,
+        individualName,
+        roleId,
+        roleName,
+        organizationName,
+        hasMedia: mediaIds.length > 0,
+        mediaCount: mediaIds.length,
+      });
+
       // Success!
       reset();
       setMediaIds([]);
@@ -102,6 +115,7 @@ export function SubmitReportModal({
       onClose();
     } catch (err) {
       console.error('Submit error:', err);
+      posthog.captureException(err);
       setError(err instanceof Error ? err.message : 'Failed to submit report');
     } finally {
       setIsSubmitting(false);

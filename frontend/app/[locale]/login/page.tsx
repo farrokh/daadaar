@@ -6,6 +6,7 @@ import { login, useAuth } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import posthog from 'posthog-js';
 import { useState } from 'react';
 
 export default function LoginPage() {
@@ -33,13 +34,22 @@ export default function LoginPage() {
     try {
       const result = await login(formData.identifier, formData.password);
       if (result.success) {
+        // Identify user in PostHog
+        posthog.identify(formData.identifier, {
+          username: formData.identifier,
+        });
+        // Track successful login
+        posthog.capture('user_logged_in', {
+          username: formData.identifier,
+        });
         await refreshUser(); // Refresh the auth context
         router.push('/');
         router.refresh();
       } else {
         setError(result.error || t('login_failed'));
       }
-    } catch (_err) {
+    } catch (err) {
+      posthog.captureException(err);
       setError(t('login_failed'));
     } finally {
       setLoading(false);

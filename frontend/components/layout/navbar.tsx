@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import posthog from 'posthog-js';
 import { useEffect, useState } from 'react';
 
 export function Navbar() {
@@ -171,7 +172,11 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={logout}
+              onClick={() => {
+                posthog.capture('user_logged_out');
+                posthog.reset();
+                logout();
+              }}
               className="text-foreground/60 hover:text-destructive transition-colors"
             >
               {t('logout')}
