@@ -90,18 +90,23 @@ export default function SignupPage() {
       });
 
       if (result.success) {
-        // Identify user in PostHog
-        posthog.identify(formData.email, {
-          email: formData.email,
-          username: formData.username,
-          displayName: formData.displayName || undefined,
-        });
-        // Track successful signup
-        posthog.capture('user_signed_up', {
-          email: formData.email,
-          username: formData.username,
-          requiresEmailVerification: result.requiresEmailVerification ?? true,
-        });
+        // Import hashing utility dynamically to avoid SSR issues
+        const { hashIdentifier } = await import('@/lib/analytics-utils');
+        const hashedEmail = await hashIdentifier(formData.email);
+
+        // Only call PostHog if it's initialized
+        if (posthog && typeof posthog.identify === 'function') {
+          // Identify user in PostHog with hashed email
+          posthog.identify(hashedEmail);
+
+          // Track successful signup with hashed identifier only
+          posthog.capture('user_signed_up', {
+            // No raw PII - only hashed identifier and flags
+            hashedIdentifier: hashedEmail,
+            requiresEmailVerification: result.requiresEmailVerification ?? true,
+          });
+        }
+
         setRequiresEmailVerification(result.requiresEmailVerification ?? true);
         setSuccess(true);
       } else {
@@ -113,7 +118,10 @@ export default function SignupPage() {
         }
       }
     } catch (err) {
-      posthog.captureException(err);
+      // Guard PostHog call to prevent errors when not initialized
+      if (posthog && typeof posthog.captureException === 'function') {
+        posthog.captureException(err);
+      }
       setError(t('signup_failed'));
     } finally {
       setLoading(false);

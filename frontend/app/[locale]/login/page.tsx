@@ -34,13 +34,17 @@ export default function LoginPage() {
     try {
       const result = await login(formData.identifier, formData.password);
       if (result.success) {
-        // Identify user in PostHog
-        posthog.identify(formData.identifier, {
-          username: formData.identifier,
-        });
-        // Track successful login
+        // Import hashing utility dynamically to avoid SSR issues
+        const { hashIdentifier } = await import('@/lib/analytics-utils');
+        const hashedId = await hashIdentifier(formData.identifier);
+
+        // Identify user in PostHog with hashed identifier
+        posthog.identify(hashedId);
+
+        // Track successful login with hashed identifier only
         posthog.capture('user_logged_in', {
-          username: formData.identifier,
+          // No raw PII - only hashed identifier
+          hashedIdentifier: hashedId,
         });
         await refreshUser(); // Refresh the auth context
         router.push('/');
@@ -49,7 +53,10 @@ export default function LoginPage() {
         setError(result.error || t('login_failed'));
       }
     } catch (err) {
-      posthog.captureException(err);
+      // Guard PostHog call to prevent errors when not initialized
+      if (posthog && typeof posthog.captureException === 'function') {
+        posthog.captureException(err);
+      }
       setError(t('login_failed'));
     } finally {
       setLoading(false);

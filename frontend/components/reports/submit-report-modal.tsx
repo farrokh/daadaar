@@ -96,17 +96,18 @@ export function SubmitReportModal({
       const { data: responseData } = response;
       if (!responseData) throw new Error('No data received');
 
-      // Track successful report submission
-      posthog.capture('report_submitted', {
-        reportId: responseData.id,
-        individualId,
-        individualName,
-        roleId,
-        roleName,
-        organizationName,
-        hasMedia: mediaIds.length > 0,
-        mediaCount: mediaIds.length,
-      });
+      // Track successful report submission - only non-PII metadata
+      if (posthog && typeof posthog.capture === 'function') {
+        posthog.capture('report_submitted', {
+          // Only non-PII identifiers and counts
+          reportId: responseData.id,
+          individualId,
+          roleId,
+          hasMedia: mediaIds.length > 0,
+          mediaCount: mediaIds.length,
+          // Removed: individualName, roleName, organizationName (PII)
+        });
+      }
 
       // Success!
       reset();
@@ -115,7 +116,14 @@ export function SubmitReportModal({
       onClose();
     } catch (err) {
       console.error('Submit error:', err);
-      posthog.captureException(err);
+
+      // Sanitize error before sending to PostHog
+      if (posthog && typeof posthog.captureException === 'function') {
+        const { sanitizeError } = await import('@/lib/analytics-utils');
+        const sanitized = sanitizeError(err, 'SubmitReportModal');
+        posthog.captureException(sanitized);
+      }
+
       setError(err instanceof Error ? err.message : 'Failed to submit report');
     } finally {
       setIsSubmitting(false);

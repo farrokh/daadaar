@@ -32,6 +32,50 @@ The wizard has completed a deep integration of your Next.js project with PostHog
 - **Error Tracking**: Exception capture enabled for login, signup, and report submission errors
 - **PostHog Reset**: User session is reset on logout to ensure clean analytics separation
 
+## Privacy & Compliance
+
+### PII Collection Notice
+This integration collects Personally Identifiable Information (PII), specifically:
+- **Email addresses** (hashed using SHA-256 before transmission)
+- **Usernames** (hashed using SHA-256 before transmission)
+- **User identifiers** (anonymized via one-way hashing)
+
+### Required Actions
+
+To ensure compliance with privacy regulations (GDPR, CCPA, etc.), the following actions are required:
+
+1. **Update Privacy Policy**
+   - Disclose that analytics data is collected via PostHog
+   - Specify what data is collected (user behavior, anonymized identifiers, error logs)
+   - Explain the purpose of data collection (product improvement, error tracking)
+   - Provide information on data retention periods
+   - Include opt-out mechanisms where applicable
+
+2. **Implement User Consent/Cookie Banner**
+   - Add a cookie consent banner for EU users (GDPR compliance)
+   - Allow users to opt-out of analytics tracking
+   - Respect Do Not Track (DNT) browser settings where applicable
+
+3. **Configure PostHog Data Retention**
+   - Set appropriate data retention policies in PostHog dashboard
+   - Configure automatic deletion of old events
+   - Review and adjust retention based on legal requirements
+
+4. **Email & Identifier Hashing** ✅ (Implemented)
+   - All email addresses and usernames are hashed using SHA-256 before sending to PostHog
+   - Hashing is performed client-side via `lib/analytics-utils.ts`
+   - Original PII is never transmitted to analytics servers
+
+5. **Audit Events for Sensitive Data**
+   - Regularly review captured events to ensure no sensitive data is logged
+   - Avoid capturing user-generated content (report details, personal information)
+   - Only track metadata and anonymized identifiers
+
+### Additional Resources
+- [PostHog Privacy & Compliance Guide](https://posthog.com/docs/privacy)
+- [PostHog GDPR Compliance](https://posthog.com/docs/privacy/gdpr-compliance)
+- [Data Retention Settings](https://posthog.com/docs/data/retention)
+
 ## Next steps
 
 We've built some insights and a dashboard for you to keep an eye on user behavior, based on the events we just instrumented:
