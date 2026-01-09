@@ -60,7 +60,7 @@ export default async function UpdatesPage({ params }: { params: Promise<{ locale
                 typeof c.message === 'string'
                   ? c.message
                   : c.message[locale as 'en' | 'fa'] ||
-                    (c.message as any).en ||
+                    (c.message as { en: string; fa: string }).en ||
                     Object.values(c.message)[0] ||
                     ''
               )

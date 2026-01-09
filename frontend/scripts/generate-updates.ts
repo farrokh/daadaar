@@ -107,7 +107,7 @@ async function generateUpdates() {
     }
 
     // Process for public/technical
-    const processed = Object.keys(grouped)
+    const processed: UpdateDay[] = Object.keys(grouped)
       .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
       .map(date => {
         const commits = grouped[date];
