@@ -21,6 +21,10 @@ The Person Detail Page provides a dedicated, shareable, and verifying presence f
 - **Associated Reports**: Displays a chronological list of verified reports linked to this individual.
 - **Deep Links**: Each report card links to the full Report Detail page.
 
+### 3. Career History
+- **Role Occupancy Timeline**: Chronological sidebar listing roles held, start/end dates, and associated organizations.
+- **Organization Linking**: Each entry links back to the organization's public detail page.
+
 ### 3. Graph Integration
 - **Graph Nodes**: The Person nodes in the interactive graph include a "View Profile" link (visible in isolated view) that navigates to this detail page.
 
@@ -42,4 +46,5 @@ The Person Detail Page provides a dedicated, shareable, and verifying presence f
 - **Share Controller**: `getIndividualByUuid` in `backend/src/controllers/share.ts` updated to:
   - Fetch basic individual data.
   - Fetch associated published reports (joined via `reportLinks`).
+  - Fetch career history (role occupancy) records.
   - Sign profile image URLs if they are S3 keys.
