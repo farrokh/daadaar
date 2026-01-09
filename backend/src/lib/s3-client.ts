@@ -251,3 +251,30 @@ export function getS3PublicUrl(key: string): string {
   // Fallback to direct S3 URL
   return `https://${BUCKET_NAME}.s3.${process.env.AWS_REGION || 'us-east-1'}.amazonaws.com/${key}`;
 }
+
+/**
+ * Extract S3 key from a potentially full URL (presigned or CDN)
+ * @param url - Full URL or key
+ * @returns S3 key (clean)
+ */
+export function extractS3KeyFromUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+
+  // If it's already a clean key (not a URL), return it
+  if (!url.startsWith('http')) return url;
+
+  try {
+    const parsed = new URL(url);
+    // Remove leading slash from pathname
+    let key = parsed.pathname.substring(1);
+
+    // Handle mock URLs
+    if (key.startsWith('api/media/mock/')) {
+      key = key.replace('api/media/mock/', '');
+    }
+
+    return decodeURIComponent(key);
+  } catch (e) {
+    return url; // fallback
+  }
+}
