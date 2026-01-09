@@ -108,6 +108,7 @@
     "search_placeholder": "Search organizations, people, reports...",
     "search_error": "Failed to load search results",
     "search_no_results": "No results found",
+    "search_partial_error": "Some results could not be loaded",
     "add_item": "Add Item",
     "sub_toggle_show": "Sub",
     "sub_toggle_hide": "Hide",

@@ -6,6 +6,8 @@ import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
 
+const MAX_CAREER_HISTORY = 100;
+
 /**
  * GET /api/share/org/:uuid
  * Get organization by shareable UUID
@@ -224,7 +226,8 @@ export async function getIndividualByUuid(req: Request, res: Response) {
       .innerJoin(schema.roles, eq(schema.roleOccupancy.roleId, schema.roles.id))
       .innerJoin(schema.organizations, eq(schema.roles.organizationId, schema.organizations.id))
       .where(eq(schema.roleOccupancy.individualId, individual.id))
-      .orderBy(desc(schema.roleOccupancy.startDate));
+      .orderBy(desc(schema.roleOccupancy.startDate))
+      .limit(MAX_CAREER_HISTORY);
 
     // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with reports and history
     (individual as any).reports = individualReports;

@@ -60,6 +60,8 @@ export function GraphSearchPanel() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [partialFailure, setPartialFailure] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const fetchIdRef = useRef(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -161,6 +163,7 @@ export function GraphSearchPanel() {
       return {
         results: aggregated,
         hadError: failureCount === 3,
+        partialFailure: failureCount > 0 && failureCount < 3,
       };
     },
     [formatter, locale]
@@ -187,10 +190,12 @@ export function GraphSearchPanel() {
       setLoading(true);
 
       runSearch(trimmed)
-        .then(({ results: fetched, hadError }) => {
+        .then(({ results: fetched, hadError, partialFailure: isPartial }) => {
           if (currentFetchId !== fetchIdRef.current) return;
           setResults(fetched);
           setError(hadError ? graphT('search_error') : null);
+          setPartialFailure(isPartial);
+          setHighlightedIndex(fetched.length > 0 ? 0 : -1);
         })
         .catch(() => {
           if (currentFetchId !== fetchIdRef.current) return;
@@ -211,17 +216,31 @@ export function GraphSearchPanel() {
       setQuery('');
       setResults([]);
       setError(null);
+      setHighlightedIndex(-1);
+      setPartialFailure(false);
     },
     [router]
   );
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && results[0]) {
+    if (event.key === 'ArrowDown') {
       event.preventDefault();
-      handleSelect(results[0].url);
+      setHighlightedIndex(prev => (results.length > 0 ? (prev + 1) % results.length : -1));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setHighlightedIndex(prev =>
+        results.length > 0 ? (prev - 1 + results.length) % results.length : -1
+      );
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      const selected = results[highlightedIndex] || results[0];
+      if (selected) {
+        handleSelect(selected.url);
+      }
     } else if (event.key === 'Escape') {
       setResults([]);
       setError(null);
+      setHighlightedIndex(-1);
     }
   };
 
@@ -232,6 +251,8 @@ export function GraphSearchPanel() {
   };
 
   const showDropdown = Boolean(query.trim()) || loading;
+  const inputId = 'graph-search-input';
+  const getItemId = (index: number) => `search-item-${index}`;
 
   return (
     <div className="w-[420px] min-w-[280px] relative">
@@ -241,6 +262,7 @@ export function GraphSearchPanel() {
         </div>
         <input
           ref={inputRef}
+          id={inputId}
           type="text"
           value={query}
           onChange={event => setQuery(event.target.value)}
@@ -248,6 +270,11 @@ export function GraphSearchPanel() {
           placeholder={graphT('search_placeholder')}
           className="w-full rounded-full border border-foreground/10 bg-white/90 px-12 py-3 text-sm text-foreground outline-none transition focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/40 focus:ring-offset-0"
           aria-label={graphT('search')}
+          aria-autocomplete="list"
+          aria-expanded={showDropdown}
+          aria-haspopup="listbox"
+          aria-controls="search-results-list"
+          aria-activedescendant={highlightedIndex >= 0 ? getItemId(highlightedIndex) : undefined}
           autoComplete="off"
         />
         {query && (
@@ -257,6 +284,8 @@ export function GraphSearchPanel() {
               setQuery('');
               setResults([]);
               setError(null);
+              setHighlightedIndex(-1);
+              setPartialFailure(false);
             }}
             className="absolute inset-y-0 right-4 flex items-center justify-center text-foreground/50 hover:text-foreground transition"
             aria-label={commonT('close')}
@@ -268,7 +297,11 @@ export function GraphSearchPanel() {
 
       {showDropdown && (
         <div className="absolute left-0 right-0 bottom-full z-40 mb-3 rounded-3xl border border-foreground/10 bg-background/95 shadow-2xl backdrop-blur-xl overflow-hidden">
-          <ul className="max-h-72 overflow-y-auto custom-scrollbar divide-y divide-foreground/5">
+          <ul
+            id="search-results-list"
+            role="listbox"
+            className="max-h-72 overflow-y-auto custom-scrollbar divide-y divide-foreground/5"
+          >
             {loading && (
               <li className="flex items-center gap-2 px-4 py-3 text-xs text-foreground/40">
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -282,18 +315,31 @@ export function GraphSearchPanel() {
               </li>
             )}
 
+            {partialFailure && !loading && !error && (
+              <li className="px-4 py-2 text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-500 border-b border-foreground/5 px-4 font-medium">
+                {graphT('search_partial_error')}
+              </li>
+            )}
+
             {!loading && !error && results.length === 0 && (
               <li className="px-4 py-3 text-xs text-foreground/50 text-center">
                 {graphT('search_no_results')}
               </li>
             )}
 
-            {results.map(result => (
-              <li key={result.id}>
+            {results.map((result, index) => (
+              <li
+                key={result.id}
+                id={getItemId(index)}
+                role="option"
+                aria-selected={index === highlightedIndex}
+              >
                 <button
                   type="button"
                   onClick={() => handleSelect(result.url)}
-                  className="w-full px-4 py-3 text-left transition hover:bg-foreground/5"
+                  className={`w-full px-4 py-3 text-left transition ${
+                    index === highlightedIndex ? 'bg-foreground/10' : 'hover:bg-foreground/5'
+                  }`}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <p className="text-sm font-semibold text-foreground truncate">{result.title}</p>

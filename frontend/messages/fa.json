@@ -106,6 +106,7 @@
     "search_placeholder": "جستجوی سازمان‌ها، افراد، گزارش‌ها...",
     "search_error": "خطا در بارگذاری نتایج جستجو",
     "search_no_results": "نتیجه‌ای یافت نشد",
+    "search_partial_error": "برخی از نتایج بارگذاری نشدند",
     "add_item": "افزودن آیتم",
     "sub_toggle_show": "زیر مجموعه",
     "sub_toggle_hide": "ببند",
