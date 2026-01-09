@@ -4,7 +4,7 @@
 import { count, eq, ilike } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
-import { generatePresignedGetUrl } from '../lib/s3-client';
+import { extractS3KeyFromUrl, generatePresignedGetUrl } from '../lib/s3-client';
 import { generateOrgSeoImage } from '../lib/seo-image-generator';
 import { notifyNewOrganization } from '../lib/slack';
 
@@ -97,7 +97,7 @@ export async function createOrganization(req: Request, res: Response) {
         nameEn: body.nameEn?.trim() || null,
         description: body.description?.trim() || null,
         descriptionEn: body.descriptionEn?.trim() || null,
-        logoUrl: body.logoUrl || null,
+        logoUrl: extractS3KeyFromUrl(body.logoUrl) || null,
         parentId: body.parentId || null,
         createdByUserId: userId,
         sessionId,
@@ -390,7 +390,7 @@ export async function updateOrganization(req: Request, res: Response) {
     }
 
     if (body.logoUrl !== undefined) {
-      updateData.logoUrl = body.logoUrl || null;
+      updateData.logoUrl = extractS3KeyFromUrl(body.logoUrl) || null;
     }
 
     // Handle parentId update
@@ -480,7 +480,7 @@ export async function updateOrganization(req: Request, res: Response) {
         updatedOrg.shareableUuid,
         updatedOrg.nameEn || updatedOrg.name,
         // Pass the original non-presigned URL from the database/updateData
-        updateData.logoUrl !== undefined ? updateData.logoUrl : existingOrg.logoUrl
+        updateData.logoUrl !== undefined ? (updateData.logoUrl as string) : existingOrg.logoUrl
       ).catch(err => console.error('SEO image generation error:', err));
     }
 

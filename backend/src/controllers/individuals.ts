@@ -5,7 +5,7 @@ import { and, count, desc, eq, ilike, or } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { invalidateMemberCountCacheForRole } from '../lib/organization-member-counts';
-import { generatePresignedGetUrl } from '../lib/s3-client';
+import { extractS3KeyFromUrl, generatePresignedGetUrl } from '../lib/s3-client';
 import { generateIndividualSeoImage } from '../lib/seo-image-generator';
 import { notifyNewIndividual } from '../lib/slack';
 
@@ -182,7 +182,7 @@ export async function createIndividual(req: Request, res: Response) {
         fullNameEn: body.fullNameEn?.trim() || null,
         biography: body.biography?.trim() || null,
         biographyEn: body.biographyEn?.trim() || null,
-        profileImageUrl: body.profileImageUrl || null,
+        profileImageUrl: extractS3KeyFromUrl(body.profileImageUrl),
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : null,
         createdByUserId: userId,
         sessionId,
@@ -530,7 +530,7 @@ export async function updateIndividual(req: Request, res: Response) {
     }
 
     if (body.profileImageUrl !== undefined) {
-      updateData.profileImageUrl = body.profileImageUrl || null;
+      updateData.profileImageUrl = extractS3KeyFromUrl(body.profileImageUrl);
     }
 
     if (body.dateOfBirth !== undefined) {

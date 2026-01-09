@@ -1,4 +1,4 @@
-import type { DefaultEdgeOptions, NodeTypes } from 'reactflow';
+import type { DefaultEdgeOptions, EdgeTypes, NodeTypes } from 'reactflow';
 import OrganizationNode from './organization-node';
 import PersonNode from './person-node';
 import ReportNode from './report-node';
@@ -10,8 +10,9 @@ export const nodeTypes: NodeTypes = {
   report: ReportNode,
 };
 
-// Edge types use default bezier edges for better routing
-export const edgeTypes = {};
+// Edge types - React Flow will use default bezier edges for any unrecognized type
+// Empty object means all edge types will fall back to the default rendering
+export const edgeTypes: EdgeTypes = {};
 
 // Default edge options with modern styling
 export const defaultEdgeOptions: DefaultEdgeOptions = {

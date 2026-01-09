@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils';
 import { Check, Share2 } from 'lucide-react';
+import posthog from 'posthog-js';
 import { type ComponentProps, useState } from 'react';
 
 import { Button } from './button';
@@ -46,6 +47,12 @@ export function ShareLinkButton({
       setCopied(true);
       setError(false);
       setToastVisible(true);
+
+      // Track successful link share
+      posthog.capture('link_shared', {
+        url: window.location.href,
+        pathname: window.location.pathname,
+      });
 
       window.setTimeout(() => setCopied(false), 2000);
       window.setTimeout(() => setToastVisible(false), 2000);
