@@ -3,6 +3,72 @@
     "date": "2026-01-09",
     "technical": [
       {
+        "hash": "010d57589642382082adbfcababce17d046c733c",
+        "date": "2026-01-09",
+        "message": "chore: update changelog translations",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6fbd1ab1acfe4d8e7d960cb6ac735146e5b15af1",
+        "date": "2026-01-09",
+        "message": "Merge pull request #59 from farrokh/feat/automated-updates",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8b5a975658a306bbc7165a0a2915a2fa9dbd7c01",
+        "date": "2026-01-09",
+        "message": "chore: resolve lint warnings and refine update generation",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2cab03bbd24fea10ee61803390ecca40291116b3",
+        "date": "2026-01-09",
+        "message": "fix: commit remaining file updates for docs and typescript interface fixes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "54841d1df3ddbe7b2a8f97601b53bae2717866e5",
+        "date": "2026-01-09",
+        "message": "docs: add Project Updates feature to frontend architecture",
+        "author": "farrokh"
+      },
+      {
+        "hash": "77ca9c62de92f6039964bffefa55f9c3140290bc",
+        "date": "2026-01-09",
+        "message": "chore: update bun.lock for @types/node v22",
+        "author": "farrokh"
+      },
+      {
+        "hash": "bf34310ee5f56757e4d4b8d7e6f786552d5e0d46",
+        "date": "2026-01-09",
+        "message": "fix: address PR review comments (linting, git parsing, node version)",
+        "author": "farrokh"
+      },
+      {
+        "hash": "3d958191fb7a875367fc000b7fd57f38ee1fdd82",
+        "date": "2026-01-09",
+        "message": "chore: add deploy:frontend script to monorepo root",
+        "author": "farrokh"
+      },
+      {
+        "hash": "a719f3b7d17d988ae23d1415d07ea5fa7c7d26b7",
+        "date": "2026-01-09",
+        "message": "feat: add 'bun run deploy:prod' script to automate updates and deployment",
+        "author": "farrokh"
+      },
+      {
+        "hash": "de04bee45f45b8fd251377ac85be0d08ac9571e7",
+        "date": "2026-01-09",
+        "message": "fix: move build script to frontend scope and add resilience for vercel cli builds",
+        "author": "farrokh"
+      },
+      {
+        "hash": "f2076135c00881d395ebfa57d7dcbd6d9ae9bd7a",
+        "date": "2026-01-09",
+        "message": "feat: Automated, localized changelog with AI translation",
+        "author": "farrokh"
+      },
+      {
         "hash": "23194994942abb9901ed04350e44a91b2f8d2a5e",
         "date": "2026-01-09",
         "message": "Merge pull request #58 from farrokh/fix/image-corruption",
@@ -47,11 +113,61 @@
     ],
     "public": [
       {
+        "hash": "2cab03bbd24fea10ee61803390ecca40291116b3",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Commit remaining file updates for docs and typescript interface fixes",
+          "fa": "بروزرسانی‌های باقی‌مانده فایل‌ها برای مستندات و اصلاحات رابط TypeScript"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "bf34310ee5f56757e4d4b8d7e6f786552d5e0d46",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Address PR review comments (linting, git parsing, node version)",
+          "fa": "پرداختن به نظرات بازبینی PR (لینتینگ، تجزیه گیت، نسخه نود)"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "a719f3b7d17d988ae23d1415d07ea5fa7c7d26b7",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Add 'bun run deploy:prod' script to automate updates and deployment",
+          "fa": "اضافه کردن اسکریپت 'bun run deploy:prod' برای خودکارسازی بروزرسانی‌ها و استقرار"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "de04bee45f45b8fd251377ac85be0d08ac9571e7",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Move build script to frontend scope and add resilience for vercel cli builds",
+          "fa": "انتقال اسکریپت ساخت به دامنه فرانت‌اند و افزودن تاب‌آوری برای ساخت‌های Vercel CLI"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "f2076135c00881d395ebfa57d7dcbd6d9ae9bd7a",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Automated, localized changelog with AI translation",
+          "fa": "چنگ‌لوگ خودکار و محلی‌سازی شده با ترجمه هوش مصنوعی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
         "hash": "71de2c0ab9a2f18a389469f367c856a051412332",
         "date": "2026-01-09",
         "message": {
           "en": "Implement privacy-compliant PostHog analytics",
-          "fa": "پیاده‌سازی تحلیلات PostHog مطابق با قوانین حفظ حریم خصوصی"
+          "fa": "پیاده‌سازی تحلیل‌های PostHog مطابق با حریم خصوصی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -61,7 +177,7 @@
         "date": "2026-01-09",
         "message": {
           "en": "Add TypeScript type annotation for edgeTypes",
-          "fa": "اضافه کردن Annotation نوع TypeScript برای edgeTypes"
+          "fa": "اضافه کردن حاشیه‌نویسی نوع TypeScript برای edgeTypes"
         },
         "author": "farrokh",
         "type": "fix"
@@ -71,7 +187,7 @@
         "date": "2026-01-09",
         "message": {
           "en": "Resolve PostHog routing conflicts and React Flow edge type warnings",
-          "fa": "رفع تعارض‌های مسیریابی PostHog و هشدارهای نوع edge React Flow"
+          "fa": "حل تعارض‌های مسیریابی PostHog و هشدارهای نوع لبه React Flow"
         },
         "author": "farrokh",
         "type": "fix"
@@ -81,7 +197,7 @@
         "date": "2026-01-09",
         "message": {
           "en": "Add PostHog analytics integration",
-          "fa": "اضافه کردن یکپارچه‌سازی تحلیلات PostHog"
+          "fa": "اضافه کردن یکپارچه‌سازی آنالیز PostHog"
         },
         "author": "farrokh",
         "type": "feature"
@@ -91,7 +207,7 @@
         "date": "2026-01-09",
         "message": {
           "en": "Lint cleanup and documentation",
-          "fa": "پاک‌سازی lint و مستندسازی"
+          "fa": "تمیز کردن لینت و مستندسازی"
         },
         "author": "farrokh",
         "type": "fix"
@@ -336,7 +452,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Incorrect column name in 0009",
-          "fa": "نام ستون نادرست در ۰۰۰۹"
+          "fa": "نام ستون نادرست در 0009"
         },
         "author": "farrokh",
         "type": "fix"
@@ -346,7 +462,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Sanitize image URLs and migrate corrupted data",
-          "fa": "شست‌وشوی URLهای تصویر و مهاجرت داده‌های خراب"
+          "fa": "پاکسازی URLهای تصویر و مهاجرت داده‌های خراب"
         },
         "author": "farrokh",
         "type": "fix"
@@ -356,7 +472,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Add data migration to clean up corrupted presigned URLs",
-          "fa": "اضافه کردن مهاجرت داده برای پاک‌سازی URLهای پیش‌امضا شده خراب"
+          "fa": "اضافه کردن مهاجرت داده‌ها برای پاکسازی URLهای presigned خراب"
         },
         "author": "farrokh",
         "type": "fix"
@@ -366,7 +482,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Use persistent CDN URLs for profile images instead of expiring presigned URLs",
-          "fa": "استفاده از URLهای CDN دائمی برای تصاویر پروفایل به جای URLهای پیش‌امضا شده‌ای که منقضی می‌شوند"
+          "fa": "استفاده از URLهای CDN دائمی برای تصاویر پروفایل به جای URLهای presigned منقضی‌شونده"
         },
         "author": "farrokh",
         "type": "fix"
@@ -376,7 +492,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Refine search locale handling, state management, and combobox accessibility",
-          "fa": "بهبود مدیریت زبان جستجو، مدیریت حالت و دسترسی به combobox"
+          "fa": "بهبود مدیریت محلی جستجو، مدیریت حالت و دسترسی به combobox"
         },
         "author": "farrokh",
         "type": "feature"
@@ -386,7 +502,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Restore mode-change reset behavior in GraphCanvas and clean up lint suppressions",
-          "fa": "بازگرداندن رفتار بازنشانی تغییر حالت در GraphCanvas و پاک‌سازی suppressions lint"
+          "fa": "برگرداندن رفتار بازنشانی تغییر حالت در GraphCanvas و پاکسازی سرکوب‌های لینت"
         },
         "author": "farrokh",
         "type": "fix"
@@ -396,7 +512,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Satisfy accessibility lint rules for search results",
-          "fa": "رعایت قوانین دسترسی lint برای نتایج جستجو"
+          "fa": "رعایت قوانین دسترسی لینت برای نتایج جستجو"
         },
         "author": "farrokh",
         "type": "fix"
@@ -406,7 +522,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Enhance search keyboard navigation, accessibility, and partial failure handling",
-          "fa": "بهبود ناوبری صفحه کلید جستجو، دسترسی و مدیریت خطاهای جزئی"
+          "fa": "بهبود ناوبری صفحه‌کلید جستجو، دسترسی و مدیریت خطاهای جزئی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -416,7 +532,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Address linting issues and add missing dependency",
-          "fa": "حل مشکلات linting و اضافه کردن وابستگی‌های گمشده"
+          "fa": "پرداختن به مسائل لینت و اضافه کردن وابستگی‌های گم‌شده"
         },
         "author": "farrokh",
         "type": "fix"
@@ -426,7 +542,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Add graph search, detail page enhancements, and browser history",
-          "fa": "اضافه کردن جستجوی گراف، بهبودهای صفحه جزئیات و تاریخچه مرورگر"
+          "fa": "اضافه کردن جستجوی گراف، بهبود صفحه جزئیات و تاریخچه مرورگر"
         },
         "author": "farrokh",
         "type": "feature"
@@ -436,7 +552,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Improve individual update logic for role occupancy",
-          "fa": "بهبود منطق بروزرسانی فردی برای اشغال نقش"
+          "fa": "بهبود منطق بروزرسانی فردی برای اشغال نقش‌ها"
         },
         "author": "farrokh",
         "type": "fix"
@@ -456,7 +572,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Add 'New Organization' context menu item to isolated graph view",
-          "fa": "اضافه کردن گزینه منوی زمینه 'سازمان جدید' به نمای گراف ایزوله"
+          "fa": "اضافه کردن گزینه منوی متنی 'سازمان جدید' به نمای گراف ایزوله"
         },
         "author": "farrokh",
         "type": "feature"
@@ -476,7 +592,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Report links a11y & person history translation",
-          "fa": "گزارش دسترسی پیوندها و ترجمه تاریخچه شخصی"
+          "fa": "گزارش پیوندهای دسترسی و ترجمه تاریخچه‌ی شخص"
         },
         "author": "farrokh",
         "type": "fix"
@@ -486,7 +602,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Enhance individual/report details and mobile exp",
-          "fa": "بهبود جزئیات فردی/گزارش و تجربه موبایل"
+          "fa": "بهبود جزئیات فردی/گزارش و تجارب موبایل"
         },
         "author": "farrokh",
         "type": "feature"
@@ -496,7 +612,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Fix role dropdown translations",
-          "fa": "رفع ترجمه‌های کشویی نقش"
+          "fa": "اصلاح ترجمه‌های منوی کشویی نقش"
         },
         "author": "farrokh",
         "type": "fix"
@@ -506,7 +622,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Fix backend linting and formatting issues",
-          "fa": "رفع مشکلات linting و فرمت بندی در سمت سرور"
+          "fa": "رفع مشکلات لینتینگ و فرمت‌دهی در بخش Backend"
         },
         "author": "farrokh",
         "type": "ui"
@@ -516,7 +632,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Enhance admin panel with image upload and graph edit shortcuts",
-          "fa": "بهبود پنل مدیریت با بارگذاری تصویر و میانبرهای ویرایش گراف"
+          "fa": "بهبود پنل مدیریت با بارگذاری تصاویر و میانبرهای ویرایش گراف"
         },
         "author": "farrokh",
         "type": "feature"
@@ -526,7 +642,7 @@
         "date": "2026-01-08",
         "message": {
           "en": "Eliminate SearchableSelect dropdown flickering and add proper spacing",
-          "fa": "از بین بردن لرزش کشوی SearchableSelect و اضافه کردن فاصله مناسب"
+          "fa": "حذف لرزش منوی کشویی Selectable در جستجو و افزودن فاصله مناسب"
         },
         "author": "farrokh",
         "type": "fix"
@@ -819,7 +935,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Add mobile not ready warning message",
-          "fa": "اضافه کردن پیام هشدار عدم آمادگی برای موبایل"
+          "fa": "اضافه کردن پیام هشدار برای ناآمادگی موبایل"
         },
         "author": "farrokh",
         "type": "feature"
@@ -829,7 +945,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Automate SEO image generation on entity creation/update",
-          "fa": "خودکار کردن تولید تصاویر SEO در زمان ایجاد/به‌روزرسانی موجودیت"
+          "fa": "خودکارسازی تولید تصاویر SEO در زمان ایجاد/بروزرسانی موجودیت"
         },
         "author": "farrokh",
         "type": "feature"
@@ -839,7 +955,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Add organization SEO support and canonical og:url",
-          "fa": "اضافه کردن پشتیبانی SEO برای سازمان و og:url استاندارد"
+          "fa": "اضافه کردن پشتیبانی SEO سازمان و og:url کاننیکال"
         },
         "author": "farrokh",
         "type": "feature"
@@ -849,7 +965,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Add dynamic Open Graph tags for individual profile views",
-          "fa": "اضافه کردن برچسب‌های Open Graph دینامیک برای نمای پروفایل فردی"
+          "fa": "اضافه کردن برچسب‌های Open Graph دینامیک برای نمای پروفایل‌های فردی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -869,7 +985,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Robust image fetching and logo fallback",
-          "fa": "دریافت تصویر قوی و جایگزینی لوگو"
+          "fa": "بازیابی قوی تصاویر و پشتیبان‌گیری لوگو"
         },
         "author": "farrokh",
         "type": "fix"
@@ -879,7 +995,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Fix production image generation",
-          "fa": "رفع تولید تصویر در تولید"
+          "fa": "رفع تولید تصویر در محیط تولید"
         },
         "author": "farrokh",
         "type": "fix"
@@ -889,7 +1005,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Redesign SEO images and fix image fetching logic",
-          "fa": "طراحی مجدد تصاویر SEO و رفع منطق دریافت تصاویر"
+          "fa": "طراحی مجدد تصاویر SEO و اصلاح منطق بازیابی تصویر"
         },
         "author": "farrokh",
         "type": "feature"
@@ -909,7 +1025,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Apply linting and formatting",
-          "fa": "اعمال linting و فرمت بندی"
+          "fa": "اعمال لینتینگ و فرمت‌دهی"
         },
         "author": "farrokh",
         "type": "fix"
@@ -919,7 +1035,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Add SEO images for social media sharing",
-          "fa": "اضافه کردن تصاویر SEO برای به اشتراک‌گذاری در شبکه‌های اجتماعی"
+          "fa": "اضافه کردن تصاویر SEO برای اشتراک‌گذاری در رسانه‌های اجتماعی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -929,7 +1045,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Fix stroke width formatting in GraphCanvas component",
-          "fa": "رفع فرمت عرض خط در کامپوننت GraphCanvas"
+          "fa": "اصلاح فرمت ضخامت خط در کامپوننت GraphCanvas"
         },
         "author": "farrokh",
         "type": "fix"
@@ -939,7 +1055,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Fix timeline range to include all role occupancy dates",
-          "fa": "رفع دامنه زمان‌بندی برای شامل شدن تمام تاریخ‌های اشغال نقش"
+          "fa": "اصلاح دامنه زمانی برای شامل کردن همه تاریخ‌های اشغال نقش"
         },
         "author": "farrokh",
         "type": "fix"
@@ -949,7 +1065,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Enhance admin panel with end date support and accessibility improvements",
-          "fa": "بهبود پنل مدیریت با پشتیبانی از تاریخ پایان و بهبود دسترسی"
+          "fa": "بهبود پنل مدیریت با پشتیبانی تاریخ پایان و بهبودهای دسترسی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -959,7 +1075,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Use `notFound()` for missing pages and prefix all internal navigation paths with the current locale.",
-          "fa": "استفاده از `notFound()` برای صفحات مفقود و پیشوند دادن به تمام مسیرهای ناوبری داخلی با زبان فعلی."
+          "fa": "استفاده از `notFound()` برای صفحات گم‌شده و اضافه کردن پیشوند همه مسیرهای ناوبری داخلی با محل فعلی."
         },
         "author": "farrokh",
         "type": "feature"
@@ -989,7 +1105,7 @@
         "date": "2026-01-07",
         "message": {
           "en": "Implement SEO Metadata for Organization and Report pages",
-          "fa": "پیاده‌سازی Metadata SEO برای صفحات سازمان و گزارش"
+          "fa": "پیاده‌سازی متا دیتاهای SEO برای صفحات سازمان و گزارش"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1268,7 +1384,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Implement UUID-based shareable links for all entities",
-          "fa": "پیاده‌سازی پیوندهای قابل اشتراک‌گذاری مبتنی بر UUID برای تمام موجودیت‌ها"
+          "fa": "پیاده‌سازی پیوندهای قابل اشتراک‌گذاری بر اساس UUID برای همه موجودیت‌ها"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1278,7 +1394,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Resolve lint and type errors",
-          "fa": "حل مشکلات lint و نوع"
+          "fa": "رفع خطاهای lint و type"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1288,7 +1404,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Enhance copy toast accessibility and sort role occupancy by start date in descending order",
-          "fa": "بهبود دسترسی toast کپی و مرتب‌سازی اشغال نقش بر اساس تاریخ شروع به ترتیب نزولی"
+          "fa": "بهبود دسترسی toast کپی و مرتب‌سازی اشغال نقش‌ها براساس تاریخ شروع به ترتیب نزولی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1298,7 +1414,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Resolve React Flow warnings with strict memoization and custom edge type registration",
-          "fa": "حل هشدارهای React Flow با حفظ دقیق و ثبت نوع لبه سفارشی"
+          "fa": "رفع هشدارهای React Flow با استفاده از memoization سختگیرانه و ثبت نوع لبه سفارشی"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1308,7 +1424,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Implement hierarchical breadcrumb navigation with backend support",
-          "fa": "پیاده‌سازی ناوبری نانویسی سلسله‌مراتبی با پشتیبانی از سمت سرور"
+          "fa": "اجرای ناوبری نانوشته سلسله‌مراتبی با پشتیبانی از backend"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1318,7 +1434,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Resolve URL state bugs and enhance error handling",
-          "fa": "حل باگ‌های وضعیت URL و بهبود مدیریت خطا"
+          "fa": "رفع اشکالات وضعیت URL و بهبود مدیریت خطا"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1328,7 +1444,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Enhance admin panel with stable data fetching, improved UX feedback, and robust user management",
-          "fa": "بهبود پنل مدیریت با دریافت داده پایدار، بازخورد تجربی کاربری بهبود یافته و مدیریت کاربر قوی"
+          "fa": "بهبود پنل مدیریت با بارگذاری پایدار داده‌ها، بازخورد UX بهبود یافته و مدیریت کاربر قوی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1338,7 +1454,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Fix linting and formatting issues",
-          "fa": "رفع مشکلات linting و قالب بندی"
+          "fa": "رفع مشکلات linting و فرمت‌بندی"
         },
         "author": "farrokh",
         "type": "ui"
@@ -1348,7 +1464,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Implement xhr upload for progress tracking and update roadmap",
-          "fa": "پیاده‌سازی بارگذاری xhr برای پیگیری پیشرفت و به‌روزرسانی نقشه راه"
+          "fa": "اجرای بارگذاری xhr برای پیگیری پیشرفت و به‌روزرسانی نقشه راه"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1358,7 +1474,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Resolve missing english translations in drill-down views",
-          "fa": "حل مشکلات ترجمه زبان انگلیسی در نمای‌های drill-down"
+          "fa": "رفع ترجمه‌های نادرست انگلیسی در نمای‌های drill-down"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1368,7 +1484,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Fix report detail page blocking overlay",
-          "fa": "رفع پوشش مانع مسدودکننده در صفحه جزئیات گزارش"
+          "fa": "رفع لایه پوششی مسدود کننده در صفحه جزئیات گزارش"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1378,7 +1494,7 @@
         "date": "2026-01-06",
         "message": {
           "en": "Fix lint formatting and select a11y",
-          "fa": "رفع قالب‌بندی lint و انتخاب دسترسی"
+          "fa": "رفع فرمت‌بندی lint و انتخاب a11y"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1467,7 +1583,7 @@
         "date": "2026-01-05",
         "message": {
           "en": "Add tailwind typography plugin and redesign report/legal pages",
-          "fa": "افزودن پلاگین تایپوگرافی Tailwind و طراحی مجدد صفحات گزارش/ قانونی"
+          "fa": "اضافه کردن پلاگین تایپوگرافی tailwind و طراحی مجدد صفحات گزارش/قانونی"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1477,7 +1593,7 @@
         "date": "2026-01-05",
         "message": {
           "en": "Add editorial-style About page with bilingual content",
-          "fa": "افزودن صفحه درباره به سبک ویرایشگر با محتوای دو زبانه"
+          "fa": "اضافه کردن صفحه About با محتوای دو زبانه به سبک ویرایشی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1487,7 +1603,7 @@
         "date": "2026-01-05",
         "message": {
           "en": "Fix dark mode shadows, panel borders and hover states",
-          "fa": "رفع سایه‌ها در حالت تاریک، مرزهای پنل و حالت‌های هاور"
+          "fa": "رفع سایه‌های حالت تاریک، حاشیه‌های پنل و حالت‌های hover"
         },
         "author": "farrokh",
         "type": "ui"
@@ -1507,7 +1623,7 @@
         "date": "2026-01-05",
         "message": {
           "en": "Add Todo model to Amplify schema and remove API key expiration configuration.",
-          "fa": "افزودن مدل Todo به طرح Amplify و حذف پیکربندی انقضای کلید API."
+          "fa": "اضافه کردن مدل Todo به طرح Amplify و حذف پیکربندی انقضای کلید API."
         },
         "author": "farrokh",
         "type": "feature"
@@ -1517,7 +1633,7 @@
         "date": "2026-01-05",
         "message": {
           "en": "Add Dockerfiles for frontend and backend, integrate AWS Amplify, and document production deployment workflow.",
-          "fa": "افزودن Dockerfile برای فرانت‌اند و بک‌اند، ادغام AWS Amplify و مستندسازی فرآیند استقرار در تولید."
+          "fa": "اضافه کردن Dockerfileها برای frontend و backend، ادغام AWS Amplify و مستندسازی روند استقرار تولید."
         },
         "author": "farrokh",
         "type": "feature"
@@ -1900,7 +2016,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Add iranian government organization seed data",
-          "fa": "افزودن داده‌های بذر سازمان دولتی ایرانی"
+          "fa": "اضافه کردن داده‌های اولیه سازمان‌های دولتی ایران"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1910,7 +2026,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Add Slack notifications for key events",
-          "fa": "افزودن اعلان‌های Slack برای رویدادهای کلیدی"
+          "fa": "اضافه کردن نوتفیکیشن‌های Slack برای رویدادهای کلیدی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1920,7 +2036,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Implement user signup, email verification, and SEO foundations",
-          "fa": "پیاده‌سازی ثبت‌نام کاربر، تأیید ایمیل و مبانی سئو"
+          "fa": "اجرای ثبت‌نام کاربر، تأیید ایمیل و ایجاد بنیادهای SEO"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1930,7 +2046,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Add end date support for role occupancy",
-          "fa": "افزودن پشتیبانی از تاریخ پایان برای اشغال نقش"
+          "fa": "اضافه کردن پشتیبانی از تاریخ پایان برای اشغال نقش‌ها"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1940,7 +2056,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Resolve lint and type check errors",
-          "fa": "حل خطاهای lint و بررسی نوع"
+          "fa": "رفع خطاهای lint و type check"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1950,7 +2066,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Implement Content Reporting System and Rich Media Support",
-          "fa": "پیاده‌سازی سیستم گزارش‌دهی محتوا و پشتیبانی از رسانه‌های غنی"
+          "fa": "اجرای سیستم گزارش‌گیری محتوا و پشتیبانی از رسانه‌های غنی"
         },
         "author": "farrokh",
         "type": "feature"
@@ -1960,7 +2076,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Apply biome formatting fixes",
-          "fa": "اعمال اصلاحات قالب‌بندی بیوم"
+          "fa": "اعمال اصلاحات فرمت‌بندی biome"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1970,7 +2086,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Fix stale vote counts by moving queries inside transactions",
-          "fa": "رفع شمارش آرای قدیمی با جابجایی پرسش‌ها درون تراکنش‌ها"
+          "fa": "رفع تعداد رای‌های قدیمی با جابجایی پرسش‌ها به داخل تراکنش‌ها"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1980,7 +2096,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Fix race condition in removeVote by moving all reads inside transaction",
-          "fa": "رفع شرایط مسابقه در removeVote با جابجایی تمام خواندن‌ها درون تراکنش"
+          "fa": "رفع حالت رقابتی در removeVote با جابجایی تمام خواندن‌ها به داخل تراکنش"
         },
         "author": "farrokh",
         "type": "fix"
@@ -1990,7 +2106,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Fix CSRF token endpoint path alignment and refine liquid glass effect",
-          "fa": "تنظیم مسیری برای نقطه پایانه توکن CSRF و اصلاح اثر شیشه مایع"
+          "fa": "رفع تراز مسیر endpoint توکن CSRF و بهبود اثر شیشه مایع"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2000,7 +2116,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Fix active-state logic for Graph nav link by using localized usePathname",
-          "fa": "رفع منطق حالت فعال برای پیوند ناوبری گراف با استفاده از usePathname محلی‌سازی شده"
+          "fa": "رفع منطق حالت فعال برای لینک ناوبری گراف با استفاده از usePathname محلی‌سازی شده"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2010,7 +2126,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Memoize logout function to prevent unnecessary re-renders",
-          "fa": "توابع خروج را به‌صورت مموری‌سازی شده برای جلوگیری از تجدید دوباره‌های غیرضروری ذخیره کنید"
+          "fa": "Memoize کردن تابع خروج برای جلوگیری از رندرهای غیرضروری مجدد"
         },
         "author": "farrokh",
         "type": "performance"
@@ -2020,7 +2136,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Add English translations and localize graph view",
-          "fa": "افزودن ترجمه‌های انگلیسی و محلی‌سازی نمای گراف"
+          "fa": "اضافه کردن ترجمه‌های انگلیسی و محلی‌سازی نمای گراف"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2030,7 +2146,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "UI Enhancements: Update voting buttons to Agree/Disagree, implement liquid glass toolbar effect, and refine graph UI",
-          "fa": "بهبودهای UI: به‌روزرسانی دکمه‌های رأی‌گیری به موافقت/عدم موافقت، پیاده‌سازی اثر نوار ابزار شیشه مایع و پیشرفت UI گراف"
+          "fa": "بهبودهای UI: به‌روزرسانی دکمه‌های رأی‌گیری به موافق/مخالف، اجرای اثر ابزار شیشه مایع، و بهبود UI گراف"
         },
         "author": "farrokh",
         "type": "ui"
@@ -2040,7 +2156,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Implement voting, centralization CSRF, and UI fixes",
-          "fa": "پیاده‌سازی رأی‌گیری، متمرکزسازی CSRF و اصلاحات UI"
+          "fa": "اجرای رأی‌گیری، متمرکز کردن CSRF و اصلاحات UI"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2050,7 +2166,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Make remove button visible on keyboard focus",
-          "fa": "نمایش دکمه حذف در حالت تمرکز صفحه کلید"
+          "fa": "نمایش دکمه حذف هنگام فوکوس صفحه‌کلید"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2060,7 +2176,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Preserve blob preview URLs after media upload completion",
-          "fa": "حفظ URLهای پیش‌نمایش blob پس از اتمام بارگذاری رسانه"
+          "fa": "حفظ URLهای پیش‌نمایش blob پس از تکمیل بارگذاری رسانه"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2070,7 +2186,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Replace hardcoded strings with translations in media-uploader",
-          "fa": "جایگزینی رشته‌های ثابت با ترجمه‌ها در بارگذاری‌کننده رسانه"
+          "fa": "جایگزینی رشته‌های سخت‌کد شده با ترجمه‌ها در بارگذار رسانه"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2080,7 +2196,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Add in-memory fallback, metrics, and fail-closed mode",
-          "fa": "افزودن پشتیبان‌گیری در حافظه، متریک‌ها و حالت عدم موفقیت با بسته شدن"
+          "fa": "اضافه کردن پشتیبانی از حافظه موقت، متریک‌ها و حالت ایمن"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2090,7 +2206,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Implement CSRF token fetching in report submission",
-          "fa": "پیاده‌سازی دریافت توکن CSRF در ارائه گزارش"
+          "fa": "اجرای دریافت توکن CSRF در ارسال گزارش"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2100,7 +2216,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Update import statement and normalize solution comparison in PoW validator",
-          "fa": "به‌روزرسانی دستور واردات و نرمال‌سازی مقایسه راه‌حل در تأییدکننده PoW"
+          "fa": "به‌روزرسانی عبارت واردات و نرمال‌سازی مقایسه راه‌حل در تأییدکننده PoW"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2110,7 +2226,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Resolve lint and formatting issues",
-          "fa": "رفع مسائل lint و قالب‌بندی"
+          "fa": "رفع مشکلات lint و فرمت‌بندی"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2120,7 +2236,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Resolve nested interactive elements in lightbox modal",
-          "fa": "حل عناصر تعاملی تو در تو در مودال lightbox"
+          "fa": "رفع عناصر تعاملی تو در تو در مودال lightbox"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2130,7 +2246,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Revoke blob URLs in MediaUploader to prevent memory leaks",
-          "fa": "تنسیخ URLهای blob در MediaUploader برای جلوگیری از نشت حافظه"
+          "fa": "بازپس‌گیری URLهای blob در MediaUploader برای جلوگیری از نشت حافظه"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2140,7 +2256,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Implement CSRF protection for state-changing operations",
-          "fa": "پیاده‌سازی حفاظت CSRF برای عملیات تغییر دهنده حالت"
+          "fa": "اجرای حفاظت CSRF برای عملیات تغییر‌دهنده حالت"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2150,7 +2266,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Ensure proper database connection handling",
-          "fa": "اطمینان از مدیریت صحیح اتصال به پایگاه داده"
+          "fa": "اطمینان از مدیریت صحیح اتصال پایگاه داده"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2160,7 +2276,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Add SQL LIKE pattern escaping for search functionality",
-          "fa": "افزودن فرار از الگوی SQL LIKE برای عملکرد جستجو"
+          "fa": "اضافه کردن الگوی فرار LIKE SQL برای قابلیت جستجو"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2180,7 +2296,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Update class names for improved styling consistency",
-          "fa": "به‌روزرسانی نام کلاس‌ها برای بهبود سازگاری در سبک"
+          "fa": "به‌روزرسانی نام کلاس‌ها برای بهبود سازگاری در استایل"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2190,7 +2306,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Add optional details field to error object in ApiResponse",
-          "fa": "افزودن فیلد جزئیات اختیاری به شیء خطا در ApiResponse"
+          "fa": "اضافه کردن فیلد جزئیات اختیاری به شیء خطا در ApiResponse"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2210,7 +2326,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Add error handling for invalid date strings in formatDate function",
-          "fa": "افزودن مدیریت خطا برای رشته‌های تاریخ نامعتبر در تابع formatDate"
+          "fa": "اضافه کردن مدیریت خطا برای رشته‌های تاریخ نامعتبر در تابع formatDate"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2220,7 +2336,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Add error handling for missing S3 bucket configuration",
-          "fa": "افزودن مدیریت خطا برای پیکربندی سطل S3 گم‌شده"
+          "fa": "اضافه کردن مدیریت خطا برای پیکربندی نادرست سطل S3"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2230,7 +2346,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Update challenge property naming for consistency",
-          "fa": "به‌روزرسانی نام‌گذاری ویژگی چالش برای سازگاری"
+          "fa": "به‌روزرسانی نام‌گذاری ویژگی چالش برای انسجام"
         },
         "author": "farrokh",
         "type": "fix"
@@ -2260,7 +2376,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Enable anonymous creation of organizations, individuals, and roles with session tracking",
-          "fa": "فعال کردن ایجاد ناشناس سازمان‌ها، افراد و نقش‌ها با ردیابی جلسه"
+          "fa": "فعال‌سازی ایجاد ناشناس سازمان‌ها، افراد و نقش‌ها همراه با ردیابی جلسه"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2270,7 +2386,7 @@
         "date": "2026-01-04",
         "message": {
           "en": "Implement code review feedback and add architecture docs",
-          "fa": "پیاده‌سازی بازخورد بررسی کد و افزودن مستندات معماری"
+          "fa": "پیاده‌سازی بازخورد کد بازبینی و افزودن مستندات معماری"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2353,7 +2469,7 @@
         "date": "2026-01-03",
         "message": {
           "en": "Implement system theme support, shared navbar, and media gallery refactor",
-          "fa": "پشتیبانی از تم سیستم، نوار جستجوی مشترک و بازنگری گالری رسانه را پیاده‌سازی کنید"
+          "fa": "پیاده‌سازی پشتیبانی از تم سیستم، نوار ابزار مشترک، و بازسازی گالری رسانه"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2363,7 +2479,7 @@
         "date": "2026-01-03",
         "message": {
           "en": "Implement robust authentication and authorization middleware, enhance graph with loading states and new report node type.",
-          "fa": "پیاده‌سازی middleware قوی برای احراز هویت و مجوز، و بهبود گراف با وضعیت‌های بارگذاری و نوع جدید نود گزارش."
+          "fa": "پیاده‌سازی میان‌افزار قوی برای احراز هویت و مجوز، بهبود نمودار با وضعیت بارگذاری و نوع گره گزارش جدید."
         },
         "author": "farrokh",
         "type": "feature"
@@ -2373,7 +2489,7 @@
         "date": "2026-01-03",
         "message": {
           "en": "Remove GitHub OAuth integration and enhance Google OAuth security by preventing automatic account linking to existing email accounts.",
-          "fa": "ادغام OAuth گیت‌هاب را حذف کرده و امنیت OAuth گوگل را با جلوگیری از پیوند خودکار حساب به حساب‌های ایمیل موجود تقویت کنید."
+          "fa": "حذف یکپارچه‌سازی OAuth با GitHub و تقویت امنیت OAuth با گوگل با جلوگیری از لینک‌سازی خودکار حساب‌ها به حساب‌های ایمیل موجود."
         },
         "author": "farrokh",
         "type": "feature"
@@ -2383,7 +2499,7 @@
         "date": "2026-01-03",
         "message": {
           "en": "Enhance modal component with new sizing, close button control, and styling, and document implemented graph management features.",
-          "fa": "اجزای مدال را با اندازه‌گیری‌های جدید، کنترل دکمه بستن و استایل بهبود دهید و ویژگی‌های مدیریت گراف پیاده‌سازی شده را مستند کنید."
+          "fa": "بهبود مولفه مودال با اندازه‌گیری جدید، کنترل دکمه بستن و استایل، و مستند سازی ویژگی‌های مدیریت نمودار پیاده‌سازی شده."
         },
         "author": "farrokh",
         "type": "feature"
@@ -2508,7 +2624,7 @@
         "date": "2026-01-02",
         "message": {
           "en": "Add inline role creation when adding a person",
-          "fa": "افزودن ایجاد نقش درون‌خطی هنگام افزودن یک فرد"
+          "fa": "افزودن ایجاد نقش داخلی هنگام افزودن شخص"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2518,7 +2634,7 @@
         "date": "2026-01-02",
         "message": {
           "en": "Add person modal for creating individuals",
-          "fa": "مدال افزودن فرد برای ایجاد افراد را اضافه کنید"
+          "fa": "افزودن مودال شخص برای ایجاد افراد"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2528,7 +2644,7 @@
         "date": "2026-01-02",
         "message": {
           "en": "Add directional edges to graph connecting parent/child organizations",
-          "fa": "اضافه کردن لبه‌های جهت‌دار به گراف که سازمان‌های والد/کودک را متصل می‌کند"
+          "fa": "افزودن لبه‌های جهت‌دار به نمودار که سازمان‌های والد و فرزند را متصل می‌کند"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2538,7 +2654,7 @@
         "date": "2026-01-02",
         "message": {
           "en": "Add organization modal and graph toolbar",
-          "fa": "مدال سازمان و نوار ابزار گراف را اضافه کنید"
+          "fa": "افزودن مودال سازمان و نوار ابزار نمودار"
         },
         "author": "farrokh",
         "type": "feature"
@@ -2568,7 +2684,7 @@
         "date": "2026-01-02",
         "message": {
           "en": "Update contact email for security issues in SECURITY.md",
-          "fa": "به‌روزرسانی ایمیل تماس برای مشکلات امنیتی در SECURITY.md"
+          "fa": "به‌روزرسانی ایمیل تماس برای مسائل امنیتی در SECURITY.md"
         },
         "author": "farrokh",
         "type": "fix"
