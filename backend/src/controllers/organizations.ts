@@ -480,9 +480,7 @@ export async function updateOrganization(req: Request, res: Response) {
         updatedOrg.shareableUuid,
         updatedOrg.nameEn || updatedOrg.name,
         // Pass the original non-presigned URL from the database/updateData
-        updateData.logoUrl !== undefined
-          ? (updateData.logoUrl as string)
-          : existingOrg.logoUrl
+        updateData.logoUrl !== undefined ? (updateData.logoUrl as string) : existingOrg.logoUrl
       ).catch(err => console.error('SEO image generation error:', err));
     }
 

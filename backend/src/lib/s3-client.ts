@@ -274,7 +274,7 @@ export function extractS3KeyFromUrl(url: string | null | undefined): string | nu
     }
 
     return decodeURIComponent(key);
-  } catch (e) {
+  } catch (_e) {
     return url; // fallback
   }
 }
