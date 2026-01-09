@@ -78,6 +78,7 @@ export function Navbar() {
             { href: '/', label: t('graph') },
             { href: '/reports', label: t('reports') },
             { href: '/about', label: t('about') },
+            { href: '/updates', label: t('updates') },
           ].map(link => (
             <Link
               key={link.href}

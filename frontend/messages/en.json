@@ -61,6 +61,7 @@
     "profile": "Profile",
     "logout": "Logout",
     "tutorial": "Tutorial",
+    "updates": "Updates",
     "tutorial_hint": "New here? Tap this tutorial to see a quick Instagram walkthrough of how to use the system.",
     "close": "Close"
   },
@@ -581,5 +582,22 @@
       "thirdparty_title": "3. Third-Party Content",
       "thirdparty_body": "Some content on the platform may be sourced from public domain records or other openly licensed sources. We strive to attribute these sources correctly."
     }
+  },
+  "updates": {
+    "title": "Project Updates",
+    "description": "Stay informed about the latest changes, improvements, and technical updates to the Daadaar platform.",
+    "public_view": "Public Summary",
+    "technical_view": "Technical Log",
+    "timeline": "Timeline",
+    "no_updates": "No updates available for this period.",
+    "view_commit": "View Commit",
+    "commit_hash": "Commit Hash",
+    "author": "Author",
+    "technical_details": "Technical Details",
+    "feature": "Feature",
+    "fix": "Fix",
+    "performance": "Performance",
+    "ui": "UI/UX",
+    "documentation": "Documentation"
   }
 }

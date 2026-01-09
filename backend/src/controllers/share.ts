@@ -125,14 +125,16 @@ export async function getOrganizationByUuid(req: Request, res: Response) {
       })
     );
 
-    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with members, parent, and children
-    (organization as any).members = membersWithSignedUrls;
-    (organization as any).parent = parentOrganization;
-    (organization as any).children = childrenWithSignedUrls;
+    const organizationWithRelations = {
+      ...organization,
+      members: membersWithSignedUrls,
+      parent: parentOrganization,
+      children: childrenWithSignedUrls,
+    };
 
     res.json({
       success: true,
-      data: organization,
+      data: organizationWithRelations,
     });
   } catch (error) {
     console.error('Error getting organization by UUID:', error);
@@ -229,13 +231,15 @@ export async function getIndividualByUuid(req: Request, res: Response) {
       .orderBy(desc(schema.roleOccupancy.startDate))
       .limit(MAX_CAREER_HISTORY);
 
-    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with reports and history
-    (individual as any).reports = individualReports;
-    (individual as any).history = history;
+    const individualWithRelations = {
+      ...individual,
+      reports: individualReports,
+      history,
+    };
 
     res.json({
       success: true,
-      data: individual,
+      data: individualWithRelations,
     });
   } catch (error) {
     console.error('Error getting individual by UUID:', error);
@@ -312,12 +316,14 @@ export async function getReportByUuid(req: Request, res: Response) {
       })
     );
 
-    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with media
-    (report as any).media = mediaWithUrls;
+    const reportWithMedia = {
+      ...report,
+      media: mediaWithUrls,
+    };
 
     res.json({
-      success: true,
-      data: report,
+      success: true, // Fixed Typo in original if any? No, original was fine.
+      data: reportWithMedia,
     });
   } catch (error) {
     console.error('Error getting report by UUID:', error);

@@ -64,7 +64,12 @@ Our design system prioritizes a "Premium, State-of-the-art" feel.
    - Secure media uploader with AVIF processing.
 5. **Voting Interface**: Optimistic UI for instant feedback.
 6. **Legal & Compliance**: Dedicated pages for Terms of Service and Privacy Policy.
-7. **Admin Dashboard** (`/admin`): Comprehensive platform management interface (admin-only).
+7. **Project Updates** (`/updates`): A public changelog with:
+   - Automated git-based generation.
+   - Dual-view (Public vs Technical).
+   - AI-powered Persian translation for public updates.
+   - Interactive minimap timeline.
+8. **Admin Dashboard** (`/admin`): Comprehensive platform management interface (admin-only).
 
 ---
 

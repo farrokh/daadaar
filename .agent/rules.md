@@ -5,10 +5,11 @@
 - Ensure the local workspace is fully updated with the merged changes before deleting any local branches.
 - Never delete a branch (local or remote) until confirmation of a successful merge into the base branch.
 
-## JSON Processing
+## Command Line & JSON Handling
+- **Do not pass complex JSON or long text arguments (like PR bodies) directly in the terminal.** Use temporary files instead.
 - Do not process complex JSON output directly in the terminal.
 - Always create a temporary Python script to process JSON data if it requires extraction or transformation.
-- Delete the temporary Python script immediately after execution.
+- Delete the temporary files/scripts immediately after execution.
 
 ## Documentation Organization
 - Always organize documentation within the `docs/` directory using the following structure:
@@ -24,3 +25,9 @@
 - Always use dynamic fetching via AWS CLI (e.g., `aws sts get-caller-identity`) or environment variables to determine these values at runtime.
 - Use placeholders like `<AWS_ACCOUNT_ID>` or `<BUCKET_NAME>` in documentation and examples.
 - Never commit actual credentials, secrets, or passwords to the repository.
+
+## Automated Updates & Localization
+- **Changelog**: The project updates feed is automatically generated from git history during the build process.
+- **Localization**: Public-facing updates (`feat`, `fix`, `ui`) are automatically translated to Persian using OpenAI.
+- **Secrets**: Translations depend on `OPENAI_API_KEY`. Ensure this is present in the build environment but **NEVER** hardcoded in the script.
+- **Caching**: The `generate-updates.ts` script caches translations in `frontend/data/updates.json` to prevent re-translation and reduce costs. Always commit this JSON file to preserve the translation memory.

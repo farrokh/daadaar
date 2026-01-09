@@ -1,0 +1,2578 @@
+[
+  {
+    "date": "2026-01-09",
+    "technical": [
+      {
+        "hash": "23194994942abb9901ed04350e44a91b2f8d2a5e",
+        "date": "2026-01-09",
+        "message": "Merge pull request #58 from farrokh/fix/image-corruption",
+        "author": "farrokh"
+      },
+      {
+        "hash": "71de2c0ab9a2f18a389469f367c856a051412332",
+        "date": "2026-01-09",
+        "message": "feat: implement privacy-compliant PostHog analytics",
+        "author": "farrokh"
+      },
+      {
+        "hash": "569c7e6953dd0f87bf279c018211b3b844ab3885",
+        "date": "2026-01-09",
+        "message": "Merge pull request #57 from farrokh/fix/image-corruption",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6cc20377994046bb1bc0e5212bbf6bf3ac47c583",
+        "date": "2026-01-09",
+        "message": "fix: add TypeScript type annotation for edgeTypes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "28a281fad6a664743492ad2a02fc35526c52f996",
+        "date": "2026-01-09",
+        "message": "fix: resolve PostHog routing conflicts and React Flow edge type warnings",
+        "author": "farrokh"
+      },
+      {
+        "hash": "aa05947fc73efcd628e9391f106d375afde66ae9",
+        "date": "2026-01-09",
+        "message": "feat: add PostHog analytics integration",
+        "author": "farrokh"
+      },
+      {
+        "hash": "55f4614c99606e7e4cf1ee7f0e11cea1dc2e68c7",
+        "date": "2026-01-09",
+        "message": "fix: lint cleanup and documentation",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "71de2c0ab9a2f18a389469f367c856a051412332",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Implement privacy-compliant PostHog analytics",
+          "fa": "پیاده‌سازی تحلیلات PostHog مطابق با قوانین حفظ حریم خصوصی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "6cc20377994046bb1bc0e5212bbf6bf3ac47c583",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Add TypeScript type annotation for edgeTypes",
+          "fa": "اضافه کردن Annotation نوع TypeScript برای edgeTypes"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "28a281fad6a664743492ad2a02fc35526c52f996",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Resolve PostHog routing conflicts and React Flow edge type warnings",
+          "fa": "رفع تعارض‌های مسیریابی PostHog و هشدارهای نوع edge React Flow"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "aa05947fc73efcd628e9391f106d375afde66ae9",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Add PostHog analytics integration",
+          "fa": "اضافه کردن یکپارچه‌سازی تحلیلات PostHog"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "55f4614c99606e7e4cf1ee7f0e11cea1dc2e68c7",
+        "date": "2026-01-09",
+        "message": {
+          "en": "Lint cleanup and documentation",
+          "fa": "پاک‌سازی lint و مستندسازی"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-08",
+    "technical": [
+      {
+        "hash": "c9d7661e49486f7e96d9d5c4178af79a5ab07db9",
+        "date": "2026-01-08",
+        "message": "fix(migration): incorrect column name in 0009",
+        "author": "farrokh"
+      },
+      {
+        "hash": "51f988183bd3178f873dc53a1ed3ddb5ba8a61a5",
+        "date": "2026-01-08",
+        "message": "fix: sanitize image URLs and migrate corrupted data",
+        "author": "farrokh"
+      },
+      {
+        "hash": "65e164f2ea33b29f92539e8a91639668f0a9bc22",
+        "date": "2026-01-08",
+        "message": "chore: limit data migration to single record for testing",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d45218f65f2dc4ad9d22ec7ef90ef3c52060c5ea",
+        "date": "2026-01-08",
+        "message": "fix(db): add data migration to clean up corrupted presigned URLs",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7ca5fa852d57c394507a4afb071525160c149a26",
+        "date": "2026-01-08",
+        "message": "Merge pull request #56 from farrokh/fix/cdn-images",
+        "author": "farrokh"
+      },
+      {
+        "hash": "51c320625e8ec8448e54e28a520ecf6158f9171d",
+        "date": "2026-01-08",
+        "message": "fix(backend): use persistent CDN URLs for profile images instead of expiring presigned URLs",
+        "author": "farrokh"
+      },
+      {
+        "hash": "4b4b33392b9829b838b709a7b4a9491dcedae63f",
+        "date": "2026-01-08",
+        "message": "docs: add session summary for graph search enhancements",
+        "author": "farrokh"
+      },
+      {
+        "hash": "ed54f38f3860afd5115beb796d31e152d11d518e",
+        "date": "2026-01-08",
+        "message": "Merge pull request #55 from farrokh/docs/search-detail-enhancements",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c1a792f43fe91911a761ef876e0b756290547740",
+        "date": "2026-01-08",
+        "message": "docs: update feature and history documentation for search and detail enhancements",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2cfa4cd119bf3386e8a9cf3a85ba0e1ca89f829a",
+        "date": "2026-01-08",
+        "message": "Merge pull request #54 from farrokh/feat/search-and-detail-enhancements",
+        "author": "farrokh"
+      },
+      {
+        "hash": "24e5f2b29617705b53d2594537c5df6efb882fdf",
+        "date": "2026-01-08",
+        "message": "feat: refine search locale handling, state management, and combobox accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "4e572b96210325e94a88e1238194439d9e7faa2d",
+        "date": "2026-01-08",
+        "message": "fix: restore mode-change reset behavior in GraphCanvas and clean up lint suppressions",
+        "author": "farrokh"
+      },
+      {
+        "hash": "db3959c8379d21cf6eda47f3538ae1b45fb88551",
+        "date": "2026-01-08",
+        "message": "fix: satisfy accessibility lint rules for search results",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c783fbefb7ee2ee39b0934f660c86b005a85affc",
+        "date": "2026-01-08",
+        "message": "feat: enhance search keyboard navigation, accessibility, and partial failure handling",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7d840cca3d408f5b336552cb93801adbe405f03b",
+        "date": "2026-01-08",
+        "message": "fix: address linting issues and add missing dependency",
+        "author": "farrokh"
+      },
+      {
+        "hash": "91a36b39e51a28ad1f0f2b0ea46c80ad7ae1b957",
+        "date": "2026-01-08",
+        "message": "feat: add graph search, detail page enhancements, and browser history",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d5749a28f0f83c0d1899156a42caf2ae2641610b",
+        "date": "2026-01-08",
+        "message": "Merge pull request #53 from farrokh/fix/individual-update-logic",
+        "author": "farrokh"
+      },
+      {
+        "hash": "dbb5b3efaf8b9cc743116903390ff4721ad1a211",
+        "date": "2026-01-08",
+        "message": "fix: improve individual update logic for role occupancy",
+        "author": "farrokh"
+      },
+      {
+        "hash": "fe236c4fc51ae9431f044573d3080c7e3ac403a6",
+        "date": "2026-01-08",
+        "message": "Merge pull request #52 from farrokh/feat/enhance-graph-view",
+        "author": "farrokh"
+      },
+      {
+        "hash": "79adf8ba0dc38a19fd30883662dd6bcafc9c633d",
+        "date": "2026-01-08",
+        "message": "feat: enhance graph view and add validation workflow",
+        "author": "farrokh"
+      },
+      {
+        "hash": "23795b9f22e3ec4607457d916709b787019d381c",
+        "date": "2026-01-08",
+        "message": "added new agent rule for new pr and fixed search result in admin panel",
+        "author": "farrokh"
+      },
+      {
+        "hash": "ccb2a3f6caa7c4ba2f33bd9d46cd225cd55ed96e",
+        "date": "2026-01-08",
+        "message": "feat: Add 'New Organization' context menu item to isolated graph view",
+        "author": "farrokh"
+      },
+      {
+        "hash": "27a60f476d6b473784956d96ec10356c8af91924",
+        "date": "2026-01-08",
+        "message": "feat: Enhance graph view with isolated mode and progressive expansion",
+        "author": "farrokh"
+      },
+      {
+        "hash": "28468a9d00d542e9002b7cb830d0d664e13e08ec",
+        "date": "2026-01-08",
+        "message": "Merge pull request #51 from farrokh/feat/detail-pages-enhancement",
+        "author": "farrokh"
+      },
+      {
+        "hash": "4dc32223c34986c05c140f9d4c4749f14783b1e9",
+        "date": "2026-01-08",
+        "message": "fix: report links a11y & person history translation",
+        "author": "farrokh"
+      },
+      {
+        "hash": "f7690866753f8227f20b7d5088e9588e44667c04",
+        "date": "2026-01-08",
+        "message": "feat: enhance individual/report details and mobile exp",
+        "author": "farrokh"
+      },
+      {
+        "hash": "40c3a8f37c495cde69bf5ba256081720931ff6f0",
+        "date": "2026-01-08",
+        "message": "Merge pull request #50 from farrokh/docs/update-admin-docs",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7868d696e39290a32db8f5bc3b3772b8347c773f",
+        "date": "2026-01-08",
+        "message": "docs: update admin panel and API documentation with recent enhancements",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2c90d516c7f58165735020fbe38a93c712302132",
+        "date": "2026-01-08",
+        "message": "Merge pull request #49 from farrokh/fix/searchable-select-flickering",
+        "author": "farrokh"
+      },
+      {
+        "hash": "69526b6facbee002b0da4f659f324eea25459136",
+        "date": "2026-01-08",
+        "message": "docs: correct roleId reset logic comment and optimize role fetching (skip on empty org)",
+        "author": "farrokh"
+      },
+      {
+        "hash": "408cb09931f2aaceeea3d0b30dd82280cf17b482",
+        "date": "2026-01-08",
+        "message": "Fix role dropdown translations",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7d7ab6c19f99f21f0aef4724b9b2a31eb34ed128",
+        "date": "2026-01-08",
+        "message": "refactor: improve cycle detection validation and cleanup role fetching logic",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7788ad1598866563079e9d6cdee988172125f96d",
+        "date": "2026-01-08",
+        "message": "style: fix backend linting and formatting issues",
+        "author": "farrokh"
+      },
+      {
+        "hash": "571fbc35fff742f46abc202d5889e40d4541bd52",
+        "date": "2026-01-08",
+        "message": "refactor: address PR review feedback",
+        "author": "farrokh"
+      },
+      {
+        "hash": "adf176953ac5a031306e8335dc7773595bc186fc",
+        "date": "2026-01-08",
+        "message": "docs: add create-pr agent workflow",
+        "author": "farrokh"
+      },
+      {
+        "hash": "5165138b1cf04dd7f4a6bb1d115127d1b32fdc5a",
+        "date": "2026-01-08",
+        "message": "chore: fix linting and type errors in frontend and backend",
+        "author": "farrokh"
+      },
+      {
+        "hash": "5739f77751e32685fbdd69c0d444a37c0b3408db",
+        "date": "2026-01-08",
+        "message": "feat(admin): enhance admin panel with image upload and graph edit shortcuts",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8cf2cff27163b0e57b37e3b6586195a2f97e3ba1",
+        "date": "2026-01-08",
+        "message": "fix: eliminate SearchableSelect dropdown flickering and add proper spacing",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "c9d7661e49486f7e96d9d5c4178af79a5ab07db9",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Incorrect column name in 0009",
+          "fa": "نام ستون نادرست در ۰۰۰۹"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "51f988183bd3178f873dc53a1ed3ddb5ba8a61a5",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Sanitize image URLs and migrate corrupted data",
+          "fa": "شست‌وشوی URLهای تصویر و مهاجرت داده‌های خراب"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "d45218f65f2dc4ad9d22ec7ef90ef3c52060c5ea",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Add data migration to clean up corrupted presigned URLs",
+          "fa": "اضافه کردن مهاجرت داده برای پاک‌سازی URLهای پیش‌امضا شده خراب"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "51c320625e8ec8448e54e28a520ecf6158f9171d",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Use persistent CDN URLs for profile images instead of expiring presigned URLs",
+          "fa": "استفاده از URLهای CDN دائمی برای تصاویر پروفایل به جای URLهای پیش‌امضا شده‌ای که منقضی می‌شوند"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "24e5f2b29617705b53d2594537c5df6efb882fdf",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Refine search locale handling, state management, and combobox accessibility",
+          "fa": "بهبود مدیریت زبان جستجو، مدیریت حالت و دسترسی به combobox"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "4e572b96210325e94a88e1238194439d9e7faa2d",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Restore mode-change reset behavior in GraphCanvas and clean up lint suppressions",
+          "fa": "بازگرداندن رفتار بازنشانی تغییر حالت در GraphCanvas و پاک‌سازی suppressions lint"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "db3959c8379d21cf6eda47f3538ae1b45fb88551",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Satisfy accessibility lint rules for search results",
+          "fa": "رعایت قوانین دسترسی lint برای نتایج جستجو"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "c783fbefb7ee2ee39b0934f660c86b005a85affc",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Enhance search keyboard navigation, accessibility, and partial failure handling",
+          "fa": "بهبود ناوبری صفحه کلید جستجو، دسترسی و مدیریت خطاهای جزئی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "7d840cca3d408f5b336552cb93801adbe405f03b",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Address linting issues and add missing dependency",
+          "fa": "حل مشکلات linting و اضافه کردن وابستگی‌های گمشده"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "91a36b39e51a28ad1f0f2b0ea46c80ad7ae1b957",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Add graph search, detail page enhancements, and browser history",
+          "fa": "اضافه کردن جستجوی گراف، بهبودهای صفحه جزئیات و تاریخچه مرورگر"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "dbb5b3efaf8b9cc743116903390ff4721ad1a211",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Improve individual update logic for role occupancy",
+          "fa": "بهبود منطق بروزرسانی فردی برای اشغال نقش"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "79adf8ba0dc38a19fd30883662dd6bcafc9c633d",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Enhance graph view and add validation workflow",
+          "fa": "بهبود نمای گراف و افزودن گردش کار اعتبارسنجی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "ccb2a3f6caa7c4ba2f33bd9d46cd225cd55ed96e",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Add 'New Organization' context menu item to isolated graph view",
+          "fa": "اضافه کردن گزینه منوی زمینه 'سازمان جدید' به نمای گراف ایزوله"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "27a60f476d6b473784956d96ec10356c8af91924",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Enhance graph view with isolated mode and progressive expansion",
+          "fa": "بهبود نمای گراف با حالت ایزوله و گسترش تدریجی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "4dc32223c34986c05c140f9d4c4749f14783b1e9",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Report links a11y & person history translation",
+          "fa": "گزارش دسترسی پیوندها و ترجمه تاریخچه شخصی"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "f7690866753f8227f20b7d5088e9588e44667c04",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Enhance individual/report details and mobile exp",
+          "fa": "بهبود جزئیات فردی/گزارش و تجربه موبایل"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "408cb09931f2aaceeea3d0b30dd82280cf17b482",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Fix role dropdown translations",
+          "fa": "رفع ترجمه‌های کشویی نقش"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "7788ad1598866563079e9d6cdee988172125f96d",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Fix backend linting and formatting issues",
+          "fa": "رفع مشکلات linting و فرمت بندی در سمت سرور"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      },
+      {
+        "hash": "5739f77751e32685fbdd69c0d444a37c0b3408db",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Enhance admin panel with image upload and graph edit shortcuts",
+          "fa": "بهبود پنل مدیریت با بارگذاری تصویر و میانبرهای ویرایش گراف"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "8cf2cff27163b0e57b37e3b6586195a2f97e3ba1",
+        "date": "2026-01-08",
+        "message": {
+          "en": "Eliminate SearchableSelect dropdown flickering and add proper spacing",
+          "fa": "از بین بردن لرزش کشوی SearchableSelect و اضافه کردن فاصله مناسب"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-07",
+    "technical": [
+      {
+        "hash": "d0fa5ea0dde2b029a4b466f901443b43e56348fd",
+        "date": "2026-01-07",
+        "message": "Merge pull request #48 from farrokh/feat/mobile-warning",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d51a265a9dceb0fe591b2b0afe1254ab9269c9f0",
+        "date": "2026-01-07",
+        "message": "refactor: lint fixes, import ordering, and seo generation updates",
+        "author": "farrokh"
+      },
+      {
+        "hash": "99cec640095a036c17263ba50e7bdd3ce5fb211a",
+        "date": "2026-01-07",
+        "message": "feat: add mobile not ready warning message",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b9cc379653bb7cb2b25e7043f5bcf900f82bf6cb",
+        "date": "2026-01-07",
+        "message": "feat(seo): Automate SEO image generation on entity creation/update",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b56cb8b7294681b42cca1fd3c9a82703df69496a",
+        "date": "2026-01-07",
+        "message": "feat(seo): Add organization SEO support and canonical og:url",
+        "author": "farrokh"
+      },
+      {
+        "hash": "60c0e0c4e65b5ffc84de1c80cc02df48da2d5c4b",
+        "date": "2026-01-07",
+        "message": "SEO fixes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "a5c845845c401cfafd6d080792a4c6a8b65a227f",
+        "date": "2026-01-07",
+        "message": "feat(seo): Add dynamic Open Graph tags for individual profile views",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d245631438b45c87274f33fa2d5bdcbef5847379",
+        "date": "2026-01-07",
+        "message": "feat(seo): Use biography in individual SEO images",
+        "author": "farrokh"
+      },
+      {
+        "hash": "742782d188272f36b60a3e64040acb15cbc7ef85",
+        "date": "2026-01-07",
+        "message": "fix(seo): Robust image fetching and logo fallback",
+        "author": "farrokh"
+      },
+      {
+        "hash": "3de3b9fd2c882c05839b1a1091752fa5581900d2",
+        "date": "2026-01-07",
+        "message": "fix(seo): Fix production image generation",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c44790f978cf7e9df0e4cb8d0e27d3459101bf50",
+        "date": "2026-01-07",
+        "message": "feat(seo): Redesign SEO images and fix image fetching logic",
+        "author": "farrokh"
+      },
+      {
+        "hash": "210cfeeee3721d3b83cc4ba5688dc3a42df37aaf",
+        "date": "2026-01-07",
+        "message": "fix(seo): Support Persian/Arabic characters in SEO images",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1c9504789510d9c62aafbc6a486b4895d42e30a6",
+        "date": "2026-01-07",
+        "message": "Merge pull request #47 from farrokh/feat/seo-images",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d5f863ff132b68d1b2ad2383f8fe794a92e4c0a3",
+        "date": "2026-01-07",
+        "message": "docs: Refine documentation for linting, privacy, and canonical links",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d729a4893c9f2542ac45d21192951577ec4c3177",
+        "date": "2026-01-07",
+        "message": "docs: Update agent rules for security and fix hardcoded identifiers",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7161d367e68447e5b91a162d6f0e2ee0d8b1f98f",
+        "date": "2026-01-07",
+        "message": "cleanup",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b131c42f4a3cfa11b80150adb3006c7f09aa0a9c",
+        "date": "2026-01-07",
+        "message": "docs: Organize SEO documentation and update agent rules",
+        "author": "farrokh"
+      },
+      {
+        "hash": "4a99da880be93a48b7bef302731dddce4eebf137",
+        "date": "2026-01-07",
+        "message": "fix: Apply linting and formatting",
+        "author": "farrokh"
+      },
+      {
+        "hash": "549ae6b87855c95baeb2c4d2e44c49b6d22b4499",
+        "date": "2026-01-07",
+        "message": "feat: Add SEO images for social media sharing",
+        "author": "farrokh"
+      },
+      {
+        "hash": "0413a8999e3f6dcd89a2d36a4a02566fad5b0e93",
+        "date": "2026-01-07",
+        "message": "Merge pull request #46 from farrokh/ui-fix",
+        "author": "farrokh"
+      },
+      {
+        "hash": "065f4465d2a9cea122c61f68a51ed84498ffd415",
+        "date": "2026-01-07",
+        "message": "Fix stroke width formatting in GraphCanvas component",
+        "author": "farrokh"
+      },
+      {
+        "hash": "70b1f004b1accd1789bf57578bbbc301db11def2",
+        "date": "2026-01-07",
+        "message": "Update visual styling for former member edges in GraphCanvas",
+        "author": "farrokh"
+      },
+      {
+        "hash": "287efcd15ad129fc7c9a0bd75699ed77c7f7c8dc",
+        "date": "2026-01-07",
+        "message": "Refactor logging in production diagnostic script for improved readability",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6c66148173d606c4bf7150dec72452b7f0c5eede",
+        "date": "2026-01-07",
+        "message": "Improve visual distinction for former member edges",
+        "author": "farrokh"
+      },
+      {
+        "hash": "0ed7385ba771d1c01a0a2b29b9a602db74fc896a",
+        "date": "2026-01-07",
+        "message": "Fix timeline range to include all role occupancy dates",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2de26fae6917f0819bfeca988d61fc7c0f1b464d",
+        "date": "2026-01-07",
+        "message": "Show former organization members with dashed edges",
+        "author": "farrokh"
+      },
+      {
+        "hash": "a2b6e8daa91e948c1b9038220e6a12b5837c9a41",
+        "date": "2026-01-07",
+        "message": "Add production diagnostic script for individual roles",
+        "author": "farrokh"
+      },
+      {
+        "hash": "995b05dfcf0a232283f8514e8bfea84a2b675fd0",
+        "date": "2026-01-07",
+        "message": "Merge pull request #45 from farrokh/codex/add-tutorial-icon-with-popup-on-navbar",
+        "author": "farrokh"
+      },
+      {
+        "hash": "199f1709dd7838cf1b38cd6c142cad60a3d9cc1c",
+        "date": "2026-01-07",
+        "message": "refactor: format imports in navbar component for improved readability",
+        "author": "farrokh"
+      },
+      {
+        "hash": "27f57047bda172b28a9c22bc90ce73a2db73f1cd",
+        "date": "2026-01-07",
+        "message": "Add tutorial icon hint to navbar",
+        "author": "farrokh"
+      },
+      {
+        "hash": "890916af4e1ef485c738f3d233e6228e5c8bee5e",
+        "date": "2026-01-07",
+        "message": "Merge pull request #44 from farrokh/codex/investigate-logo-visibility-issue-in-posts",
+        "author": "farrokh"
+      },
+      {
+        "hash": "58d97e654739e16250e2815fe9a0c4b22d41b512",
+        "date": "2026-01-07",
+        "message": "Add social meta images for X cards",
+        "author": "farrokh"
+      },
+      {
+        "hash": "890f7fcbcb19ceb9fe677148f4e16efd8c67a7b7",
+        "date": "2026-01-07",
+        "message": "Merge pull request #43 from farrokh/feat/admin-panel-enhancements",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2bf1b43b6dfee87795ddfe5223f461c7a6df4775",
+        "date": "2026-01-07",
+        "message": "feat: enhance admin panel with end date support and accessibility improvements",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1aa217de825c02be153205207e5560c2ef5f69c9",
+        "date": "2026-01-07",
+        "message": "docs: Update production workflow and detail page features",
+        "author": "farrokh"
+      },
+      {
+        "hash": "bdedbcb700c5bec7956f2bbb8ea3b89a7b9dcd97",
+        "date": "2026-01-07",
+        "message": "Merge pull request #42 from farrokh/feature/seo-metadata",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8383167ac0b808ac23f0eb250897934f9a6bbc22",
+        "date": "2026-01-07",
+        "message": "feat: Use `notFound()` for missing pages and prefix all internal navigation paths with the current locale.",
+        "author": "farrokh"
+      },
+      {
+        "hash": "3c5e9774da1386a09f4169169433c9bf90c7b3f8",
+        "date": "2026-01-07",
+        "message": "feat: Enhance detail pages with related data and SEO social previews",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1c1a74874c205a61317f33bf4932419b6f42c785",
+        "date": "2026-01-07",
+        "message": "feat: Add Individual Profile Page and Graph Linking",
+        "author": "farrokh"
+      },
+      {
+        "hash": "3684505fea34ed409fc41972e1cd3ab8378e652b",
+        "date": "2026-01-07",
+        "message": "feat: Implement SEO Metadata for Organization and Report pages",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8f8c5eac5dc481abf7900767f728211323c608c7",
+        "date": "2026-01-07",
+        "message": "Merge pull request #41 from farrokh/feature/organization-detail-page",
+        "author": "farrokh"
+      },
+      {
+        "hash": "932814062dc164c1c395b07064d759905126bce7",
+        "date": "2026-01-07",
+        "message": "docs: Add Organization Detail Page documentation",
+        "author": "farrokh"
+      },
+      {
+        "hash": "ffdfd22763b1791e4ed3cf83fb3dfe6608af962c",
+        "date": "2026-01-07",
+        "message": "feat: Implement Organization Detail Page and link from Graph",
+        "author": "farrokh"
+      },
+      {
+        "hash": "45e77273069c8648fc4591ff9973c2b257c5af93",
+        "date": "2026-01-07",
+        "message": "Merge pull request #40 from farrokh/feature/uuid-shareable-links",
+        "author": "farrokh"
+      },
+      {
+        "hash": "81b8f8da6cd418415e0fd7fbf140b0aac10fb2be",
+        "date": "2026-01-07",
+        "message": "chore: Condense array definitions in Drizzle snapshot for improved readability.",
+        "author": "farrokh"
+      },
+      {
+        "hash": "307f8e85579096e873cfc34b02daac2d3061bbde",
+        "date": "2026-01-07",
+        "message": "docs: update data architecture and add api documentation for UUIDs",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "99cec640095a036c17263ba50e7bdd3ce5fb211a",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Add mobile not ready warning message",
+          "fa": "اضافه کردن پیام هشدار عدم آمادگی برای موبایل"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "b9cc379653bb7cb2b25e7043f5bcf900f82bf6cb",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Automate SEO image generation on entity creation/update",
+          "fa": "خودکار کردن تولید تصاویر SEO در زمان ایجاد/به‌روزرسانی موجودیت"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "b56cb8b7294681b42cca1fd3c9a82703df69496a",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Add organization SEO support and canonical og:url",
+          "fa": "اضافه کردن پشتیبانی SEO برای سازمان و og:url استاندارد"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "a5c845845c401cfafd6d080792a4c6a8b65a227f",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Add dynamic Open Graph tags for individual profile views",
+          "fa": "اضافه کردن برچسب‌های Open Graph دینامیک برای نمای پروفایل فردی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "d245631438b45c87274f33fa2d5bdcbef5847379",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Use biography in individual SEO images",
+          "fa": "استفاده از بیوگرافی در تصاویر SEO فردی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "742782d188272f36b60a3e64040acb15cbc7ef85",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Robust image fetching and logo fallback",
+          "fa": "دریافت تصویر قوی و جایگزینی لوگو"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "3de3b9fd2c882c05839b1a1091752fa5581900d2",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Fix production image generation",
+          "fa": "رفع تولید تصویر در تولید"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "c44790f978cf7e9df0e4cb8d0e27d3459101bf50",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Redesign SEO images and fix image fetching logic",
+          "fa": "طراحی مجدد تصاویر SEO و رفع منطق دریافت تصاویر"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "210cfeeee3721d3b83cc4ba5688dc3a42df37aaf",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Support Persian/Arabic characters in SEO images",
+          "fa": "پشتیبانی از کاراکترهای فارسی/عربی در تصاویر SEO"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "4a99da880be93a48b7bef302731dddce4eebf137",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Apply linting and formatting",
+          "fa": "اعمال linting و فرمت بندی"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "549ae6b87855c95baeb2c4d2e44c49b6d22b4499",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Add SEO images for social media sharing",
+          "fa": "اضافه کردن تصاویر SEO برای به اشتراک‌گذاری در شبکه‌های اجتماعی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "065f4465d2a9cea122c61f68a51ed84498ffd415",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Fix stroke width formatting in GraphCanvas component",
+          "fa": "رفع فرمت عرض خط در کامپوننت GraphCanvas"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "0ed7385ba771d1c01a0a2b29b9a602db74fc896a",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Fix timeline range to include all role occupancy dates",
+          "fa": "رفع دامنه زمان‌بندی برای شامل شدن تمام تاریخ‌های اشغال نقش"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "2bf1b43b6dfee87795ddfe5223f461c7a6df4775",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Enhance admin panel with end date support and accessibility improvements",
+          "fa": "بهبود پنل مدیریت با پشتیبانی از تاریخ پایان و بهبود دسترسی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "8383167ac0b808ac23f0eb250897934f9a6bbc22",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Use `notFound()` for missing pages and prefix all internal navigation paths with the current locale.",
+          "fa": "استفاده از `notFound()` برای صفحات مفقود و پیشوند دادن به تمام مسیرهای ناوبری داخلی با زبان فعلی."
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "3c5e9774da1386a09f4169169433c9bf90c7b3f8",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Enhance detail pages with related data and SEO social previews",
+          "fa": "بهبود صفحات جزئیات با داده‌های مرتبط و پیش‌نمایش‌های اجتماعی SEO"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "1c1a74874c205a61317f33bf4932419b6f42c785",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Add Individual Profile Page and Graph Linking",
+          "fa": "اضافه کردن صفحه پروفایل فردی و پیوند گراف"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "3684505fea34ed409fc41972e1cd3ab8378e652b",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Implement SEO Metadata for Organization and Report pages",
+          "fa": "پیاده‌سازی Metadata SEO برای صفحات سازمان و گزارش"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "ffdfd22763b1791e4ed3cf83fb3dfe6608af962c",
+        "date": "2026-01-07",
+        "message": {
+          "en": "Implement Organization Detail Page and link from Graph",
+          "fa": "پیاده‌سازی صفحه جزئیات سازمان و پیوند از گراف"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-06",
+    "technical": [
+      {
+        "hash": "1fb5a0f89f21549ffb72bc00f891d5a6569a6ad4",
+        "date": "2026-01-06",
+        "message": "feat: implement UUID-based shareable links for all entities",
+        "author": "farrokh"
+      },
+      {
+        "hash": "3d06180c015c3cbf89d3794a6e8c6a5cb030dd13",
+        "date": "2026-01-06",
+        "message": "Merge pull request #39 from farrokh/docs-cleanup",
+        "author": "farrokh"
+      },
+      {
+        "hash": "96f67fab7adebe3bc8a2492ec77aa4beb3377e65",
+        "date": "2026-01-06",
+        "message": "lint and type check fixed",
+        "author": "farrokh"
+      },
+      {
+        "hash": "dabbc95a01d3b8e0bd53917160ede0912531d1c0",
+        "date": "2026-01-06",
+        "message": "lint and type check",
+        "author": "farrokh"
+      },
+      {
+        "hash": "dc996ff7df894552bd3bcdff6dc71037fe23e902",
+        "date": "2026-01-06",
+        "message": "docs: update documentation structure and improve clarity on production guidelines",
+        "author": "farrokh"
+      },
+      {
+        "hash": "24f6a8ca598c6e82fa35e5bb34309a4eacd39af0",
+        "date": "2026-01-06",
+        "message": "Merge pull request #38 from farrokh/codex/update-node-detail-view-format",
+        "author": "farrokh"
+      },
+      {
+        "hash": "f950074de838d56999e8696d30c1a4e693a40237",
+        "date": "2026-01-06",
+        "message": "fix: resolve lint and type errors",
+        "author": "farrokh"
+      },
+      {
+        "hash": "07a1c7b0df9d779e7d023ec2a56c99bd8479cdb9",
+        "date": "2026-01-06",
+        "message": "refactor: extract BaseNodeCard to reduce duplication and improve accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "fd95a0711fd4978f846ebf6b3525f52cead5d276",
+        "date": "2026-01-06",
+        "message": "docs: update frontend architecture to include connection detail view",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6fdea471ae49b26c181a4e042c258bd7ff91cc3d",
+        "date": "2026-01-06",
+        "message": "Merge pull request #37 from farrokh/codex/save-and-share-browsing-state",
+        "author": "farrokh"
+      },
+      {
+        "hash": "85e3bd00aac9135429b97ca0fe3a4c02a9af9ee5",
+        "date": "2026-01-06",
+        "message": "chore: address post-review feedback on docs, formatting and accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6a2a0b3aff8466e4098a4cb5b5dd79a8c56d0a43",
+        "date": "2026-01-06",
+        "message": "feat: enhance copy toast accessibility and sort role occupancy by start date in descending order",
+        "author": "farrokh"
+      },
+      {
+        "hash": "506de70c891ef04c3015c92c895fea12b36fbecc",
+        "date": "2026-01-06",
+        "message": "chore: apply lint formatting fixes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "25959e653602f5f786334864eb28d180c5e85c49",
+        "date": "2026-01-06",
+        "message": "fix: resolve React Flow warnings with strict memoization and custom edge type registration",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1a7428fd5411e54e7efc9cfb1a99b2f2f567aebc",
+        "date": "2026-01-06",
+        "message": "feat: implement hierarchical breadcrumb navigation with backend support",
+        "author": "farrokh"
+      },
+      {
+        "hash": "9568748e41dca25006c9d928d92c83f2acdb8f02",
+        "date": "2026-01-06",
+        "message": "fix: resolve URL state bugs and enhance error handling",
+        "author": "farrokh"
+      },
+      {
+        "hash": "aeb55f85246fdd510284eefc90844742292b306f",
+        "date": "2026-01-06",
+        "message": "Merge pull request #36 from farrokh/codex/extend-admin-panel-for-user-management",
+        "author": "farrokh"
+      },
+      {
+        "hash": "424cdf376472454b2e38411a27b60c18eca277d9",
+        "date": "2026-01-06",
+        "message": "feat(admin): enhance admin panel with stable data fetching, improved UX feedback, and robust user management",
+        "author": "farrokh"
+      },
+      {
+        "hash": "831ee189d86661abe18da5dadc45859d569e37e7",
+        "date": "2026-01-06",
+        "message": "Merge pull request #35 from farrokh/fix/media-upload-progress",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b06d89991d7e227533284f4a6cedb11e4f641ac6",
+        "date": "2026-01-06",
+        "message": "style: fix linting and formatting issues",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b2d31aa06a5af541e2b2df16f96d1b921b7ad3bb",
+        "date": "2026-01-06",
+        "message": "Expand detail node cards in graph",
+        "author": "farrokh"
+      },
+      {
+        "hash": "4e8d5d9a995973b38e3991462215848aafbb6d02",
+        "date": "2026-01-06",
+        "message": "Move share control into graph context menu",
+        "author": "farrokh"
+      },
+      {
+        "hash": "24168113bab7a58294567a587735cd06a12b8c95",
+        "date": "2026-01-06",
+        "message": "Extend admin panel management capabilities",
+        "author": "farrokh"
+      },
+      {
+        "hash": "155bf0204fd39d8719ccafd0e3a46d27f74f2e67",
+        "date": "2026-01-06",
+        "message": "Merge pull request #34 from farrokh/chore/agent-git-rules",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6584a01eb9356ddcb95cf6aca5e91b4526ed0f8f",
+        "date": "2026-01-06",
+        "message": "fix: implement xhr upload for progress tracking and update roadmap",
+        "author": "farrokh"
+      },
+      {
+        "hash": "503594c768075fb64f1abca0097ce88867f1f511",
+        "date": "2026-01-06",
+        "message": "chore(agent): add git workflow rules to .cursorrules and .agent/rules.md",
+        "author": "farrokh"
+      },
+      {
+        "hash": "dbc681a304fdb6cd697aa75ebfe3b30275a32486",
+        "date": "2026-01-06",
+        "message": "Merge pull request #33 from farrokh/fix/graph-translation",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1c40c28623ad4bc15fcc160fc82d4dded574f678",
+        "date": "2026-01-06",
+        "message": "fix(graph): resolve missing english translations in drill-down views",
+        "author": "farrokh"
+      },
+      {
+        "hash": "67a3809ace94fce8cdb8093afb817e6f350b9163",
+        "date": "2026-01-06",
+        "message": "Merge pull request #32 from farrokh/fix-video-upload",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d2d29373d1f1f0e63f1c77eedb5122a1e07897ff",
+        "date": "2026-01-06",
+        "message": "style: fix linting and formatting issues",
+        "author": "farrokh"
+      },
+      {
+        "hash": "ec86f321618d371632280dff4a72aefebb66bc45",
+        "date": "2026-01-06",
+        "message": "docs: Add S3 CORS configuration and documentation for video uploads",
+        "author": "farrokh"
+      },
+      {
+        "hash": "512b93b4f0d89bef458926b9dde457a5fcf1ec0a",
+        "date": "2026-01-06",
+        "message": "Fix report detail page blocking overlay",
+        "author": "farrokh"
+      },
+      {
+        "hash": "cf8a819234763d72b654d0ed81130e20082e56e1",
+        "date": "2026-01-06",
+        "message": "Add CodeBuild backfill for member roles",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7d3bef4f205cce1c682c2b7d3ea5668066ad8a30",
+        "date": "2026-01-06",
+        "message": "Add CodeBuild backfill for missing individual role",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b0573d1a6123135b2eed9fd5346da0cf6685fc35",
+        "date": "2026-01-06",
+        "message": "Add default member role fallback",
+        "author": "farrokh"
+      },
+      {
+        "hash": "ea014d3c97d15fe546cd759a48815635b4364762",
+        "date": "2026-01-06",
+        "message": "Add default role for org members",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2dd2ebd59d26e19ec8ee52e3e37606b882efcf61",
+        "date": "2026-01-06",
+        "message": "Merge pull request #20 from farrokh/prod-deployment",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2b1228daa8366c7d814e041b0c87daf4a49ed138",
+        "date": "2026-01-06",
+        "message": "Fix lint formatting and select a11y",
+        "author": "farrokh"
+      },
+      {
+        "hash": "24ec8c1e22139f5c0b1b1dc7104df0e7a6e435bd",
+        "date": "2026-01-06",
+        "message": "Update workflows with deployment and ops lessons",
+        "author": "farrokh"
+      },
+      {
+        "hash": "409552d72a6f0dfa76620f01223f1d55f066b67a",
+        "date": "2026-01-06",
+        "message": "Add Slack notifier health check",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c7ef1b8396e8b92619805662c5634fa6cda34bc6",
+        "date": "2026-01-06",
+        "message": "Document backend env and S3 role usage",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1c51e887d7d6e8bbcb5defb6950f26011a43e38f",
+        "date": "2026-01-06",
+        "message": "Prevent local .env from leaking into Docker image",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "1fb5a0f89f21549ffb72bc00f891d5a6569a6ad4",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Implement UUID-based shareable links for all entities",
+          "fa": "پیاده‌سازی پیوندهای قابل اشتراک‌گذاری مبتنی بر UUID برای تمام موجودیت‌ها"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "f950074de838d56999e8696d30c1a4e693a40237",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Resolve lint and type errors",
+          "fa": "حل مشکلات lint و نوع"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "6a2a0b3aff8466e4098a4cb5b5dd79a8c56d0a43",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Enhance copy toast accessibility and sort role occupancy by start date in descending order",
+          "fa": "بهبود دسترسی toast کپی و مرتب‌سازی اشغال نقش بر اساس تاریخ شروع به ترتیب نزولی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "25959e653602f5f786334864eb28d180c5e85c49",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Resolve React Flow warnings with strict memoization and custom edge type registration",
+          "fa": "حل هشدارهای React Flow با حفظ دقیق و ثبت نوع لبه سفارشی"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "1a7428fd5411e54e7efc9cfb1a99b2f2f567aebc",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Implement hierarchical breadcrumb navigation with backend support",
+          "fa": "پیاده‌سازی ناوبری نانویسی سلسله‌مراتبی با پشتیبانی از سمت سرور"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "9568748e41dca25006c9d928d92c83f2acdb8f02",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Resolve URL state bugs and enhance error handling",
+          "fa": "حل باگ‌های وضعیت URL و بهبود مدیریت خطا"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "424cdf376472454b2e38411a27b60c18eca277d9",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Enhance admin panel with stable data fetching, improved UX feedback, and robust user management",
+          "fa": "بهبود پنل مدیریت با دریافت داده پایدار، بازخورد تجربی کاربری بهبود یافته و مدیریت کاربر قوی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "d2d29373d1f1f0e63f1c77eedb5122a1e07897ff",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Fix linting and formatting issues",
+          "fa": "رفع مشکلات linting و قالب بندی"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      },
+      {
+        "hash": "6584a01eb9356ddcb95cf6aca5e91b4526ed0f8f",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Implement xhr upload for progress tracking and update roadmap",
+          "fa": "پیاده‌سازی بارگذاری xhr برای پیگیری پیشرفت و به‌روزرسانی نقشه راه"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "1c40c28623ad4bc15fcc160fc82d4dded574f678",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Resolve missing english translations in drill-down views",
+          "fa": "حل مشکلات ترجمه زبان انگلیسی در نمای‌های drill-down"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "512b93b4f0d89bef458926b9dde457a5fcf1ec0a",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Fix report detail page blocking overlay",
+          "fa": "رفع پوشش مانع مسدودکننده در صفحه جزئیات گزارش"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "2b1228daa8366c7d814e041b0c87daf4a49ed138",
+        "date": "2026-01-06",
+        "message": {
+          "en": "Fix lint formatting and select a11y",
+          "fa": "رفع قالب‌بندی lint و انتخاب دسترسی"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-05",
+    "technical": [
+      {
+        "hash": "e2a536331a407113da4c76f4c6ff34fdb96281fe",
+        "date": "2026-01-05",
+        "message": "refactor(auth): streamline email verification logic and update related messaging",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1d29adcd32a5b31af250e213ccabef437cba0b80",
+        "date": "2026-01-05",
+        "message": "Update signup verification messaging",
+        "author": "farrokh"
+      },
+      {
+        "hash": "3179c25b1be3809ca9285727e6a315ba11e71444",
+        "date": "2026-01-05",
+        "message": "Update docs, infra, and app changes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "27a9f2791abb7430208e8e4c5410b97480a885a2",
+        "date": "2026-01-05",
+        "message": "Update bun.lock for Lambda client",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b13bf692329a3f7ec115f7529df233c4bb48440c",
+        "date": "2026-01-05",
+        "message": "Update auth verification, Slack Lambda, and legal copy",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d1300573c6bead71657f79c5c025b8e195ec00cb",
+        "date": "2026-01-05",
+        "message": "fix(frontend): add tailwind typography plugin and redesign report/legal pages",
+        "author": "farrokh"
+      },
+      {
+        "hash": "405c3676a8cd62c6d79ea080ef96f3417f675b10",
+        "date": "2026-01-05",
+        "message": "feat(frontend): add editorial-style About page with bilingual content",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6c1864a9010a3eab2e0aeccf9fe4b780ce138b35",
+        "date": "2026-01-05",
+        "message": "style: fix dark mode shadows, panel borders and hover states",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b17886c23fa625ef93cdda785fb6018b8565b11a",
+        "date": "2026-01-05",
+        "message": "feat: update deployment setup, migrations, and graph UI",
+        "author": "farrokh"
+      },
+      {
+        "hash": "418d26bb84865b400b9274d37d5cdce128098360",
+        "date": "2026-01-05",
+        "message": "Merge pull request #11 from farrokh/production-initial",
+        "author": "farrokh"
+      },
+      {
+        "hash": "07e5e6660ab5e16655b40f54aba0f4109e7bf362",
+        "date": "2026-01-05",
+        "message": "feat: Add Todo model to Amplify schema and remove API key expiration configuration.",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8a3e00edba2391250a89710f452e48d9ab3bf7df",
+        "date": "2026-01-05",
+        "message": "feat: Add Dockerfiles for frontend and backend, integrate AWS Amplify, and document production deployment workflow.",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "d1300573c6bead71657f79c5c025b8e195ec00cb",
+        "date": "2026-01-05",
+        "message": {
+          "en": "Add tailwind typography plugin and redesign report/legal pages",
+          "fa": "افزودن پلاگین تایپوگرافی Tailwind و طراحی مجدد صفحات گزارش/ قانونی"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "405c3676a8cd62c6d79ea080ef96f3417f675b10",
+        "date": "2026-01-05",
+        "message": {
+          "en": "Add editorial-style About page with bilingual content",
+          "fa": "افزودن صفحه درباره به سبک ویرایشگر با محتوای دو زبانه"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "6c1864a9010a3eab2e0aeccf9fe4b780ce138b35",
+        "date": "2026-01-05",
+        "message": {
+          "en": "Fix dark mode shadows, panel borders and hover states",
+          "fa": "رفع سایه‌ها در حالت تاریک، مرزهای پنل و حالت‌های هاور"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      },
+      {
+        "hash": "b17886c23fa625ef93cdda785fb6018b8565b11a",
+        "date": "2026-01-05",
+        "message": {
+          "en": "Update deployment setup, migrations, and graph UI",
+          "fa": "به‌روزرسانی تنظیمات استقرار، مهاجرت‌ها و UI گراف"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "07e5e6660ab5e16655b40f54aba0f4109e7bf362",
+        "date": "2026-01-05",
+        "message": {
+          "en": "Add Todo model to Amplify schema and remove API key expiration configuration.",
+          "fa": "افزودن مدل Todo به طرح Amplify و حذف پیکربندی انقضای کلید API."
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "8a3e00edba2391250a89710f452e48d9ab3bf7df",
+        "date": "2026-01-05",
+        "message": {
+          "en": "Add Dockerfiles for frontend and backend, integrate AWS Amplify, and document production deployment workflow.",
+          "fa": "افزودن Dockerfile برای فرانت‌اند و بک‌اند، ادغام AWS Amplify و مستندسازی فرآیند استقرار در تولید."
+        },
+        "author": "farrokh",
+        "type": "feature"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-04",
+    "technical": [
+      {
+        "hash": "9302039332da021bf09b64bc49226febd70ecb6e",
+        "date": "2026-01-04",
+        "message": "feat: add iranian government organization seed data",
+        "author": "farrokh"
+      },
+      {
+        "hash": "a22b5fa24e54bf63de54c0c1a40d1c38e446cf41",
+        "date": "2026-01-04",
+        "message": "Merge pull request #10 from farrokh/slack-notifier",
+        "author": "farrokh"
+      },
+      {
+        "hash": "84f00b000dadbb2aa17dbc4b754de8979f2ab878",
+        "date": "2026-01-04",
+        "message": "docs: Update Implementation Summary and Backend Architecture with Slack Notifications",
+        "author": "farrokh"
+      },
+      {
+        "hash": "91db08ee76873a1e1ee3f5a85a27eb81e832ec15",
+        "date": "2026-01-04",
+        "message": "feat: Add Slack notifications for key events",
+        "author": "farrokh"
+      },
+      {
+        "hash": "9bdaee2d6d5fe6450cacdb852f4dd87528c1a553",
+        "date": "2026-01-04",
+        "message": "Merge pull request #9 from farrokh/reporting-logos",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7b997cac810a77afeffe452bf780ebefc5b7b8e0",
+        "date": "2026-01-04",
+        "message": "chore: fix lint and type check errors",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6e91406c25a652e3a36d51a727969d3a69e311cb",
+        "date": "2026-01-04",
+        "message": "feat: implement user signup, email verification, and SEO foundations",
+        "author": "farrokh"
+      },
+      {
+        "hash": "16dcfa39609dd59c54d021bf9a8f90212b291e47",
+        "date": "2026-01-04",
+        "message": "feat: add end date support for role occupancy",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7774a8088b61eaeeeb9affe764db53872321ffb6",
+        "date": "2026-01-04",
+        "message": "fix: resolve lint and type check errors",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b81fc84829c31e728580dce6c8af7fcdfc711713",
+        "date": "2026-01-04",
+        "message": "feat: Implement Content Reporting System and Rich Media Support",
+        "author": "farrokh"
+      },
+      {
+        "hash": "56fcc9981099b80f73a5288492cfadd7b1a3e752",
+        "date": "2026-01-04",
+        "message": "Merge pull request #8 from farrokh/voting-mech",
+        "author": "farrokh"
+      },
+      {
+        "hash": "59a789dacc809c584f01ebf1d423773ffe87c8f6",
+        "date": "2026-01-04",
+        "message": "Merge remote-tracking branch 'origin/main' into voting-mech",
+        "author": "farrokh"
+      },
+      {
+        "hash": "f6d68f36a1628c12ed7d5ac64cdf4d04c3a2443a",
+        "date": "2026-01-04",
+        "message": "Merge pull request #7 from farrokh/UI-update",
+        "author": "farrokh"
+      },
+      {
+        "hash": "098816e91f9befae8e357751c8cdaa6582afcb2b",
+        "date": "2026-01-04",
+        "message": "fix: apply biome formatting fixes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "28b846cd23ed0c9270a7b3acf450aac1216cc5a0",
+        "date": "2026-01-04",
+        "message": "Fix stale vote counts by moving queries inside transactions",
+        "author": "farrokh"
+      },
+      {
+        "hash": "a1555129f2c970d13dbf28daf94144ade86846e0",
+        "date": "2026-01-04",
+        "message": "Fix race condition in removeVote by moving all reads inside transaction",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c4da602fa98c5659ce04d309739eab8a7944f7c9",
+        "date": "2026-01-04",
+        "message": "Fix CSRF token endpoint path alignment and refine liquid glass effect",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c1651f7f17c2e1a04da95d17ff6225762a9de2f5",
+        "date": "2026-01-04",
+        "message": "Fix active-state logic for Graph nav link by using localized usePathname",
+        "author": "farrokh"
+      },
+      {
+        "hash": "54e4df9b00187ee847f6cf6aaca75f0a061c9872",
+        "date": "2026-01-04",
+        "message": "refactor: update Next.js Image component `layout` prop to `fill`",
+        "author": "farrokh"
+      },
+      {
+        "hash": "9f4c8aa869cbd151546d34a175b3de6d1cbcd2b2",
+        "date": "2026-01-04",
+        "message": "perf(auth): memoize logout function to prevent unnecessary re-renders",
+        "author": "farrokh"
+      },
+      {
+        "hash": "04be7dbaf3a634968310941c50dd06d97844b357",
+        "date": "2026-01-04",
+        "message": "Add mandatory PoW validation to DELETE vote operation",
+        "author": "farrokh"
+      },
+      {
+        "hash": "45ec23031ddc01f0b641dab553f528f22efe6901",
+        "date": "2026-01-04",
+        "message": "docs: Add entity visual identity feature to the roadmap.",
+        "author": "farrokh"
+      },
+      {
+        "hash": "ec956f2883468af27eae6d52d00c49bdfbf1e62b",
+        "date": "2026-01-04",
+        "message": "chore: fix lint warnings and formatting issues in frontend",
+        "author": "farrokh"
+      },
+      {
+        "hash": "0d6780023b4ccc55aaf021a9ca086fc0dc34fe4a",
+        "date": "2026-01-04",
+        "message": "feat: add English translations and localize graph view",
+        "author": "farrokh"
+      },
+      {
+        "hash": "66cab1f00dfc0e4c42e3c66836ab33f9e4d19103",
+        "date": "2026-01-04",
+        "message": "UI Enhancements: Update voting buttons to Agree/Disagree, implement liquid glass toolbar effect, and refine graph UI",
+        "author": "farrokh"
+      },
+      {
+        "hash": "30ec5c54c11d6be8183ee31bc72218f95cda9ba2",
+        "date": "2026-01-04",
+        "message": "refactor: use fetchApi for CSRF token handling and remove voting placeholder",
+        "author": "farrokh"
+      },
+      {
+        "hash": "f86b838643a9ef4a245bc7539206ce69a9ba2c21",
+        "date": "2026-01-04",
+        "message": "feat: Implement voting, centralization CSRF, and UI fixes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6a5aad29e17ab3c706693a74bf2c9bb3bf4bae88",
+        "date": "2026-01-04",
+        "message": "Merge pull request #6 from farrokh/reports-initial",
+        "author": "farrokh"
+      },
+      {
+        "hash": "0580afebf38951b64ed013ffe607c6262eeff97e",
+        "date": "2026-01-04",
+        "message": "docs: update rate limiter documentation for in-memory fallback and fail-closed mode",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d2fc0a5823e003e4ea01fd3b8eed3e830f51a3f9",
+        "date": "2026-01-04",
+        "message": "fix(accessibility): make remove button visible on keyboard focus",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8b5bc5be54791f0638cc13036d180379774daf5f",
+        "date": "2026-01-04",
+        "message": "fix: preserve blob preview URLs after media upload completion",
+        "author": "farrokh"
+      },
+      {
+        "hash": "268c04448c995f3f27427864595481a7d9c9fa0e",
+        "date": "2026-01-04",
+        "message": "refactor(media-uploader): replace alert() with accessible, translatable error feedback",
+        "author": "farrokh"
+      },
+      {
+        "hash": "4731ac1b206126df1b55640cac5e21b087424029",
+        "date": "2026-01-04",
+        "message": "feat(i18n): replace hardcoded strings with translations in media-uploader",
+        "author": "farrokh"
+      },
+      {
+        "hash": "4e3949a2013cfc27bc75e2021670c29842ea2ebf",
+        "date": "2026-01-04",
+        "message": "Remove autoPlay from video element in report detail page",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c5a134ef8a2260b79c07b971a03a0858bc87dab9",
+        "date": "2026-01-04",
+        "message": "feat(rate-limiter): add in-memory fallback, metrics, and fail-closed mode",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6e2112fe01eac0526363e6abf620f23dd20f8b00",
+        "date": "2026-01-04",
+        "message": "refactor: streamline ApiResponse type handling",
+        "author": "farrokh"
+      },
+      {
+        "hash": "6cd0470e1d9689b9af27f881a15bd255755c235d",
+        "date": "2026-01-04",
+        "message": "fix: implement CSRF token fetching in report submission",
+        "author": "farrokh"
+      },
+      {
+        "hash": "dd24657ad7a24cfe4de1a1c0fa74ef4cefd5d004",
+        "date": "2026-01-04",
+        "message": "fix: update import statement and normalize solution comparison in PoW validator",
+        "author": "farrokh"
+      },
+      {
+        "hash": "0a0848da96e9b7899c65f88d5b46ffca8975cb9f",
+        "date": "2026-01-04",
+        "message": "fix: resolve lint and formatting issues",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b8ae379506a74bb31d364ccc326515b978e0a76a",
+        "date": "2026-01-04",
+        "message": "docs: sync rules and documentation with recent implementation changes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "01e5df21aaa2f1acc32858aae6df0454f856bb95",
+        "date": "2026-01-04",
+        "message": "docs: update migration guidance to use generate+migrate workflow",
+        "author": "farrokh"
+      },
+      {
+        "hash": "35f47caabe2a00a50be1b2b2edc4a8768be7ff74",
+        "date": "2026-01-04",
+        "message": "fix(accessibility): resolve nested interactive elements in lightbox modal",
+        "author": "farrokh"
+      },
+      {
+        "hash": "564e9db0f8daa383b463bce9d05873db1447c58e",
+        "date": "2026-01-04",
+        "message": "fix: revoke blob URLs in MediaUploader to prevent memory leaks",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2f27e455e4d788a4c2be69d9c3975c6899594024",
+        "date": "2026-01-04",
+        "message": "docs: fix Database Migration section - mark as complete and correct filename",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7cd6a2b193c9fd17a3749c6615332444f333793f",
+        "date": "2026-01-04",
+        "message": "docs: add comprehensive Redis configuration and fallback behavior documentation",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2c798586e4778d7d85c0861c817a00791580c42b",
+        "date": "2026-01-04",
+        "message": "feat(security): implement CSRF protection for state-changing operations",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8dfca9b1868a6a9d0b020dc29dd9e070a208b656",
+        "date": "2026-01-04",
+        "message": "fix(check_db): ensure proper database connection handling",
+        "author": "farrokh"
+      },
+      {
+        "hash": "affba8d85df55e76ef9244fa6ff96202f0e19785",
+        "date": "2026-01-04",
+        "message": "fix(reports): add SQL LIKE pattern escaping for search functionality",
+        "author": "farrokh"
+      },
+      {
+        "hash": "04c9cdac730a34093c58ec7a3be6ed93821061d1",
+        "date": "2026-01-04",
+        "message": "fix(media): enhance image upload handling and cleanup process",
+        "author": "farrokh"
+      },
+      {
+        "hash": "4c2dcaf652d59eae18e625f1858d847da873bce3",
+        "date": "2026-01-04",
+        "message": "fix(SubmitReportModal): update class names for improved styling consistency",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8ba513d6a4eeae6f861fedf6fbce8ce429d6c1c5",
+        "date": "2026-01-04",
+        "message": "fix(api-types): add optional details field to error object in ApiResponse",
+        "author": "farrokh"
+      },
+      {
+        "hash": "fcb1d6afe84670e26011eb83bd766d43d835e63f",
+        "date": "2026-01-04",
+        "message": "fix(pow): update PowChallenge property naming for consistency with API",
+        "author": "farrokh"
+      },
+      {
+        "hash": "f4b8a0592ff53d76fa2d28dca8735af9d69d9695",
+        "date": "2026-01-04",
+        "message": "fix(utils): add error handling for invalid date strings in formatDate function",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1e8e88084f83fa2ffdcf42bb49b8298ea40b2b70",
+        "date": "2026-01-04",
+        "message": "fix(utils): add error handling for missing S3 bucket configuration",
+        "author": "farrokh"
+      },
+      {
+        "hash": "ada4eb6bb4b5243df894639e8566db68d716e489",
+        "date": "2026-01-04",
+        "message": "fix(pow): update challenge property naming for consistency",
+        "author": "farrokh"
+      },
+      {
+        "hash": "650e16d6277ace3e32e4c12231ed80bbe689e33b",
+        "date": "2026-01-04",
+        "message": "refactor(rate-limiter): enhance atomicity in rate limit checks",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c0e63994d42b2729a36de01beef2e817b83d064b",
+        "date": "2026-01-04",
+        "message": "fix(pow-validator): improve challenge usage validation in PoW solution",
+        "author": "farrokh"
+      },
+      {
+        "hash": "82fc1d0629a89a0f12201fd814bfc68c185fd882",
+        "date": "2026-01-04",
+        "message": "feat: Add rate limiting for proof-of-work challenge generation.",
+        "author": "farrokh"
+      },
+      {
+        "hash": "e0ff9c1e574ec75ce2a1cd127882edfc5c3400e3",
+        "date": "2026-01-04",
+        "message": "feat: enable anonymous creation of organizations, individuals, and roles with session tracking",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c64d9ea51df3669f96b6dcd72634c2e364dfcd4f",
+        "date": "2026-01-04",
+        "message": "chore: fix lint and type errors across project",
+        "author": "farrokh"
+      },
+      {
+        "hash": "af7b50ba81ed6cee3c1e49b17ff2973a0d31ba85",
+        "date": "2026-01-04",
+        "message": "feat: implement code review feedback and add architecture docs",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "9302039332da021bf09b64bc49226febd70ecb6e",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add iranian government organization seed data",
+          "fa": "افزودن داده‌های بذر سازمان دولتی ایرانی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "91db08ee76873a1e1ee3f5a85a27eb81e832ec15",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add Slack notifications for key events",
+          "fa": "افزودن اعلان‌های Slack برای رویدادهای کلیدی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "6e91406c25a652e3a36d51a727969d3a69e311cb",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Implement user signup, email verification, and SEO foundations",
+          "fa": "پیاده‌سازی ثبت‌نام کاربر، تأیید ایمیل و مبانی سئو"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "16dcfa39609dd59c54d021bf9a8f90212b291e47",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add end date support for role occupancy",
+          "fa": "افزودن پشتیبانی از تاریخ پایان برای اشغال نقش"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "7774a8088b61eaeeeb9affe764db53872321ffb6",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Resolve lint and type check errors",
+          "fa": "حل خطاهای lint و بررسی نوع"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "b81fc84829c31e728580dce6c8af7fcdfc711713",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Implement Content Reporting System and Rich Media Support",
+          "fa": "پیاده‌سازی سیستم گزارش‌دهی محتوا و پشتیبانی از رسانه‌های غنی"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "098816e91f9befae8e357751c8cdaa6582afcb2b",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Apply biome formatting fixes",
+          "fa": "اعمال اصلاحات قالب‌بندی بیوم"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "28b846cd23ed0c9270a7b3acf450aac1216cc5a0",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Fix stale vote counts by moving queries inside transactions",
+          "fa": "رفع شمارش آرای قدیمی با جابجایی پرسش‌ها درون تراکنش‌ها"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "a1555129f2c970d13dbf28daf94144ade86846e0",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Fix race condition in removeVote by moving all reads inside transaction",
+          "fa": "رفع شرایط مسابقه در removeVote با جابجایی تمام خواندن‌ها درون تراکنش"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "c4da602fa98c5659ce04d309739eab8a7944f7c9",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Fix CSRF token endpoint path alignment and refine liquid glass effect",
+          "fa": "تنظیم مسیری برای نقطه پایانه توکن CSRF و اصلاح اثر شیشه مایع"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "c1651f7f17c2e1a04da95d17ff6225762a9de2f5",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Fix active-state logic for Graph nav link by using localized usePathname",
+          "fa": "رفع منطق حالت فعال برای پیوند ناوبری گراف با استفاده از usePathname محلی‌سازی شده"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "9f4c8aa869cbd151546d34a175b3de6d1cbcd2b2",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Memoize logout function to prevent unnecessary re-renders",
+          "fa": "توابع خروج را به‌صورت مموری‌سازی شده برای جلوگیری از تجدید دوباره‌های غیرضروری ذخیره کنید"
+        },
+        "author": "farrokh",
+        "type": "performance"
+      },
+      {
+        "hash": "0d6780023b4ccc55aaf021a9ca086fc0dc34fe4a",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add English translations and localize graph view",
+          "fa": "افزودن ترجمه‌های انگلیسی و محلی‌سازی نمای گراف"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "66cab1f00dfc0e4c42e3c66836ab33f9e4d19103",
+        "date": "2026-01-04",
+        "message": {
+          "en": "UI Enhancements: Update voting buttons to Agree/Disagree, implement liquid glass toolbar effect, and refine graph UI",
+          "fa": "بهبودهای UI: به‌روزرسانی دکمه‌های رأی‌گیری به موافقت/عدم موافقت، پیاده‌سازی اثر نوار ابزار شیشه مایع و پیشرفت UI گراف"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      },
+      {
+        "hash": "f86b838643a9ef4a245bc7539206ce69a9ba2c21",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Implement voting, centralization CSRF, and UI fixes",
+          "fa": "پیاده‌سازی رأی‌گیری، متمرکزسازی CSRF و اصلاحات UI"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "d2fc0a5823e003e4ea01fd3b8eed3e830f51a3f9",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Make remove button visible on keyboard focus",
+          "fa": "نمایش دکمه حذف در حالت تمرکز صفحه کلید"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "8b5bc5be54791f0638cc13036d180379774daf5f",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Preserve blob preview URLs after media upload completion",
+          "fa": "حفظ URLهای پیش‌نمایش blob پس از اتمام بارگذاری رسانه"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "4731ac1b206126df1b55640cac5e21b087424029",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Replace hardcoded strings with translations in media-uploader",
+          "fa": "جایگزینی رشته‌های ثابت با ترجمه‌ها در بارگذاری‌کننده رسانه"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "c5a134ef8a2260b79c07b971a03a0858bc87dab9",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add in-memory fallback, metrics, and fail-closed mode",
+          "fa": "افزودن پشتیبان‌گیری در حافظه، متریک‌ها و حالت عدم موفقیت با بسته شدن"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "6cd0470e1d9689b9af27f881a15bd255755c235d",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Implement CSRF token fetching in report submission",
+          "fa": "پیاده‌سازی دریافت توکن CSRF در ارائه گزارش"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "dd24657ad7a24cfe4de1a1c0fa74ef4cefd5d004",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Update import statement and normalize solution comparison in PoW validator",
+          "fa": "به‌روزرسانی دستور واردات و نرمال‌سازی مقایسه راه‌حل در تأییدکننده PoW"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "0a0848da96e9b7899c65f88d5b46ffca8975cb9f",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Resolve lint and formatting issues",
+          "fa": "رفع مسائل lint و قالب‌بندی"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "35f47caabe2a00a50be1b2b2edc4a8768be7ff74",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Resolve nested interactive elements in lightbox modal",
+          "fa": "حل عناصر تعاملی تو در تو در مودال lightbox"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "564e9db0f8daa383b463bce9d05873db1447c58e",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Revoke blob URLs in MediaUploader to prevent memory leaks",
+          "fa": "تنسیخ URLهای blob در MediaUploader برای جلوگیری از نشت حافظه"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "2c798586e4778d7d85c0861c817a00791580c42b",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Implement CSRF protection for state-changing operations",
+          "fa": "پیاده‌سازی حفاظت CSRF برای عملیات تغییر دهنده حالت"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "8dfca9b1868a6a9d0b020dc29dd9e070a208b656",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Ensure proper database connection handling",
+          "fa": "اطمینان از مدیریت صحیح اتصال به پایگاه داده"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "affba8d85df55e76ef9244fa6ff96202f0e19785",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add SQL LIKE pattern escaping for search functionality",
+          "fa": "افزودن فرار از الگوی SQL LIKE برای عملکرد جستجو"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "04c9cdac730a34093c58ec7a3be6ed93821061d1",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Enhance image upload handling and cleanup process",
+          "fa": "بهبود مدیریت بارگذاری تصویر و فرآیند پاکسازی"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "4c2dcaf652d59eae18e625f1858d847da873bce3",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Update class names for improved styling consistency",
+          "fa": "به‌روزرسانی نام کلاس‌ها برای بهبود سازگاری در سبک"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "8ba513d6a4eeae6f861fedf6fbce8ce429d6c1c5",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add optional details field to error object in ApiResponse",
+          "fa": "افزودن فیلد جزئیات اختیاری به شیء خطا در ApiResponse"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "fcb1d6afe84670e26011eb83bd766d43d835e63f",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Update PowChallenge property naming for consistency with API",
+          "fa": "به‌روزرسانی نام‌گذاری ویژگی PowChallenge برای سازگاری با API"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "f4b8a0592ff53d76fa2d28dca8735af9d69d9695",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add error handling for invalid date strings in formatDate function",
+          "fa": "افزودن مدیریت خطا برای رشته‌های تاریخ نامعتبر در تابع formatDate"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "1e8e88084f83fa2ffdcf42bb49b8298ea40b2b70",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add error handling for missing S3 bucket configuration",
+          "fa": "افزودن مدیریت خطا برای پیکربندی سطل S3 گم‌شده"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "ada4eb6bb4b5243df894639e8566db68d716e489",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Update challenge property naming for consistency",
+          "fa": "به‌روزرسانی نام‌گذاری ویژگی چالش برای سازگاری"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "c0e63994d42b2729a36de01beef2e817b83d064b",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Improve challenge usage validation in PoW solution",
+          "fa": "بهبود اعتبارسنجی استفاده از چالش در راه‌حل PoW"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "82fc1d0629a89a0f12201fd814bfc68c185fd882",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Add rate limiting for proof-of-work challenge generation.",
+          "fa": "افزودن محدودیت نرخ برای تولید چالش اثبات کار."
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "e0ff9c1e574ec75ce2a1cd127882edfc5c3400e3",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Enable anonymous creation of organizations, individuals, and roles with session tracking",
+          "fa": "فعال کردن ایجاد ناشناس سازمان‌ها، افراد و نقش‌ها با ردیابی جلسه"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "af7b50ba81ed6cee3c1e49b17ff2973a0d31ba85",
+        "date": "2026-01-04",
+        "message": {
+          "en": "Implement code review feedback and add architecture docs",
+          "fa": "پیاده‌سازی بازخورد بررسی کد و افزودن مستندات معماری"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-03",
+    "technical": [
+      {
+        "hash": "e723adecf92df543cac93dc6f0b6d2a5f007123d",
+        "date": "2026-01-03",
+        "message": "refactor(graph): modernize canvas ui and refactor component architecture",
+        "author": "farrokh"
+      },
+      {
+        "hash": "f10d1b850aa31d5e874119c2bb37330be94895dd",
+        "date": "2026-01-03",
+        "message": "docs: update architecture summary with theme support and graph enhancements",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2d054edca3544b84d0087f585dfecdc0ea758d8b",
+        "date": "2026-01-03",
+        "message": "Implement timeline filtering for graph canvas with temporal edge support",
+        "author": "farrokh"
+      },
+      {
+        "hash": "4548d20955742fba8c298a6c92a2234739aad471",
+        "date": "2026-01-03",
+        "message": "feat: implement system theme support, shared navbar, and media gallery refactor",
+        "author": "farrokh"
+      },
+      {
+        "hash": "620d94a51ccb41bb1778b96cea8b10bfceb87fda",
+        "date": "2026-01-03",
+        "message": "Merge pull request #4 from farrokh/landing-page",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8b05d6f90584c6bb9d7c4394efc50d56f6eaadf5",
+        "date": "2026-01-03",
+        "message": "feat: implement robust authentication and authorization middleware, enhance graph with loading states and new report node type.",
+        "author": "farrokh"
+      },
+      {
+        "hash": "842efbf7aa89f867274f263b58514d28f2301f47",
+        "date": "2026-01-03",
+        "message": "chore: format backend/src/routes/auth.ts",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d3ebabb050ea94c22c1cf68b7f822b2229fe2a56",
+        "date": "2026-01-03",
+        "message": "feat: remove GitHub OAuth integration and enhance Google OAuth security by preventing automatic account linking to existing email accounts.",
+        "author": "farrokh"
+      },
+      {
+        "hash": "59c5dc6dbe33d1528a1c976d5e5a0b5e78fb5f92",
+        "date": "2026-01-03",
+        "message": "refactor: Add `RequestHandler` type assertion to all Express route handlers.",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8523833cd1ff4e47121e1b0f4561e74dc4aa67ed",
+        "date": "2026-01-03",
+        "message": "refactor: improve code formatting, import ordering, and add minor logic adjustments across the codebase Summary of all fixes:",
+        "author": "farrokh"
+      },
+      {
+        "hash": "8cf16f8a252f983221525f5d200afa321a1dcca5",
+        "date": "2026-01-03",
+        "message": "feat: Enhance modal component with new sizing, close button control, and styling, and document implemented graph management features.",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "4548d20955742fba8c298a6c92a2234739aad471",
+        "date": "2026-01-03",
+        "message": {
+          "en": "Implement system theme support, shared navbar, and media gallery refactor",
+          "fa": "پشتیبانی از تم سیستم، نوار جستجوی مشترک و بازنگری گالری رسانه را پیاده‌سازی کنید"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "8b05d6f90584c6bb9d7c4394efc50d56f6eaadf5",
+        "date": "2026-01-03",
+        "message": {
+          "en": "Implement robust authentication and authorization middleware, enhance graph with loading states and new report node type.",
+          "fa": "پیاده‌سازی middleware قوی برای احراز هویت و مجوز، و بهبود گراف با وضعیت‌های بارگذاری و نوع جدید نود گزارش."
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "d3ebabb050ea94c22c1cf68b7f822b2229fe2a56",
+        "date": "2026-01-03",
+        "message": {
+          "en": "Remove GitHub OAuth integration and enhance Google OAuth security by preventing automatic account linking to existing email accounts.",
+          "fa": "ادغام OAuth گیت‌هاب را حذف کرده و امنیت OAuth گوگل را با جلوگیری از پیوند خودکار حساب به حساب‌های ایمیل موجود تقویت کنید."
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "8cf16f8a252f983221525f5d200afa321a1dcca5",
+        "date": "2026-01-03",
+        "message": {
+          "en": "Enhance modal component with new sizing, close button control, and styling, and document implemented graph management features.",
+          "fa": "اجزای مدال را با اندازه‌گیری‌های جدید، کنترل دکمه بستن و استایل بهبود دهید و ویژگی‌های مدیریت گراف پیاده‌سازی شده را مستند کنید."
+        },
+        "author": "farrokh",
+        "type": "feature"
+      }
+    ]
+  },
+  {
+    "date": "2026-01-02",
+    "technical": [
+      {
+        "hash": "f997c6b2e849f80fbec23fe4923f3137342cbf07",
+        "date": "2026-01-02",
+        "message": "feat: add inline role creation when adding a person",
+        "author": "farrokh"
+      },
+      {
+        "hash": "00167c9d9c2951a576fbf8a2df70c327d7423a4e",
+        "date": "2026-01-02",
+        "message": "feat: add person modal for creating individuals",
+        "author": "farrokh"
+      },
+      {
+        "hash": "9c17f6fa46fbdf44f41a6f10df7373e2ec71dc91",
+        "date": "2026-01-02",
+        "message": "feat: add directional edges to graph connecting parent/child organizations",
+        "author": "farrokh"
+      },
+      {
+        "hash": "a0423165281715019c53832513267181810c6882",
+        "date": "2026-01-02",
+        "message": "feat: add organization modal and graph toolbar",
+        "author": "farrokh"
+      },
+      {
+        "hash": "f2da9382f4f18f63164eea711939d70fa0b0f8b6",
+        "date": "2026-01-02",
+        "message": "Merge pull request #3 from farrokh/coderabbit",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1eb3954355424ac8a93a0f564c6595053af9bd42",
+        "date": "2026-01-02",
+        "message": "chore: update CodeRabbit tools configuration to use ast-grep",
+        "author": "farrokh"
+      },
+      {
+        "hash": "40823d356b466ba0c9499fc915434be3d1e58e84",
+        "date": "2026-01-02",
+        "message": "chore: add CodeRabbit configuration",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d54f905efd2f73552c36807c22cd7f7391ddac6c",
+        "date": "2026-01-02",
+        "message": "Merge pull request #2 from farrokh/feat/database-setup",
+        "author": "farrokh"
+      },
+      {
+        "hash": "ae9ec25a6ed31904024c2c0ccccc4017df614b33",
+        "date": "2026-01-02",
+        "message": "fix: standardize JSON formatting in database schema files",
+        "author": "farrokh"
+      },
+      {
+        "hash": "32b078e42c269b3d4fdc65e489e51812b0b2874b",
+        "date": "2026-01-02",
+        "message": "refactor: update package scripts and improve backend structure",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c1cc8497ac37c2c14379de1394e61067ff270aca",
+        "date": "2026-01-02",
+        "message": "feat(database): implement PostgreSQL schema with Drizzle ORM",
+        "author": "farrokh"
+      },
+      {
+        "hash": "532c8dd77cd6c5c0cddf948480222b9a0b0db9d7",
+        "date": "2026-01-02",
+        "message": "Merge pull request #1 from farrokh/docs/add-code-of-conduct",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2d4ccc5cd3e1fd6b29a5ff81e39d89cde43f04e1",
+        "date": "2026-01-02",
+        "message": "chore: remove unused internationalization configuration files",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b583fa1b3604cfe290ab4a87a5761187758e62a9",
+        "date": "2026-01-02",
+        "message": "chore: clean up code formatting and remove trailing whitespace in configuration and source files",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7f2448562736d1fd2e59459e3b656bf643f223c2",
+        "date": "2026-01-02",
+        "message": "chore: update project dependencies and improve build configuration",
+        "author": "farrokh"
+      },
+      {
+        "hash": "63c013ac95cb6933354574157a748c82e2711dff",
+        "date": "2026-01-02",
+        "message": "docs: add Contributor Covenant Code of Conduct",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b149baea7f0612608d3c219b8b2229bf8ff9cd47",
+        "date": "2026-01-02",
+        "message": "fix: update contact email for security issues in SECURITY.md",
+        "author": "farrokh"
+      },
+      {
+        "hash": "7f8a5eb2dbf4eb02e1f0112499307543de78b740",
+        "date": "2026-01-02",
+        "message": "chore: initial project setup",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "f997c6b2e849f80fbec23fe4923f3137342cbf07",
+        "date": "2026-01-02",
+        "message": {
+          "en": "Add inline role creation when adding a person",
+          "fa": "افزودن ایجاد نقش درون‌خطی هنگام افزودن یک فرد"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "00167c9d9c2951a576fbf8a2df70c327d7423a4e",
+        "date": "2026-01-02",
+        "message": {
+          "en": "Add person modal for creating individuals",
+          "fa": "مدال افزودن فرد برای ایجاد افراد را اضافه کنید"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "9c17f6fa46fbdf44f41a6f10df7373e2ec71dc91",
+        "date": "2026-01-02",
+        "message": {
+          "en": "Add directional edges to graph connecting parent/child organizations",
+          "fa": "اضافه کردن لبه‌های جهت‌دار به گراف که سازمان‌های والد/کودک را متصل می‌کند"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "a0423165281715019c53832513267181810c6882",
+        "date": "2026-01-02",
+        "message": {
+          "en": "Add organization modal and graph toolbar",
+          "fa": "مدال سازمان و نوار ابزار گراف را اضافه کنید"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "ae9ec25a6ed31904024c2c0ccccc4017df614b33",
+        "date": "2026-01-02",
+        "message": {
+          "en": "Standardize JSON formatting in database schema files",
+          "fa": "استانداردسازی فرمت JSON در فایل‌های طرح پایگاه داده"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "c1cc8497ac37c2c14379de1394e61067ff270aca",
+        "date": "2026-01-02",
+        "message": {
+          "en": "Implement PostgreSQL schema with Drizzle ORM",
+          "fa": "پیاده‌سازی طرح PostgreSQL با Drizzle ORM"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "b149baea7f0612608d3c219b8b2229bf8ff9cd47",
+        "date": "2026-01-02",
+        "message": {
+          "en": "Update contact email for security issues in SECURITY.md",
+          "fa": "به‌روزرسانی ایمیل تماس برای مشکلات امنیتی در SECURITY.md"
+        },
+        "author": "farrokh",
+        "type": "fix"
+      }
+    ]
+  }
+]

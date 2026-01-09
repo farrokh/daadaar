@@ -11,7 +11,10 @@ This guide covers deploying the Next.js frontend to Vercel and wiring it to the 
 Use the Vercel overrides in `frontend/vercel.json`:
 - Install Command: `bun install`
 - Build Command: `bun run build`
+- Install Command: `bun install`
+- Build Command: `bun run build`
 - Output Directory: `.next`
+- **Note**: Ensure `@types/node` is set to `^22.0.0` or compatible LTS version to avoid conflicts with Next.js 16.
 
 ## 3) Environment Variables
 Set these for **Production** (and **Preview** if you want previews to work):
@@ -44,3 +47,16 @@ curl https://api.daadaar.com/health
 ```
 
 If `curl -I https://www.daadaar.com` includes a `server: Vercel` header, the deployment is live.
+
+## 7) Routine Deployment
+
+To deploy updates to production with automated changelog generation:
+
+```bash
+# Run from frontend directory
+bun run deploy:prod
+```
+
+This single command will:
+1.  Generate localized updates from git history (using your local API key).
+2.  Deploy the updated site to Vercel.

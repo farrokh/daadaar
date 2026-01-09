@@ -178,3 +178,12 @@ aws codebuild start-build \
   --region us-east-1 \
   --environment-variables-override name=RUN_MIGRATIONS,value=true,type=PLAINTEXT
 ```
+
+### Frontend Update Workflow
+To deploy frontend changes (including the automated changelog):
+
+1.  **Deploy Production**:
+    Run this single command from the `frontend/` directory. It will automatically generate translations (using your local key) and then trigger the deployment.
+    ```bash
+    bun run deploy:prod
+    ```

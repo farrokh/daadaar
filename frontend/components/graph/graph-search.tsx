@@ -352,6 +352,7 @@ export function GraphSearchPanel() {
         <div className="absolute left-0 right-0 bottom-full z-40 mb-3 rounded-3xl border border-foreground/10 bg-background/95 shadow-2xl backdrop-blur-xl overflow-hidden">
           <div
             id="search-results-list"
+            // biome-ignore lint/a11y/useSemanticElements: Custom listbox implementation not suitable for native select
             role="listbox"
             tabIndex={-1}
             className="max-h-72 overflow-y-auto custom-scrollbar divide-y divide-foreground/5"
@@ -386,6 +387,7 @@ export function GraphSearchPanel() {
                 <button
                   id={getItemId(index)}
                   type="button"
+                  // biome-ignore lint/a11y/useSemanticElements: Interactive option using button for best accessibility in custom control
                   role="option"
                   aria-selected={index === highlightedIndex}
                   tabIndex={-1}
