@@ -51,6 +51,8 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const searchParams = useSearchParams();
   const { currentUser } = useAuth();
   const [isAddOrgModalOpen, setIsAddOrgModalOpen] = useState(false);
+  const [addOrgParentId, setAddOrgParentId] = useState<number | undefined>(undefined);
+  const [addOrgParentName, setAddOrgParentName] = useState<string | undefined>(undefined);
   const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState(false);
   const [isSubmitReportModalOpen, setIsSubmitReportModalOpen] = useState(false);
   const [showMiniMap, setShowMiniMap] = useState(false);
@@ -481,6 +483,15 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     ...(viewContext.mode === 'people' && viewContext.organizationId
       ? [
           {
+            label: t('add_organization'),
+            icon: Building2,
+            onClick: () => {
+              setAddOrgParentId(viewContext.organizationId);
+              setAddOrgParentName(viewContext.organizationName);
+              setIsAddOrgModalOpen(true);
+            },
+          },
+          {
             label: t('add_person'),
             icon: User,
             onClick: () => setIsAddPersonModalOpen(true),
@@ -573,11 +584,17 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         </output>
       )}
 
-      {/* Add Organization Modal */}
+  /* Add Organization Modal */
       <AddOrganizationModal
         isOpen={isAddOrgModalOpen}
-        onClose={() => setIsAddOrgModalOpen(false)}
+        onClose={() => {
+          setIsAddOrgModalOpen(false);
+          setAddOrgParentId(undefined);
+          setAddOrgParentName(undefined);
+        }}
         onSuccess={() => fetchOrganizations()}
+        defaultParentId={addOrgParentId}
+        defaultParentName={addOrgParentName}
       />
 
       {/* Add Person Modal */}
