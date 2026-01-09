@@ -53,7 +53,27 @@ export function OrganizationManagementPanel() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   // Function to fetch organizations for the dropdown
-  const fetchParentOrgs = useCallback(async (searchQuery = '') => {
+  const mergeParentOrgs = useCallback(
+    (newOrgs: Organization[], includeIds: number[] = []) => {
+      setParentOrgs(prev => {
+        const map = new Map<number, Organization>();
+        for (const id of includeIds) {
+          const existing = prev.find(org => org.id === id);
+          if (existing) {
+            map.set(id, existing);
+          }
+        }
+        for (const org of newOrgs) {
+          map.set(org.id, org);
+        }
+        return Array.from(map.values());
+      });
+    },
+    []
+  );
+
+  const fetchParentOrgs = useCallback(
+    async (searchQuery = '') => {
     setFetchingParentOrgs(true);
     try {
       const query = new URLSearchParams({
@@ -67,13 +87,14 @@ export function OrganizationManagementPanel() {
       if (response.success && response.data) {
         const data = response.data;
         if ('organizations' in data) {
-          setParentOrgs(prev => {
-            const map = new Map(prev.map(o => [o.id, o]));
-            for (const o of data.organizations) {
-              map.set(o.id, o);
+          const includeIds: number[] = [];
+          if (form.parentId) {
+            const parsed = Number(form.parentId);
+            if (!Number.isNaN(parsed)) {
+              includeIds.push(parsed);
             }
-            return Array.from(map.values());
-          });
+          }
+        mergeParentOrgs(data.organizations, includeIds);
         }
       }
     } catch (err) {
@@ -81,7 +102,9 @@ export function OrganizationManagementPanel() {
     } finally {
       setFetchingParentOrgs(false);
     }
-  }, []);
+    },
+    [form.parentId, mergeParentOrgs]
+  );
 
   const fetchOrganizations = useCallback(async () => {
     setLoading(true);
