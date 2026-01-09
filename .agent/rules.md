@@ -5,10 +5,11 @@
 - Ensure the local workspace is fully updated with the merged changes before deleting any local branches.
 - Never delete a branch (local or remote) until confirmation of a successful merge into the base branch.
 
-## JSON Processing
+## Command Line & JSON Handling
+- **Do not pass complex JSON or long text arguments (like PR bodies) directly in the terminal.** Use temporary files instead.
 - Do not process complex JSON output directly in the terminal.
 - Always create a temporary Python script to process JSON data if it requires extraction or transformation.
-- Delete the temporary Python script immediately after execution.
+- Delete the temporary files/scripts immediately after execution.
 
 ## Documentation Organization
 - Always organize documentation within the `docs/` directory using the following structure:

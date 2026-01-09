@@ -8,7 +8,7 @@ import OpenAI from "openai";
 const execAsync = promisify(exec);
 
 // Output path
-const outputPath = path.resolve(process.cwd(), "frontend/data/updates.json");
+const outputPath = path.resolve(process.cwd(), "data/updates.json");
 const dataDir = path.dirname(outputPath);
 
 async function generateUpdates() {
@@ -206,12 +206,21 @@ async function generateUpdates() {
     console.log(`Total days processed: ${processed.length}`);
 
   } catch (error) {
-    console.warn("Warning: Could not generate updates from git log. Using empty upates list.", error);
-    // Write empty array to ensure file exists
-    if (!fs.existsSync(outputPath)) {
+    console.warn("Warning: Could not generate updates from git log.", error);
+    
+    // Check if we have an existing file we can preserve
+    if (fs.existsSync(outputPath)) {
+        console.log("Preserving existing updates.json found in build.");
+    } else {
+        // Only write empty if absolutely nothing exists
+        console.warn("No existing data found. Creating empty updates list.");
+        if (!fs.existsSync(dataDir)) {
+          fs.mkdirSync(dataDir, { recursive: true });
+        }
         fs.writeFileSync(outputPath, JSON.stringify([], null, 2));
     }
-    process.exit(0); // Do not fail the build
+    // Do not fail the build, allow existing file to be used
+    process.exit(0); 
   }
 }
 
