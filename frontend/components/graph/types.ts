@@ -11,7 +11,14 @@ export interface OrganizationNodeData {
   url?: string | null; // Fully-qualified URL (pre-resolved)
   s3Key?: string | null; // Raw S3 key
   isDetailView?: boolean;
+  memberCount?: number;
+  childCount?: number;
+  parentOrgId?: number;
+  toggleOnLeft?: boolean;
   onEdit?: () => void;
+  onExpand?: () => void;
+  onToggleChildren?: () => void;
+  isExpanded?: boolean;
 }
 
 export interface PersonNodeData {

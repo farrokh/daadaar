@@ -58,6 +58,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const [isHelpCollapsed, setIsHelpCollapsed] = useState(false);
+  const [peopleExpandedOrgIds, setPeopleExpandedOrgIds] = useState<Set<number>>(new Set());
   const hasInitialLoadCompleted = useRef(false);
 
   const locale = useLocale();
@@ -90,12 +91,30 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     fetchOrganizations,
     fetchOrganizationPeople,
     fetchIndividualReports,
+    toggleChildOrgExpansion,
+    expandedOrgIds,
   } = useGraphData({
     initialView,
     tOrg,
     tPerson,
     locale,
   });
+
+  const togglePeopleOrgChildren = useCallback((orgId: number) => {
+    setPeopleExpandedOrgIds(prev => {
+      const next = new Set(prev);
+      if (next.has(orgId)) {
+        next.delete(orgId);
+      } else {
+        next.add(orgId);
+      }
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    setPeopleExpandedOrgIds(new Set());
+  }, [viewContext.mode, viewContext.organizationId]);
 
   // Handle node click
   const onNodeClick = useCallback(
@@ -234,13 +253,11 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     if (viewContext.mode === 'people' && viewContext.organizationUuid) {
       params.set('organizationUuid', viewContext.organizationUuid);
       params.delete('individualUuid');
-      // Clean up old numeric params for backward compatibility
       params.delete('organizationId');
       params.delete('individualId');
     } else if (viewContext.mode === 'reports' && viewContext.individualUuid) {
       params.set('individualUuid', viewContext.individualUuid);
       params.delete('organizationUuid');
-      // Clean up old numeric params for backward compatibility
       params.delete('organizationId');
       params.delete('individualId');
     } else {
@@ -260,32 +277,26 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
   }, [pathname, router, searchParams, viewContext, loading]);
 
   // Load initial data
-  // Track if we have done the initial data fetch
   const hasPerformedInitialFetch = useRef(false);
 
   // Load initial data and sync with external URL changes
   // biome-ignore lint/correctness/useExhaustiveDependencies: We only want this to run when external props change
   useEffect(() => {
-    // Determine target view from initialView (props)
     const targetMode = initialView?.mode || 'organizations';
     const targetOrgId = initialView?.organizationId;
     const targetIndId = initialView?.individualId;
 
-    // Get current internal state
     const currentMode = viewContext.mode;
     const currentOrgId = viewContext.organizationId;
     const currentIndId = viewContext.individualId;
 
-    // Check if internal state already matches target
     const isMatched =
       targetMode === currentMode && targetOrgId === currentOrgId && targetIndId === currentIndId;
 
-    // If matches, normally we skip. BUT on first load, we must fetch because data is empty!
     if (isMatched && hasPerformedInitialFetch.current) return;
 
     hasPerformedInitialFetch.current = true;
 
-    // Fetch target data
     if (targetMode === 'organizations') {
       fetchOrganizations();
     } else if (targetMode === 'people' && targetOrgId) {
@@ -297,10 +308,136 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         fetchIndividualReports(initialView.individualId);
       }
     }
-    // We intentionally omit fetchers and viewContext from dependencies.
-    // We only want this to run when the *external* props (initialView) change.
-    // If viewContext changes (internal navigation), we do NOT want this to run/revert.
   }, [initialView?.mode, initialView?.organizationId, initialView?.individualId]);
+
+  // Filter nodes and edges based on date range and inject admin edit callbacks
+  const peopleMainOrgNodeId =
+    viewContext.mode === 'people' && viewContext.organizationId
+      ? `org-${viewContext.organizationId}`
+      : undefined;
+
+  const visibleNodes = nodes
+    .filter(node => {
+      if (node.type === 'report') {
+        const data = node.data as ReportNodeData;
+        if (!data.incidentDate) return true;
+        const year = new Date(data.incidentDate).getFullYear();
+        return year >= dateRange[0] && year <= dateRange[1];
+      }
+
+      if (viewContext.mode === 'people' && node.type === 'organization' && peopleMainOrgNodeId) {
+        if (node.id === peopleMainOrgNodeId) return true;
+
+        const parentOrgId = (node.data as OrganizationNodeData & { parentOrgId?: number })
+          .parentOrgId;
+
+        if (!parentOrgId) {
+          return true;
+        }
+
+        if (parentOrgId === viewContext.organizationId) {
+          return true;
+        }
+
+        return peopleExpandedOrgIds.has(parentOrgId);
+      }
+
+      return true;
+    })
+    .map(node => {
+      // Create a new data object to avoid mutation
+      const newData = { ...node.data };
+
+      // Inject callbacks for organizations
+      if (node.type === 'organization') {
+        newData.childCount = (node.data as OrganizationNodeData).childCount;
+
+        if (viewContext.mode === 'organizations') {
+          newData.isExpanded = expandedOrgIds.has(newData.id);
+          newData.onToggleChildren = () => toggleChildOrgExpansion(newData.id);
+        } else if (viewContext.mode === 'people') {
+          if (newData.childCount && newData.childCount > 0 && newData.id) {
+            newData.onToggleChildren = () => togglePeopleOrgChildren(newData.id);
+            newData.isExpanded = peopleExpandedOrgIds.has(newData.id);
+          } else {
+            newData.onToggleChildren = undefined;
+            newData.isExpanded = false;
+          }
+        } else {
+          newData.onToggleChildren = undefined;
+          newData.isExpanded = false;
+        }
+
+        newData.toggleOnLeft = viewContext.mode === 'people';
+
+        newData.onExpand = undefined; // Member expansion not used
+      }
+
+      // Inject onEdit callback for admin users
+      if (isAdmin && (node.type === 'organization' || node.type === 'individual')) {
+        newData.onEdit = () => {
+          // Navigate to admin panel with appropriate tab
+          const tab = node.type === 'organization' ? 'organizations' : 'individuals';
+          router.push(`/admin?tab=${tab}`);
+        };
+      }
+
+      return {
+        ...node,
+        data: newData,
+      };
+    });
+
+  const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
+
+  const visibleEdges = edges
+    .filter(edge => {
+      return visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target);
+    })
+    .map(edge => {
+      // Check if this is a former occupancy (ended in the past)
+      if (edge.type === 'occupies' && edge.data?.endDate) {
+        const endDate = new Date(edge.data.endDate);
+        const now = new Date();
+
+        // If the role ended in the past, mark it as a former occupancy
+        if (endDate < now) {
+          return {
+            ...edge,
+            type: 'occupies_former',
+            animated: true,
+            style: {
+              strokeWidth: 0.7,
+              opacity: 0.3, // More faded
+            },
+          };
+        }
+      }
+
+      // Color hierarchy edges based on the source organization
+      // This makes different branches of the organization tree visually distinct
+      if (edge.type === 'hierarchy') {
+        // Extract the numeric ID from the source string (e.g. "org-123" -> 123)
+        const sourceId = Number.parseInt(edge.source.replace(/\D/g, ''), 10);
+
+        if (!Number.isNaN(sourceId)) {
+          // Use golden angle approximation (137.508°) to generate distinct hues
+          // This ensures that even sequential IDs get very different colors
+          const hue = (sourceId * 137.508) % 360;
+
+          return {
+            ...edge,
+            style: {
+              ...edge.style,
+              stroke: `hsl(${hue}, 75%, 45%)`, // High saturation, medium lightness for visibility
+              strokeWidth: 2,
+            },
+          };
+        }
+      }
+
+      return edge;
+    });
 
   if (loading) {
     return (
@@ -329,65 +466,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       </div>
     );
   }
-
-  // Filter nodes and edges based on date range and inject admin edit callbacks
-  const visibleNodes = nodes
-    .filter(node => {
-      if (node.type === 'report') {
-        const data = node.data as ReportNodeData;
-        if (!data.incidentDate) return true;
-        const year = new Date(data.incidentDate).getFullYear();
-        return year >= dateRange[0] && year <= dateRange[1];
-      }
-      return true;
-    })
-    .map(node => {
-      // Inject onEdit callback for admin users
-      if (isAdmin && (node.type === 'organization' || node.type === 'individual')) {
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            onEdit: () => {
-              // Navigate to admin panel with appropriate tab
-              const tab = node.type === 'organization' ? 'organizations' : 'individuals';
-              router.push(`/admin?tab=${tab}`);
-            },
-          },
-        };
-      }
-      return node;
-    });
-
-  const visibleEdges = edges
-    .filter(edge => {
-      // Always show edges, but we'll modify their type based on whether they're current or former
-      const sourceVisible = visibleNodes.some(n => n.id === edge.source);
-      const targetVisible = visibleNodes.some(n => n.id === edge.target);
-      return sourceVisible && targetVisible;
-    })
-    .map(edge => {
-      // Check if this is a former occupancy (ended in the past)
-      if (edge.type === 'occupies' && edge.data?.endDate) {
-        const endDate = new Date(edge.data.endDate);
-        const now = new Date();
-
-        // If the role ended in the past, mark it as a former occupancy
-        if (endDate < now) {
-          return {
-            ...edge,
-            type: 'occupies_former',
-            animated: true,
-            style: {
-              strokeWidth: 0.7,
-              opacity: 0.3, // More faded
-            },
-          };
-        }
-      }
-
-      return edge;
-    });
 
   // Calculate context menu items based on view mode
   const contextMenuItems = [

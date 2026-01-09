@@ -4,6 +4,7 @@
 import { and, count, desc, eq, ilike, or } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
+import { invalidateMemberCountCacheForRole } from '../lib/organization-member-counts';
 import { generatePresignedGetUrl } from '../lib/s3-client';
 import { generateIndividualSeoImage } from '../lib/seo-image-generator';
 import { notifyNewIndividual } from '../lib/slack';
@@ -198,6 +199,11 @@ export async function createIndividual(req: Request, res: Response) {
         createdByUserId: userId,
         sessionId,
       });
+
+      // Invalidate member count cache for this organization
+      invalidateMemberCountCacheForRole(resolvedRoleId).catch(err =>
+        console.error('Cache invalidation error:', err)
+      );
     }
 
     if (newIndividual) {
@@ -580,6 +586,13 @@ export async function updateIndividual(req: Request, res: Response) {
             .update(schema.roleOccupancy)
             .set(roleUpdateData)
             .where(eq(schema.roleOccupancy.id, latestRoleOccupancy.id));
+
+          // Invalidate cache if role changed
+          if (roleUpdateData.roleId) {
+            invalidateMemberCountCacheForRole(roleUpdateData.roleId).catch(err =>
+              console.error('Cache invalidation error:', err)
+            );
+          }
         }
       } else {
         // Create new role occupancy if none exists
@@ -605,6 +618,11 @@ export async function updateIndividual(req: Request, res: Response) {
             createdByUserId: userId,
             sessionId,
           });
+
+          // Invalidate member count cache for this organization
+          invalidateMemberCountCacheForRole(roleIdToUse).catch(err =>
+            console.error('Cache invalidation error:', err)
+          );
         }
       }
     }
