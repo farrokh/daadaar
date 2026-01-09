@@ -65,37 +65,42 @@ export function AddOrganizationModal({
   const t = useTranslations('organization');
   const tCommon = useTranslations('common');
 
-  const fetchOrganizations = useCallback(async (search: string) => {
-    setFetchingOrgs(true);
-    const query = new URLSearchParams({
-      page: '1',
-      limit: '20',
-      q: search,
-    });
+  const fetchOrganizations = useCallback(
+    async (search: string) => {
+      setFetchingOrgs(true);
+      const query = new URLSearchParams({
+        page: '1',
+        limit: '20',
+        q: search,
+      });
 
-    const response = await fetchApi<OrganizationListResponse>(`/organizations?${query.toString()}`);
+      const response = await fetchApi<OrganizationListResponse>(
+        `/organizations?${query.toString()}`
+      );
 
-    if (response.success && response.data) {
-      const data = response.data;
-      if ('organizations' in data) {
-        setOrganizations(prev => {
-          // If we have a default parent, ensure we keep it in the list if it's not returned by the API
-          // This prevents the label from disappearing when searching
-          if (defaultParentId && defaultParentName) {
-            const hasDefault = data.organizations.some(o => o.id === defaultParentId);
-            if (!hasDefault) {
-              return [
-                { id: defaultParentId, name: defaultParentName, nameEn: null },
-                ...data.organizations,
-              ];
+      if (response.success && response.data) {
+        const data = response.data;
+        if ('organizations' in data) {
+          setOrganizations(_prev => {
+            // If we have a default parent, ensure we keep it in the list if it's not returned by the API
+            // This prevents the label from disappearing when searching
+            if (defaultParentId && defaultParentName) {
+              const hasDefault = data.organizations.some(o => o.id === defaultParentId);
+              if (!hasDefault) {
+                return [
+                  { id: defaultParentId, name: defaultParentName, nameEn: null },
+                  ...data.organizations,
+                ];
+              }
             }
-          }
-          return data.organizations;
-        });
+            return data.organizations;
+          });
+        }
       }
-    }
-    setFetchingOrgs(false);
-  }, [defaultParentId, defaultParentName]);
+      setFetchingOrgs(false);
+    },
+    [defaultParentId, defaultParentName]
+  );
 
   // Handle default parent initialization
   useEffect(() => {

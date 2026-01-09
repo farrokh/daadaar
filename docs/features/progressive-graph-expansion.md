@@ -1,7 +1,7 @@
 # Progressive Graph Expansion Feature
 
 **Date**: 2026-01-08  
-**Status**: ✅ Implemented
+**Status**: In Review
 
 ## Overview
 
@@ -113,7 +113,7 @@ setExpandedOrgIds(new Set(rootNodeIds));
 
 ### Accessibility
 - Buttons have proper `aria-label` attributes
-- Keyboard navigation supported
+- Planned keyboard navigation support (see Future Enhancements #5 for keyboard shortcuts)
 - Visual indicators are clear and distinct
 
 ## Future Enhancements
@@ -122,7 +122,7 @@ Potential improvements:
 1. Add animation for node appearance/disappearance
 2. Remember expansion state in URL parameters
 3. Add "Expand All" / "Collapse All" controls
-4. Show loading state during layout recalculation for very large graphs
+4. Show loading state during layout recalculation for large graphs
 5. Add keyboard shortcuts for expansion (e.g., Space or Enter on focused node)
 
 ## Related Files

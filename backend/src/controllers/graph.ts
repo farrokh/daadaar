@@ -226,7 +226,9 @@ export async function getOrganizationPeople(req: Request, res: Response) {
     const grandChildOrgIds = grandChildOrganizations.map(org => org.id);
     const descendantOrgIds = [...childOrgIds, ...grandChildOrgIds];
     const recursiveMemberCounts =
-      descendantOrgIds.length > 0 ? await getBatchRecursiveMemberCounts(descendantOrgIds) : new Map<number, number>();
+      descendantOrgIds.length > 0
+        ? await getBatchRecursiveMemberCounts(descendantOrgIds)
+        : new Map<number, number>();
 
     const orgWithPresignedLogo = {
       ...organization,
@@ -241,19 +243,19 @@ export async function getOrganizationPeople(req: Request, res: Response) {
     };
 
     // Get child counts for child organizations
-    const childChildCounts =
-      childOrgIds.length > 0
+    const descendantChildCounts =
+      descendantOrgIds.length > 0
         ? await db
             .select({
               parentId: schema.organizationHierarchy.parentId,
               count: sql<number>`count(${schema.organizationHierarchy.childId})`,
             })
             .from(schema.organizationHierarchy)
-            .where(inArray(schema.organizationHierarchy.parentId, childOrgIds))
+            .where(inArray(schema.organizationHierarchy.parentId, descendantOrgIds))
             .groupBy(schema.organizationHierarchy.parentId)
         : [];
 
-    const childCountMap = new Map(childChildCounts.map(c => [c.parentId, Number(c.count)]));
+    const childCountMap = new Map(descendantChildCounts.map(c => [c.parentId, Number(c.count)]));
 
     // Build organization nodes for children
     const childOrgNodes = await Promise.all(
@@ -337,7 +339,7 @@ export async function getOrganizationPeople(req: Request, res: Response) {
               : await generatePresignedGetUrl(org.logoUrl)
             : null,
           memberCount: recursiveMemberCounts.get(org.id) || 0,
-          childCount: 0,
+          childCount: childCountMap.get(org.id) || 0,
           parentOrgId: org.parentId,
         },
         position: { x: 0, y: 0 }, // Will be calculated on frontend

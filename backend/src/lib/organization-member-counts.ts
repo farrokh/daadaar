@@ -120,8 +120,10 @@ export async function getBatchRecursiveMemberCounts(
       }
     } catch (error) {
       console.error('Redis mget error:', error);
-      // Fall back to calculating all if cache fails
-      uncachedIds.push(...organizationIds);
+      // Fall back to calculating all if cache fails (ensure unique IDs)
+      const mergedIds = new Set([...uncachedIds, ...organizationIds]);
+      uncachedIds.length = 0;
+      uncachedIds.push(...mergedIds);
     }
   } else {
     // No Redis, calculate all

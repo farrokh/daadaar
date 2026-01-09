@@ -1,9 +1,9 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { memo } from 'react';
 import { Handle, Position } from 'reactflow';
-import { useTranslations } from 'next-intl';
 
 import { Edit2, ExternalLink, Network, User } from 'lucide-react';
 import Link from 'next/link';
@@ -46,6 +46,9 @@ function BaseNodeCard({
   toggleOnLeft,
 }: BaseNodeCardProps) {
   const t = useTranslations('graph');
+  const expandLabel = t('sub_toggle_expand_label');
+  const collapseLabel = t('sub_toggle_collapse_label');
+
   const expansionIndicator =
     childCount !== undefined && childCount > 0 ? (
       <button
@@ -62,11 +65,14 @@ function BaseNodeCard({
             : 'bg-background/60 text-accent-secondary border-accent-secondary/20 hover:bg-accent-secondary/10 hover:border-accent-secondary/30 hover:shadow-md'
         )}
         onMouseDown={e => e.stopPropagation()}
-        aria-label={isExpanded ? 'Collapse sub-organizations' : 'Expand sub-organizations'}
-        title={isExpanded ? 'Collapse' : 'Expand'}
+        aria-label={isExpanded ? collapseLabel : expandLabel}
+        title={isExpanded ? collapseLabel : expandLabel}
       >
         <Network
-          className={cn('w-4 h-4 transition-transform duration-300', isExpanded ? 'rotate-90' : 'rotate-0')}
+          className={cn(
+            'w-4 h-4 transition-transform duration-300',
+            isExpanded ? 'rotate-90' : 'rotate-0'
+          )}
         />
         <span className="text-xs font-bold">{childCount}</span>
         <span className="text-[9px] font-medium whitespace-nowrap">
@@ -106,10 +112,30 @@ function BaseNodeCard({
             </button>
           )}
 
-          <Handle type="source" position={Position.Right} id="right" className="!w-3 !h-3 !opacity-0" />
-          <Handle type="target" position={Position.Right} id="right" className="!w-3 !h-3 !opacity-0" />
-          <Handle type="source" position={Position.Left} id="left" className="!w-3 !h-3 !opacity-0" />
-          <Handle type="target" position={Position.Left} id="left" className="!w-3 !h-3 !opacity-0" />
+          <Handle
+            type="source"
+            position={Position.Right}
+            id="right"
+            className="!w-3 !h-3 !opacity-0"
+          />
+          <Handle
+            type="target"
+            position={Position.Right}
+            id="right"
+            className="!w-3 !h-3 !opacity-0"
+          />
+          <Handle
+            type="source"
+            position={Position.Left}
+            id="left"
+            className="!w-3 !h-3 !opacity-0"
+          />
+          <Handle
+            type="target"
+            position={Position.Left}
+            id="left"
+            className="!w-3 !h-3 !opacity-0"
+          />
 
           {isDetailView ? (
             <div className="space-y-4">
@@ -132,6 +158,7 @@ function BaseNodeCard({
                 {displayDescription && (
                   <section
                     className="text-sm text-foreground/60 leading-relaxed max-h-32 overflow-y-auto pr-2 outline-none focus-visible:ring-1 ring-primary/50 rounded-sm"
+                    // biome-ignore lint/a11y/noNoninteractiveTabindex: Scrollable region must be focusable
                     tabIndex={0}
                     aria-label="Description"
                   >

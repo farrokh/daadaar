@@ -107,7 +107,9 @@
     "search_coming_soon": "Search functionality coming soon...",
     "add_item": "Add Item",
     "sub_toggle_show": "Sub",
-    "sub_toggle_hide": "Hide"
+    "sub_toggle_hide": "Hide",
+    "sub_toggle_expand_label": "Expand sub-organizations",
+    "sub_toggle_collapse_label": "Collapse sub-organizations"
   },
   "organization": {
     "add_title": "Add New Organization",

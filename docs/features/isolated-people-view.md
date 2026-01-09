@@ -13,7 +13,7 @@ This document summarizes the recent changes to the **isolated organization peopl
 - `GET /api/graph/organization/:id/people` now:
   - Loads every child organization and their grandchildren before building nodes/edges so the isolated graph can expand one level deeper without additional refetches.
   - Uses `getBatchRecursiveMemberCounts` for each child/grandchild when constructing node data so badges on the left column show sum counts from their entire subtree.
-  - Keeps the center organization’s `memberCount` as the count of individuals directly assigned to it (no recursive sum), matching the isolatd view badge expectation.
+  - Keeps the center organization’s `memberCount` as the count of individuals directly assigned to it (no recursive sum), matching the isolated view badge expectation.
   - Returns `parentOrgId` metadata for sub-organizations (for layout/toggling) and wires up additional hierarchy edges toward grandchildren so the frontend can flatten the left column.
 
 ## Frontend changes

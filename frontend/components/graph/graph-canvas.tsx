@@ -116,7 +116,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   useEffect(() => {
     setPeopleExpandedOrgIds(new Set());
-  }, [viewContext.mode, viewContext.organizationId]);
+  }, [viewContext.mode]);
 
   // Handle node click
   const onNodeClick = useCallback(
@@ -556,7 +556,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           />
         )}
       </ReactFlow>
-
       {/* Context Menu */}
       {contextMenu && contextMenuItems.length > 0 && (
         <ContextMenu
@@ -566,7 +565,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           onClose={() => setContextMenu(null)}
         />
       )}
-
       {showCopyToast && (
         <output
           className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-2 fade-in"
@@ -583,8 +581,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           </div>
         </output>
       )}
-
-  /* Add Organization Modal */
+      {/* Add Organization Modal */}
       <AddOrganizationModal
         isOpen={isAddOrgModalOpen}
         onClose={() => {
@@ -596,7 +593,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         defaultParentId={addOrgParentId}
         defaultParentName={addOrgParentName}
       />
-
       {/* Add Person Modal */}
       {viewContext.organizationId && (
         <AddPersonModal
@@ -611,7 +607,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           organizationName={viewContext.organizationName}
         />
       )}
-
       {/* Submit Report Modal */}
       {viewContext.individualId && (
         <SubmitReportModal
@@ -627,7 +622,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           }}
         />
       )}
-
       {/* Navigation breadcrumb */}
       <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg border border-foreground/10 z-10">
         <div className="flex items-center gap-2 text-sm">
@@ -747,7 +741,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
           )}
         </div>
       </div>
-
       {/* Help tooltip */}
       {/* Help tooltip */}
       <div

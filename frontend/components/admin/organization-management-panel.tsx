@@ -53,55 +53,52 @@ export function OrganizationManagementPanel() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   // Function to fetch organizations for the dropdown
-  const mergeParentOrgs = useCallback(
-    (newOrgs: Organization[], includeIds: number[] = []) => {
-      setParentOrgs(prev => {
-        const map = new Map<number, Organization>();
-        for (const id of includeIds) {
-          const existing = prev.find(org => org.id === id);
-          if (existing) {
-            map.set(id, existing);
-          }
+  const mergeParentOrgs = useCallback((newOrgs: Organization[], includeIds: number[] = []) => {
+    setParentOrgs(prev => {
+      const map = new Map<number, Organization>();
+      for (const id of includeIds) {
+        const existing = prev.find(org => org.id === id);
+        if (existing) {
+          map.set(id, existing);
         }
-        for (const org of newOrgs) {
-          map.set(org.id, org);
-        }
-        return Array.from(map.values());
-      });
-    },
-    []
-  );
+      }
+      for (const org of newOrgs) {
+        map.set(org.id, org);
+      }
+      return Array.from(map.values());
+    });
+  }, []);
 
   const fetchParentOrgs = useCallback(
     async (searchQuery = '') => {
-    setFetchingParentOrgs(true);
-    try {
-      const query = new URLSearchParams({
-        page: '1',
-        limit: '20',
-        q: searchQuery,
-      });
-      const response = await fetchApi<OrganizationListResponse>(
-        `/admin/organizations?${query.toString()}`
-      );
-      if (response.success && response.data) {
-        const data = response.data;
-        if ('organizations' in data) {
-          const includeIds: number[] = [];
-          if (form.parentId) {
-            const parsed = Number(form.parentId);
-            if (!Number.isNaN(parsed)) {
-              includeIds.push(parsed);
+      setFetchingParentOrgs(true);
+      try {
+        const query = new URLSearchParams({
+          page: '1',
+          limit: '20',
+          q: searchQuery,
+        });
+        const response = await fetchApi<OrganizationListResponse>(
+          `/admin/organizations?${query.toString()}`
+        );
+        if (response.success && response.data) {
+          const data = response.data;
+          if ('organizations' in data) {
+            const includeIds: number[] = [];
+            if (form.parentId) {
+              const parsed = Number(form.parentId);
+              if (!Number.isNaN(parsed)) {
+                includeIds.push(parsed);
+              }
             }
+            mergeParentOrgs(data.organizations, includeIds);
           }
-        mergeParentOrgs(data.organizations, includeIds);
         }
+      } catch (err) {
+        console.error('Failed to fetch parent orgs', err);
+      } finally {
+        setFetchingParentOrgs(false);
       }
-    } catch (err) {
-      console.error('Failed to fetch parent orgs', err);
-    } finally {
-      setFetchingParentOrgs(false);
-    }
     },
     [form.parentId, mergeParentOrgs]
   );

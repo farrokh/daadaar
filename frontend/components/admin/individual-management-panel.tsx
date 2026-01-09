@@ -74,21 +74,24 @@ export function IndividualManagementPanel() {
 
   const individuals = indsData?.individuals || [];
 
-  const updateOrganizationOptions = useCallback((newOrgs: Organization[], includeIds: number[] = []) => {
-    setOrganizations(prev => {
-      const map = new Map<number, Organization>();
-      for (const id of includeIds) {
-        const existing = prev.find(org => org.id === id);
-        if (existing) {
-          map.set(id, existing);
+  const updateOrganizationOptions = useCallback(
+    (newOrgs: Organization[], includeIds: number[] = []) => {
+      setOrganizations(prev => {
+        const map = new Map<number, Organization>();
+        for (const id of includeIds) {
+          const existing = prev.find(org => org.id === id);
+          if (existing) {
+            map.set(id, existing);
+          }
         }
-      }
-      for (const org of newOrgs) {
-        map.set(org.id, org);
-      }
-      return Array.from(map.values());
-    });
-  }, []);
+        for (const org of newOrgs) {
+          map.set(org.id, org);
+        }
+        return Array.from(map.values());
+      });
+    },
+    []
+  );
 
   const fetchOrganizations = useCallback(
     async (searchQuery = '') => {
@@ -104,23 +107,23 @@ export function IndividualManagementPanel() {
         const response = await fetchApi<OrganizationListResponse>(
           `/admin/organizations?${query.toString()}`
         );
-            if (response.success && response.data) {
-              if ('organizations' in response.data) {
-                const includeIds =
-                  form.organizationId && !Number.isNaN(Number(form.organizationId))
-                    ? [Number(form.organizationId)]
-                    : [];
-                updateOrganizationOptions(response.data.organizations, includeIds);
-              } else if (Array.isArray(response.data)) {
-                const includeIds =
-                  form.organizationId && !Number.isNaN(Number(form.organizationId))
-                    ? [Number(form.organizationId)]
-                    : [];
-                updateOrganizationOptions(response.data, includeIds);
-              }
-            } else if (response.error) {
-              console.error(response.error.message);
-            }
+        if (response.success && response.data) {
+          if ('organizations' in response.data) {
+            const includeIds =
+              form.organizationId && !Number.isNaN(Number(form.organizationId))
+                ? [Number(form.organizationId)]
+                : [];
+            updateOrganizationOptions(response.data.organizations, includeIds);
+          } else if (Array.isArray(response.data)) {
+            const includeIds =
+              form.organizationId && !Number.isNaN(Number(form.organizationId))
+                ? [Number(form.organizationId)]
+                : [];
+            updateOrganizationOptions(response.data, includeIds);
+          }
+        } else if (response.error) {
+          console.error(response.error.message);
+        }
       } catch (err) {
         console.error('Failed to fetch organizations:', err);
       } finally {
