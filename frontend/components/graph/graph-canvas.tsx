@@ -275,7 +275,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     if (nextSearch === currentSearch) return;
 
     const nextUrl = nextSearch ? `${pathname}?${nextSearch}` : pathname;
-    router.replace(nextUrl);
+    router.push(nextUrl);
   }, [pathname, router, searchParams, viewContext, loading]);
 
   // Load initial data
