@@ -10,8 +10,13 @@ export const nodeTypes: NodeTypes = {
   report: ReportNode,
 };
 
-// Edge types use default bezier edges for better routing
-export const edgeTypes = {};
+// Edge types - define custom types to avoid React Flow warnings
+// Note: We use the default edge component but need to explicitly define the types
+export const edgeTypes = {
+  hierarchy: undefined, // Use default bezier edge
+  occupies: undefined, // Use default bezier edge
+  occupies_former: undefined, // Use default bezier edge
+};
 
 // Default edge options with modern styling
 export const defaultEdgeOptions: DefaultEdgeOptions = {
