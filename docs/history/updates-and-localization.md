@@ -22,6 +22,7 @@ We implemented a comprehensive system for the "Project Updates" page (`/updates`
   *   **Smooth Animations**: Removed jarring scale effects on exit, improved hover transitions.
   *   **Localization Support**: Updated component to accept and render dual-language message objects (`{ en, fa }`).
 *   **Performance**: Optimized animations with `framer-motion`.
+*   **Dependencies**: Downgraded `@types/node` to `^22.0.0` to ensure stability with Next.js 16 (LTS alignment).
 
 ### 3. Workflow & Documentation
 *   **Workflow**: Added `.agent/workflows/automated-updates.md` to describe the process.

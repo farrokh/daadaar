@@ -11,7 +11,10 @@ This guide covers deploying the Next.js frontend to Vercel and wiring it to the 
 Use the Vercel overrides in `frontend/vercel.json`:
 - Install Command: `bun install`
 - Build Command: `bun run build`
+- Install Command: `bun install`
+- Build Command: `bun run build`
 - Output Directory: `.next`
+- **Note**: Ensure `@types/node` is set to `^22.0.0` or compatible LTS version to avoid conflicts with Next.js 16.
 
 ## 3) Environment Variables
 Set these for **Production** (and **Preview** if you want previews to work):
