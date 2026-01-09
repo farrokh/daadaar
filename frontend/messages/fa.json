@@ -103,6 +103,10 @@
     "fit_view": "تنظیم اندازه",
     "search": "جستجو",
     "search_coming_soon": "قابلیت جستجو به زودی اضافه می‌شود...",
+    "search_placeholder": "جستجوی سازمان‌ها، افراد، گزارش‌ها...",
+    "search_error": "خطا در بارگذاری نتایج جستجو",
+    "search_no_results": "نتیجه‌ای یافت نشد",
+    "search_partial_error": "برخی از نتایج بارگذاری نشدند",
     "add_item": "افزودن آیتم",
     "sub_toggle_show": "زیر مجموعه",
     "sub_toggle_hide": "ببند",
@@ -141,6 +145,7 @@
     "added_on": "اضافه شده در",
     "org_id": "شناسه سازمان",
     "members": "اعضا",
+    "sub_organizations": "زیرسازمان‌ها",
     "no_members": "عضوی یافت نشد.",
     "no_organizations_found": "سازمانی یافت نشد"
   },

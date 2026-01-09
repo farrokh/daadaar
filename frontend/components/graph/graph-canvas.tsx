@@ -114,6 +114,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     });
   }, []);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Reset expanded state when switching modes
   useEffect(() => {
     setPeopleExpandedOrgIds(new Set());
   }, [viewContext.mode]);
@@ -275,7 +276,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
     if (nextSearch === currentSearch) return;
 
     const nextUrl = nextSearch ? `${pathname}?${nextSearch}` : pathname;
-    router.replace(nextUrl);
+    router.push(nextUrl);
   }, [pathname, router, searchParams, viewContext, loading]);
 
   // Load initial data

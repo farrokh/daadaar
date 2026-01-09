@@ -1,3 +1,4 @@
+import { GraphSearchPanel } from '@/components/graph/graph-search';
 // ... imports
 import { Button } from '@/components/ui/button';
 import { FluidGlassFilters } from '@/components/ui/fluid-glass-filters';
@@ -147,7 +148,7 @@ export function GraphDock({
         {/* Right Content Area */}
         <div
           className={cn(
-            'flex items-center overflow-hidden transition-all duration-500 ease-out',
+            'flex items-center overflow-visible transition-all duration-500 ease-out',
             activeTool
               ? 'opacity-100 max-w-[800px] translate-x-0'
               : 'opacity-0 max-w-0 -translate-x-4'
@@ -166,8 +167,8 @@ export function GraphDock({
           )}
 
           {activeTool === 'search' && (
-            <div className="px-6 py-2 text-sm text-foreground/60 font-medium animate-in slide-in-from-left-4 fade-in duration-300 whitespace-nowrap">
-              {t('search_coming_soon') || 'Search functionality coming soon...'}
+            <div className="px-3 animate-in slide-in-from-left-4 fade-in duration-300">
+              <GraphSearchPanel />
             </div>
           )}
         </div>

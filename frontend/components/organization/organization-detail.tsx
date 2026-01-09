@@ -126,6 +126,48 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
             </div>
           </section>
 
+          {/* Sub-Organizations */}
+          {organization.children && organization.children.length > 0 && (
+            <section className="pt-8 border-t border-foreground/10">
+              <h2 className="text-sm font-bold uppercase text-foreground/40 tracking-widest mb-4">
+                {t('sub_organizations')}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {organization.children.map(child => (
+                  <Link
+                    href={`/${locale}/org/${child.shareableUuid}`}
+                    key={child.id}
+                    className="block group"
+                  >
+                    <div className="flex items-start gap-4 p-4 rounded-xl bg-foreground/5 border border-foreground/10 hover:bg-foreground/10 transition-colors group-hover:border-foreground/20">
+                      <div className="w-12 h-12 rounded-xl bg-foreground/10 flex items-center justify-center shrink-0 overflow-hidden">
+                        {child.logoUrl ? (
+                          <img
+                            src={child.logoUrl}
+                            alt={child.name}
+                            className="w-full h-full object-cover rounded-xl"
+                          />
+                        ) : (
+                          <Building2 className="w-6 h-6 text-foreground/40" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold group-hover:text-primary transition-colors line-clamp-1">
+                          {isRtl ? child.name : child.nameEn || child.name}
+                        </h3>
+                        {(child.description || child.descriptionEn) && (
+                          <p className="text-xs text-foreground/60 line-clamp-2 mt-1">
+                            {isRtl ? child.description : child.descriptionEn || child.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Members */}
           <section className="pt-8 border-t border-foreground/10">
             <h2 className="text-sm font-bold uppercase text-foreground/40 tracking-widest mb-4">
@@ -173,17 +215,24 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
 
         {/* Sidebar Info */}
         <div className="space-y-8">
-          {organization.parentId && (
+          {organization.parent && (
             <div className="p-6 rounded-2xl border border-foreground/10 space-y-4">
               <h3 className="text-xs font-bold uppercase text-foreground/40 tracking-widest">
                 {t('parent_org')}
               </h3>
-              <div className="flex items-center gap-2 text-foreground/60">
-                <div className="w-8 h-8 rounded-full bg-foreground/5 flex items-center justify-center">
-                  <Building2 className="w-4 h-4" />
+              <Link
+                href={`/${locale}/org/${organization.parent.shareableUuid}`}
+                className="flex items-center gap-3 text-foreground hover:text-foreground/70 transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-full bg-foreground/5 group-hover:bg-foreground/10 flex items-center justify-center transition-colors">
+                  <Building2 className="w-5 h-5" />
                 </div>
-                <span className="text-sm">ID: {organization.parentId}</span>
-              </div>
+                <span className="text-sm font-medium group-hover:underline">
+                  {isRtl
+                    ? organization.parent.name
+                    : organization.parent.nameEn || organization.parent.name}
+                </span>
+              </Link>
             </div>
           )}
         </div>

@@ -6,6 +6,8 @@ import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
 
+const MAX_CAREER_HISTORY = 100;
+
 /**
  * GET /api/share/org/:uuid
  * Get organization by shareable UUID
@@ -76,8 +78,57 @@ export async function getOrganizationByUuid(req: Request, res: Response) {
       })
     );
 
-    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with members
+    // Fetch parent organization if exists
+    let parentOrganization = null;
+    if (organization.parentId) {
+      const [parent] = await db
+        .select({
+          id: schema.organizations.id,
+          shareableUuid: schema.organizations.shareableUuid,
+          name: schema.organizations.name,
+          nameEn: schema.organizations.nameEn,
+        })
+        .from(schema.organizations)
+        .where(eq(schema.organizations.id, organization.parentId))
+        .limit(1);
+
+      if (parent) {
+        parentOrganization = parent;
+      }
+    }
+
+    // Fetch child organizations
+    const childOrganizations = await db
+      .select({
+        id: schema.organizations.id,
+        shareableUuid: schema.organizations.shareableUuid,
+        name: schema.organizations.name,
+        nameEn: schema.organizations.nameEn,
+        description: schema.organizations.description,
+        descriptionEn: schema.organizations.descriptionEn,
+        logoUrl: schema.organizations.logoUrl,
+      })
+      .from(schema.organizations)
+      .where(eq(schema.organizations.parentId, organization.id))
+      .limit(50);
+
+    // Sign child organization logo URLs
+    const childrenWithSignedUrls = await Promise.all(
+      childOrganizations.map(async child => {
+        if (child.logoUrl && !child.logoUrl.startsWith('http')) {
+          return {
+            ...child,
+            logoUrl: await generatePresignedGetUrl(child.logoUrl),
+          };
+        }
+        return child;
+      })
+    );
+
+    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with members, parent, and children
     (organization as any).members = membersWithSignedUrls;
+    (organization as any).parent = parentOrganization;
+    (organization as any).children = childrenWithSignedUrls;
 
     res.json({
       success: true,
@@ -157,8 +208,30 @@ export async function getIndividualByUuid(req: Request, res: Response) {
       .orderBy(desc(schema.reports.incidentDate))
       .limit(20);
 
-    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with reports
+    // Fetch career history (role occupancies)
+    const history = await db
+      .select({
+        id: schema.roleOccupancy.id,
+        roleId: schema.roleOccupancy.roleId,
+        startDate: schema.roleOccupancy.startDate,
+        endDate: schema.roleOccupancy.endDate,
+        roleTitle: schema.roles.title,
+        roleTitleEn: schema.roles.titleEn,
+        organizationId: schema.organizations.id,
+        organizationName: schema.organizations.name,
+        organizationNameEn: schema.organizations.nameEn,
+        organizationUuid: schema.organizations.shareableUuid,
+      })
+      .from(schema.roleOccupancy)
+      .innerJoin(schema.roles, eq(schema.roleOccupancy.roleId, schema.roles.id))
+      .innerJoin(schema.organizations, eq(schema.roles.organizationId, schema.organizations.id))
+      .where(eq(schema.roleOccupancy.individualId, individual.id))
+      .orderBy(desc(schema.roleOccupancy.startDate))
+      .limit(MAX_CAREER_HISTORY);
+
+    // biome-ignore lint/suspicious/noExplicitAny: Extending inferred type with reports and history
     (individual as any).reports = individualReports;
+    (individual as any).history = history;
 
     res.json({
       success: true,

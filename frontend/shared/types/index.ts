@@ -114,6 +114,21 @@ export interface Organization {
   createdAt: string;
   updatedAt: string;
   members?: OrganizationMember[];
+  parent?: {
+    id: number;
+    shareableUuid: string;
+    name: string;
+    nameEn: string | null;
+  } | null;
+  children?: Array<{
+    id: number;
+    shareableUuid: string;
+    name: string;
+    nameEn: string | null;
+    description: string | null;
+    descriptionEn: string | null;
+    logoUrl: string | null;
+  }>;
 }
 
 export interface OrganizationMember extends Individual {
