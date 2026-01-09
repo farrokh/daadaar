@@ -106,7 +106,10 @@ export function GraphSearchPanel() {
           ...reportsRes.value.data.reports.map(report => ({
             id: `${report.shareableUuid}-report`,
             type: 'report' as SearchResultType,
-            title: locale === 'en' ? (report.titleEn || report.title || '') : (report.title || report.titleEn || ''),
+            title:
+              locale === 'en'
+                ? report.titleEn || report.title || ''
+                : report.title || report.titleEn || '',
             subtitle: formatReportSubtitle(report, formatter),
             url: `/reports/${report.shareableUuid}`,
           }))
@@ -123,7 +126,10 @@ export function GraphSearchPanel() {
           ...individuals.map(person => ({
             id: `${person.shareableUuid}-individual`,
             type: 'individual' as SearchResultType,
-            title: locale === 'en' ? (person.fullNameEn || person.fullName || '') : (person.fullName || person.fullNameEn || ''),
+            title:
+              locale === 'en'
+                ? person.fullNameEn || person.fullName || ''
+                : person.fullName || person.fullNameEn || '',
             subtitle: formatIndividualSubtitle(person),
             url: `/person/${person.shareableUuid}`,
           }))
@@ -140,8 +146,11 @@ export function GraphSearchPanel() {
           ...organizations.map(org => ({
             id: `${org.shareableUuid}-organization`,
             type: 'organization' as SearchResultType,
-            title: locale === 'en' ? (org.nameEn || org.name || '') : (org.name || org.nameEn || ''),
-            subtitle: locale === 'en' ? (org.descriptionEn || org.description || undefined) : (org.description || org.descriptionEn || undefined),
+            title: locale === 'en' ? org.nameEn || org.name || '' : org.name || org.nameEn || '',
+            subtitle:
+              locale === 'en'
+                ? org.descriptionEn || org.description || undefined
+                : org.description || org.descriptionEn || undefined,
             url: `/org/${org.shareableUuid}`,
           }))
         );
@@ -154,7 +163,7 @@ export function GraphSearchPanel() {
         hadError: failureCount === 3,
       };
     },
-    [formatter]
+    [formatter, locale]
   );
 
   useEffect(() => {

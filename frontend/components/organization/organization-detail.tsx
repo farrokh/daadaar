@@ -157,9 +157,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
                         </h3>
                         {(child.description || child.descriptionEn) && (
                           <p className="text-xs text-foreground/60 line-clamp-2 mt-1">
-                            {isRtl
-                              ? child.description
-                              : child.descriptionEn || child.description}
+                            {isRtl ? child.description : child.descriptionEn || child.description}
                           </p>
                         )}
                       </div>
@@ -230,7 +228,9 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
                   <Building2 className="w-5 h-5" />
                 </div>
                 <span className="text-sm font-medium group-hover:underline">
-                  {isRtl ? organization.parent.name : organization.parent.nameEn || organization.parent.name}
+                  {isRtl
+                    ? organization.parent.name
+                    : organization.parent.nameEn || organization.parent.name}
                 </span>
               </Link>
             </div>
