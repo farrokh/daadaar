@@ -297,42 +297,44 @@ export function GraphSearchPanel() {
 
       {showDropdown && (
         <div className="absolute left-0 right-0 bottom-full z-40 mb-3 rounded-3xl border border-foreground/10 bg-background/95 shadow-2xl backdrop-blur-xl overflow-hidden">
-          <ul
+          <div
             id="search-results-list"
             role="listbox"
+            tabIndex={-1}
             className="max-h-72 overflow-y-auto custom-scrollbar divide-y divide-foreground/5"
           >
             {loading && (
-              <li className="flex items-center gap-2 px-4 py-3 text-xs text-foreground/40">
+              <div className="flex items-center gap-2 px-4 py-3 text-xs text-foreground/40">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 {commonT('loading')}
-              </li>
+              </div>
             )}
 
             {error && !loading && (
-              <li className="px-4 py-3 text-xs text-destructive font-semibold" role="alert">
+              <div className="px-4 py-3 text-xs text-destructive font-semibold" role="alert">
                 {error}
-              </li>
+              </div>
             )}
 
             {partialFailure && !loading && !error && (
-              <li className="px-4 py-2 text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-500 border-b border-foreground/5 px-4 font-medium">
+              <div className="px-4 py-2 text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-500 border-b border-foreground/5 px-4 font-medium">
                 {graphT('search_partial_error')}
-              </li>
+              </div>
             )}
 
             {!loading && !error && results.length === 0 && (
-              <li className="px-4 py-3 text-xs text-foreground/50 text-center">
+              <div className="px-4 py-3 text-xs text-foreground/50 text-center">
                 {graphT('search_no_results')}
-              </li>
+              </div>
             )}
 
             {results.map((result, index) => (
-              <li
+              <div
                 key={result.id}
                 id={getItemId(index)}
                 role="option"
                 aria-selected={index === highlightedIndex}
+                tabIndex={-1}
               >
                 <button
                   type="button"
@@ -353,9 +355,9 @@ export function GraphSearchPanel() {
                     </p>
                   )}
                 </button>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>

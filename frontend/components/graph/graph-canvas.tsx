@@ -116,7 +116,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   useEffect(() => {
     setPeopleExpandedOrgIds(new Set());
-  }, [viewContext.mode]);
+  }, []);
 
   // Handle node click
   const onNodeClick = useCallback(
