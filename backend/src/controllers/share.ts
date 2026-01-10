@@ -218,6 +218,8 @@ export async function getIndividualByUuid(req: Request, res: Response) {
           )`
         ),
       with: {
+        // Note: reportLinks are intentionally excluded here to prevent circular dependencies
+        // (Individual -> Reports -> ReportLinks -> Individual) and minimize payload size.
         media: {
           columns: {
             id: true,
