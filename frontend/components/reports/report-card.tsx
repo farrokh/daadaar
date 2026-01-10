@@ -45,9 +45,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({ report }) => {
   const previewImage = report.media?.find(m => m.mediaType === 'image') as
     | (NonNullable<typeof report.media>[number] & { url?: string })
     | undefined;
-  const imageUrl = previewImage
-    ? previewImage.url || ''
-    : null;
+  const imageUrl = previewImage ? previewImage.url || '' : null;
 
   const hasMedia = report.media && report.media.length > 0;
   const mediaCount = report.media?.length || 0;

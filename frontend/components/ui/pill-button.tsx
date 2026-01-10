@@ -73,6 +73,7 @@ export function PillButton({
 
   if (href && action !== 'share') {
     return (
+      // biome-ignore lint/suspicious/noExplicitAny: Generic props spread to Link
       <Link href={href} className={baseClasses} {...(props as any)}>
         {DisplayIcon && <DisplayIcon className="w-3.5 h-3.5 shrink-0" />}
         {displayLabel && <span>{displayLabel}</span>}

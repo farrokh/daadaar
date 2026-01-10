@@ -388,9 +388,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                 {selectedMedia.mediaType === 'image' && (
                   <motion.img
                     layoutId={`media-${selectedMedia.id}`}
-                    src={
-                      selectedMedia.url || ''
-                    }
+                    src={selectedMedia.url || ''}
                     alt={
                       t('evidenceImageAlt', {
                         title:
@@ -404,9 +402,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                 )}
                 {selectedMedia.mediaType === 'video' && (
                   <video
-                    src={
-                      selectedMedia.url || ''
-                    }
+                    src={selectedMedia.url || ''}
                     controls
                     autoPlay
                     className="max-w-full max-h-full rounded-[2rem] shadow-2xl border border-foreground/10 bg-black"
@@ -436,9 +432,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                 className="mt-12 flex items-center gap-6"
               >
                 <a
-                  href={
-                    selectedMedia.url || ''
-                  }
+                  href={selectedMedia.url || ''}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-10 py-4 rounded-full bg-foreground text-background text-xs font-black uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-2xl active:scale-95"
