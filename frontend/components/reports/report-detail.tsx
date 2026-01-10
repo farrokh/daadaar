@@ -385,7 +385,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                       selectedMedia.url ||
                       getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
                     }
-                    alt="Evidence Evidence"
+                    alt="Evidence"
                     className="max-w-full max-h-full object-contain rounded-[2rem] shadow-2xl border border-foreground/10"
                   />
                 )}

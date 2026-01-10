@@ -1,7 +1,15 @@
 import { fetchApi } from '@/lib/api';
 import { calculateGridLayout } from '@/lib/graph-layout';
 import { calculateOrganizationPeopleLayout } from '@/lib/organization-people-layout';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { Edge, Node } from 'reactflow';
 import type { ViewContext, ViewMode } from '../components/graph/config';
 import type { ReportNodeData } from '../components/graph/types';
@@ -68,9 +76,9 @@ export interface UseGraphDataReturn {
   organizationPath: OrganizationPathItem[];
   dateRange: [number, number];
   timeRangeLimit: [number, number];
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
-  setEdges: React.Dispatch<React.SetStateAction<Edge[]>>;
-  setDateRange: React.Dispatch<React.SetStateAction<[number, number]>>;
+  setNodes: Dispatch<SetStateAction<Node[]>>;
+  setEdges: Dispatch<SetStateAction<Edge[]>>;
+  setDateRange: Dispatch<SetStateAction<[number, number]>>;
   fetchOrganizations: () => Promise<void>;
   fetchOrganizationPeople: (orgId: number, orgName?: string) => Promise<void>;
   fetchIndividualReports: (individualId: number, individualName?: string) => Promise<void>;

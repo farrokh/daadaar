@@ -47,7 +47,9 @@
     "report": "Report",
     "organization": "Organization",
     "person": "Individual",
-    "add_new": "Add"
+    "add_new": "Add new",
+    "menu": "Menu",
+    "viewPeople": "View Graph"
   },
   "mobile": {
     "not_ready_title": "Desktop Experience Recommended",
@@ -70,7 +72,8 @@
     "updates": "Updates",
     "search": "Search",
     "tutorial_hint": "New here? Tap this tutorial to see a quick Instagram walkthrough of how to use the system.",
-    "close": "Close"
+    "close": "Close",
+    "menu": "Menu"
   },
   "landing": {
     "hero_title": "Exposing Injustice, Anonymously",

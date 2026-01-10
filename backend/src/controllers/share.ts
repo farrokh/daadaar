@@ -282,10 +282,26 @@ export async function getReportByUuid(req: Request, res: Response) {
       with: {
         reportLinks: {
           with: {
-            individual: true,
+            individual: {
+              columns: {
+                id: true,
+                shareableUuid: true,
+                fullName: true,
+                fullNameEn: true,
+                profileImageUrl: true,
+              },
+            },
             role: {
               with: {
-                organization: true,
+                organization: {
+                  columns: {
+                    id: true,
+                    shareableUuid: true,
+                    name: true,
+                    nameEn: true,
+                    logoUrl: true,
+                  },
+                },
               },
             },
           },
@@ -301,7 +317,15 @@ export async function getReportByUuid(req: Request, res: Response) {
             profileImageUrl: true,
           },
         },
-        aiVerification: true,
+        aiVerification: {
+          columns: {
+            confidenceScore: true,
+            consistencyScore: true,
+            credibilityScore: true,
+            flags: true,
+            createdAt: true,
+          },
+        },
       },
     });
 
@@ -318,11 +342,19 @@ export async function getReportByUuid(req: Request, res: Response) {
     // Generate presigned URLs for media
     const mediaWithUrls = await Promise.all(
       report.media.map(async item => {
+        let url = null;
         if (item.s3Key) {
-          const url = await generatePresignedGetUrl(item.s3Key, item.s3Bucket);
-          return { ...item, url };
+          url = await generatePresignedGetUrl(item.s3Key, item.s3Bucket);
         }
-        return item;
+        return {
+          id: item.id,
+          type: item.mediaType,
+          caption: item.originalFilename,
+          url,
+          mimeType: item.mimeType,
+          size: item.fileSizeBytes,
+          createdAt: item.createdAt,
+        };
       })
     );
 

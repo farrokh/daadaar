@@ -4,7 +4,7 @@ import { fetchApi } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import type { CreateContentReportRequest } from '@/shared/api-types';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from './button';
 
@@ -42,6 +42,22 @@ export function ReportContentButton({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -75,10 +91,11 @@ export function ReportContentButton({
   };
 
   const modalContent = (
+    // Escape key is handled by document listener in useEffect
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Backdrop click is sufficient, keyboard handled globally
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] p-4 backdrop-blur-sm"
       onClick={() => setIsOpen(false)}
-      onKeyDown={e => e.key === 'Escape' && setIsOpen(false)}
     >
       {/* biome-ignore lint/a11y/useSemanticElements: positioning control */}
       <div

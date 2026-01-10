@@ -66,6 +66,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
               type="button"
               onClick={() => router.push(`/${locale}`)}
               className="flex items-center gap-2 text-sm font-semibold text-foreground/40 hover:text-foreground transition-all group"
+              aria-label={commonT('home')}
             >
               <ArrowLeft
                 className={`w-4 h-4 transition-transform group-hover:-translate-x-1 ${isRtl ? 'rotate-180 group-hover:translate-x-1' : ''}`}
@@ -98,6 +99,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
                 )
               }
               className="w-10 h-10 flex items-center justify-center rounded-full bg-foreground/5 hover:bg-foreground/10 text-accent-primary transition-colors"
+              aria-label={commonT('viewPeople')}
             >
               <Network size={20} />
             </button>
@@ -296,6 +298,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
               type="button"
               onClick={() => setIsMenuOpen(true)}
               className="w-10 h-10 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none text-foreground/40 hover:text-foreground"
+              aria-label={commonT('menu')}
             >
               <Menu size={20} />
             </button>
@@ -326,12 +329,18 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
           {
             label: tGraph('add_organization'),
             icon: <Building2 size={20} className="text-foreground/80" />,
-            onClick: () => setIsAddOrgModalOpen(true),
+            onClick: () => {
+              setIsMenuOpen(false);
+              setIsAddOrgModalOpen(true);
+            },
           },
           {
             label: tGraph('add_person'),
             icon: <User size={20} className="text-foreground/80" />,
-            onClick: () => setIsAddPersonModalOpen(true),
+            onClick: () => {
+              setIsMenuOpen(false);
+              setIsAddPersonModalOpen(true);
+            },
           },
         ]}
       />
@@ -340,6 +349,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
         isOpen={isAddOrgModalOpen}
         onClose={() => setIsAddOrgModalOpen(false)}
         onSuccess={() => {
+          setIsAddOrgModalOpen(false);
           router.refresh();
         }}
         defaultParentId={organization.id}
@@ -350,6 +360,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
         isOpen={isAddPersonModalOpen}
         onClose={() => setIsAddPersonModalOpen(false)}
         onSuccess={() => {
+          setIsAddPersonModalOpen(false);
           router.refresh();
         }}
         organizationId={organization.id}

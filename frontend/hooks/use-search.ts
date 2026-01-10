@@ -78,6 +78,7 @@ export function useSearch(locale: string) {
 
       setLoading(true);
       setError(null);
+      setPartialFailure(false);
 
       try {
         const encoded = encodeURIComponent(term);
@@ -163,9 +164,15 @@ export function useSearch(locale: string) {
           setError('Search failed');
         }
 
+        if (successCount > 0 && successCount < 3) {
+          setPartialFailure(true);
+        } else if (successCount === 3) {
+          setPartialFailure(false);
+        }
+
         setResults(aggregated);
       } catch (err) {
-        setError('Search encounterd an error');
+        setError('Search encountered an error');
         console.error('Search error:', err);
       } finally {
         setLoading(false);

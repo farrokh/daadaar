@@ -73,7 +73,9 @@ export function MobileMenu({
             )}
           >
             <div className="flex items-center justify-between border-b border-foreground/10 pb-4">
-              <span className="text-lg font-bold tracking-tight text-foreground px-2">Menu</span>
+              <span className="text-lg font-bold tracking-tight text-foreground px-2">
+                {t('menu')}
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
