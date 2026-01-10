@@ -3,10 +3,10 @@
 import { AddOrganizationModal } from '@/components/graph/add-organization-modal';
 import { AddPersonModal } from '@/components/graph/add-person-modal';
 import { MobileMenu } from '@/components/layout/mobile-menu';
-import { ShareLinkButton } from '@/components/ui/share-link-button';
+import { PillButton } from '@/components/ui/pill-button';
 import type { Organization } from '@/shared/types';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Building2, Calendar, ChevronRight, Menu, Network, User } from 'lucide-react';
+import { ArrowLeft, Building2, Calendar, ChevronRight, Menu, Network, Share2, User } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -91,18 +91,18 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
 
           {/* Graph Button - Right */}
           <div className="flex items-center gap-2 z-10">
-            <button
-              type="button"
-              onClick={() =>
-                router.push(
-                  `/${locale}/?view=people&organizationUuid=${organization.shareableUuid}`
-                )
-              }
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-foreground/5 hover:bg-foreground/10 text-accent-primary transition-colors"
-              aria-label={commonT('viewPeople')}
-            >
-              <Network size={20} />
-            </button>
+            <PillButton
+              href={`/${locale}/?view=people&organizationUuid=${organization.shareableUuid}`}
+              label={t('view_on_graph')}
+              icon={Network}
+            />
+
+            <PillButton
+              action="share"
+              label={commonT('share')}
+              copiedLabel={commonT('copied')}
+              icon={Share2}
+            />
           </div>
         </div>
 
@@ -302,11 +302,11 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
             >
               <Menu size={20} />
             </button>
-            <ShareLinkButton
+            <PillButton
+              action="share"
               label=""
-              copiedLabel=""
-              hideLabelOnMobile
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none"
+              icon={Share2}
+              className="w-10 h-10 min-w-[2.5rem] p-0 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none text-foreground/40 hover:text-foreground"
             />
           </div>
 

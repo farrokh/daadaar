@@ -179,7 +179,7 @@ export interface Individual {
   currentRole?: string | null;
   currentOrganization?: string | null;
   currentOrganizationId?: number | null;
-  reports?: Report[];
+  reports?: ReportWithDetails[];
   history?: Array<{
     id: number;
     roleId: number;

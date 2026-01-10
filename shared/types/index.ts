@@ -155,6 +155,7 @@ export interface Individual {
   currentRole?: string | null;
   currentOrganization?: string | null;
   currentOrganizationId?: number | null;
+  reports?: ReportWithDetails[];
 }
 
 export interface RoleOccupancy {
