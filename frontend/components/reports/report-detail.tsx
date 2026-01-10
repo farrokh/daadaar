@@ -2,8 +2,8 @@
 
 import { MobileMenu } from '@/components/layout/mobile-menu';
 import { VotingButtons } from '@/components/reports/voting-buttons';
+import { PillButton } from '@/components/ui/pill-button';
 import { ReportContentButton } from '@/components/ui/report-content-button';
-import { ShareLinkButton } from '@/components/ui/share-link-button';
 import { Link, usePathname } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth';
 import { formatDate, getS3PublicUrl } from '@/lib/utils';
@@ -109,29 +109,29 @@ export default function ReportDetail({ report }: ReportDetailProps) {
             <span>{t('reports')}</span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent-primary/5 border border-accent-primary/10 shadow-sm transition-transform hover:scale-105">
+          <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-3 h-8 rounded-full bg-transparent hover:bg-foreground/[0.02] transition-colors cursor-default">
               <ShieldQuestion className="w-3.5 h-3.5 text-accent-primary" />
-              <span className="text-[10px] font-black text-accent-primary uppercase tracking-wider">
+              <span className="text-[11px] font-bold text-accent-primary uppercase tracking-widest">
                 {confidenceScore}%
               </span>
             </div>
 
-            <div className="hidden md:flex items-center gap-2">
-              <ShareLinkButton
-                label={commonT('share')}
-                copiedLabel={commonT('copied')}
-                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:text-foreground transition-all bg-foreground/5 hover:bg-foreground/10 px-4 h-8 rounded-full border-none shadow-sm"
-              />
-              <ReportContentButton
-                contentType="report"
-                contentId={report.id}
-                className="flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:text-foreground transition-all bg-foreground/5 hover:bg-foreground/10 px-4 h-8 rounded-full border-none shadow-sm group"
-              >
-                <Flag size={16} className="group-hover:text-red-500 transition-colors" />
-                <span>{commonT('report')}</span>
-              </ReportContentButton>
-            </div>
+            <ReportContentButton
+              contentType="report"
+              contentId={report.id}
+              className="inline-flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-widest text-foreground/50 hover:text-foreground transition-all duration-300 bg-transparent hover:bg-foreground/[0.02] px-3 h-8 rounded-full cursor-pointer whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/10"
+            >
+              <Flag size={14} />
+              <span>{commonT('report')}</span>
+            </ReportContentButton>
+
+            <PillButton
+              action="share"
+              label={commonT('share')}
+              copiedLabel={commonT('copied')}
+              icon={Share2}
+            />
           </div>
         </div>
 
@@ -331,11 +331,11 @@ export default function ReportDetail({ report }: ReportDetailProps) {
             >
               <Menu size={20} />
             </button>
-            <ShareLinkButton
+            <PillButton
+              action="share"
               label=""
-              copiedLabel=""
-              hideLabelOnMobile
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none"
+              icon={Share2}
+              className="w-10 h-10 min-w-[2.5rem] p-0 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none text-foreground/40 hover:text-foreground"
             />
           </div>
 

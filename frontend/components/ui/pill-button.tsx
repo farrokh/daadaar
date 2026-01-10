@@ -3,8 +3,8 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Check, type LucideIcon, Share2 } from 'lucide-react';
-import posthog from 'posthog-js';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 import { useState } from 'react';
 
 interface PillButtonProps {
@@ -67,7 +67,8 @@ export function PillButton({
 
   // Determine Icon to show
   const DisplayIcon = action === 'share' && copied ? Check : Icon;
-  const displayLabel = action === 'share' ? (error ? errorLabel : copied ? copiedLabel : label) : label;
+  const displayLabel =
+    action === 'share' ? (error ? errorLabel : copied ? copiedLabel : label) : label;
 
   if (href && action !== 'share') {
     return (
@@ -79,11 +80,7 @@ export function PillButton({
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      className={baseClasses}
-    >
+    <button type="button" onClick={handleClick} className={baseClasses}>
       {DisplayIcon && <DisplayIcon className="w-3.5 h-3.5 shrink-0" />}
       {displayLabel && <span>{displayLabel}</span>}
     </button>

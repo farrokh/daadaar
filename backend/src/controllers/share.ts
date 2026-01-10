@@ -205,8 +205,7 @@ export async function getIndividualByUuid(req: Request, res: Response) {
         ),
       with: {
         media: {
-          where: (media, { eq }) =>
-            and(eq(media.mediaType, 'image'), eq(media.isDeleted, false)),
+          where: (media, { eq }) => and(eq(media.mediaType, 'image'), eq(media.isDeleted, false)),
           limit: 1,
         },
       },
