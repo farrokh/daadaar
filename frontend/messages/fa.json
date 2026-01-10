@@ -158,7 +158,8 @@
     "members": "اعضا",
     "sub_organizations": "زیرسازمان‌ها",
     "no_members": "عضوی یافت نشد.",
-    "no_organizations_found": "سازمانی یافت نشد"
+    "no_organizations_found": "سازمانی یافت نشد",
+    "share_organization": "اشتراک‌گذاری سازمان"
   },
   "person": {
     "add_title": "افزودن فرد جدید",
