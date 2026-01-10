@@ -3,6 +3,12 @@
     "date": "2026-01-10",
     "technical": [
       {
+        "hash": "26681a3f0f8307355f0a5a77e626766ba6a8f9dd",
+        "date": "2026-01-10",
+        "message": "chore: enhance report security and mobile menu accessibility",
+        "author": "farrokh"
+      },
+      {
         "hash": "28569cdb9959188e2a4bbfbccffd65f07c2bcc45",
         "date": "2026-01-10",
         "message": "chore: update changelog generation to include ui/ux chores",
