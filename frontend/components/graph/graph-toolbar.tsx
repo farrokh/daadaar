@@ -3,12 +3,13 @@
 import { Button } from '@/components/ui/button';
 import { Building2, FileText, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import type { ViewMode } from './config';
 
 interface GraphToolbarProps {
   onAddOrganization: () => void;
   onAddPerson?: () => void;
   onAddReport?: () => void;
-  viewMode: 'organizations' | 'people' | 'reports';
+  viewMode: ViewMode;
   isLoading?: boolean;
 }
 

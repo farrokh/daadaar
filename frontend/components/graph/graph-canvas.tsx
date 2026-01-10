@@ -8,13 +8,16 @@ import ReactFlow, {
   applyEdgeChanges,
   applyNodeChanges,
   MiniMap,
+  useReactFlow,
+  ReactFlowProvider,
+  type Edge,
   type Node,
   type OnEdgesChange,
   type OnNodesChange,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import { useGraphData } from '@/hooks/use-graph-data';
+import { type OrganizationPathItem, useGraphData } from '@/hooks/use-graph-data';
 import { useAuth } from '@/lib/auth';
 import { type ViewContext, defaultEdgeOptions, edgeTypes, nodeTypes } from './config';
 import { GraphControls } from './graph-controls';
@@ -45,7 +48,15 @@ interface GraphCanvasProps {
   initialView?: ViewContext;
 }
 
-export default function GraphCanvas({ initialView }: GraphCanvasProps) {
+export default function GraphCanvas(props: GraphCanvasProps) {
+  return (
+    <ReactFlowProvider>
+      <GraphCanvasInner {...props} />
+    </ReactFlowProvider>
+  );
+}
+
+function GraphCanvasInner({ initialView }: GraphCanvasProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -138,12 +149,12 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
   // Handle node changes
   const onNodesChange: OnNodesChange = useCallback(
-    changes => setNodes(nds => applyNodeChanges(changes, nds)),
+    changes => setNodes((nds: Node[]) => applyNodeChanges(changes, nds)),
     [setNodes]
   );
 
   const onEdgesChange: OnEdgesChange = useCallback(
-    changes => setEdges(eds => applyEdgeChanges(changes, eds)),
+    changes => setEdges((eds: Edge[]) => applyEdgeChanges(changes, eds)),
     [setEdges]
   );
 
@@ -268,6 +279,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       params.delete('individualUuid');
       params.delete('organizationId');
       params.delete('individualId');
+      params.delete('search');
     }
 
     const nextSearch = params.toString();
@@ -306,10 +318,6 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       if (typeof initialView?.organizationId === 'number') {
         fetchOrganizationPeople(initialView.organizationId);
       }
-    } else if (targetMode === 'reports' && targetIndId) {
-      if (typeof initialView?.individualId === 'number') {
-        fetchIndividualReports(initialView.individualId);
-      }
     }
   }, [initialView?.mode, initialView?.organizationId, initialView?.individualId]);
 
@@ -320,7 +328,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       : undefined;
 
   const visibleNodes = nodes
-    .filter(node => {
+    .filter((node: Node) => {
       if (node.type === 'report') {
         const data = node.data as ReportNodeData;
         if (!data.incidentDate) return true;
@@ -347,7 +355,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
 
       return true;
     })
-    .map(node => {
+    .map((node: Node) => {
       // Create a new data object to avoid mutation
       const newData = { ...node.data };
 
@@ -391,13 +399,13 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       };
     });
 
-  const visibleNodeIds = new Set(visibleNodes.map(n => n.id));
+  const visibleNodeIds = new Set(visibleNodes.map((n: Node) => n.id));
 
   const visibleEdges = edges
-    .filter(edge => {
+    .filter((edge: Edge) => {
       return visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target);
     })
-    .map(edge => {
+    .map((edge: Edge) => {
       // Check if this is a former occupancy (ended in the past)
       if (edge.type === 'occupies' && edge.data?.endDate) {
         const endDate = new Date(edge.data.endDate);
@@ -624,7 +632,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
         />
       )}
       {/* Navigation breadcrumb */}
-      <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg border border-foreground/10 z-10">
+      <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg border border-foreground/10 z-10 hidden lg:block">
         <div className="flex items-center gap-2 text-sm">
           {/* Organization path for people view */}
           {viewContext.mode === 'people' && organizationPath.length > 0 && (
@@ -632,7 +640,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
               {(() => {
                 // Filter out the current organization from the path as it matches the current view title
                 const path = organizationPath.filter(
-                  item => item.id !== viewContext.organizationId
+                  (item: OrganizationPathItem) => item.id !== viewContext.organizationId
                 );
 
                 if (path.length === 0) return null;
@@ -672,8 +680,9 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
                 ));
               })()}
 
-              {organizationPath.filter(item => item.id !== viewContext.organizationId).length >
-                0 && <span className="text-foreground/40">/</span>}
+              {organizationPath.filter(
+                (item: OrganizationPathItem) => item.id !== viewContext.organizationId
+              ).length > 0 && <span className="text-foreground/40">/</span>}
               <span className="text-foreground font-medium">{viewContext.organizationName}</span>
               {viewContext.organizationId && (
                 <ReportContentButton
@@ -745,7 +754,7 @@ export default function GraphCanvas({ initialView }: GraphCanvasProps) {
       {/* Help tooltip */}
       {/* Help tooltip */}
       <div
-        className={`fixed top-6 right-44 z-40 bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-lg liquid-glass rounded-full transition-all duration-500 ease-in-out cursor-default select-none overflow-hidden flex items-center h-9 ${
+        className={`fixed top-6 right-44 z-40 bg-white/40 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-lg liquid-glass rounded-full transition-all duration-500 ease-in-out cursor-default select-none overflow-hidden hidden lg:flex items-center h-9 ${
           isHelpCollapsed ? 'w-9 justify-center' : 'max-w-[400px]'
         }`}
         onMouseEnter={() => setIsHelpCollapsed(false)}

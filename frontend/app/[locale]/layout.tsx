@@ -1,7 +1,7 @@
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { SessionManager } from '@/components/auth/session-manager';
 import { LanguageToggle } from '@/components/layout/language-toggle';
-import { MobileNotReady } from '@/components/layout/mobile-not-ready';
+import { MobileNavbar } from '@/components/layout/mobile-navbar';
 import { Navbar } from '@/components/layout/navbar';
 import { ToolProvider } from '@/components/providers/tool-provider';
 import { NextIntlClientProvider } from 'next-intl';
@@ -100,7 +100,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
             <ToolProvider>
-              <MobileNotReady />
+              <MobileNavbar />
               <Navbar />
               <LanguageToggle />
               <SessionManager />

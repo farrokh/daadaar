@@ -1,7 +1,92 @@
 [
   {
+    "date": "2026-01-10",
+    "technical": [
+      {
+        "hash": "c14c324293c5fa80a7b3d3eeaa570fe36dfa2b94",
+        "date": "2026-01-10",
+        "message": "coomit history update",
+        "author": "farrokh"
+      },
+      {
+        "hash": "26681a3f0f8307355f0a5a77e626766ba6a8f9dd",
+        "date": "2026-01-10",
+        "message": "chore: enhance report security and mobile menu accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "28569cdb9959188e2a4bbfbccffd65f07c2bcc45",
+        "date": "2026-01-10",
+        "message": "chore: update changelog generation to include ui/ux chores",
+        "author": "farrokh"
+      },
+      {
+        "hash": "bc44d09c62485a476b061b160c1a73ac27bb142a",
+        "date": "2026-01-10",
+        "message": "chore: enhance report security and mobile menu accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "cfa5a22a62f700bed44831eacc7499159b73fb79",
+        "date": "2026-01-10",
+        "message": "chore: enhance security, ui, and accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "84b48003bb8981f800299e54ff3113591f4dacad",
+        "date": "2026-01-10",
+        "message": "chore: refine mobile ux, cleanup components, and update translations",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "28569cdb9959188e2a4bbfbccffd65f07c2bcc45",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Update changelog generation to include ui/ux chores",
+          "fa": "به‌روزرسانی تولید گزارش تغییرات برای شامل کردن وظایف ui/ux"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      },
+      {
+        "hash": "cfa5a22a62f700bed44831eacc7499159b73fb79",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Enhance security, ui, and accessibility",
+          "fa": "تقویت امنیت، رابط کاربری و دسترسی"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      },
+      {
+        "hash": "84b48003bb8981f800299e54ff3113591f4dacad",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Refine mobile ux, cleanup components, and update translations",
+          "fa": "بهبود تجربه کاربری در موبایل، تمیز کردن کامپوننت‌ها و به‌روزرسانی ترجمه‌ها"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      }
+    ]
+  },
+  {
     "date": "2026-01-09",
     "technical": [
+      {
+        "hash": "1ad3ac01be4aed03308b8c68077e5c3957965789",
+        "date": "2026-01-09",
+        "message": "Merge pull request #60 from farrokh/chore/update-translations",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d8aac03eff453984310fb53a0a546b38d119c543",
+        "date": "2026-01-09",
+        "message": "chore: fix formatting issues",
+        "author": "farrokh"
+      },
       {
         "hash": "010d57589642382082adbfcababce17d046c733c",
         "date": "2026-01-09",
@@ -2678,6 +2763,16 @@
         },
         "author": "farrokh",
         "type": "feature"
+      },
+      {
+        "hash": "7f2448562736d1fd2e59459e3b656bf643f223c2",
+        "date": "2026-01-02",
+        "message": {
+          "en": "Update project dependencies and improve build configuration",
+          "fa": "به‌روزرسانی وابستگی‌های پروژه و بهبود پیکربندی ساخت"
+        },
+        "author": "farrokh",
+        "type": "ui"
       },
       {
         "hash": "b149baea7f0612608d3c219b8b2229bf8ff9cd47",

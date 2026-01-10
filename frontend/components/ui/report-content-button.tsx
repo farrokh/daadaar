@@ -1,15 +1,20 @@
 'use client';
 
 import { fetchApi } from '@/lib/api';
+import { cn } from '@/lib/utils';
 import type { CreateContentReportRequest } from '@/shared/api-types';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Button } from './button';
 
 interface ReportContentButtonProps {
   contentType: 'report' | 'organization' | 'individual' | 'user' | 'media';
   contentId: number;
   className?: string;
+  children?: React.ReactNode;
+  variant?: React.ComponentProps<typeof Button>['variant'];
+  size?: React.ComponentProps<typeof Button>['size'];
 }
 
 const REASON_OPTIONS = [
@@ -25,6 +30,9 @@ export function ReportContentButton({
   contentType,
   contentId,
   className = '',
+  children,
+  variant = 'ghost',
+  size = 'sm',
 }: ReportContentButtonProps) {
   const t = useTranslations('contentReport');
   const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +41,22 @@ export function ReportContentButton({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,10 +91,17 @@ export function ReportContentButton({
   };
 
   const modalContent = (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
-      <dialog
-        open
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200 border-0"
+    // Escape key is handled by document listener in useEffect
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Backdrop click is sufficient, keyboard handled globally
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] p-4 backdrop-blur-sm"
+      onClick={() => setIsOpen(false)}
+    >
+      {/* biome-ignore lint/a11y/useSemanticElements: positioning control */}
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200 border-0 relative"
         onClick={e => e.stopPropagation()}
         onKeyDown={e => e.stopPropagation()}
       >
@@ -184,16 +215,40 @@ export function ReportContentButton({
             </div>
           </form>
         )}
-      </dialog>
+      </div>
     </div>
   );
 
+  // If children are provided, render a custom trigger (raw button) to allow full styling control (e.g. for MobileMenu grid)
+  if (children) {
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className={cn('transition-all duration-200', className)}
+          title={t('reportButton')}
+          aria-label={t('reportButton')}
+        >
+          {children}
+        </button>
+        {isOpen && typeof document !== 'undefined' && createPortal(modalContent, document.body)}
+      </>
+    );
+  }
+
   return (
     <>
-      <button
+      <Button
         type="button"
+        variant={variant}
+        size={size}
         onClick={() => setIsOpen(true)}
-        className={`p-1 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all duration-200 ${className}`}
+        className={cn(
+          'transition-all duration-200',
+          'rounded-full hover:text-red-500 hover:bg-red-500/10',
+          className
+        )}
         title={t('reportButton')}
         aria-label={t('reportButton')}
       >
@@ -212,7 +267,7 @@ export function ReportContentButton({
             d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
           />
         </svg>
-      </button>
+      </Button>
 
       {isOpen && typeof document !== 'undefined' && createPortal(modalContent, document.body)}
     </>

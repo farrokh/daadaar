@@ -1,7 +1,8 @@
+import { cn } from '@/lib/utils';
 import * as React from 'react';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'link';
+  variant?: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'destructive';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'icon';
 }
 
@@ -17,6 +18,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       outline: 'border border-foreground/10 bg-transparent hover:bg-foreground/5',
       ghost: 'hover:bg-foreground/5',
       link: 'text-primary underline-offset-4 hover:underline',
+      destructive: 'bg-red-600 text-white hover:bg-red-700',
     };
 
     const sizeClasses = {
@@ -29,7 +31,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
-        className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+        className={cn(baseClasses, variantClasses[variant], sizeClasses[size], className)}
         ref={ref}
         {...props}
       />

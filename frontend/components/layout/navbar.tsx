@@ -52,7 +52,7 @@ export function Navbar() {
   }, []);
 
   return (
-    <div className="fixed bottom-4 left-0 right-0 flex items-center justify-between p-6 z-50 pointer-events-none">
+    <div className="fixed bottom-4 left-0 right-0 hidden lg:flex items-center justify-between p-6 z-50 pointer-events-none">
       {/* Left Section: Logo & Nav */}
       <div
         className={cn(

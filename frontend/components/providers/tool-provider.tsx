@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, createContext, useContext, useState } from 'react';
+import { type ReactNode, createContext, useContext, useMemo, useState } from 'react';
 
 interface ToolContextType {
   setTools: (tools: ReactNode) => void;
@@ -12,7 +12,9 @@ const ToolContext = createContext<ToolContextType | undefined>(undefined);
 export function ToolProvider({ children }: { children: ReactNode }) {
   const [tools, setTools] = useState<ReactNode>(null);
 
-  return <ToolContext.Provider value={{ tools, setTools }}>{children}</ToolContext.Provider>;
+  const value = useMemo(() => ({ tools, setTools }), [tools]);
+
+  return <ToolContext.Provider value={value}>{children}</ToolContext.Provider>;
 }
 
 export function useToolContext() {

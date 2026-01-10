@@ -39,7 +39,15 @@
     "copied": "کپی شد!",
     "link_copied": "پیوند در کلیپ‌بورد کپی شد",
     "home": "خانه",
-    "view_profile": "مشاهده پروفایل"
+    "view_profile": "مشاهده پروفایل",
+    "details": "جزئیات",
+    "verified": "تأیید شده",
+    "report": "گزارش",
+    "organization": "سازمان",
+    "person": "فرد",
+    "add_new": "افزودن جدید",
+    "menu": "منو",
+    "viewPeople": "مشاهده گراف"
   },
   "mobile": {
     "not_ready_title": "توصیه به استفاده از دسکتاپ",
@@ -60,8 +68,10 @@
     "admin": "مدیریت",
     "tutorial": "راهنما",
     "updates": "بروزرسانی‌ها",
+    "search": "جستجو",
     "tutorial_hint": "تازه واردید؟ روی این آموزش بزنید تا راهنمای سریع اینستاگرام درباره نحوه استفاده از سیستم را ببینید.",
-    "close": "بستن"
+    "close": "بستن",
+    "menu": "منو"
   },
   "landing": {
     "hero_title": "افشای بی‌عدالتی، به صورت ناشناس",
@@ -231,6 +241,7 @@
     "ai_analysis": "تحلیل هوش مصنوعی",
     "media_attachments": "فایل‌های پیوست",
     "linked_individuals": "افراد مرتبط",
+    "report_subject": "موضوع گزارش",
     "votes": "رای‌ها",
     "upvote": "موافق",
     "downvote": "مخالف",
@@ -247,7 +258,8 @@
     "title_required": "عنوان الزامی است",
     "content_required": "محتوا الزامی است",
     "media_upload_error": "بارگذاری رسانه ناموفق بود",
-    "media_delete_error": "حذف رسانه ناموفق بود"
+    "media_delete_error": "حذف رسانه ناموفق بود",
+    "reporter": "گزارش‌دهنده"
   },
   "voting": {
     "upvote": "موافقم",

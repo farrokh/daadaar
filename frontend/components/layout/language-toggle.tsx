@@ -15,7 +15,7 @@ export function LanguageToggle() {
   const query = search ? `?${search}` : '';
 
   return (
-    <div className="fixed top-6 right-6 z-50 animate-in fade-in slide-in-from-top-4 duration-700">
+    <div className="fixed top-6 right-6 z-50 animate-in fade-in slide-in-from-top-4 duration-700 hidden lg:block">
       <div
         className={cn(
           'flex items-center p-1 rounded-full',

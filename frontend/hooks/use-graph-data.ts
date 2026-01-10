@@ -1,7 +1,15 @@
 import { fetchApi } from '@/lib/api';
 import { calculateGridLayout } from '@/lib/graph-layout';
 import { calculateOrganizationPeopleLayout } from '@/lib/organization-people-layout';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import type { Edge, Node } from 'reactflow';
 import type { ViewContext, ViewMode } from '../components/graph/config';
 import type { ReportNodeData } from '../components/graph/types';
@@ -59,7 +67,31 @@ interface UseGraphDataProps {
   locale: string;
 }
 
-export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDataProps) => {
+export interface UseGraphDataReturn {
+  nodes: Node[];
+  edges: Edge[];
+  loading: boolean;
+  error: string | null;
+  viewContext: ViewContext;
+  organizationPath: OrganizationPathItem[];
+  dateRange: [number, number];
+  timeRangeLimit: [number, number];
+  setNodes: Dispatch<SetStateAction<Node[]>>;
+  setEdges: Dispatch<SetStateAction<Edge[]>>;
+  setDateRange: Dispatch<SetStateAction<[number, number]>>;
+  fetchOrganizations: () => Promise<void>;
+  fetchOrganizationPeople: (orgId: number, orgName?: string) => Promise<void>;
+  fetchIndividualReports: (individualId: number, individualName?: string) => Promise<void>;
+  toggleChildOrgExpansion: (orgId: number) => void;
+  expandedOrgIds: Set<number>;
+}
+
+export const useGraphData = ({
+  initialView,
+  tOrg,
+  tPerson,
+  locale,
+}: UseGraphDataProps): UseGraphDataReturn => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -337,22 +369,39 @@ export const useGraphData = ({ initialView, tOrg, tPerson, locale }: UseGraphDat
     [tPerson, locale]
   );
 
-  return {
-    nodes,
-    edges,
-    loading,
-    error,
-    viewContext,
-    organizationPath,
-    dateRange,
-    timeRangeLimit,
-    setNodes,
-    setEdges,
-    setDateRange,
-    fetchOrganizations,
-    fetchOrganizationPeople,
-    fetchIndividualReports,
-    toggleChildOrgExpansion,
-    expandedOrgIds,
-  };
+  return useMemo(
+    () => ({
+      nodes,
+      edges,
+      loading,
+      error,
+      viewContext,
+      organizationPath,
+      dateRange,
+      timeRangeLimit,
+      setNodes,
+      setEdges,
+      setDateRange,
+      fetchOrganizations,
+      fetchOrganizationPeople,
+      fetchIndividualReports,
+      toggleChildOrgExpansion,
+      expandedOrgIds,
+    }),
+    [
+      nodes,
+      edges,
+      loading,
+      error,
+      viewContext,
+      organizationPath,
+      dateRange,
+      timeRangeLimit,
+      fetchOrganizations,
+      fetchOrganizationPeople,
+      fetchIndividualReports,
+      toggleChildOrgExpansion,
+      expandedOrgIds,
+    ]
+  );
 };
