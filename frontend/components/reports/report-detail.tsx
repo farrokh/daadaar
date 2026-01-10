@@ -278,7 +278,11 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                       {item.mediaType === 'image' && (
                         <img
                           src={mediaUrl}
-                          alt="Evidence"
+                          alt={
+                            t('evidenceImageAlt', {
+                              title: item.filename || item.originalFilename || item.id,
+                            }) || t('imageEvidence')
+                          }
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       )}
@@ -388,7 +392,14 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                       selectedMedia.url ||
                       getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
                     }
-                    alt="Evidence"
+                    alt={
+                      t('evidenceImageAlt', {
+                        title:
+                          selectedMedia.filename ||
+                          selectedMedia.originalFilename ||
+                          selectedMedia.id,
+                      }) || t('imageEvidence')
+                    }
                     className="max-w-full max-h-full object-contain rounded-[2rem] shadow-2xl border border-foreground/10"
                   />
                 )}
@@ -415,7 +426,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                       <FileText size={64} className="text-foreground/20" />
                     )}
                     <p className="text-sm font-black uppercase tracking-[0.2em] text-foreground/40">
-                      {selectedMedia.originalFilename}
+                      {selectedMedia.filename || selectedMedia.originalFilename}
                     </p>
                   </div>
                 )}

@@ -261,7 +261,9 @@
     "content_required": "Content is required",
     "media_upload_error": "Failed to upload media",
     "media_delete_error": "Failed to delete media",
-    "reporter": "Reporter"
+    "reporter": "Reporter",
+    "evidenceImageAlt": "Evidence: {title}",
+    "imageEvidence": "Evidence Image"
   },
   "voting": {
     "upvote": "agree",

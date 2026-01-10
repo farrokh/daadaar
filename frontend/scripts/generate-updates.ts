@@ -127,7 +127,11 @@ async function generateUpdates() {
             else if (lowerMsg.startsWith('perf')) type = 'performance';
             else if (lowerMsg.startsWith('docs')) type = 'documentation';
             else if (lowerMsg.startsWith('style') || lowerMsg.startsWith('ui')) type = 'ui';
-            else if (lowerMsg.startsWith('chore') && (lowerMsg.includes('ui') || lowerMsg.includes('ux'))) type = 'ui'; // Treat UI/UX chores as UI updates
+            else if (
+              lowerMsg.startsWith('chore') &&
+              (lowerMsg.includes('ui') || lowerMsg.includes('ux'))
+            )
+              type = 'ui'; // Treat UI/UX chores as UI updates
 
             // Clean message
             cleanMsg = cleanMsg.replace(

@@ -3,6 +3,12 @@
     "date": "2026-01-10",
     "technical": [
       {
+        "hash": "28569cdb9959188e2a4bbfbccffd65f07c2bcc45",
+        "date": "2026-01-10",
+        "message": "chore: update changelog generation to include ui/ux chores",
+        "author": "farrokh"
+      },
+      {
         "hash": "bc44d09c62485a476b061b160c1a73ac27bb142a",
         "date": "2026-01-10",
         "message": "chore: enhance report security and mobile menu accessibility",
@@ -22,6 +28,16 @@
       }
     ],
     "public": [
+      {
+        "hash": "28569cdb9959188e2a4bbfbccffd65f07c2bcc45",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Update changelog generation to include ui/ux chores",
+          "fa": "به‌روزرسانی تولید گزارش تغییرات برای شامل کردن وظایف ui/ux"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      },
       {
         "hash": "cfa5a22a62f700bed44831eacc7499159b73fb79",
         "date": "2026-01-10",

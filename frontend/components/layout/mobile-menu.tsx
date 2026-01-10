@@ -269,10 +269,10 @@ export function MobileMenu({
                   className="overflow-hidden"
                 >
                   <div className="grid grid-cols-3 gap-3">
-                    {customActions.map((action, index) => (
+                    {customActions.map(action => (
                       <button
                         type="button"
-                        key={index}
+                        key={action.label}
                         onClick={() => {
                           action.onClick();
                           onClose();

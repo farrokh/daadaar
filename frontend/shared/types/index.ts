@@ -279,6 +279,7 @@ export interface Media {
   s3Key: string;
   s3Bucket: string;
   originalFilename: string | null;
+  filename?: string;
   mimeType: string | null;
   mediaType: MediaType;
   fileSizeBytes: number | null;

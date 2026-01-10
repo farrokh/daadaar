@@ -306,6 +306,11 @@ export async function getReportByUuid(req: Request, res: Response) {
               },
             },
             role: {
+              columns: {
+                id: true,
+                title: true,
+                titleEn: true,
+              },
               with: {
                 organization: {
                   columns: {
@@ -321,7 +326,7 @@ export async function getReportByUuid(req: Request, res: Response) {
           },
         },
         media: {
-          where: eq(schema.media.isDeleted, false),
+          where: (media, { eq }) => eq(media.isDeleted, false),
         },
         user: {
           columns: {
@@ -363,7 +368,7 @@ export async function getReportByUuid(req: Request, res: Response) {
         return {
           id: item.id,
           type: item.mediaType,
-          caption: item.originalFilename,
+          filename: item.originalFilename,
           url,
           mimeType: item.mimeType,
           size: item.fileSizeBytes,
