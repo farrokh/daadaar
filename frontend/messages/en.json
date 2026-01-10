@@ -266,8 +266,8 @@
     "imageEvidence": "Evidence Image"
   },
   "voting": {
-    "upvote": "agree",
-    "downvote": "disagree",
+    "upvote": "Upvote",
+    "downvote": "Downvote",
     "removeVote": "Remove Vote",
     "upvotes": "Agreements",
     "downvotes": "Disagreements",

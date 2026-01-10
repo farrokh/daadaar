@@ -262,8 +262,8 @@
     "reporter": "گزارش‌دهنده"
   },
   "voting": {
-    "upvote": "موافقم",
-    "downvote": "مخالفم",
+    "upvote": "موافق",
+    "downvote": "مخالف",
     "removeVote": "حذف رأی",
     "upvotes": "موافقان",
     "downvotes": "مخالفان",
