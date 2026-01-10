@@ -148,6 +148,11 @@ Use the CodeBuild runner so migrations execute inside the VPC:
 - Automatic/seeding scripts must not run in production (risking data overwrite or security issues).
 - **Seeding is not allowed in production.**
 
+### Cost Guardrails
+- **VPC Endpoints**: Verify endpoints are NOT in all AZs.
+- Command: `aws ec2 describe-vpc-endpoints --query "VpcEndpoints[*].{ID:VpcEndpointId, Service:ServiceName, AZs:length(DnsEntries)}"`
+- **Expectation**: `AZs` count should be **1** (or 2). If it is 6, immediate action is required to remove subnets.
+
 ---
 
 ## Updating Production

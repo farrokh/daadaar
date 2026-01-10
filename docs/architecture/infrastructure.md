@@ -65,6 +65,13 @@ All sensitive credentials stored in AWS Secrets Manager:
 2. **Transactional Emails**:
    - App Runner → VPC Endpoint → SES (private path).
 
+### 💰 Cost Control (VPC Endpoints)
+**CRITICAL POLICY**: To minimize infrastructure costs, **VPC Interface Endpoints must NOT be deployed to all Availability Zones.**
+
+- **Policy**: Limit Interface Endpoints to **1 Availability Zone** (e.g., `us-east-1a`).
+- **Reasoning**: AWS charges ~$7.20/month *per Endpoint* per AZ. Deploying to all 6 AZs increases costs by 500% (~$250/month vs ~$40/month) with no benefit for our traffic scale.
+- **Monitoring**: Periodically check `VPC > Endpoints` to ensuring subnets are restricted to a single AZ.
+
 ---
 
 ## 🔴 Redis Configuration & Operations
