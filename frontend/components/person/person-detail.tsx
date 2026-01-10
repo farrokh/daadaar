@@ -86,7 +86,7 @@ export default function PersonDetail({ person }: PersonDetailProps) {
 
           <div className="hidden md:flex items-center gap-2">
             <PillButton
-              href={`/${locale}/graph?individualId=${person.id}`}
+              href={`/${locale}/?view=people&individualId=${person.id}`}
               label={t('view_on_graph')}
               icon={Network}
             />

@@ -301,6 +301,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
               action="share"
               label=""
               icon={Share2}
+              aria-label={t('share_organization')}
               className="w-10 h-10 min-w-[2.5rem] p-0 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none text-foreground/40 hover:text-foreground"
             />
           </div>

@@ -190,6 +190,20 @@ export async function getIndividualByUuid(req: Request, res: Response) {
 
     // Fetch related reports with media and votes
     const individualReportsRaw = await db.query.reports.findMany({
+      columns: {
+        id: true,
+        shareableUuid: true,
+        title: true,
+        titleEn: true,
+        content: true,
+        contentEn: true,
+        incidentDate: true,
+        incidentLocation: true,
+        incidentLocationEn: true,
+        upvoteCount: true,
+        downvoteCount: true,
+        createdAt: true,
+      },
       where: (reports, { eq, and }) =>
         and(
           eq(reports.isPublished, true),
@@ -205,6 +219,16 @@ export async function getIndividualByUuid(req: Request, res: Response) {
         ),
       with: {
         media: {
+          columns: {
+            id: true,
+            mediaType: true,
+            originalFilename: true,
+            mimeType: true,
+            fileSizeBytes: true,
+            s3Key: true,
+            s3Bucket: true,
+            createdAt: true,
+          },
           where: (media, { eq }) => and(eq(media.mediaType, 'image'), eq(media.isDeleted, false)),
           limit: 1,
         },
@@ -226,6 +250,7 @@ export async function getIndividualByUuid(req: Request, res: Response) {
               id: item.id,
               mediaType: item.mediaType,
               originalFilename: item.originalFilename,
+              filename: item.originalFilename,
               url,
               mimeType: item.mimeType,
               fileSizeBytes: item.fileSizeBytes,
@@ -404,8 +429,6 @@ export async function getReportByUuid(req: Request, res: Response) {
           mimeType: item.mimeType,
           fileSizeBytes: item.fileSizeBytes,
           createdAt: item.createdAt,
-          s3Key: item.s3Key,
-          s3Bucket: item.s3Bucket,
         };
       })
     );

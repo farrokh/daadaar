@@ -6,7 +6,7 @@ import { PillButton } from '@/components/ui/pill-button';
 import { ReportContentButton } from '@/components/ui/report-content-button';
 import { Link, usePathname } from '@/i18n/routing';
 import { useAuth } from '@/lib/auth';
-import { formatDate, getS3PublicUrl } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import type { Media, ReportWithDetails } from '@/shared/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -265,7 +265,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
 
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                 {report.media.map(item => {
-                  const mediaUrl = item.url || getS3PublicUrl(item.s3Key, item.s3Bucket);
+                  const mediaUrl = item.url || '';
                   return (
                     <motion.button
                       key={item.id}
@@ -389,8 +389,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                   <motion.img
                     layoutId={`media-${selectedMedia.id}`}
                     src={
-                      selectedMedia.url ||
-                      getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                      selectedMedia.url || ''
                     }
                     alt={
                       t('evidenceImageAlt', {
@@ -406,8 +405,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
                 {selectedMedia.mediaType === 'video' && (
                   <video
                     src={
-                      selectedMedia.url ||
-                      getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                      selectedMedia.url || ''
                     }
                     controls
                     autoPlay
@@ -439,7 +437,7 @@ export default function ReportDetail({ report }: ReportDetailProps) {
               >
                 <a
                   href={
-                    selectedMedia.url || getS3PublicUrl(selectedMedia.s3Key, selectedMedia.s3Bucket)
+                    selectedMedia.url || ''
                   }
                   target="_blank"
                   rel="noopener noreferrer"

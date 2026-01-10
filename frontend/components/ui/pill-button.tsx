@@ -7,7 +7,7 @@ import Link from 'next/link';
 import posthog from 'posthog-js';
 import { useState } from 'react';
 
-interface PillButtonProps {
+interface PillButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   icon?: LucideIcon;
   href?: string;
@@ -27,6 +27,7 @@ export function PillButton({
   className,
   copiedLabel = 'Copied!',
   errorLabel = 'Error',
+  ...props
 }: PillButtonProps) {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(false);
@@ -72,7 +73,7 @@ export function PillButton({
 
   if (href && action !== 'share') {
     return (
-      <Link href={href} className={baseClasses}>
+      <Link href={href} className={baseClasses} {...(props as any)}>
         {DisplayIcon && <DisplayIcon className="w-3.5 h-3.5 shrink-0" />}
         {displayLabel && <span>{displayLabel}</span>}
       </Link>
@@ -80,7 +81,7 @@ export function PillButton({
   }
 
   return (
-    <button type="button" onClick={handleClick} className={baseClasses}>
+    <button type="button" onClick={handleClick} className={baseClasses} {...props}>
       {DisplayIcon && <DisplayIcon className="w-3.5 h-3.5 shrink-0" />}
       {displayLabel && <span>{displayLabel}</span>}
     </button>
