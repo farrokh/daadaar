@@ -52,9 +52,12 @@ export default function ReportDetail({ report }: ReportDetailProps) {
   const { isAnonymous } = useAuth();
   const [selectedMedia, setSelectedMedia] = useState<(Media & { url?: string }) | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const dialogRef = useRef<HTMLDialogElement>(null);
 
+  // Handle media selection (click to open Lightbox)
   const handleSelectMedia = (media: Media & { url?: string }) => {
+    if (!media.url) return; // Guard: only proceed if media has a URL
     setSelectedMedia(media);
     posthog.capture('media_viewed', {
       reportId: report.id,
@@ -265,7 +268,8 @@ export default function ReportDetail({ report }: ReportDetailProps) {
 
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
                 {report.media.map(item => {
-                  const mediaUrl = item.url || '';
+                  const mediaUrl = item.url;
+                  if (!mediaUrl) return null; // Skip invalid media
                   return (
                     <motion.button
                       key={item.id}
