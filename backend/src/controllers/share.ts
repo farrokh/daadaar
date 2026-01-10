@@ -367,12 +367,15 @@ export async function getReportByUuid(req: Request, res: Response) {
         }
         return {
           id: item.id,
-          type: item.mediaType,
-          filename: item.originalFilename,
+          mediaType: item.mediaType,
+          originalFilename: item.originalFilename,
+          filename: item.originalFilename, // Keep for backward compatibility
           url,
           mimeType: item.mimeType,
-          size: item.fileSizeBytes,
+          fileSizeBytes: item.fileSizeBytes,
           createdAt: item.createdAt,
+          s3Key: item.s3Key,
+          s3Bucket: item.s3Bucket,
         };
       })
     );
