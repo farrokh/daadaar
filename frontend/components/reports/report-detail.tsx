@@ -321,6 +321,9 @@ export default function ReportDetail({ report }: ReportDetailProps) {
               type="button"
               onClick={() => setIsMenuOpen(true)}
               className="w-10 h-10 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none text-foreground/40 hover:text-foreground"
+              aria-label="Open menu"
+              aria-haspopup="true"
+              aria-expanded={isMenuOpen}
             >
               <Menu size={20} />
             </button>

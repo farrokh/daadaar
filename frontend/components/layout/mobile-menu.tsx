@@ -18,7 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ReportContentButton } from '../ui/report-content-button';
 
 interface MobileMenuProps {
@@ -46,6 +46,23 @@ export function MobileMenu({
   const { currentUser, isAuthenticated, logout } = useAuth();
   const registeredUser = currentUser?.type === 'registered' ? currentUser : null;
   const [showCreateActions, setShowCreateActions] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+        setShowCreateActions(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   const menuClass =
     'liquid-glass bg-background/80 backdrop-blur-2xl border border-foreground/10 shadow-2xl';

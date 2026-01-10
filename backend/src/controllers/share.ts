@@ -274,6 +274,20 @@ export async function getReportByUuid(req: Request, res: Response) {
     }
 
     const report = await db.query.reports.findFirst({
+      columns: {
+        id: true,
+        shareableUuid: true,
+        title: true,
+        titleEn: true,
+        content: true,
+        contentEn: true,
+        incidentDate: true,
+        incidentLocation: true,
+        incidentLocationEn: true,
+        upvoteCount: true,
+        downvoteCount: true,
+        createdAt: true,
+      },
       where: and(
         eq(schema.reports.shareableUuid, uuid),
         eq(schema.reports.isPublished, true),
