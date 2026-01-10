@@ -1,5 +1,50 @@
 [
   {
+    "date": "2026-01-10",
+    "technical": [
+      {
+        "hash": "bc44d09c62485a476b061b160c1a73ac27bb142a",
+        "date": "2026-01-10",
+        "message": "chore: enhance report security and mobile menu accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "cfa5a22a62f700bed44831eacc7499159b73fb79",
+        "date": "2026-01-10",
+        "message": "chore: enhance security, ui, and accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "84b48003bb8981f800299e54ff3113591f4dacad",
+        "date": "2026-01-10",
+        "message": "chore: refine mobile ux, cleanup components, and update translations",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "cfa5a22a62f700bed44831eacc7499159b73fb79",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Enhance security, ui, and accessibility",
+          "fa": "تقویت امنیت، رابط کاربری و دسترسی"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      },
+      {
+        "hash": "84b48003bb8981f800299e54ff3113591f4dacad",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Refine mobile ux, cleanup components, and update translations",
+          "fa": "بهبود تجربه کاربری در موبایل، تمیز کردن کامپوننت‌ها و به‌روزرسانی ترجمه‌ها"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      }
+    ]
+  },
+  {
     "date": "2026-01-09",
     "technical": [
       {
@@ -2690,6 +2735,16 @@
         },
         "author": "farrokh",
         "type": "feature"
+      },
+      {
+        "hash": "7f2448562736d1fd2e59459e3b656bf643f223c2",
+        "date": "2026-01-02",
+        "message": {
+          "en": "Update project dependencies and improve build configuration",
+          "fa": "به‌روزرسانی وابستگی‌های پروژه و بهبود پیکربندی ساخت"
+        },
+        "author": "farrokh",
+        "type": "ui"
       },
       {
         "hash": "b149baea7f0612608d3c219b8b2229bf8ff9cd47",
