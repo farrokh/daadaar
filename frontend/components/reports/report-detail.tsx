@@ -335,6 +335,8 @@ export default function ReportDetail({ report }: ReportDetailProps) {
               action="share"
               label=""
               icon={Share2}
+              aria-label={commonT('share')}
+              title={commonT('share')}
               className="w-10 h-10 min-w-[2.5rem] p-0 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none text-foreground/40 hover:text-foreground"
             />
           </div>
