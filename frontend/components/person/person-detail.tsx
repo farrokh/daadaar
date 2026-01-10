@@ -5,7 +5,7 @@ import { SubmitReportModal } from '@/components/reports/submit-report-modal';
 import { ShareLinkButton } from '@/components/ui/share-link-button';
 import type { Individual } from '@/shared/types';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Briefcase, Calendar, FileText, Menu, User } from 'lucide-react';
+import { ArrowLeft, Briefcase, Calendar, FileText, Menu, Network, User } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -69,6 +69,22 @@ export default function PersonDetail({ person }: PersonDetailProps) {
               />
               <span className="hidden md:inline">{commonT('home')}</span>
             </button>
+          </div>
+
+          <div className="hidden md:flex items-center gap-2">
+            <Link
+              href={`/${locale}/graph?individualId=${person.id}`}
+              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:text-foreground transition-all bg-foreground/5 hover:bg-foreground/10 px-4 h-8 rounded-full border-none shadow-sm"
+            >
+              <Network className="w-3.5 h-3.5" />
+              <span>{t('view_on_graph')}</span>
+            </Link>
+
+            <ShareLinkButton
+              label={commonT('share')}
+              copiedLabel={commonT('copied')}
+              className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-foreground/60 hover:text-foreground transition-all bg-foreground/5 hover:bg-foreground/10 px-4 h-8 rounded-full border-none shadow-sm"
+            />
           </div>
         </div>
 
