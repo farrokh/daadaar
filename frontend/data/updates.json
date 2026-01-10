@@ -3,6 +3,102 @@
     "date": "2026-01-10",
     "technical": [
       {
+        "hash": "9de61aae8782ed140d21dc4306fdd651f99ac318",
+        "date": "2026-01-10",
+        "message": "fix: Guard media lightbox against missing URLs and improve accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "700c5bbf75852d9b239e0d2c57cb624b40c5673d",
+        "date": "2026-01-10",
+        "message": "fix: Update person graph link and report share accessibility",
+        "author": "farrokh"
+      },
+      {
+        "hash": "915b76ce77bcf997c8f94c02ba05f67bb7357d1e",
+        "date": "2026-01-10",
+        "message": "fix: Add missing translation and resolve SQL alias error",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d0d3112661dd0fd050d91952c6d14c41a0ea3f46",
+        "date": "2026-01-10",
+        "message": "docs: Document circular dependency prevention in share controller",
+        "author": "farrokh"
+      },
+      {
+        "hash": "61010df261336291397b1b8f67a44f55ecd7bf2d",
+        "date": "2026-01-10",
+        "message": "fix: Improve AWS cost check accuracy using unique AZs",
+        "author": "farrokh"
+      },
+      {
+        "hash": "e6f06829605bb9bf2978104204fcd4c84abfac2a",
+        "date": "2026-01-10",
+        "message": "fix: Resolve linting issues and formatting",
+        "author": "farrokh"
+      },
+      {
+        "hash": "c34c5285bb6c3c2d1013c6af43c4dca73829033e",
+        "date": "2026-01-10",
+        "message": "fix: Secure share functionality and refine UI links",
+        "author": "farrokh"
+      },
+      {
+        "hash": "1a769ee12d64288ba6e77ddf063db7152b37e1f5",
+        "date": "2026-01-10",
+        "message": "Enhance voting system with desktop labels and refined UI styling",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2a8197d1daba3b21eb3478db8b2122664fd4c3b4",
+        "date": "2026-01-10",
+        "message": "Enhance details page UI components and fix mobile navigation consistency",
+        "author": "farrokh"
+      },
+      {
+        "hash": "e767c031742e27b363b702ea06277eca67cd9de0",
+        "date": "2026-01-10",
+        "message": "Feat: Enhance Person Details UI with cover images, voting counts, and timeline; add PillButton",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b9999f7f8f650f6363d84cac9182ea38e2187d6b",
+        "date": "2026-01-10",
+        "message": "Refactor: Implement minimal visual style for PillButton",
+        "author": "farrokh"
+      },
+      {
+        "hash": "ad328a91881fbca2b468e66e9471c3936d4e0955",
+        "date": "2026-01-10",
+        "message": "Feat: Add Share and Graph buttons to Person Detail header",
+        "author": "farrokh"
+      },
+      {
+        "hash": "31efa3900aaa78750861cd3f5444e826a936ad97",
+        "date": "2026-01-10",
+        "message": "aws bill checker",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d5a7f56609c5ec3b76627266099a50eebfc8065b",
+        "date": "2026-01-10",
+        "message": "Fix: Correctly map media properties in public share API",
+        "author": "farrokh"
+      },
+      {
+        "hash": "178a71fc8500b542d082dede8fd2a71f3141a310",
+        "date": "2026-01-10",
+        "message": "Merge pull request #61 from farrokh/chore/mobile-ux-refinements-and-fixes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "86b08edb3088a7e81fd423a3e2f636b84210e025",
+        "date": "2026-01-10",
+        "message": "chore: fix linting and formatting issues",
+        "author": "farrokh"
+      },
+      {
         "hash": "c14c324293c5fa80a7b3d3eeaa570fe36dfa2b94",
         "date": "2026-01-10",
         "message": "coomit history update",
@@ -40,6 +136,96 @@
       }
     ],
     "public": [
+      {
+        "hash": "9de61aae8782ed140d21dc4306fdd651f99ac318",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Guard media lightbox against missing URLs and improve accessibility",
+          "fa": "از بروز خطا در URLهای غایب در جعبه نور رسانه جلوگیری شده و دسترسی‌پذیری بهبود یافته است."
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "700c5bbf75852d9b239e0d2c57cb624b40c5673d",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Update person graph link and report share accessibility",
+          "fa": "لینک گراف شخص و دسترسی به اشتراک گزارش به‌روزرسانی شد."
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "915b76ce77bcf997c8f94c02ba05f67bb7357d1e",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Add missing translation and resolve SQL alias error",
+          "fa": "ترجمه‌ غایب اضافه شده و خطای نام مستعار SQL برطرف شد."
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "61010df261336291397b1b8f67a44f55ecd7bf2d",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Improve AWS cost check accuracy using unique AZs",
+          "fa": "دقت بررسی هزینه‌های AWS با استفاده از AZهای منحصر به فرد بهبود یافته است."
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "e6f06829605bb9bf2978104204fcd4c84abfac2a",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Resolve linting issues and formatting",
+          "fa": "مشکلات linting و فرمت‌دهی برطرف شده است."
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "c34c5285bb6c3c2d1013c6af43c4dca73829033e",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Secure share functionality and refine UI links",
+          "fa": "عملکرد اشتراک امن شده و لینک‌های UI بهینه‌سازی شده‌اند."
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
+      {
+        "hash": "e767c031742e27b363b702ea06277eca67cd9de0",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Enhance Person Details UI with cover images, voting counts, and timeline; add PillButton",
+          "fa": "جزئیات UI شخص با تصاویر کاور، شمارش رأی‌ها و زمان‌بندی بهبود یافته؛ دکمه PillButton اضافه شد."
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "ad328a91881fbca2b468e66e9471c3936d4e0955",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Add Share and Graph buttons to Person Detail header",
+          "fa": "دکمه‌های اشتراک و گراف به هدر جزئیات شخص اضافه شد."
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "d5a7f56609c5ec3b76627266099a50eebfc8065b",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Correctly map media properties in public share API",
+          "fa": "ویژگی‌های رسانه به‌طور صحیح در API اشتراک عمومی نقشه‌برداری شدند."
+        },
+        "author": "farrokh",
+        "type": "fix"
+      },
       {
         "hash": "28569cdb9959188e2a4bbfbccffd65f07c2bcc45",
         "date": "2026-01-10",
