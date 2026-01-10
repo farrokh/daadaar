@@ -3,6 +3,18 @@
     "date": "2026-01-09",
     "technical": [
       {
+        "hash": "1ad3ac01be4aed03308b8c68077e5c3957965789",
+        "date": "2026-01-09",
+        "message": "Merge pull request #60 from farrokh/chore/update-translations",
+        "author": "farrokh"
+      },
+      {
+        "hash": "d8aac03eff453984310fb53a0a546b38d119c543",
+        "date": "2026-01-09",
+        "message": "chore: fix formatting issues",
+        "author": "farrokh"
+      },
+      {
         "hash": "010d57589642382082adbfcababce17d046c733c",
         "date": "2026-01-09",
         "message": "chore: update changelog translations",

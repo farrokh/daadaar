@@ -22,6 +22,7 @@ interface ShareLinkButtonProps {
   className?: string;
   iconClassName?: string;
   ariaLabel?: string;
+  hideLabelOnMobile?: boolean;
 }
 
 export function ShareLinkButton({
@@ -36,6 +37,7 @@ export function ShareLinkButton({
   className,
   iconClassName,
   ariaLabel,
+  hideLabelOnMobile,
 }: ShareLinkButtonProps) {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(false);
@@ -77,7 +79,7 @@ export function ShareLinkButton({
         ) : (
           <Share2 className={cn('w-4 h-4', iconClassName)} />
         )}
-        <span className="text-sm font-medium">
+        <span className={cn('font-medium', hideLabelOnMobile && 'hidden sm:inline')}>
           {error ? (errorLabel ?? 'Error') : copied ? (copiedLabel ?? label) : label}
         </span>
       </div>

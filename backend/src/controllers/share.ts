@@ -273,10 +273,37 @@ export async function getReportByUuid(req: Request, res: Response) {
       });
     }
 
-    const [report] = await db
-      .select()
-      .from(schema.reports)
-      .where(eq(schema.reports.shareableUuid, uuid));
+    const report = await db.query.reports.findFirst({
+      where: and(
+        eq(schema.reports.shareableUuid, uuid),
+        eq(schema.reports.isPublished, true),
+        eq(schema.reports.isDeleted, false)
+      ),
+      with: {
+        reportLinks: {
+          with: {
+            individual: true,
+            role: {
+              with: {
+                organization: true,
+              },
+            },
+          },
+        },
+        media: {
+          where: eq(schema.media.isDeleted, false),
+        },
+        user: {
+          columns: {
+            id: true,
+            username: true,
+            displayName: true,
+            profileImageUrl: true,
+          },
+        },
+        aiVerification: true,
+      },
+    });
 
     if (!report) {
       return res.status(404).json({
@@ -288,42 +315,41 @@ export async function getReportByUuid(req: Request, res: Response) {
       });
     }
 
-    // Only return published reports
-    if (!report.isPublished || report.isDeleted) {
-      return res.status(404).json({
-        success: false,
-        error: {
-          code: 'NOT_FOUND',
-          message: 'Report not found',
-        },
-      });
-    }
-
-    // Fetch media
-    const mediaItems = await db
-      .select()
-      .from(schema.media)
-      .where(and(eq(schema.media.reportId, report.id), eq(schema.media.isDeleted, false)));
-
-    // Sign media URLs
+    // Generate presigned URLs for media
     const mediaWithUrls = await Promise.all(
-      mediaItems.map(async item => {
+      report.media.map(async item => {
         if (item.s3Key) {
-          const url = await generatePresignedGetUrl(item.s3Key);
+          const url = await generatePresignedGetUrl(item.s3Key, item.s3Bucket);
           return { ...item, url };
         }
         return item;
       })
     );
 
-    const reportWithMedia = {
+    // Generate presigned URLs for linked individuals
+    if (report.reportLinks && report.reportLinks.length > 0) {
+      await Promise.all(
+        report.reportLinks.map(async link => {
+          if (
+            link.individual?.profileImageUrl &&
+            !link.individual.profileImageUrl.startsWith('http')
+          ) {
+            link.individual.profileImageUrl = await generatePresignedGetUrl(
+              link.individual.profileImageUrl
+            );
+          }
+        })
+      );
+    }
+
+    const reportWithRelations = {
       ...report,
       media: mediaWithUrls,
     };
 
     res.json({
-      success: true, // Fixed Typo in original if any? No, original was fine.
-      data: reportWithMedia,
+      success: true,
+      data: reportWithRelations,
     });
   } catch (error) {
     console.error('Error getting report by UUID:', error);

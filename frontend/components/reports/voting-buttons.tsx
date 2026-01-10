@@ -91,17 +91,17 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
 
   if (compact) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4 px-2">
         {/* Upvote Button */}
         <button
           type="button"
           onClick={handleUpvote}
           disabled={isLoading}
           className={`
-            flex items-center gap-1 px-2 py-1 rounded-lg transition-colors duration-200
+            flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors duration-200
             ${
               currentVote === 'upvote'
-                ? 'text-green-500'
+                ? 'text-green-500 font-bold'
                 : 'text-foreground/40 hover:text-green-500'
             }
             ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
@@ -109,8 +109,10 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
           title={t('upvote')}
         >
           <ThumbsUp className="w-4 h-4" />
-          <span className="text-sm font-medium">{upvoteCount}</span>
+          <span className="text-sm">{upvoteCount}</span>
         </button>
+
+        <div className="w-px h-3 bg-foreground/10" />
 
         {/* Downvote Button */}
         <button
@@ -118,14 +120,14 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
           onClick={handleDownvote}
           disabled={isLoading}
           className={`
-            flex items-center gap-1 px-2 py-1 rounded-lg transition-colors duration-200
-            ${currentVote === 'downvote' ? 'text-red-500' : 'text-foreground/40 hover:text-red-500'}
+            flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors duration-200
+            ${currentVote === 'downvote' ? 'text-red-500 font-bold' : 'text-foreground/40 hover:text-red-500'}
             ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           `}
           title={t('downvote')}
         >
           <ThumbsDown className="w-4 h-4" />
-          <span className="text-sm font-medium">{downvoteCount}</span>
+          <span className="text-sm">{downvoteCount}</span>
         </button>
       </div>
     );
@@ -141,7 +143,7 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
       )}
 
       {/* Voting Buttons */}
-      <div className="flex items-center gap-2 max-w-fit p-1 rounded-full border border-foreground/10 bg-foreground/[0.02]">
+      <div className="flex items-center gap-1.5 p-1 rounded-full border border-foreground/5 bg-foreground/[0.03]">
         {/* Upvote Button */}
         <button
           type="button"
@@ -159,11 +161,11 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
           title={t('upvote')}
         >
           <ThumbsUp
-            className={`w-4 h-4 transition-transform duration-300 ${
+            className={`w-3.5 h-3.5 transition-transform duration-300 ${
               currentVote === 'upvote' ? 'scale-110 fill-current' : 'group-hover:scale-110'
             }`}
           />
-          <span className="text-sm font-medium tabular-nums">{upvoteCount}</span>
+          <span className="text-xs font-bold tabular-nums">{upvoteCount}</span>
         </button>
 
         <div className="w-px h-4 bg-foreground/10" />
@@ -184,9 +186,9 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
           `}
           title={t('downvote')}
         >
-          <span className="text-sm font-medium tabular-nums">{downvoteCount}</span>
+          <span className="text-xs font-bold tabular-nums">{downvoteCount}</span>
           <ThumbsDown
-            className={`w-4 h-4 transition-transform duration-300 ${
+            className={`w-3.5 h-3.5 transition-transform duration-300 ${
               currentVote === 'downvote' ? 'scale-110 fill-current' : 'group-hover:scale-110'
             }`}
           />

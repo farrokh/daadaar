@@ -10,7 +10,7 @@ export function GraphControls() {
   const t = useTranslations('graph');
 
   return (
-    <div className="absolute bottom-32 left-6 z-10 flex flex-col gap-2 p-1.5 bg-background/60 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+    <div className="absolute bottom-32 left-6 z-10 flex flex-col gap-3 p-1.5 bg-background/60 backdrop-blur-2xl border border-foreground/10 rounded-2xl shadow-2xl scale-[0.8] origin-bottom-left md:scale-100 transform-gpu">
       <Button
         variant="ghost"
         size="sm"

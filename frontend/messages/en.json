@@ -41,7 +41,13 @@
     "copied": "Copied!",
     "link_copied": "Link copied to clipboard",
     "home": "Home",
-    "view_profile": "View Profile"
+    "view_profile": "View Profile",
+    "details": "Details",
+    "verified": "Verified",
+    "report": "Report",
+    "organization": "Organization",
+    "person": "Individual",
+    "add_new": "Add"
   },
   "mobile": {
     "not_ready_title": "Desktop Experience Recommended",
@@ -62,6 +68,7 @@
     "logout": "Logout",
     "tutorial": "Tutorial",
     "updates": "Updates",
+    "search": "Search",
     "tutorial_hint": "New here? Tap this tutorial to see a quick Instagram walkthrough of how to use the system.",
     "close": "Close"
   },
@@ -233,6 +240,7 @@
     "ai_analysis": "AI Analysis",
     "media_attachments": "Media Attachments",
     "linked_individuals": "Linked Individuals",
+    "report_subject": "Subject of Report",
     "votes": "Votes",
     "upvote": "Upvote",
     "downvote": "Downvote",
@@ -249,7 +257,8 @@
     "title_required": "Title is required",
     "content_required": "Content is required",
     "media_upload_error": "Failed to upload media",
-    "media_delete_error": "Failed to delete media"
+    "media_delete_error": "Failed to delete media",
+    "reporter": "Reporter"
   },
   "voting": {
     "upvote": "agree",

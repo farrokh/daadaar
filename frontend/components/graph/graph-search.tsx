@@ -8,54 +8,7 @@ import { useRouter } from 'next/navigation';
 import posthog from 'posthog-js';
 import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-type SearchResultType = 'report' | 'individual' | 'organization';
-
-interface SearchResult {
-  id: string;
-  type: SearchResultType;
-  title: string;
-  subtitle?: string;
-  url: string;
-}
-
-const SEARCH_LIMIT = 3;
-
-const formatReportSubtitle = (
-  report: ReportWithDetails & { shareableUuid: string },
-  formatter: Intl.DateTimeFormat
-) => {
-  const segments: string[] = [];
-  const currentLocale = formatter.resolvedOptions().locale;
-  const isEnglish = currentLocale.startsWith('en');
-
-  const location = isEnglish
-    ? report.incidentLocationEn || report.incidentLocation
-    : report.incidentLocation || report.incidentLocationEn;
-
-  if (location) {
-    segments.push(location);
-  }
-  if (report.incidentDate) {
-    const parsed = new Date(report.incidentDate);
-    if (!Number.isNaN(parsed.getTime())) {
-      segments.push(formatter.format(parsed));
-    }
-  }
-  return segments.length ? segments.join(' • ') : undefined;
-};
-
-const formatIndividualSubtitle = (
-  person: Individual & { currentRole?: string | null; currentOrganization?: string | null }
-) => {
-  const parts: string[] = [];
-  if (person.currentRole) {
-    parts.push(person.currentRole);
-  }
-  if (person.currentOrganization) {
-    parts.push(person.currentOrganization);
-  }
-  return parts.length ? parts.join(' • ') : undefined;
-};
+import { type SearchResult, type SearchResultType, useSearch } from '@/hooks/use-search';
 
 export function GraphSearchPanel() {
   const graphT = useTranslations('graph');
@@ -64,134 +17,19 @@ export function GraphSearchPanel() {
   const router = useRouter();
 
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [partialFailure, setPartialFailure] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const fetchIdRef = useRef(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const formatter = useMemo(
-    () =>
-      new Intl.DateTimeFormat(locale || 'en', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      }),
-    [locale]
-  );
-
-  const runSearch = useCallback(
-    async (term: string) => {
-      const encoded = encodeURIComponent(term);
-      const requests = await Promise.allSettled([
-        fetchApi<{
-          reports: (ReportWithDetails & { shareableUuid: string })[];
-        }>(`/reports?page=1&limit=${SEARCH_LIMIT}&search=${encoded}`),
-        fetchApi<
-          (Individual & {
-            shareableUuid: string;
-            currentRole?: string | null;
-            currentOrganization?: string | null;
-          })[]
-        >(`/individuals?q=${encoded}&limit=${SEARCH_LIMIT}`),
-        fetchApi<(Organization & { shareableUuid: string })[]>(
-          `/organizations?q=${encoded}&limit=${SEARCH_LIMIT}`
-        ),
-      ]);
-
-      const aggregated: SearchResult[] = [];
-      let failureCount = 0;
-
-      const [reportsRes, individualsRes, organizationsRes] = requests;
-      const currentLocale = formatter.resolvedOptions().locale;
-      const isEnglish = currentLocale.startsWith('en');
-
-      if (
-        reportsRes.status === 'fulfilled' &&
-        reportsRes.value.success &&
-        Array.isArray(reportsRes.value.data?.reports)
-      ) {
-        aggregated.push(
-          ...reportsRes.value.data.reports.map(report => ({
-            id: `${report.shareableUuid}-report`,
-            type: 'report' as SearchResultType,
-            title: isEnglish
-              ? report.titleEn || report.title || ''
-              : report.title || report.titleEn || '',
-            subtitle: formatReportSubtitle(report, formatter),
-            url: `/reports/${report.shareableUuid}`,
-          }))
-        );
-      } else {
-        failureCount += 1;
-      }
-
-      if (individualsRes.status === 'fulfilled' && individualsRes.value.success) {
-        const individuals = Array.isArray(individualsRes.value.data)
-          ? individualsRes.value.data
-          : [];
-        aggregated.push(
-          ...individuals.map(person => ({
-            id: `${person.shareableUuid}-individual`,
-            type: 'individual' as SearchResultType,
-            title: isEnglish
-              ? person.fullNameEn || person.fullName || ''
-              : person.fullName || person.fullNameEn || '',
-            subtitle: formatIndividualSubtitle(person),
-            url: `/person/${person.shareableUuid}`,
-          }))
-        );
-      } else {
-        failureCount += 1;
-      }
-
-      if (organizationsRes.status === 'fulfilled' && organizationsRes.value.success) {
-        const organizations = Array.isArray(organizationsRes.value.data)
-          ? organizationsRes.value.data
-          : [];
-        aggregated.push(
-          ...organizations.map(org => ({
-            id: `${org.shareableUuid}-organization`,
-            type: 'organization' as SearchResultType,
-            title: isEnglish ? org.nameEn || org.name || '' : org.name || org.nameEn || '',
-            subtitle: isEnglish
-              ? org.descriptionEn || org.description || undefined
-              : org.description || org.descriptionEn || undefined,
-            url: `/org/${org.shareableUuid}`,
-          }))
-        );
-      } else {
-        failureCount += 1;
-      }
-
-      // Track search performed - anonymized to protect user privacy
-      if (aggregated.length > 0) {
-        try {
-          posthog.capture('search_performed', {
-            // Anonymized: send query length instead of actual query text
-            queryLength: term.length,
-            resultsCount: aggregated.length,
-            reportResults: aggregated.filter(r => r.type === 'report').length,
-            individualResults: aggregated.filter(r => r.type === 'individual').length,
-            organizationResults: aggregated.filter(r => r.type === 'organization').length,
-            hadPartialFailure: failureCount > 0 && failureCount < 3,
-          });
-        } catch (error) {
-          // Silently fail - analytics should never break search
-          console.warn('PostHog capture failed:', error);
-        }
-      }
-
-      return {
-        results: aggregated,
-        hadError: failureCount === 3,
-        partialFailure: failureCount > 0 && failureCount < 3,
-      };
-    },
-    [formatter]
-  );
+  const {
+    results,
+    loading,
+    error,
+    partialFailure,
+    runSearch,
+    setResults,
+    setError,
+    setPartialFailure,
+  } = useSearch(locale);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -200,51 +38,25 @@ export function GraphSearchPanel() {
   useEffect(() => {
     const trimmed = query.trim();
     if (!trimmed) {
-      fetchIdRef.current += 1;
       setResults([]);
-      setLoading(false);
-      setError(null);
-      setPartialFailure(false);
       setHighlightedIndex(-1);
       return;
     }
 
-    setError(null);
+    const timeoutId = setTimeout(() => {
+      runSearch(trimmed);
+    }, 300);
 
-    const timeoutId = window.setTimeout(() => {
-      const currentFetchId = ++fetchIdRef.current;
-      setLoading(true);
+    return () => clearTimeout(timeoutId);
+  }, [query, runSearch, setResults]);
 
-      runSearch(trimmed)
-        .then(({ results: fetched, hadError, partialFailure: isPartial }) => {
-          if (currentFetchId !== fetchIdRef.current) return;
-          if (hadError) {
-            setResults([]);
-            setPartialFailure(false);
-            setHighlightedIndex(-1);
-            setError(graphT('search_error'));
-          } else {
-            setResults(fetched);
-            setError(null);
-            setPartialFailure(isPartial);
-            setHighlightedIndex(fetched.length > 0 ? 0 : -1);
-          }
-        })
-        .catch(() => {
-          if (currentFetchId !== fetchIdRef.current) return;
-          setResults([]);
-          setPartialFailure(false);
-          setHighlightedIndex(-1);
-          setError(graphT('search_error'));
-        })
-        .finally(() => {
-          if (currentFetchId !== fetchIdRef.current) return;
-          setLoading(false);
-        });
-    }, 320);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [graphT, query, runSearch]);
+  useEffect(() => {
+    if (results.length > 0) {
+      setHighlightedIndex(0);
+    } else {
+      setHighlightedIndex(-1);
+    }
+  }, [results]);
 
   const handleSelect = useCallback(
     (url: string, result?: SearchResult) => {
@@ -271,7 +83,7 @@ export function GraphSearchPanel() {
       setHighlightedIndex(-1);
       setPartialFailure(false);
     },
-    [router, query]
+    [router, query, setResults, setError, setPartialFailure]
   );
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

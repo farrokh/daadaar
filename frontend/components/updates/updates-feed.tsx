@@ -41,7 +41,7 @@ export function UpdatesFeed({ updates, locale }: UpdatesFeedProps) {
   };
 
   return (
-    <div className="pt-32 pb-32 px-6 md:px-12 max-w-5xl mx-auto font-sans relative">
+    <div className="pt-24 pb-24 md:pt-32 md:pb-32 px-5 md:px-12 max-w-5xl mx-auto font-sans relative">
       {/* Minimap - Hidden on small screens */}
       {!isRtl && (
         <div className="fixed left-6 top-1/2 -translate-y-1/2 hidden xl:flex flex-col gap-0.5 py-4 z-50">
