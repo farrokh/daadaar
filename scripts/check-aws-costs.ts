@@ -15,15 +15,30 @@ async function checkVpcEndpoints() {
       // S3 is usually Gateway, others Interface.
       if (ep.Service.includes('s3') && ep.SubnetCount === 0) continue; // S3 Gateway
 
-      if (ep.SubnetCount > 2) {
+      let azCount = ep.SubnetCount;
+
+      // Resolve actual unique AZs if subnets exist
+      if (ep.Subnets && ep.Subnets.length > 0) {
+        try {
+          // Bun shell automatically joins array arguments with spaces
+          const subnetsOutput =
+            await $`aws ec2 describe-subnets --subnet-ids ${ep.Subnets} --query "Subnets[*].AvailabilityZone" --output json`.text();
+          const azs = JSON.parse(subnetsOutput) as string[];
+          azCount = new Set(azs).size;
+        } catch (_) {
+          console.warn(`⚠️ Could not resolve AZs for ${ep.ID}, falling back to subnet count.`);
+        }
+      }
+
+      if (azCount > 2) {
         console.error(
-          `❌ [HIGH COST WARNING] Endpoint ${ep.ID} (${ep.Service}) is in ${ep.SubnetCount} AZs!`
+          `❌ [HIGH COST WARNING] Endpoint ${ep.ID} (${ep.Service}) is in ${azCount} AZs!`
         );
-        console.error(`   - This costs ~$${(ep.SubnetCount * 0.01 * 24).toFixed(2)}/day.`);
+        console.error(`   - This costs ~$${(azCount * 0.01 * 24).toFixed(2)}/day.`);
         console.error('   - Recommended: Reduce to 1-2 AZs.');
         hasIssues = true;
       } else {
-        console.log(`✅ ${ep.Service}: Optimized (${ep.SubnetCount} AZs)`);
+        console.log(`✅ ${ep.Service}: Optimized (${azCount} AZs)`);
       }
     }
 
