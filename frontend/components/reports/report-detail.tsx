@@ -1,6 +1,7 @@
 'use client';
 
 import { MobileMenu } from '@/components/layout/mobile-menu';
+import { AiVerificationCard } from '@/components/reports/ai-verification-card';
 import { VotingButtons } from '@/components/reports/voting-buttons';
 import { PillButton } from '@/components/ui/pill-button';
 import { ReportContentButton } from '@/components/ui/report-content-button';
@@ -255,6 +256,13 @@ export default function ReportDetail({ report }: ReportDetailProps) {
               <p className="whitespace-pre-wrap">{content}</p>
             </div>
           </motion.div>
+
+          {/* AI Verification Card */}
+          {report.aiVerification && (
+            <motion.div variants={fadeInUp}>
+              <AiVerificationCard verification={report.aiVerification} />
+            </motion.div>
+          )}
 
           {/* Media Attachments Section - Tightened */}
           {report.media && report.media.length > 0 && (

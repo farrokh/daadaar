@@ -1,0 +1,1 @@
+ALTER TABLE "ai_verification" ADD COLUMN "flags_en" text;

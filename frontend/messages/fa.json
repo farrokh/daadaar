@@ -260,7 +260,9 @@
     "content_required": "محتوا الزامی است",
     "media_upload_error": "بارگذاری رسانه ناموفق بود",
     "media_delete_error": "حذف رسانه ناموفق بود",
-    "reporter": "گزارش‌دهنده"
+    "reporter": "گزارش‌دهنده",
+    "evidenceImageAlt": "تصویر مدرک: {title}",
+    "imageEvidence": "تصویر مدرک"
   },
   "voting": {
     "upvote": "موافق",
@@ -388,7 +390,11 @@
     "refresh": "به‌روزرسانی",
     "no_reports_found": "گزارشی مطابق با معیارهای جستجو یافت نشد.",
     "no_organizations_found": "سازمانی یافت نشد",
-    "pagination_page": "صفحه {current} از {total}"
+    "pagination_page": "صفحه {current} از {total}",
+    "incident_reports_title": "مدیریت گزارش‌های ارسالی",
+    "col_report_title": "عنوان گزارش",
+    "col_author": "نویسنده",
+    "col_ai_status": "وضعیت هوش مصنوعی"
   },
   "auth": {
     "login_title": "ورود به دادار",
@@ -630,5 +636,15 @@
     "performance": "بهبود عملکرد",
     "ui": "رابط کاربری",
     "documentation": "مستندات"
+  },
+  "ai_verification": {
+    "ai_analysis_title": "تحلیل هوشمند محتوا",
+    "no_summary_available": "خلاصه‌ای برای این گزارش موجود نیست.",
+    "confidence": "اطمینان",
+    "credibility": "اعتبار",
+    "consistency": "سازگاری",
+    "analysis_details": "جزئیات تحلیل",
+    "flags": "پرچم‌ها",
+    "ai_disclaimer": "تحلیل فوق صرفاً توسط هوش مصنوعی (مدل Sonar از Perplexity) تولید شده است. این سیستم ممکن است دچار خطا شود یا اطلاعات را به اشتباه تفسیر کند. لطفاً این تحلیل را به عنوان یک نظر مشورتی و با احتیاط در نظر بگیرید."
   }
 }

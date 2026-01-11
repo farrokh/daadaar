@@ -51,6 +51,7 @@
 ## ✨ Features
 
 - [features/admin-panel.md](./features/admin-panel.md)
+- [features/ai-verification.md](./features/ai-verification.md)
 - [features/image-upload-format.md](./features/image-upload-format.md)
 - [features/HIERARCHICAL_BREADCRUMB.md](./features/HIERARCHICAL_BREADCRUMB.md)
 - [features/SHAREABLE_GRAPH_VIEWS.md](./features/SHAREABLE_GRAPH_VIEWS.md)

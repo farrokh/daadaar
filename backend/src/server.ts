@@ -10,6 +10,7 @@ import { checkSlackNotifierHealth } from './lib/slack';
 import adminContentReportsRoutes from './routes/admin/content-reports';
 import adminIndividualsRoutes from './routes/admin/individuals';
 import adminOrganizationsRoutes from './routes/admin/organizations';
+import adminReportsRoutes from './routes/admin/reports';
 import adminRolesRoutes from './routes/admin/roles';
 import adminUsersRoutes from './routes/admin/users';
 import authRoutes from './routes/auth';
@@ -24,6 +25,7 @@ import reportsRoutes from './routes/reports';
 import rolesRoutes from './routes/roles';
 import seoImagesRoutes from './routes/seo-images';
 import shareRoutes from './routes/share';
+import './workers/ai-verification-worker'; // Start background worker
 import votesRoutes from './routes/votes';
 
 const app: Express = express();
@@ -74,6 +76,7 @@ app.use('/api/admin/users', adminUsersRoutes);
 app.use('/api/admin/organizations', adminOrganizationsRoutes);
 app.use('/api/admin/roles', adminRolesRoutes);
 app.use('/api/admin/individuals', adminIndividualsRoutes);
+app.use('/api/admin/reports', adminReportsRoutes);
 
 // Simple health check for App Runner (no DB/Redis checks to avoid timeouts)
 app.get('/health', (_req, res) => {

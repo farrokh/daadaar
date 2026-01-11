@@ -168,14 +168,19 @@ Moderate user-submitted content reports for abuse, spam, and policy violations.
 - Admin notes for internal tracking
 - Automatic reviewer assignment and timestamps
 
+#### Incident Report Management (`/api/admin/reports`)
+Manage the actual incident reports, including AI verification status and manual triggers.
+
+**Endpoints:**
+- `GET /api/admin/reports` - List all incident reports with AI verification status
+- `POST /api/admin/reports/:id/verify` - Manually trigger AI verification for a report
+
 ### Anonymous Contribution Flow
 1. User lands on site (Anonymous session created).
 2. User submits an entity (e.g., Organization).
 3. `authMiddleware` identifies them by `sessionId`.
 4. Controller saves `sessionId` in the database.
 5. User can view/edit their own submissions within that session context.
-
----
 
 ---
  
@@ -227,12 +232,16 @@ We send Slack notifications via a dedicated Lambda function to avoid NAT costs w
    - `GET /api/health/notifications/slack` (Lambda dry-run, no message sent)
    - Returns `200` when the Lambda invocation permission is valid.
  
- ---
- 
+ ### 3. AI Verification Service
+ We use **Perplexity AI (Sonar model)** for automated report analysis.
+ - **Utility**: `backend/src/services/grok-service.ts`
+ - **Functionality**: Performs fact-checking and consistency analysis.
+ - **Integration**: Triggered via BullMQ in the background.
+
  ## ⚙️ Background Processing
 
 We use **BullMQ** (powered by Redis) for tasks that should not block the main request-response cycle:
-- **AI Verification**: Triggering GPT-4 analysis of new reports.
+- **AI Verification**: Triggering Perplexity analysis of new reports.
 - **Media Optimization**: Finalizing S3 uploads and generating thumbnails.
 - **Trust Score Recalculation**: Daily background jobs to update user reputation.
 
@@ -274,6 +283,8 @@ The backend allows only the configured frontend origin:
 - `SESSION_SECRET` - Session encryption secret
 - `ENCRYPTION_KEY` - Data encryption key
 - `EMAIL_VERIFICATION_ENABLED` - Enable email verification checks (`true`/`false`)
+- `AI_VERIFICATION_ENABLED` - Enable automatic AI verification on submission (`true`/`false`)
+- `PERPLEXITY_API_KEY` - API key for Perplexity AI service
 
 **AWS:**
 - `AWS_REGION` - AWS region (us-east-1)

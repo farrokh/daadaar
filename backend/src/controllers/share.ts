@@ -29,7 +29,18 @@ export async function getOrganizationByUuid(req: Request, res: Response) {
     }
 
     const [organization] = await db
-      .select()
+      .select({
+        id: schema.organizations.id,
+        shareableUuid: schema.organizations.shareableUuid,
+        name: schema.organizations.name,
+        nameEn: schema.organizations.nameEn,
+        description: schema.organizations.description,
+        descriptionEn: schema.organizations.descriptionEn,
+        logoUrl: schema.organizations.logoUrl,
+        parentId: schema.organizations.parentId,
+        createdAt: schema.organizations.createdAt,
+        updatedAt: schema.organizations.updatedAt,
+      })
       .from(schema.organizations)
       .where(eq(schema.organizations.shareableUuid, uuid));
 
@@ -169,7 +180,18 @@ export async function getIndividualByUuid(req: Request, res: Response) {
     }
 
     const [individual] = await db
-      .select()
+      .select({
+        id: schema.individuals.id,
+        shareableUuid: schema.individuals.shareableUuid,
+        fullName: schema.individuals.fullName,
+        fullNameEn: schema.individuals.fullNameEn,
+        biography: schema.individuals.biography,
+        biographyEn: schema.individuals.biographyEn,
+        profileImageUrl: schema.individuals.profileImageUrl,
+        dateOfBirth: schema.individuals.dateOfBirth,
+        createdAt: schema.individuals.createdAt,
+        updatedAt: schema.individuals.updatedAt,
+      })
       .from(schema.individuals)
       .where(eq(schema.individuals.shareableUuid, uuid));
 
@@ -398,7 +420,11 @@ export async function getReportByUuid(req: Request, res: Response) {
             confidenceScore: true,
             consistencyScore: true,
             credibilityScore: true,
+            factCheckSummary: true,
+            factCheckSummaryEn: true,
+            modelUsed: true,
             flags: true,
+            flagsEn: true,
             createdAt: true,
           },
         },

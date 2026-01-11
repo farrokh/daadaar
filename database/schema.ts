@@ -401,7 +401,8 @@ export const aiVerification = pgTable(
     credibilityScore: real('credibility_score'), // Source credibility
     factCheckSummary: text('fact_check_summary'),
     factCheckSummaryEn: text('fact_check_summary_en'),
-    flags: text('flags'), // JSON array of warning flags
+    flags: text('flags'), // JSON array of warning flags (Persian)
+    flagsEn: text('flags_en'), // JSON array of warning flags (English)
     modelUsed: varchar('model_used', { length: 100 }), // e.g., "gpt-4"
     processingTimeMs: integer('processing_time_ms'),
     isManualOverride: boolean('is_manual_override').default(false).notNull(),

@@ -62,12 +62,12 @@ The development of Daadaar is organized into three strategic phases, moving from
 
 ### High Priority
 
-- [ ] **AI Verification (Basic)**: OpenAI GPT-4 API integration for report analysis and confidence scoring with background job queue (BullMQ)
-  - ✅ Database schema complete (`ai_verification` table with all fields)
-  - ❌ **Missing**: OpenAI SDK dependency (`openai` package)
-  - ❌ **Missing**: BullMQ dependency and job queue setup
-  - ❌ **Missing**: AI verification controller and background job processor
-  - ❌ **Missing**: Integration with report creation workflow
+- [x] **AI Verification**: Perplexity AI (Sonar) integration for report analysis and confidence scoring with background job queue (BullMQ).
+  - ✅ Perplexity AI integration (Sonar model)
+  - ✅ BullMQ job queue and background processor
+  - ✅ Admin manual trigger dashboard
+  - ✅ Feature-flagged (`AI_VERIFICATION_ENABLED`) for controlled rollout
+  - ✅ AI Disclaimer UI and bilingual summaries
 - [ ] **Full-Text Search**: PostgreSQL tsvector/tsquery implementation for searching reports by organization, role, individual, date range, and AI confidence
   - ✅ `pg_trgm` extension available in database init script
   - ❌ **Missing**: tsvector columns and indexes on reports table
