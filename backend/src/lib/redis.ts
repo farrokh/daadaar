@@ -12,13 +12,26 @@ if (!redisUrl) {
 // Lazy Redis connection to avoid blocking app startup
 let redisInstance: Redis | null = null;
 
+// Redis config object for reuse (e.g. in Workers)
+export const redisConfig = {
+  host: undefined, // Parsed from URL usually, but here we use the URL directly if possible or parse it.
+  // Actually, easiest is to just reuse the URL logic if possible, or common options.
+  // ioredis constructor takes URL as first arg, options as second.
+  lazyConnect: true,
+  maxRetriesPerRequest: null, // Important for BullMQ!
+  connectTimeout: 10000,
+  ...(useTls ? { tls: {} } : {}),
+};
+
 function getRedisClient(): Redis | null {
   if (!redisUrl) return null;
 
   if (!redisInstance) {
     redisInstance = new Redis(redisUrl, {
-      lazyConnect: true, // Don't connect immediately
-      maxRetriesPerRequest: 3,
+      ...redisConfig,
+      maxRetriesPerRequest: 3, // For the general shared client, we want retries.
+      // BUT for BullMQ, maxRetriesPerRequest must be null.
+      // The shared client is used for session/rate-limit, so 3 is fine.
       retryStrategy: times => {
         if (times > 3) {
           console.error('Redis connection failed after 3 retries');
@@ -26,8 +39,6 @@ function getRedisClient(): Redis | null {
         }
         return Math.min(times * 100, 2000); // Exponential backoff
       },
-      connectTimeout: 10000,
-      ...(useTls ? { tls: {} } : {}),
     });
 
     // Handle connection errors gracefully

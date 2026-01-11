@@ -391,7 +391,11 @@
     "refresh": "Refresh",
     "no_reports_found": "No content reports found matching the criteria.",
     "no_organizations_found": "No organizations found",
-    "pagination_page": "Page {current} of {total}"
+    "pagination_page": "Page {current} of {total}",
+    "incident_reports_title": "Incident Reports Management",
+    "col_report_title": "Report Title",
+    "col_author": "Author",
+    "col_ai_status": "AI Status"
   },
   "auth": {
     "login_title": "Login to Daadaar",
@@ -633,5 +637,15 @@
     "performance": "Performance",
     "ui": "UI/UX",
     "documentation": "Documentation"
+  },
+  "ai_verification": {
+    "ai_analysis_title": "AI Content Analysis",
+    "no_summary_available": "No summary available for this report.",
+    "confidence": "Confidence",
+    "credibility": "Credibility",
+    "consistency": "Consistency",
+    "analysis_details": "Analysis Details",
+    "flags": "Flags",
+    "ai_disclaimer": "The analysis above is generated solely by AI (Perplexity Sonar model). This system may produce inaccuracies or misinterpret facts. Please consider this analysis as advisory and use with caution."
   }
 }

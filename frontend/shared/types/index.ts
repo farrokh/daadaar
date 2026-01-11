@@ -306,6 +306,7 @@ export interface AiVerification {
   factCheckSummary: string | null;
   factCheckSummaryEn: string | null;
   flags: string | null;
+  flagsEn: string | null;
   modelUsed: string | null;
   processingTimeMs: number | null;
   isManualOverride: boolean;

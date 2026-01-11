@@ -6,6 +6,7 @@ import { checkReportSubmissionLimit } from '../lib/rate-limiter';
 import { generatePresignedGetUrl } from '../lib/s3-client';
 import { generateReportSeoImage } from '../lib/seo-image-generator';
 import { notifyNewReport } from '../lib/slack';
+import { addVerificationJob } from '../queues/ai-verification-queue';
 
 /**
  * Escape special characters in a string for use in SQL LIKE patterns.
@@ -216,11 +217,24 @@ export async function createReport(req: Request, res: Response) {
           completeReport.media?.[0]?.mediaType === 'image' ? completeReport.media[0].s3Key : null
         ).catch(err => console.error('SEO image generation error:', err));
       }
+
+      // Enqueue AI verification job (if enabled)
+      if (process.env.AI_VERIFICATION_ENABLED === 'true') {
+        addVerificationJob(completeReport.id).catch(err =>
+          console.error('Failed to enqueue AI verification job:', err)
+        );
+      } else {
+        console.log(`AI verification is disabled via feature flag for report ${completeReport.id}`);
+      }
     }
 
     return res.status(201).json({
       success: true,
-      data: completeReport,
+      data: {
+        ...completeReport,
+        userId: undefined,
+        sessionId: undefined,
+      },
     });
   } catch (error) {
     console.error('Create report error:', error);
@@ -301,6 +315,21 @@ export async function getReports(req: Request, res: Response) {
     // Fetch reports
     const reports = await db.query.reports.findMany({
       where: and(...conditions),
+      columns: {
+        id: true,
+        shareableUuid: true,
+        title: true,
+        titleEn: true,
+        content: true,
+        contentEn: true,
+        incidentDate: true,
+        incidentLocation: true,
+        incidentLocationEn: true,
+        upvoteCount: true,
+        downvoteCount: true,
+        createdAt: true,
+        updatedAt: true,
+      },
       with: {
         reportLinks: {
           with: {
@@ -321,6 +350,19 @@ export async function getReports(req: Request, res: Response) {
             username: true,
             displayName: true,
             profileImageUrl: true,
+          },
+        },
+        aiVerification: {
+          columns: {
+            confidenceScore: true,
+            consistencyScore: true,
+            credibilityScore: true,
+            factCheckSummary: true,
+            factCheckSummaryEn: true,
+            modelUsed: true,
+            flags: true,
+            flagsEn: true,
+            createdAt: true,
           },
         },
       },
@@ -391,6 +433,21 @@ export async function getReportById(req: Request, res: Response) {
     }
 
     const report = await db.query.reports.findFirst({
+      columns: {
+        id: true,
+        shareableUuid: true,
+        title: true,
+        titleEn: true,
+        content: true,
+        contentEn: true,
+        incidentDate: true,
+        incidentLocation: true,
+        incidentLocationEn: true,
+        upvoteCount: true,
+        downvoteCount: true,
+        createdAt: true,
+        updatedAt: true,
+      },
       where: and(
         eq(schema.reports.id, reportId),
         eq(schema.reports.isPublished, true),
@@ -419,6 +476,13 @@ export async function getReportById(req: Request, res: Response) {
           },
         },
         votes: {
+          columns: {
+            id: true,
+            reportId: true,
+            userId: true,
+            voteType: true,
+            createdAt: true,
+          },
           with: {
             user: {
               columns: {
@@ -429,6 +493,7 @@ export async function getReportById(req: Request, res: Response) {
             },
           },
         },
+        aiVerification: true,
       },
     });
 

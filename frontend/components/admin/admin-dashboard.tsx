@@ -6,10 +6,17 @@ import { useMemo, useState } from 'react';
 import { ContentReportsList } from './content-reports-list';
 import { IndividualManagementPanel } from './individual-management-panel';
 import { OrganizationManagementPanel } from './organization-management-panel';
+import { ReportManagementPanel } from './report-management-panel';
 import { RoleManagementPanel } from './role-management-panel';
 import { UserManagementPanel } from './user-management-panel';
 
-type AdminTab = 'reports' | 'users' | 'organizations' | 'roles' | 'individuals';
+type AdminTab =
+  | 'reports'
+  | 'incident_reports'
+  | 'users'
+  | 'organizations'
+  | 'roles'
+  | 'individuals';
 
 interface AdminDashboardProps {
   initialTab?: AdminTab;
@@ -28,6 +35,7 @@ export function AdminDashboard({
   const tabs = useMemo(
     () => [
       { key: 'reports', label: t('tab_reports') },
+      { key: 'incident_reports', label: t('incident_reports_title') },
       ...(canManageUsers ? [{ key: 'users', label: t('tab_users') }] : []),
       { key: 'organizations', label: t('tab_organizations') },
       { key: 'roles', label: t('tab_roles') },
@@ -69,6 +77,7 @@ export function AdminDashboard({
 
       <div className="space-y-12">
         {activeTab === 'reports' && <ContentReportsList />}
+        {activeTab === 'incident_reports' && <ReportManagementPanel />}
         {activeTab === 'users' && canManageUsers && <UserManagementPanel />}
         {activeTab === 'organizations' && <OrganizationManagementPanel />}
         {activeTab === 'roles' && <RoleManagementPanel />}
