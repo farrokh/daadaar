@@ -32,6 +32,10 @@ The Organization Detail Page provides a dedicated, shareable, and verifying pres
 - **Share Button**: Integrated share functionality copying the secure UUID-based link.
 - **Social Previews**: Optimized Open Graph and Twitter Card metadata with fallback images (site logo) to ensure robust previews on social platforms.
 
+### 6. Administrative Actions (Authenticated)
+- **Add Organization**: Button to create a new sub-organization directly under the current organization.
+- **Add Individual**: Button to create a new individual and immediately assign them a role within the current organization.
+
 ## Implementation Details
 
 ### Frontend
