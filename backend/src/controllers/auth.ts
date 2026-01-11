@@ -56,11 +56,16 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
-    // Validate password strength (min 8 chars)
-    if (password.length < 8) {
+    // Validate password strength (min 8 chars, mixed case, numbers)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
       return res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Password must be at least 8 characters' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message:
+            'Password must be at least 8 characters and include uppercase, lowercase, and number',
+        },
       });
     }
 
@@ -548,10 +553,15 @@ export const changePassword = async (req: Request, res: Response) => {
       });
     }
 
-    if (newPassword.length < 8) {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
       return res.status(400).json({
         success: false,
-        error: { code: 'VALIDATION_ERROR', message: 'Password must be at least 8 characters' },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message:
+            'Password must be at least 8 characters and include uppercase, lowercase, and number',
+        },
       });
     }
 

@@ -5,9 +5,10 @@ import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
 import { ChangePasswordForm } from './change-password-form';
 
+import type { AuthUser } from '@/shared/types';
+
 interface ProfileDashboardProps {
-  // biome-ignore lint/suspicious/noExplicitAny: User type definition varies in different files
-  user: any;
+  user: AuthUser;
 }
 
 type ProfileTab = 'security';

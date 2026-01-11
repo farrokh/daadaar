@@ -22,8 +22,16 @@ export function ChangePasswordForm() {
     setLoading(true);
     setMessage(null);
 
+
     if (formData.newPassword !== formData.confirmPassword) {
       setMessage({ type: 'error', text: t('password_mismatch') });
+      setLoading(false);
+      return;
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(formData.newPassword)) {
+      setMessage({ type: 'error', text: t('password_complexity_error') });
       setLoading(false);
       return;
     }

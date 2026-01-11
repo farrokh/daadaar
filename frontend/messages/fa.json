@@ -611,7 +611,8 @@
     "password_updated": "رمز عبور با موفقیت به‌روزرسانی شد",
     "password_update_failed": "به‌روزرسانی رمز عبور ناموفق بود",
     "password_mismatch": "رمزهای عبور جدید مطابقت ندارند",
-    "current_password_incorrect": "رمز عبور فعلی نادرست است"
+    "current_password_incorrect": "رمز عبور فعلی نادرست است",
+    "password_complexity_error": "رمز عبور باید حداقل ۸ کاراکتر باشد و شامل حروف بزرگ، کوچک و عدد باشد"
   },
   "updates": {
     "title": "بروزرسانی‌های پروژه",

@@ -614,7 +614,8 @@
     "password_updated": "Password updated successfully",
     "password_update_failed": "Failed to update password",
     "password_mismatch": "New passwords do not match",
-    "current_password_incorrect": "Current password is incorrect"
+    "current_password_incorrect": "Current password is incorrect",
+    "password_complexity_error": "Password must be at least 8 characters long and include uppercase, lowercase, and numeric characters"
   },
   "updates": {
     "title": "Project Updates",
