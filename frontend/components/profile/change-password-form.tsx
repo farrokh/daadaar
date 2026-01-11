@@ -22,7 +22,6 @@ export function ChangePasswordForm() {
     setLoading(true);
     setMessage(null);
 
-
     if (formData.newPassword !== formData.confirmPassword) {
       setMessage({ type: 'error', text: t('password_mismatch') });
       setLoading(false);
