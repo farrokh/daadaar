@@ -1,5 +1,40 @@
 [
   {
+    "date": "2026-01-11",
+    "technical": [
+      {
+        "hash": "bcf50b5ff47aa601169c2590b5c6b8d91e52539a",
+        "date": "2026-01-11",
+        "message": "Merge pull request #64 from farrokh/feat/detail-action-buttons",
+        "author": "farrokh"
+      },
+      {
+        "hash": "b6ae740565cc855369b6961a4d6bca4923933331",
+        "date": "2026-01-11",
+        "message": "updated agent rules for Github workflows",
+        "author": "farrokh"
+      },
+      {
+        "hash": "9941a457550763a53dd6aba85b9e0ee5d525d017",
+        "date": "2026-01-11",
+        "message": "feat: add action buttons to detail pages",
+        "author": "farrokh"
+      }
+    ],
+    "public": [
+      {
+        "hash": "9941a457550763a53dd6aba85b9e0ee5d525d017",
+        "date": "2026-01-11",
+        "message": {
+          "en": "Add action buttons to detail pages",
+          "fa": "اضافه کردن دکمه‌های عمل به صفحات جزئیات"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      }
+    ]
+  },
+  {
     "date": "2026-01-10",
     "technical": [
       {

@@ -45,21 +45,22 @@ The development of Daadaar is organized into three strategic phases, moving from
 - [x] **Documentation Suite**: Comprehensive architecture documentation
 - [x] **SEO & Legal**: Sitemap, Robots.txt, Manifest, and Legal pages (Terms, Privacy)
 
+#### Interaction & Moderation
+- [x] **Voting Mechanism**: Upvote/downvote with PoW for anonymous users.
+  - ✅ Database schema, Rate limiting, PoW validation
+  - ✅ Atomic vote count updates, Optimistic UI
+- [x] **Content Reporting System**: Universal reporting for incorrect/inappropriate content.
+  - ✅ Database schema, Routes, Controller, Frontend UI
+  - ✅ Admin Dashboard for review, Email notifications
+  - ✅ Report buttons on Organizations, Individuals, Media
+  - ✅ Report resolution workflow
+
+
 ---
 
 ## 🚧 In Progress (Phase 1 - MVP Completion)
 
 ### High Priority
-- [x] **Voting Mechanism**: Upvote/downvote with PoW for anonymous users, session-based duplicate prevention, and atomic vote count updates
-  - ✅ Database schema complete (`votes` table with unique constraints)
-  - ✅ Rate limiting function exists (`checkVotingLimit`)
-  - ✅ PoW resource type configured for voting
-  - ✅ Voting routes (`POST /api/votes`, `DELETE /api/votes/:reportId`, `GET /api/votes/:reportId/my-vote`)
-  - ✅ Controller implementation with PoW validation for anonymous users
-  - ✅ Atomic vote count updates on reports table using SQL expressions
-  - ✅ Frontend voting functionality with `useVoting` hook and `VotingButtons` component
-  - ✅ Vote change support (upvote ↔ downvote) with automatic count adjustments
-  - ✅ Optimistic UI updates with server reconciliation
 
 - [ ] **AI Verification (Basic)**: OpenAI GPT-4 API integration for report analysis and confidence scoring with background job queue (BullMQ)
   - ✅ Database schema complete (`ai_verification` table with all fields)
@@ -80,22 +81,7 @@ The development of Daadaar is organized into three strategic phases, moving from
   - ❌ **Missing**: Trust score calculation logic
   - ❌ **Missing**: Trust score update triggers/hooks
   - ❌ **Missing**: Organization creation permission checks based on trust score
-- [x] **Content Reporting System**: Universal reporting for incorrect/inappropriate content across all entities (reports, organizations, individuals, users, media)
-  - ✅ Database schema complete (`content_reports` table with all status/reason enums)
-  - ✅ Type definitions exist (`ContentReport` interface)
-  - ✅ Content reporting routes (`POST /api/content-reports`)
-  - ✅ Content reporting controller
-  - ✅ Frontend reporting UI (`ReportContentButton` component)
-  - ✅ Translation keys (English and Persian)
-  - **Enhancements (Next Steps):**
-    - ✅ Add report button to organization detail pages
-    - ✅ Add report button to individual detail pages
-    - ❌ **Missing**: Add report button to user profile pages (pages not yet implemented)
-    - ✅ Add report button to media items
-    - ✅ Build admin dashboard to review submitted content reports
-    - ✅ Add email notifications for moderators when reports are submitted
-    - ✅ Implement report resolution workflow (review, resolve, dismiss)
-    - ✅ Add report statistics (basic count aggregation)
+
 
 - [ ] **Admin Roles & Banning**: User/moderator/admin roles with banning system for registered users and anonymous sessions, plus ban history tracking
   - ✅ Database schema complete (`users.role`, `users.isBanned`, `ban_history` table)
@@ -131,14 +117,12 @@ The development of Daadaar is organized into three strategic phases, moving from
   - ✅ Report statistics (basic counts by status and type)
   - ❌ **Missing**: Bulk actions for report management
   - ❌ **Missing**: Moderator activity logs
-- [x] **Content Reporting Enhancements**:
-  - ✅ Add report buttons to entity pages (organizations, individuals, media)
-  - ✅ Email notifications for moderators on new reports
-  - ✅ Report resolution workflow with status transitions
-  - ❌ **Missing**: Report history and audit trail
-  - ❌ **Missing**: Automated report categorization and prioritization
 - [ ] **Ban Management UI**: Interface for temporary/permanent bans with reason tracking
 - [ ] **Async Image Processing**: Implement background job queue (e.g., AWS SQS + Lambda or Kafka) to convert images after direct S3 upload, decoupling processing from user upload flow
+- [x] **Detail Page Management**:
+  - ✅ "Add Organization" and "Add Individual" buttons on Organization Detail pages
+  - ✅ "Add Report" button on Individual Detail pages
+  - ✅ Optimized for authenticated curators
 - [ ] **Content Moderation Workflow**: Review, resolve, dismiss, and escalate reported content
 
 ### Organization Management
@@ -202,15 +186,14 @@ The development of Daadaar is organized into three strategic phases, moving from
 ## 🎯 Next Immediate Steps
 
 ### Critical Path (Next 2 Weeks)
-1. **Voting System**: Complete voting endpoints with PoW validation for anonymous users
-2. **AI Verification**: Implement BullMQ job queue and OpenAI integration
-3. **Search Implementation**: Add full-text search with PostgreSQL tsvector
+1. **AI Verification**: Implement BullMQ job queue and OpenAI integration
+2. **Search Implementation**: Add full-text search with PostgreSQL tsvector
+3. **Trust Score System**: Implement calculation logic and database tracking
 
 ### Short-Term (Next Month)
-4. **Trust Score System**: Implement calculation logic and database tracking
-5. **Content Reporting**: Build universal reporting system with admin review workflow
-6. **Entity Visual Identity**: Add logo/image support to organizations, individuals, and users
-7. **Admin Dashboard**: Create moderation interface for content review and ban management
+4. **Entity Visual Identity**: Add logo/image support to user profiles (remaining)
+5. **Detail Page Enhancements**: Further refine administrative tools
+
 
 
 ### Medium-Term (Next Quarter)

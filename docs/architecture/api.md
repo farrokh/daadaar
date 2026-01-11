@@ -21,6 +21,7 @@ To enhance security and prevent resource enumeration, we use **UUIDs** for all p
 | `/api/share/individual/:uuid` | GET | Fetch individual details by UUID | `uuid`: v4 UUID |
 | `/api/share/report/:uuid` | GET | Fetch report details by UUID | `uuid`: v4 UUID |
 | `/api/share/user/:uuid` | GET | Fetch public user profile by UUID | `uuid`: v4 UUID |
+| `/api/content-reports` | POST | Submit a content report | Body: `targetId`, `targetType`, `reason` |
 
 ### Security Features
 - **Validation**: all UUIDs are validated against v4 format regex.

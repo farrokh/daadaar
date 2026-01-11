@@ -32,6 +32,9 @@ The Person Detail Page provides a dedicated, shareable, and verifying presence f
 - **Share Button**: Copies the secure UUID-based link.
 - **Social Previews**: Dynamic `generateMetadata` ensures rich social cards (Open Graph, Twitter) with the individual's name, biography snippet, and profile image. Includes **fallback image support** (Daadaar logo) to ensure links always look professional even if the profile image is missing or fails to load.
 
+### 5. Administrative Actions (Authenticated)
+- **Add Report**: Button to create a new report specifically linked to this individual, streamlining the reporting workflow.
+
 ## Implementation Details
 
 ### Frontend
