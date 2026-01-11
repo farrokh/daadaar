@@ -595,6 +595,25 @@
       "thirdparty_body": "برخی از محتوای پلتفرم ممکن است از منابع عمومی یا دارای مجوز باز تهیه شده باشد. ما تلاش می‌کنیم به این منابع اعتبار دهیم."
     }
   },
+  "profile": {
+    "title": "پروفایل",
+    "subtitle": "مدیریت تنظیمات حساب کاربری و ترجیحات",
+    "tab_security": "امنیت",
+    "change_password": "تغییر رمز عبور",
+    "change_password_desc": "رمز عبور خود را برای حفظ امنیت حساب کاربری به‌روزرسانی کنید",
+    "current_password": "رمز عبور فعلی",
+    "current_password_placeholder": "رمز عبور فعلی را وارد کنید",
+    "new_password": "رمز عبور جدید",
+    "new_password_placeholder": "رمز عبور جدید را وارد کنید",
+    "confirm_password": "تأیید رمز عبور جدید",
+    "confirm_password_placeholder": "رمز عبور جدید را دوباره وارد کنید",
+    "update_password": "به‌روزرسانی رمز عبور",
+    "password_updated": "رمز عبور با موفقیت به‌روزرسانی شد",
+    "password_update_failed": "به‌روزرسانی رمز عبور ناموفق بود",
+    "password_mismatch": "رمزهای عبور جدید مطابقت ندارند",
+    "current_password_incorrect": "رمز عبور فعلی نادرست است",
+    "password_complexity_error": "رمز عبور باید حداقل ۸ کاراکتر باشد و شامل حروف بزرگ، کوچک و عدد باشد"
+  },
   "updates": {
     "title": "بروزرسانی‌های پروژه",
     "description": "از آخرین تغییرات، بهبودها و بروزرسانی‌های فنی پلتفرم دادار مطلع شوید.",
