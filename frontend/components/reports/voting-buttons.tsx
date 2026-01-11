@@ -143,18 +143,18 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
       )}
 
       {/* Voting Buttons */}
-      <div className="flex items-center gap-1.5 p-1 rounded-full border border-foreground/5 bg-foreground/[0.03]">
+      <div className="flex items-center gap-3">
         {/* Upvote Button */}
         <button
           type="button"
           onClick={handleUpvote}
           disabled={isLoading}
           className={`
-            group flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300
+            group flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 border
             ${
               currentVote === 'upvote'
-                ? 'bg-green-500/10 text-green-600'
-                : 'text-foreground/50 hover:bg-foreground/5 hover:text-foreground'
+                ? 'bg-green-500/10 text-green-600 border-green-500/20'
+                : 'bg-foreground/[0.03] text-foreground/50 border-foreground/5 hover:bg-foreground/5 hover:text-foreground'
             }
             ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           `}
@@ -165,10 +165,11 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
               currentVote === 'upvote' ? 'scale-110 fill-current' : 'group-hover:scale-110'
             }`}
           />
-          <span className="text-xs font-bold tabular-nums">{upvoteCount}</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest">{t('upvote')}</span>
+          <span className="text-[11px] font-black tabular-nums border-l border-current/10 pl-2 ml-1">
+            {upvoteCount}
+          </span>
         </button>
-
-        <div className="w-px h-4 bg-foreground/10" />
 
         {/* Downvote Button */}
         <button
@@ -176,22 +177,25 @@ export const VotingButtons: React.FC<VotingButtonsProps> = ({
           onClick={handleDownvote}
           disabled={isLoading}
           className={`
-            group flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300
+            group flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 border
             ${
               currentVote === 'downvote'
-                ? 'bg-red-500/10 text-red-600'
-                : 'text-foreground/50 hover:bg-foreground/5 hover:text-foreground'
+                ? 'bg-red-500/10 text-red-600 border-red-500/20'
+                : 'bg-foreground/[0.03] text-foreground/50 border-foreground/5 hover:bg-foreground/5 hover:text-foreground'
             }
             ${isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
           `}
           title={t('downvote')}
         >
-          <span className="text-xs font-bold tabular-nums">{downvoteCount}</span>
           <ThumbsDown
             className={`w-3.5 h-3.5 transition-transform duration-300 ${
               currentVote === 'downvote' ? 'scale-110 fill-current' : 'group-hover:scale-110'
             }`}
           />
+          <span className="text-[11px] font-bold uppercase tracking-widest">{t('downvote')}</span>
+          <span className="text-[11px] font-black tabular-nums border-l border-current/10 pl-2 ml-1">
+            {downvoteCount}
+          </span>
         </button>
       </div>
 

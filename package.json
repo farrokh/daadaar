@@ -28,6 +28,7 @@
     "docker:down": "docker compose down",
     "docker:reset": "docker compose down -v && docker compose up -d",
     "docker:logs": "docker compose logs -f",
+    "aws:cost-check": "bun scripts/check-aws-costs.ts",
     "setup": "bun scripts/setup-env.ts",
     "clean": "rm -rf frontend/.next frontend/node_modules backend/dist backend/node_modules shared/node_modules node_modules",
     "prepare": "echo 'Ready to develop!'"

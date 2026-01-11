@@ -2,11 +2,24 @@
 
 import { MobileMenu } from '@/components/layout/mobile-menu';
 import { SubmitReportModal } from '@/components/reports/submit-report-modal';
-import { ShareLinkButton } from '@/components/ui/share-link-button';
+import { PillButton } from '@/components/ui/pill-button';
+import { cn } from '@/lib/utils';
 import type { Individual } from '@/shared/types';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Briefcase, Calendar, FileText, Menu, User } from 'lucide-react';
+import {
+  ArrowLeft,
+  Briefcase,
+  Calendar,
+  FileText,
+  Menu,
+  Network,
+  Share2,
+  ThumbsDown,
+  ThumbsUp,
+  User,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -70,6 +83,21 @@ export default function PersonDetail({ person }: PersonDetailProps) {
               <span className="hidden md:inline">{commonT('home')}</span>
             </button>
           </div>
+
+          <div className="hidden md:flex items-center gap-2">
+            <PillButton
+              href={`/${locale}/?view=people&individualUuid=${person.shareableUuid}`}
+              label={t('view_on_graph')}
+              icon={Network}
+            />
+
+            <PillButton
+              action="share"
+              label={commonT('share')}
+              copiedLabel={commonT('copied')}
+              icon={Share2}
+            />
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
@@ -125,40 +153,69 @@ export default function PersonDetail({ person }: PersonDetailProps) {
               {t('associated_reports')}
             </h2>
             {person.reports && person.reports.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6">
-                {person.reports.map(report => (
-                  <Link
-                    href={`/${locale}/reports/${report.shareableUuid}`}
-                    key={report.id}
-                    className="group"
-                  >
-                    <div className="p-8 rounded-[2rem] bg-foreground/[0.02] border border-foreground/5 hover:bg-foreground/[0.05] transition-all group-hover:-translate-y-1 group-hover:shadow-xl group-hover:border-foreground/10">
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="p-3 rounded-2xl bg-accent-primary/5 group-hover:bg-accent-primary/10 transition-colors">
-                          <FileText className="w-5 h-5 text-accent-primary" />
-                        </div>
-                        <h3 className="text-xl font-bold group-hover:text-accent-primary transition-colors leading-tight">
-                          {isRtl ? report.title : report.titleEn || report.title}
-                        </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {person.reports.map(report => {
+                  const coverImage = report.media?.find(m => m.mediaType === 'image');
+                  return (
+                    <Link
+                      href={`/${locale}/reports/${report.shareableUuid}`}
+                      key={report.id}
+                      className="group flex flex-col h-full rounded-[1.5rem] bg-foreground/[0.02] border border-foreground/5 overflow-hidden hover:bg-foreground/[0.04] hover:border-foreground/10 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                    >
+                      {/* Cover Image Area */}
+                      <div className="h-48 w-full bg-foreground/5 relative overflow-hidden">
+                        {coverImage?.url ? (
+                          <img
+                            src={coverImage.url}
+                            alt={report.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-foreground/10 group-hover:text-accent-primary/20 transition-colors">
+                            <FileText className="w-12 h-12" />
+                          </div>
+                        )}
+
+                        {/* Status / Category badge usually goes here, simplified for now */}
                       </div>
-                      <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-foreground/30">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-3.5 h-3.5" />
-                          <span>
-                            {new Date(report.incidentDate || report.createdAt).toLocaleDateString(
-                              locale,
-                              {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              }
-                            )}
-                          </span>
+
+                      {/* Content Area */}
+                      <div className="p-5 flex-1 flex flex-col gap-4">
+                        <div className="space-y-2 flex-1">
+                          <h3 className="text-lg font-bold leading-snug group-hover:text-accent-primary transition-colors line-clamp-2">
+                            {isRtl ? report.title : report.titleEn || report.title}
+                          </h3>
+
+                          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-foreground/40">
+                            <Calendar className="w-3 h-3" />
+                            <span>
+                              {new Date(report.incidentDate || report.createdAt).toLocaleDateString(
+                                locale,
+                                {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                }
+                              )}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Footer: Votes */}
+                        <div className="flex items-center gap-3 pt-4 border-t border-foreground/5">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-foreground/60 bg-foreground/5 px-2.5 py-1 rounded-full">
+                            <ThumbsUp className="w-3 h-3" />
+                            <span>{report.upvoteCount || 0}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-foreground/60 bg-foreground/5 px-2.5 py-1 rounded-full">
+                            <ThumbsDown className="w-3 h-3" />
+                            <span>{report.downvoteCount || 0}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
               </div>
             ) : (
               <p className="text-foreground/40 text-sm font-medium italic">{t('no_reports')}</p>
@@ -174,57 +231,69 @@ export default function PersonDetail({ person }: PersonDetailProps) {
               {t('career_history')}
             </h2>
             {person.history && person.history.length > 0 ? (
-              <div className="space-y-8 relative before:absolute before:left-6 before:top-2 before:bottom-2 before:w-px before:bg-foreground/5">
-                {person.history.map(record => (
-                  <div key={record.id} className="relative pl-14">
-                    <div className="absolute left-3 top-0 w-6 h-6 rounded-full bg-background border-2 border-accent-primary/20 z-10 flex items-center justify-center">
-                      <div className="w-1.5 h-1.5 rounded-full bg-accent-primary" />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="text-sm font-black text-foreground">
-                        {isRtl ? record.roleTitle : record.roleTitleEn || record.roleTitle}
-                      </h3>
-                      <Link
-                        href={`/${locale}/org/${record.organizationUuid}`}
-                        className="text-xs font-bold text-accent-primary hover:underline transition-all block"
+              <div className="space-y-4">
+                {person.history.map((record, index) => {
+                  const isPresent = !record.endDate;
+                  return (
+                    <div
+                      key={record.id}
+                      className="group relative flex items-start gap-4 p-4 rounded-2xl hover:bg-foreground/[0.02] transition-colors border border-transparent hover:border-foreground/5"
+                    >
+                      {/* Timeline Line */}
+                      {index !== (person.history?.length || 0) - 1 && (
+                        <div className="absolute left-[27px] top-10 bottom-0 w-px bg-foreground/5 group-hover:bg-foreground/10 transition-colors" />
+                      )}
+
+                      {/* Icon / Dot */}
+                      <div
+                        className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center border ${isPresent ? 'bg-accent-primary/10 border-accent-primary/20 text-accent-primary' : 'bg-foreground/5 border-foreground/5 text-foreground/20'}`}
                       >
-                        {isRtl
-                          ? record.organizationName
-                          : record.organizationNameEn || record.organizationName}
-                      </Link>
-                      <time className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest block pt-1">
-                        {new Date(record.startDate).toLocaleDateString(locale, {
-                          year: 'numeric',
-                          month: 'short',
-                        })}
-                        {' → '}
-                        {record.endDate
-                          ? new Date(record.endDate).toLocaleDateString(locale, {
-                              year: 'numeric',
-                              month: 'short',
-                            })
-                          : t('present')}
-                      </time>
+                        <Briefcase className="w-3 h-3" />
+                      </div>
+
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        <div className="flex items-start justify-between gap-4">
+                          <h3 className="text-sm font-bold text-foreground leading-snug">
+                            {isRtl ? record.roleTitle : record.roleTitleEn || record.roleTitle}
+                          </h3>
+                          {isPresent && (
+                            <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full bg-accent-primary/10 text-accent-primary text-[9px] font-black uppercase tracking-widest">
+                              {t('present')}
+                            </span>
+                          )}
+                        </div>
+
+                        <Link
+                          href={`/${locale}/org/${record.organizationUuid}`}
+                          className="text-xs font-semibold text-foreground/60 hover:text-accent-primary transition-colors block truncate"
+                        >
+                          {isRtl
+                            ? record.organizationName
+                            : record.organizationNameEn || record.organizationName}
+                        </Link>
+
+                        <time className="text-[10px] font-medium text-foreground/30 block">
+                          {new Date(record.startDate).toLocaleDateString(locale, {
+                            year: 'numeric',
+                            month: 'short',
+                          })}
+                          {' — '}
+                          {record.endDate
+                            ? new Date(record.endDate).toLocaleDateString(locale, {
+                                year: 'numeric',
+                                month: 'short',
+                              })
+                            : t('present')}
+                        </time>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-foreground/40 text-sm font-medium italic">{t('no_history')}</p>
             )}
           </section>
-
-          {/* Quick Info */}
-          <div className="p-8 rounded-[2rem] border border-foreground/5 bg-foreground/[0.01] space-y-6">
-            <div className="space-y-2">
-              <span className="text-[10px] font-black uppercase text-foreground/20 tracking-[0.3em] block">
-                UUID
-              </span>
-              <code className="text-[10px] font-mono bg-foreground/5 px-2 py-1 rounded text-foreground/40 block truncate">
-                {person.shareableUuid}
-              </code>
-            </div>
-          </div>
         </motion.aside>
       </div>
 
@@ -243,11 +312,13 @@ export default function PersonDetail({ person }: PersonDetailProps) {
             >
               <Menu size={20} />
             </button>
-            <ShareLinkButton
+            <PillButton
+              action="share"
               label=""
-              copiedLabel=""
-              hideLabelOnMobile
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none"
+              icon={Share2}
+              aria-label={commonT('share')}
+              title={commonT('share')}
+              className="w-10 h-10 min-w-[2.5rem] p-0 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none text-foreground/40 hover:text-foreground"
             />
           </div>
 

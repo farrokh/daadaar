@@ -1,7 +1,7 @@
 // Share controller
 // Handles shareable link endpoints using UUIDs instead of sequential IDs
 
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import type { Request, Response } from 'express';
 import { db, schema } from '../db';
 import { generatePresignedGetUrl } from '../lib/s3-client';
@@ -188,27 +188,84 @@ export async function getIndividualByUuid(req: Request, res: Response) {
       individual.profileImageUrl = await generatePresignedGetUrl(individual.profileImageUrl);
     }
 
-    // Fetch related reports
-    const individualReports = await db
-      .select({
-        id: schema.reports.id,
-        shareableUuid: schema.reports.shareableUuid,
-        title: schema.reports.title,
-        titleEn: schema.reports.titleEn,
-        incidentDate: schema.reports.incidentDate,
-        createdAt: schema.reports.createdAt,
-      })
-      .from(schema.reports)
-      .innerJoin(schema.reportLinks, eq(schema.reports.id, schema.reportLinks.reportId))
-      .where(
+    // Fetch related reports with media and votes
+    const individualReportsRaw = await db.query.reports.findMany({
+      columns: {
+        id: true,
+        shareableUuid: true,
+        title: true,
+        titleEn: true,
+        content: true,
+        contentEn: true,
+        incidentDate: true,
+        incidentLocation: true,
+        incidentLocationEn: true,
+        upvoteCount: true,
+        downvoteCount: true,
+        createdAt: true,
+      },
+      where: (reports, { eq, and }) =>
         and(
-          eq(schema.reportLinks.individualId, individual.id),
-          eq(schema.reports.isPublished, true),
-          eq(schema.reports.isDeleted, false)
-        )
-      )
-      .orderBy(desc(schema.reports.incidentDate))
-      .limit(20);
+          eq(reports.isPublished, true),
+          eq(reports.isDeleted, false),
+          // We can't easily filter by relation existence in query builder without 'exists' or raw sql
+          // So we'll use a semi-join logic or just filter in memory if the dataset is small, but for now let's use the raw SQL exists approach combined with query builder if possible, OR just stick to query builder and filter afterwards if performance allows (not ideal).
+          // BETTER APPROACH: Use the same logic as 'getReports' but restricted to this individual
+          sql`EXISTS (
+            SELECT 1 FROM report_links
+            WHERE report_links.report_id = ${reports.id}
+            AND report_links.individual_id = ${individual.id}
+          )`
+        ),
+      with: {
+        // Note: reportLinks are intentionally excluded here to prevent circular dependencies
+        // (Individual -> Reports -> ReportLinks -> Individual) and minimize payload size.
+        media: {
+          columns: {
+            id: true,
+            mediaType: true,
+            originalFilename: true,
+            mimeType: true,
+            fileSizeBytes: true,
+            s3Key: true,
+            s3Bucket: true,
+            createdAt: true,
+          },
+          where: (media, { eq }) => and(eq(media.mediaType, 'image'), eq(media.isDeleted, false)),
+          limit: 1,
+        },
+      },
+      orderBy: [desc(schema.reports.incidentDate)],
+      limit: 20,
+    });
+
+    // Sign media URLs for reports
+    const individualReports = await Promise.all(
+      individualReportsRaw.map(async report => {
+        const mediaWithUrls = await Promise.all(
+          report.media.map(async item => {
+            let url = null;
+            if (item.s3Key) {
+              url = await generatePresignedGetUrl(item.s3Key, item.s3Bucket);
+            }
+            return {
+              id: item.id,
+              mediaType: item.mediaType,
+              originalFilename: item.originalFilename,
+              filename: item.originalFilename,
+              url,
+              mimeType: item.mimeType,
+              fileSizeBytes: item.fileSizeBytes,
+              createdAt: item.createdAt,
+            };
+          })
+        );
+        return {
+          ...report,
+          media: mediaWithUrls,
+        };
+      })
+    );
 
     // Fetch career history (role occupancies)
     const history = await db
@@ -367,11 +424,12 @@ export async function getReportByUuid(req: Request, res: Response) {
         }
         return {
           id: item.id,
-          type: item.mediaType,
-          filename: item.originalFilename,
+          mediaType: item.mediaType,
+          originalFilename: item.originalFilename,
+          filename: item.originalFilename, // Keep for backward compatibility
           url,
           mimeType: item.mimeType,
-          size: item.fileSizeBytes,
+          fileSizeBytes: item.fileSizeBytes,
           createdAt: item.createdAt,
         };
       })

@@ -47,7 +47,7 @@
     "report": "Report",
     "organization": "Organization",
     "person": "Individual",
-    "add_new": "Add new",
+    "add_new": "Add",
     "menu": "Menu",
     "viewPeople": "View Graph"
   },
@@ -160,7 +160,8 @@
     "members": "Members",
     "sub_organizations": "Sub-Organizations",
     "no_members": "No members found.",
-    "no_organizations_found": "No organizations found"
+    "no_organizations_found": "No organizations found",
+    "share_organization": "Share Organization"
   },
   "person": {
     "add_title": "Add New Person",
@@ -266,8 +267,8 @@
     "imageEvidence": "Evidence Image"
   },
   "voting": {
-    "upvote": "agree",
-    "downvote": "disagree",
+    "upvote": "Upvote",
+    "downvote": "Downvote",
     "removeVote": "Remove Vote",
     "upvotes": "Agreements",
     "downvotes": "Disagreements",

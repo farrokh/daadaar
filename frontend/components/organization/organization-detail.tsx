@@ -3,10 +3,19 @@
 import { AddOrganizationModal } from '@/components/graph/add-organization-modal';
 import { AddPersonModal } from '@/components/graph/add-person-modal';
 import { MobileMenu } from '@/components/layout/mobile-menu';
-import { ShareLinkButton } from '@/components/ui/share-link-button';
+import { PillButton } from '@/components/ui/pill-button';
 import type { Organization } from '@/shared/types';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Building2, Calendar, ChevronRight, Menu, Network, User } from 'lucide-react';
+import {
+  ArrowLeft,
+  Building2,
+  Calendar,
+  ChevronRight,
+  Menu,
+  Network,
+  Share2,
+  User,
+} from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -60,7 +69,7 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
     >
       {/* Header / Breadcrumb */}
       <motion.header variants={fadeInUp} className="mb-12 space-y-8">
-        <div className="flex items-center justify-between gap-6 border-b border-foreground/5 pb-4 md:pb-6 relative min-h-[6rem]">
+        <div className="flex items-center justify-between gap-6 border-b border-foreground/5 pb-4 md:pb-6">
           <div className="flex items-center gap-2 z-10">
             <button
               type="button"
@@ -75,42 +84,28 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
             </button>
           </div>
 
-          {/* Mobile Logo - Centered in Header Row */}
-          <div className="absolute left-1/2 -translate-x-1/2 md:hidden">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-foreground/[0.02] to-foreground/[0.08] backdrop-blur-sm flex items-center justify-center shrink-0 border border-foreground/10 shadow-sm overflow-hidden transform"
-            >
-              {organization.logoUrl ? (
-                <img src={organization.logoUrl} alt={name} className="w-full h-full object-cover" />
-              ) : (
-                <Building2 className="w-10 h-10 text-foreground/20" />
-              )}
-            </motion.div>
-          </div>
+          <div className="hidden md:flex items-center gap-2 z-10">
+            <PillButton
+              href={`/${locale}/?view=people&organizationUuid=${organization.shareableUuid}`}
+              label={t('view_on_graph')}
+              icon={Network}
+            />
 
-          {/* Graph Button - Right */}
-          <div className="flex items-center gap-2 z-10">
-            <button
-              type="button"
-              onClick={() =>
-                router.push(
-                  `/${locale}/?view=people&organizationUuid=${organization.shareableUuid}`
-                )
-              }
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-foreground/5 hover:bg-foreground/10 text-accent-primary transition-colors"
-              aria-label={commonT('viewPeople')}
-            >
-              <Network size={20} />
-            </button>
+            <PillButton
+              action="share"
+              label={commonT('share')}
+              copiedLabel={commonT('copied')}
+              icon={Share2}
+            />
           </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
           {/* Organization Logo (Desktop Only) */}
+          {/* Organization Logo */}
           <motion.div
             whileHover={{ scale: 1.02 }}
-            className="hidden md:flex w-24 h-24 md:w-32 md:h-32 rounded-[2rem] bg-gradient-to-br from-foreground/[0.02] to-foreground/[0.08] backdrop-blur-sm items-center justify-center shrink-0 border border-foreground/10 shadow-sm overflow-hidden"
+            className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] bg-gradient-to-br from-foreground/[0.02] to-foreground/[0.08] backdrop-blur-sm flex items-center justify-center shrink-0 border border-foreground/10 shadow-sm overflow-hidden"
           >
             {organization.logoUrl ? (
               <img src={organization.logoUrl} alt={name} className="w-full h-full object-cover" />
@@ -302,11 +297,12 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
             >
               <Menu size={20} />
             </button>
-            <ShareLinkButton
+            <PillButton
+              action="share"
               label=""
-              copiedLabel=""
-              hideLabelOnMobile
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none"
+              icon={Share2}
+              aria-label={t('share_organization')}
+              className="w-10 h-10 min-w-[2.5rem] p-0 flex items-center justify-center rounded-full bg-transparent hover:bg-foreground/5 transition-colors border-none shadow-none text-foreground/40 hover:text-foreground"
             />
           </div>
 

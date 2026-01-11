@@ -45,7 +45,7 @@
     "report": "گزارش",
     "organization": "سازمان",
     "person": "فرد",
-    "add_new": "افزودن جدید",
+    "add_new": "ایجاد",
     "menu": "منو",
     "viewPeople": "مشاهده گراف"
   },
@@ -158,7 +158,8 @@
     "members": "اعضا",
     "sub_organizations": "زیرسازمان‌ها",
     "no_members": "عضوی یافت نشد.",
-    "no_organizations_found": "سازمانی یافت نشد"
+    "no_organizations_found": "سازمانی یافت نشد",
+    "share_organization": "اشتراک‌گذاری سازمان"
   },
   "person": {
     "add_title": "افزودن فرد جدید",
@@ -262,8 +263,8 @@
     "reporter": "گزارش‌دهنده"
   },
   "voting": {
-    "upvote": "موافقم",
-    "downvote": "مخالفم",
+    "upvote": "موافق",
+    "downvote": "مخالف",
     "removeVote": "حذف رأی",
     "upvotes": "موافقان",
     "downvotes": "مخالفان",
