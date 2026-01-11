@@ -133,7 +133,7 @@ export function GraphSearchPanel() {
           onChange={event => setQuery(event.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={graphT('search_placeholder')}
-          className="w-full rounded-full border border-foreground/10 bg-white/90 px-12 py-3 text-sm text-foreground outline-none transition focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/40 focus:ring-offset-0"
+          className="w-full rounded-full border border-foreground/10 bg-background/80 backdrop-blur-xl px-12 py-3 text-sm text-foreground placeholder:text-foreground/50 outline-none transition focus:border-accent-primary focus:ring-2 focus:ring-accent-primary/40 focus:ring-offset-0"
           aria-label={graphT('search')}
           aria-autocomplete="list"
           aria-expanded={showDropdown}

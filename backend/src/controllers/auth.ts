@@ -525,3 +525,75 @@ export const getBanStatus = async (req: Request, res: Response) => {
     },
   });
 };
+
+/**
+ * POST /api/auth/change-password
+ * Change user password
+ */
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!req.currentUser || req.currentUser.type !== 'registered') {
+      return res.status(401).json({
+        success: false,
+        error: { code: 'UNAUTHORIZED', message: 'Not authenticated' },
+      });
+    }
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'Current and new password are required' },
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'Password must be at least 8 characters' },
+      });
+    }
+
+    const user = await db.query.users.findFirst({
+      where: eq(schema.users.id, req.currentUser.id),
+    });
+
+    if (!user || !user.passwordHash) {
+      return res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'User not found' },
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.passwordHash);
+
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_CREDENTIALS', message: 'Current password is incorrect' },
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await db
+      .update(schema.users)
+      .set({
+        passwordHash,
+        updatedAt: new Date(),
+      })
+      .where(eq(schema.users.id, user.id));
+
+    res.json({
+      success: true,
+      message: 'Password updated successfully',
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Internal server error' },
+    });
+  }
+};

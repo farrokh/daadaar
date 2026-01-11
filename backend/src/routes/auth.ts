@@ -54,6 +54,9 @@ router.delete('/session', authMiddleware, csrfProtection, authController.invalid
 // GET /api/auth/me - Get current user info
 router.get('/me', authMiddleware, authController.getMe);
 
+// POST /api/auth/change-password
+router.post('/change-password', authMiddleware, csrfProtection, authController.changePassword);
+
 // GET /api/auth/ban-status - Check if current user/session is banned
 router.get('/ban-status', authMiddleware, authController.getBanStatus);
 
