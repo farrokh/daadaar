@@ -86,6 +86,18 @@ export default function OrganizationDetail({ organization }: OrganizationDetailP
 
           <div className="hidden md:flex items-center gap-2 z-10">
             <PillButton
+              onClick={() => setIsAddOrgModalOpen(true)}
+              label={tGraph('add_organization')}
+              icon={Building2}
+            />
+
+            <PillButton
+              onClick={() => setIsAddPersonModalOpen(true)}
+              label={tGraph('add_person')}
+              icon={User}
+            />
+
+            <PillButton
               href={`/${locale}/?view=people&organizationUuid=${organization.shareableUuid}`}
               label={t('view_on_graph')}
               icon={Network}
