@@ -4,6 +4,9 @@
 - Always `git pull origin main` after a merge is completed.
 - Ensure the local workspace is fully updated with the merged changes before deleting any local branches.
 - Never delete a branch (local or remote) until confirmation of a successful merge into the base branch.
+- When creating a new PR, always create a dummy file first and run in in terminal to create a new PR.
+- Always use github templates for PRs and issues.
+- PR title should follow github PR title format.
 
 ## Command Line & JSON Handling
 - **Do not pass complex JSON or long text arguments (like PR bodies) directly in the terminal.** Use temporary files instead.
