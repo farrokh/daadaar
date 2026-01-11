@@ -86,6 +86,12 @@ export default function PersonDetail({ person }: PersonDetailProps) {
 
           <div className="hidden md:flex items-center gap-2">
             <PillButton
+              onClick={() => setIsSubmitReportModalOpen(true)}
+              label={tGraph('add_report')}
+              icon={FileText}
+            />
+
+            <PillButton
               href={`/${locale}/?view=people&individualUuid=${person.shareableUuid}`}
               label={t('view_on_graph')}
               icon={Network}

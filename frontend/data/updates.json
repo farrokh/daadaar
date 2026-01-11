@@ -3,6 +3,48 @@
     "date": "2026-01-10",
     "technical": [
       {
+        "hash": "a68f288451816970f84c504d9168d658891f8a47",
+        "date": "2026-01-10",
+        "message": "Merge pull request #63 from farrokh/feat/user-profile-and-fixes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "14e6d80e077e28f3ff463842ebf64be0d471efd5",
+        "date": "2026-01-10",
+        "message": "style: remove extra newline and apply lint fixes",
+        "author": "farrokh"
+      },
+      {
+        "hash": "0a0bd4bb8303022776fc415d0cfcc03a92cbde70",
+        "date": "2026-01-10",
+        "message": "feat: enforce password complexity and improve type safety",
+        "author": "farrokh"
+      },
+      {
+        "hash": "cb0f7d4a9d5ce581fe1547f20c2bd9a0d42ce217",
+        "date": "2026-01-10",
+        "message": "feat: Add user profile, password change, and fix search bar UI",
+        "author": "farrokh"
+      },
+      {
+        "hash": "5e1f5487567441e0876ab4157c59f81c0774b866",
+        "date": "2026-01-10",
+        "message": "Merge pull request #62 from farrokh/feat/ui-refinements-voting",
+        "author": "farrokh"
+      },
+      {
+        "hash": "2b80674517258431c84ac3584ef5548ace345af6",
+        "date": "2026-01-10",
+        "message": "lint fix",
+        "author": "farrokh"
+      },
+      {
+        "hash": "657626ca9abc5f323daea0a97d7435f0af454b53",
+        "date": "2026-01-10",
+        "message": "chore: Update project updates data",
+        "author": "farrokh"
+      },
+      {
         "hash": "9de61aae8782ed140d21dc4306fdd651f99ac318",
         "date": "2026-01-10",
         "message": "fix: Guard media lightbox against missing URLs and improve accessibility",
@@ -136,6 +178,36 @@
       }
     ],
     "public": [
+      {
+        "hash": "14e6d80e077e28f3ff463842ebf64be0d471efd5",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Remove extra newline and apply lint fixes",
+          "fa": "خط خالی اضافی را حذف کرده و اصلاحات lint را اعمال کنید"
+        },
+        "author": "farrokh",
+        "type": "ui"
+      },
+      {
+        "hash": "0a0bd4bb8303022776fc415d0cfcc03a92cbde70",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Enforce password complexity and improve type safety",
+          "fa": "پیچیدگی رمز عبور را اجباری کرده و ایمنی نوع را بهبود ببخشید"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
+      {
+        "hash": "cb0f7d4a9d5ce581fe1547f20c2bd9a0d42ce217",
+        "date": "2026-01-10",
+        "message": {
+          "en": "Add user profile, password change, and fix search bar UI",
+          "fa": "پروفایل کاربر، تغییر رمز عبور را اضافه کنید و رابط کاربری نوار جستجو را اصلاح کنید"
+        },
+        "author": "farrokh",
+        "type": "feature"
+      },
       {
         "hash": "9de61aae8782ed140d21dc4306fdd651f99ac318",
         "date": "2026-01-10",
